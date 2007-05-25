@@ -1,0 +1,553 @@
+
+			    Tiny Z80 Assembler
+				  Ver 0.1
+
+				《福永省三》
+			     fukuchan@mh1.117.ne.jp
+
+
+1. このプログラムについて
+
+      このプログラムは、UNIXシステムで動く、低機能 Z80 絶対番地クロス
+    アセンブラです。
+
+      ・アセンブル後のマシン語をバイナリファイルで出力します。
+      ・おまけ程度にラベルリストも標準出力に出力できます。
+      ・一度のアセンブルで生成されるマシン語は最大65536バイトまでです。
+      ・ラベルは、31文字までのものを、2048個まで使えます。
+      ・いくつかの未定義命令も使えるはずです。
+
+      注意) かなり適当に作ったので、バグが潜んでいるかもしれません。
+
+      ・このソフトは無保証です。このソフトを使用した事によるいかなる損害も
+        作者は保証いたしません。
+
+
+2. コンパイル＆インストール
+
+   インストーラを用意していませんので、
+
+    % cc -o zasm88 zasm88.c
+    
+    でコンパイルした後、適当なディレクトリにインストールして下さい。
+
+
+3. zasm88 の使用方法
+
+    zasm88 [-org n] [-nv] [-l] source_file output_file
+
+	source_file	… ソースファイル(テキスト)
+	output_file	… マシン語出力ファイル(バイナリ)
+
+	-org n		… アセンブルの開始番地。n は、0x0000 〜 0xffff 。
+			   省略時は、-org 0x0000 とみなされるます。
+			   なお、ソース中に ORG の指定のある場合はそちらが
+			   優先されます。
+	-nv		… Not Verbose 指定。
+			   アセンブル中に、標準エラー出力に出力されるメッ
+			   セージを抑止します。
+	-l		… ラベルの一覧を標準出力に出力します。
+
+
+    [実行結果の例]
+
+	% zasm88 sample.asm sample.bin
+	*** pass 1 ***
+	*** pass 2 ***
+	Start C000H  End C0FFH (Size=256)
+
+    -nv オプションをつけると、正常終了時は一切の表示がされません。
+
+
+
+
+4. ソースファイルの書式
+
+	基本的に、ザイログ社の Z80ニモニックに準拠したアセンブラです。
+	といっても、作者自身がそんなにZ80のアセンブラを使いこんだ経験がない
+	ので、もしかするとかなり特殊な仕様が含まれるかも知れません。
+
+	
+  4.1 行の書式
+
+	ラベル: ニモニック   オペランド ;コメント
+
+	・1行の長さは、最大で255 バイトです。
+	・行の先頭の文字が、* または ; の時は、その行はすべてコメントと
+	  みなされ、無視されます。
+	・セミコロンの後ろはコメントとみなされ、無視されます。
+	・ラベル、オペコードは、それぞれ 1行に1つのみ 許されます。
+
+  4.2 ラベル
+
+	・ラベルの直後にはコロンが必要です。
+	・ラベルに使える文字は、英字、数字、アンダースコアです。ただし、
+	  ラベルの先頭に数字を使うことはできません。なお、英字の大文字、
+	  小文字は区別されます。
+	・以下の文字は予約語です。ラベルに使用することはできません。
+	  ただし、ラベルの一部としてなかに含まれる場合や、小文字であれば、
+	  使用可能です。
+  
+		  A B C D E F H L AF BC DE HL IX IY I R
+		  NZ Z NC C PE PO P M IXH IXL IYH IYL $
+
+	・ラベルは先頭の31文字目までが認識されます。
+	・ラベルは最大 2048個まで登録できます
+	・長いラベル名をたくさん使用した場合、ラベル用のメモリ不足のエラー
+	  がでることがあります。この時は、ラベル数を減らすか、ラベルの文字
+	  数を減らして下さい。(通常使用の限りでは、まず大丈夫でしょう)
+	・ラベルの値は、EQU命令の時は、そのオペランドの値、それ以外の時は
+	  その書式のあるアドレスの値となります。
+
+  4.3 ニモニック
+
+	・ニモニックは大文字のみが使えます。
+	・ニモニックとオペランドは一文字以上のスペースかタブで区切ります。
+	・相対ジャンプ命令(JR、DJNZ)では、オペランドにジャンプ先のアドレス
+	  またはラベルを指定します。ディスプレスメント(変位値)は、アセン
+	  ブラで計算します
+	    例 1.  JR    0D500H
+	    例 2.  JR    NZ,$-2
+	    例 3.  DJNZ  LOOP
+	・IN/OUT命令は、以下のように記述します
+	    例 1.  IN    A,(10H)
+	    例 2.  OUT   (C),H
+
+  4.4 オペランド
+
+	・オペランドとオペランドの間はコンマで区切ります。
+	・オペランド中のスペースやタブはラベルや数値、演算子の区切りと
+	  みなされます。ラベルや数値の途中にスペース、タブを入れるとエラー
+	  となります。
+	    例 1.  ( IX  + 2*  10 )  → 問題なし
+	    例 2.  ( I X + 2*  1 0 ) → エラー
+	・オペランドには、10進数、2進数、16進数の数値が使えます。
+	    10進数…普通に表記します
+		例  1024  -16
+	     2進数…末尾に、B または b をつけます。
+		例   10011010B   01b
+	    16進数…末尾に、H または h をつけます。ただし、先頭が A〜F
+		    の時は、その前に 0 をつけます。A〜Fは小文字でも
+		    構いません。
+		例   25H  0AF00H  0ffh
+  	・文字定数は、' で括ります。'そのものを文字列中で扱う時は、
+	  '' というように、アポストロフィを2個並べます。
+		例 1.	'ABC'
+		例 2.	'Search ''COMMAND''!'
+	・文字定数は、末尾の2文字の ASCII コードを値として持ちます。
+		例 1.  CP  '0'       →  CP  30H       と同じ
+		例 2.  LD  HL,'YN'   →  LD  HL,594EH  と同じ
+	  なお、文字定数は、アドレス指定には使えません。また、文字定数を
+	  演算することもできません。
+		例 3.  LD  (IX +'MO'),B   →  エラー
+		例 4.  LD  B,'X'-'A'      →  エラー
+	・ラベルは、そのラベルに定義された値を与えます。演算することも
+	  可能です。
+	        例 1.  LD   A,(IX+POSI)
+		例 2.  JP   PUT_C
+		例 3.  DB   5 + BASE * 3
+	・オペランドに $ を指定すると、現在アセンブル中のアドレスが
+	  与えられます。
+	        例 1.  JR   $-2
+	・オペランドの数値の指定の際は、以下の演算子が使えます。
+		+ - * /
+	  演算は、* と / が優先されます。括弧は使用できません。
+
+  4.5 疑似命令
+
+     ORG	書式	ORG	値
+
+	アセンブル開始アドレス(マシン語生成開始アドレス)を指定します。
+	ORG 疑似命令に、ラベルをつけることはできません。
+	値にラベルを使用する場合、そのラベルは定義済でなければいけません。
+	ORG 疑似命令は、最大 8 個まで宣言することができます。
+
+	なお、マシン後の生成エリアは、65536バイトが確保されているのみです。
+	ORG を複数指定した場合、マシン語の生成アドレスが重なることがある
+	かも知れませんが、そのチェックは一切行ないません。
+
+     END	書式	END
+		
+	ソースファイルの終了を示します。この行以降はアセンブルされません。
+	END 疑似命令に、ラベルをつけることはできません。
+
+
+     EQU	書式	ラベル: EQU	値
+
+	ラベルに値を定義します。
+	値にラベルを使用する場合、そのラベルは定義済でなければなりません。
+
+     DB		書式	DB	値,値,値,値,…
+
+	バイトデータを定義します。
+	オペランドは最低1個必要です。
+	オペランドは、1行の制限内であればいくつあっても構いません。
+
+     DW		書式	DW	値,値,値,値,…
+
+	ワードデータを定義します。
+	オペランドは最低1個必要です。
+	オペランドは、1行の制限内であればいくつあっても構いません。
+	値はリトルエンディアン(上位と下位が逆になった並び)で設定されます。
+
+     DS		書式	DS	値
+
+	値で示されたバイト数、メモリを確保します。
+	確保した領域は、0 で埋められます。
+	値にラベルを使用する場合、そのラベルは定義済でなければなりません。
+	
+  4.6 未定義命令
+
+  	以下の未定義命令をサポートしていますが、あまりチェックはしていません。
+
+	IXH, IXL, IYH, IYL を含む、LD 命令
+	IXH, IXL, IYH, IYL を含む、INC/DEC 命令
+	IXH, IXL, IYH, IYL を含む、ADD/ADC/SUB/SBC/AND/XOR/OR/CP 命令
+	
+	EX	DE,IX
+	EX	DE,IY
+	
+	IN	F,(C)
+	
+	SLL	r		r=A B C D E H L (HL) (IX+d) (IY+d)
+
+
+5. エラーメッセージ
+
+	アセンブル中にエラーが出た場合、以下のようなエラーメッセージが
+	表示されます。
+
+	Error in 行番号 [エラーメッセージ(エラーコード)]	
+
+	エラーメッセージは以下のとおり。デバッグの名残で、やたらとたくさん
+	あります。なお、複数のエラーが見つかった時は、正確なエラーを
+	示すことができません。
+
+
+	Detect NULL label
+		: だけのラベルが見つかった
+	LABEL Detect bad character
+		英数字、アンダースコア以外の文字をラベルに使った
+	LABEL Duplicate labels
+		同じ名前のラベルがすでに存在する
+	LABEL Over! Number of label
+		ラベルの数が、2048個を越えた
+	LABEL Over! Label memory buffer
+		ラベル用のメモリが不足した
+	Can't detect more OPRAND
+		必要なオペランドがない
+	String fotmat is bad
+		文字列が、' で囲まれていない
+	Address fotmat is bad
+		アドレッシングが () で囲まれていない
+	This REG can't use for addressing
+		間接アドレッシングできないレジスタを使用している
+	This REG can't use for index-addressing
+		IX、IY 以外のレジスタでインデックスアドレッシングしている
+	REG can't caliculate
+		レジスタを演算しようとした
+	Calcuration expression error
+		計算の書式エラー
+	Calcuration string error
+		計算式中に、不正なスペースが見つかった
+	Label undefined
+		ラベルが定義されていない
+	OPRAND is too many
+		オペランドがおお過ぎる
+	Syntax error
+		書式エラー
+	Displacement error
+		インデックス、相対ジャンプの変位値エラー(-128〜127を越えた)
+	This OPCODE need defined label
+		ラベルが定義されていない
+	ORG Over! Number of ORG
+		ORG 命令が 8 個を越えた
+	!! UNKNOWN ERROR !!?
+		システムエラー
+
+
+6. 技術資料 … ソース解読の手引
+
+	プログラムのながれ
+
+	{	
+	    1行をバッファに格納
+	    ↓
+	    ラベル、オペランド、オペコードに分類
+	    ↓
+	    オペランド別に、処理
+		↓
+		・疑似命令の時	→	各種特殊処理
+		・通常命令の時
+		  ↓
+		  ラベルがあれば登録
+		  オペランドを解析(最大2個)
+		  	↓
+			オペランドの種類は、レジスタ、コンディション、
+			間接アドレッシング、直接アドレッシング、定数、
+			文字列。この時、数値の場合は計算する。
+		  オペコードとオペランドの組合せを検査
+		  ↓
+		  コードを出力
+	 }
+	↓
+	ラベル未定義以外のエラーが出た場合、中止
+	↓
+	上記の { } を再度繰り返す。ただし、ラベル登録は行なわない。
+	↓	 
+	エラーが出たら中止
+	↓
+	ORG で指定した範囲を出力
+
+	
+    ※ラベル、オペランド、オペコードの分類
+
+	: で区切られていれば、ラベル。
+	スペース、タブで区切られていたら、オペランド。
+	それ以降に文字があれば、それらはオペランド。
+	; 以降は無視する。
+
+
+    ※ラベルの登録
+    
+	ラベル用に、char型の 65536 バイトのバッファと、ラベル管理用の構造体を
+	2048 個 を使用する。
+
+	ラベル名は、65536バイトのバッファに詰めて格納していく。この時、ラベル
+	の末尾に、\0 をいれ、ラベル管理用構造に、この格納した先頭のアドレス
+	(ポインタではなく配列の要素番号)と、ラベルの値を設定する。
+
+	ラベル管理構造体の、先頭アドレスが 0 の時は、未使用を表す。よって、
+	ラベル用のバッファの要素 0 は 使えない。
+	
+	ラベルは最大で 31文字、ラベル数は最大で 2048個なので、
+	(31 + 1) * 2048 = 65536 となり、この時のみバッファが溢れる。
+
+
+    ※オペランドの種類は、以下のとおり。
+
+	A B C D E F H L AF BC DE HL SP IX IY I R AF'
+	C NC Z NC PE PO P M
+	(BC) (DE) (HL) (SP) (IX) (IY) (IX+d) (IY+d) (C)
+	値 (値) 文字列
+
+		文字列は、オペコードによっては、数値扱いもする。
+
+
+    ※オペコードとオペランドの組合せは以下のとおり
+
+	なお、以下の組合せは、生成される命令コードのパターンにより
+	区別されている。
+
+	LD	A B C D E H L		A B C D E H L (HL)
+	LD	(HL)			A B C D E H L
+	LD	A B C D E H L (HL)	値
+	LD	A B C D E H L		(IX+d) (IY+d)
+	LD	(IX+d) (IY+d)		A B C D E H L
+	LD	(IX+d) (IY+d)		値
+	LD	A			(BC) (DE)
+	LD	A			(値)
+	LD	(BC) (DE)		A
+	LD	(値)			A
+	LD	A			I R
+	LD	I R			A
+	LD	A B C D E		IXH IXL IYH IYL
+	LD	IXH IHL IYH IYL		A B C D E
+	LD	IXH IHL IYH IYL		値
+	LD	IXH IHL			IXH IXL
+	LD	IYH IYL			IYH IYL
+	LD	BC DE HL SP		値
+	LD	IX IY			値
+	LD	HL			(値)
+	LD	IX IY			(値)
+	LD	(値)			HL
+	LD	(値)			IX IY
+	LD	BC DE HL SP		(値)
+	LD	(値)			BC DE HL SP
+	LD	SP			HL
+	LD	SP			IX IY
+	PUSH	BC DE HL AF
+	PUSH	IX IY
+	POP	BC DE HL AF
+	POP	IX IY
+	EX	DE			HL
+	EX	(SP)			HL
+	EX	(SP)			IX IY
+	EX	AF			AF'
+	EXX
+	LDI
+	LDIR
+	LDD
+	LDDR
+	CPI
+	CPIR
+	CPD
+	CPDR
+	ADD	A			A B C D E H L (HL)
+	ADD	A			(IX+d) (IY+d)
+	ADD	A			値
+	ADD	A			IXH IXL IYH IYL
+	ADC	A			A B C D E H L (HL)
+	ADD	A			(IX+d) (IY+d)
+	ADD	A			値
+	ADC	A			IXH IXL IYH IYL
+	SUB				A B C D E H L (HL)
+	SUB				(IX+d) (IY+d)
+	SUB				値
+	SUB				IXH IXL IYH IYL
+	SBC	A			A B C D E H L (HL)
+	SBC	A			(IX+d) (IY+d)
+	SBC	A			値
+	SBC	A			IXH IXL IYH IYL
+	AND				A B C D E H L (HL)
+	AND				(IX+d) (IY+d)
+	AND				値
+	AND				IXH IXL IYH IYL
+	XOR				A B C D E H L (HL)
+	XOR				(IX+d) (IY+d)
+	XOR				値
+	XOR				IXH IXL IYH IYL
+	OR				A B C D E H L (HL)
+	OR				(IX+d) (IY+d)
+	OR				値
+	OR				IXH IXL IYH IYL
+	CP				A B C D E H L (HL)
+	CP				(IX+d) (IY+d)
+	CP				値
+	CP				IXH IXL IYH IYL
+	INC	A B C D E H L (HL)
+	INC	(IX+d)(IY+d)
+	INC	IXH IXL IYH IYL
+	DEC	A B C D E H L (HL)
+	DEC	(IX+d)(IY+d)
+	DEC	IXH IXL IYH IYL
+	ADD	HL			BC DE HL SP
+	ADD	IX			BC DE IX SP
+	ADD	IY			BC DE IY SP
+	ADC	HL			BC DE HL SP
+	SBC	HL			BC DE HL SP
+	INC	BC DE HL SP
+	INC	IX IY
+	DEC	NC DE HL SP
+	DEC	IX IY
+	DAA
+	CPL
+	NEG
+	CCF
+	SCF
+	NOP
+	HALT
+	DI
+	EI
+	IM	0 1 2
+	RLCA
+	RLA
+	RRCA
+	RRA
+	RLC				A B C D E H L (HL)
+	RLC				(IX+d) (IY+d)
+	RRC				A B C D E H L (HL)
+	RRC				(IX+d) (IY+d)
+	RL				A B C D E H L (HL)
+	RL				(IX+d) (IY+d)
+	RR				A B C D E H L (HL)
+	RR				(IX+d) (IY+d)
+	SLA				A B C D E H L (HL)
+	SLA				(IX+d) (IY+d)
+	SRA				A B C D E H L (HL)
+	SRA				(IX+d) (IY+d)
+	SLL				A B C D E H L (HL)
+	SLL				(IX+d) (IY+d)
+	SRL				A B C D E H L (HL)
+	SRL				(IX+d) (IY+d)
+	RLD
+	RRD
+	RETI
+	RETN
+	RST	0H 8H 10H 18H 20H 28H 30H 38H
+	IN	A			(値)
+	IN	A N C D E F H L		(C)
+	INI
+	INIR
+	IND
+	INDR
+	OUT	(値)			A
+	OUT	(C)			A B C D E F H L
+	OUTI
+	OTIR
+	OUTD
+	OTDR
+	BIT	0 1 2 3 4 5 6 7		A B C D E H L (HL)
+	BIT	0 1 2 3 4 5 6 7		(IX+d) (IY+d)
+	RES	0 1 2 3 4 5 6 7		A B C D E H L (HL)
+	RES	0 1 2 3 4 5 6 7		(IX+d) (IY+d)
+	SET	0 1 2 3 4 5 6 7		A B C D E H L (HL)
+	SET	0 1 2 3 4 5 6 7		(IX+d) (IY+d)
+	JP	値
+	JP	NZ Z NC C PE PO P M	値
+	CALL	値
+	CALL	NZ Z NC C PE PO P M	値
+	RET
+	RET	NZ Z NC C PE PO P M
+	JR	値
+	JR	NZ Z NC C		値
+	DJNZ	値
+	JP	(HL)
+	JP	(IX) (IY)
+
+
+    ※生成される命令コードの種類
+
+	定数
+	インデックス (IX使用時 DD 、IY使用時 FD)
+	--ppprrrの形式
+		-- は定数
+		ppp は第1オペランドによって決定
+		qqq は第2オペランドによって決定
+		[1]	     ppp / qqq
+			B	000
+			C	001
+			D	010
+			E	011
+			H 	100	IXH IYH も同じ
+			L	101	IXL IYL も同じ
+			(HL)	110	(IX+d) (IY+d) も同じ
+			A	111
+	--ppp---の形式
+		--000---は定数
+		ppp は第1オペランドによって決定 [1]参照
+	--qqq---の形式
+		--000---は定数
+		qqq は第1オペランドによって決定 [1]参照
+	-----pppの形式
+		-----000は定数
+		ppp は第1オペランドによって決定 [1]参照
+	-----qqqの形式
+		-----000は定数
+		qqq は第1オペランドによって決定 [1]参照
+	--pp----の形式
+		--00----は定数
+		pp は第1オペランドによって決定
+		[2]	      pp / qq
+			BC	00
+			DE	01
+			HL	10	IX IY も同じ
+			SP	11	AF も同じ
+	--qq----の形式
+		--00----は定数
+		qq は第2オペランドによって決定 [2]参照
+	8ビット定数
+	16ビット定数上位8ビット
+	16ビット定数下位8ビット
+	インデックスのオフセット (-128〜127)
+	相対ジャンプのオフセット (-128〜127)
+
+
+7. 履歴
+
+  0.2	ORG命令のバグ修正
+
+  0.1	OUT (C),F           の追加
+	EX DE,IX / EX DE,IY の削除
+
+  0.0	最初のリリース
