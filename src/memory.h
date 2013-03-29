@@ -3,6 +3,7 @@
 
 
 extern	int	set_version;	/* バージョン強制変更 '0' 〜 '9'	*/
+extern	int	rom_version;	/* (変更前の) BASIC ROMバージョン	*/
 
 extern	int	use_extram;			/* 128KB拡張RAMを使う	*/
 extern	int	use_jisho_rom;			/* 辞書ROMを使う	*/
@@ -17,6 +18,8 @@ extern	int	memory_wait;			/* メモリウェイト有無	*/
 extern	char	*file_compatrom;		/* P88SR emu のROMを使う*/
 
 extern	int	has_kanji_rom;			/* 漢字ROMの有無	*/
+
+extern	int	linear_ext_ram;			/* 拡張RAMを連続させる	*/
 
 
 extern	byte	*main_rom;			/* メイン ROM (32KB)	*/

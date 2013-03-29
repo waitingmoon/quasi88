@@ -20,16 +20,23 @@
 
 
 /****************************************************************************
- * 環境の初期化
- *	
- * int osd_environment( void )
- *	環境変数の処理や、dir_rom などのメモリ確保などを行う。
- *	この関数は、 QUASI88 本体からは呼び出さない。機種依存部で最初に
- *	呼び出しておくこと。(これを呼び出すまで、このヘッダに書かれている関数・
- *	変数はアクセスしてはならない)
- *	エラーが発生すると偽が返るので、呼出元は処理を中断する、
+ * ファイル操作環境の初期化
+ *
+ * int	osd_file_config_init(void)
+ *	各種ファイル処理に使用する、ディレクトリ名などの設定を行う。この関数の
+ *	呼び出し以降、このヘッダに書かれている関数・変数が使用可能となる。
+ *
+ *	この関数は、 config_init() 内部にて最初に呼び出される。
+ *	正常終了時は真を、異常終了時は偽を返す。
+ *	(偽を返した場合、 config_init() もエラーとなる)
+ *
+ * void	osd_file_config_exit(void)
+ *	osd_file_config_init() の後片付けを行う。(確保したリソースの解放など)
+ *	この関数は、終了時に1回だけ呼び出される。
+ *
  *****************************************************************************/
-int	osd_environment( void );
+int	osd_file_config_init(void);
+void	osd_file_config_exit(void);
 
 
 
@@ -76,6 +83,12 @@ int	osd_environment( void );
  *		4桁の数字 + 拡張子 ( 0000.bmp など ) を連結したファイル名になる
  *		空文字列の場合は、デフォルトのファイル名が使用される。
  *
+ *	char file_wav[QUASI88_MAX_FILENAME]
+ *		サウンド出力保存用のファイルのベース名。
+ *		実際にサウンド出力を保存する場合は、このファイル名に
+ *		4桁の数字 + 拡張子 ( 0000.wav ) を連結したファイル名になる
+ *		空文字列の場合は、デフォルトのファイル名が使用される。
+ *
  *	char *file_rec / char *file_pb
  *		キー入力の記録用/再生用ファイル名。
  *		使用しないなら、NULL にしておく。
@@ -92,6 +105,7 @@ extern char file_sout[QUASI88_MAX_FILENAME];	/* シリアル入力のファイル名 */
 
 extern char file_state[QUASI88_MAX_FILENAME];	/* ステートファイル名	    */
 extern char file_snap[QUASI88_MAX_FILENAME];	/* スナップショットベース部 */
+extern char file_wav[QUASI88_MAX_FILENAME];	/* サウンド出力ベース部     */
 
 extern char *file_compatrom;		/* P88SR.exeのROMを使うならファイル名*/
 extern char *file_rec;			/* キー入力記録するなら、ファイル名  */
@@ -105,38 +119,38 @@ extern char *file_pb;			/* キー入力再生するなら、ファイル名  */
  *	osd_path_join を使って、パス名を生成する。
  *	osd_dir_cwd() は NULL を返さないこと!  他は……まあ NULL でもいいや。
  *
- * const char *osd_dir_cwd( void )	デフォルトのディレクトリを返す
- * const char *osd_dir_rom( void )	ROMイメージのあるディレクトリを返す
- * const char *osd_dir_disk( void )	DISKイメージの基準ディレクトリを返す
- * const char *osd_dir_tape( void )	TAPEイメージの基準ディレクトリを返す
- * const char *osd_dir_snap( void )	スナップショット保存ディレクトリを返す
- * const char *osd_dir_snap( void )	ステートファイル保存ディレクトリを返す
- * const char *osd_dir_gcfg( void )	共通設定ファイルのディレクトリを返す
- * const char *osd_dir_lcfg( void )	個別設定ファイルのディレクトリを返す
+ * const char *osd_dir_cwd  (void)	デフォルトのディレクトリを返す
+ * const char *osd_dir_rom  (void)	ROMイメージのあるディレクトリを返す
+ * const char *osd_dir_disk (void)	DISKイメージの基準ディレクトリを返す
+ * const char *osd_dir_tape (void)	TAPEイメージの基準ディレクトリを返す
+ * const char *osd_dir_snap (void)	スナップショット保存ディレクトリを返す
+ * const char *osd_dir_state(void)	ステートファイル保存ディレクトリを返す
+ * const char *osd_dir_gcfg (void)	共通設定ファイルのディレクトリを返す
+ * const char *osd_dir_lcfg (void)	個別設定ファイルのディレクトリを返す
  *
- * int osd_set_dir_???( const char *new_dir )
+ * int osd_set_dir_???(const char *new_dir)
  *					それぞれ、各ディレクトリを new_dir に
  *					設定する。失敗した場合は偽が返る。
  *					( この時、各ディレクトリは元のまま )
  *****************************************************************************/
 
-const char *osd_dir_cwd( void );
-const char *osd_dir_rom( void );
-const char *osd_dir_disk( void );
-const char *osd_dir_tape( void );
-const char *osd_dir_snap( void );
-const char *osd_dir_state(void );
-const char *osd_dir_gcfg( void );
-const char *osd_dir_lcfg( void );
+const char *osd_dir_cwd  (void);
+const char *osd_dir_rom  (void);
+const char *osd_dir_disk (void);
+const char *osd_dir_tape (void);
+const char *osd_dir_snap (void);
+const char *osd_dir_state(void);
+const char *osd_dir_gcfg (void);
+const char *osd_dir_lcfg (void);
 
-int	osd_set_dir_cwd ( const char *new_dir );
-int	osd_set_dir_rom ( const char *new_dir );
-int	osd_set_dir_disk( const char *new_dir );
-int	osd_set_dir_tape( const char *new_dir );
-int	osd_set_dir_snap( const char *new_dir );
-int	osd_set_dir_state(const char *new_dir );
-int	osd_set_dir_gcfg( const char *new_dir );
-int	osd_set_dir_lcfg( const char *new_dir );
+int	osd_set_dir_cwd  (const char *new_dir);
+int	osd_set_dir_rom  (const char *new_dir);
+int	osd_set_dir_disk (const char *new_dir);
+int	osd_set_dir_tape (const char *new_dir);
+int	osd_set_dir_snap (const char *new_dir);
+int	osd_set_dir_state(const char *new_dir);
+int	osd_set_dir_gcfg (const char *new_dir);
+int	osd_set_dir_lcfg (const char *new_dir);
 
 
 
@@ -147,7 +161,7 @@ int	osd_set_dir_lcfg( const char *new_dir );
  *		2 … シフトJIS
  *	この情報は、メニュー画面でファイル名を表示する際にのみ利用する。
  *****************************************************************************/
-int	osd_kanji_code( void );
+int	osd_kanji_code(void);
 
 
 
@@ -176,10 +190,12 @@ int	osd_kanji_code( void );
  *	FTYPE_KEY_REC		キー入力記録				"wb"
  *	FTYPE_STATE_LOAD	レジューム用イメージ			"rb"
  *	FTYPE_STATE_SAVE	サスペンド用イメージ			"wb"
- *	FTYPE_READ		リード汎用				"rb"
+ *	FTYPE_CFG		設定ファイル			"r", "w","a"
+ *	FTYPE_READ		バイナリリード汎用			"rb"
+ *	FTYPE_WRITE		バイナリリード汎用			"wb"
  *	---------------------------------------------------------------------
  *
- * OSD_FILE *osd_fopen( int type, const char *path, const char *mode )
+ * OSD_FILE *osd_fopen(int type, const char *path, const char *mode)
  *	fopen と同じ。成功時はファイルポインタが、失敗時は NULL を返す。
  *	type は、上記の FTYPE_xxxx を指定する。
  *	type が FTYPE_DISK の場合で、すでに同じファイルが開いてある時は、
@@ -187,32 +203,38 @@ int	osd_kanji_code( void );
  *	その開いているファイルのファイルポインタを返す。
  *	(同じファイルが開いているかどうか検知できる場合のみ)
  *
- * int	osd_fclose( OSD_FILE *stream )
+ * int	osd_fclose(OSD_FILE *stream)
  *	fclose と同じ。失敗時でも EOF を返さなくてもかまわない。
  *
- * int	osd_fflush( OSD_FILE *stream )
+ * int	osd_fflush(OSD_FILE *stream)
  *	fflush と同じ。失敗時でも EOF を返さなくてもかまわない。
  *
- * int	osd_fseek( OSD_FILE *stream, long offset, int whence )
+ * int	osd_fseek(OSD_FILE *stream, long offset, int whence)
  *	fseek と同じ。失敗時には -1 を返す。
  *
- * long	osd_ftell( OSD_FILE *stream )
+ * long	osd_ftell(OSD_FILE *stream)
  *	ftell と同じ。失敗時には -1 を返す。
  *
- * void	osd_rewind( OSD_FILE *stream )
+ * void	osd_rewind(OSD_FILE *stream)
  *	rewind と同じ。
  *
- * size_t osd_fread( void *ptr, size_t size, size_t nobj, OSD_FILE *stream )
+ * size_t osd_fread(void *ptr, size_t size, size_t nobj, OSD_FILE *stream)
  *	fread と同じ。読み込みに成功したブロック数を返す。
  *
  * size_t osd_fwrite(const void *ptr,size_t size,size_t nobj,OSD_FILE *stream)
  *	fwrite と同じ。書き込みに成功したブロック数を返す。
  *
- * int	osd_fputc( int c, OSD_FILE *stream )
+ * int	osd_fputc(int c, OSD_FILE *stream)
  *	fputc と同じ。失敗時には EOF を返す。
  *
- * int	osd_fgetc( OSD_FILE *stream )
+ * int	osd_fgetc(OSD_FILE *stream)
  *	fgetc と同じ。失敗時には EOF を返す。
+ *
+ * char	*osd_fgets(char *str, int size, OSD_FILE *stream)
+ *	fgets と同じ。失敗時には NULL を返す。
+ *
+ * int	osd_fputs(const char *str, OSD_FILE *stream)
+ *	fputs と同じ。失敗時には NULL を返す。
  *
  *****************************************************************************/
 
@@ -231,7 +253,9 @@ enum {
   FTYPE_KEY_REC,
   FTYPE_STATE_LOAD,
   FTYPE_STATE_SAVE,
+  FTYPE_CFG,
   FTYPE_READ,
+  FTYPE_WRITE,
   FTYPE_END
 };
 
@@ -242,16 +266,18 @@ typedef struct OSD_FILE_STRUCT		OSD_FILE;
 
 
 
-OSD_FILE *osd_fopen( int type, const char *path, const char *mode );
-int	osd_fclose( OSD_FILE * );
-int	osd_fflush( OSD_FILE * );
-int	osd_fseek( OSD_FILE *, long, int );
-long	osd_ftell( OSD_FILE * );
-void	osd_rewind( OSD_FILE * );
-size_t	osd_fread( void *, size_t, size_t, OSD_FILE * );
-size_t	osd_fwrite( const void *, size_t, size_t, OSD_FILE * );
-int	osd_fputc( int, OSD_FILE * );
-int	osd_fgetc( OSD_FILE * );
+OSD_FILE *osd_fopen(int type, const char *path, const char *mode);
+int	osd_fclose (OSD_FILE *stream);
+int	osd_fflush (OSD_FILE *stream);
+int	osd_fseek  (OSD_FILE *stream, long offset, int whence);
+long	osd_ftell  (OSD_FILE *stream);
+void	osd_rewind (OSD_FILE *stream);
+size_t	osd_fread  (void *ptr, size_t size, size_t nobj, OSD_FILE *stream);
+size_t	osd_fwrite (const void *ptr,size_t size,size_t nobj,OSD_FILE *stream);
+int	osd_fputc  (int c, OSD_FILE *stream);
+int	osd_fgetc  (OSD_FILE *stream);
+char	*osd_fgets (char *str, int size, OSD_FILE *stream);
+int	osd_fputs  (const char *str, OSD_FILE *stream);
 
 
 
@@ -262,11 +288,11 @@ int	osd_fgetc( OSD_FILE * );
  *	呼び出し元は、返って来た内容により以下の処理を行う。
  *
  *		FILE_STAT_NOEXIST … ファイルの新規作成を試みる。
- *						( fopen( "filename", "w" ) ) 
+ *						( fopen("filename", "w") ) 
  *		FILE_STAT_DIR     … ディレクトリを読み込みを試みる。
  *						( osd_opendir ) 
  *		FILE_STAT_FILE    … ファイルを読み書きを試みる。
- *				 ( fopen( "filename", "r" or "r+" or "a", ) )
+ *				 ( fopen("filename", "r" or "r+" or "a") )
  *
  *	属性が不明の場合は・・・どうしよう・・・??
  *	とりあえず、 FILE_STAT_FILE を返すことにしておけば大きな問題はない ?
@@ -274,19 +300,19 @@ int	osd_fgetc( OSD_FILE * );
 #define	FILE_STAT_NOEXIST	(0)	/* 存在しない			*/
 #define	FILE_STAT_DIR		(1)	/* ディレクトリ			*/
 #define	FILE_STAT_FILE		(2)	/* ファイル			*/
-int	osd_file_stat( const char *filename );
+int	osd_file_stat(const char *filename);
 
 
 
 /****************************************************************************
  * ディレクトリ閲覧
  *
- * T_DIR_INFO *osd_opendir( const char *filename )
+ * T_DIR_INFO *osd_opendir(const char *filename)
  *	filename で指定されたディレクトリを開き、その情報をセットしたワーク
  *	へのポインタを返す。このポインタは、osd_readdir、osd_closedir にて使用
  *	呼び出し側が直接中身を参照することはない。
  *
- * const T_DIR_ENTRY *osd_readdir( T_DIR_INFO *dirp )
+ * const T_DIR_ENTRY *osd_readdir(T_DIR_INFO *dirp)
  *	osd_opendir にて開いたディレクトリからエントリを一つ読み取って、内容を
  *	T_DIR_ENTRY型のワークにセットし、そのポインタを返す。
  *
@@ -308,7 +334,7 @@ int	osd_file_stat( const char *filename );
  *	なお、画面の表示は、 osd_readdir にて取得した順に行うので、予め適切な
  *	順序でソーティングされているのがよい。
  *
- * void osd_closedir( T_DIR_INFO *dirp )
+ * void osd_closedir(T_DIR_INFO *dirp)
  *	ディレクトリを閉じる。以降 dirp は使わない。
  *
  *****************************************************************************/
@@ -328,9 +354,9 @@ typedef	struct {
 } T_DIR_ENTRY;
 
 
-T_DIR_INFO	*osd_opendir( const char *filename );
-T_DIR_ENTRY	*osd_readdir( T_DIR_INFO *dirp );
-void		osd_closedir( T_DIR_INFO *dirp );
+T_DIR_INFO	*osd_opendir(const char *filename);
+T_DIR_ENTRY	*osd_readdir(T_DIR_INFO *dirp);
+void		osd_closedir(T_DIR_INFO *dirp);
 
 
 
@@ -339,24 +365,22 @@ void		osd_closedir( T_DIR_INFO *dirp );
  *	パス名を、ディレクトリ名とファイル名に分離したり、つなげたりする。
  *	いずれの関数も、処理に失敗した場合は偽を返す。
  *
- * int	osd_path_normalize( const char *path, char resolved_path[], int size )
+ * int	osd_path_normalize(const char *path, char resolved_path[], int size)
  *	path で与えられたパス名を展開し、 resolved_path にセットする。
  *	resolved_path のバッファサイズは、 size バイト。
  *
- * int	osd_path_split( const char *path, char dir[], char file[],
- *			int size )
+ * int	osd_path_split(const char *path, char dir[], char file[], int size)
  *	path で与えられたパス名をディレクトリ名とファイル名に分割して、
  *	dir, file にセットする。 dir, file のバッファサイズはともにsize バイト
  *
- * int	osd_path_join( const char *dir, const char *file, char path[],
- *		       int size )
+ * int	osd_path_join(const char *dir, const char *file, char path[], int size)
  *	dir, file 与えられたディレクトリ名とファイル名を結合したパス名を
  *	path にセットする。 path のバッファサイズは、size バイト
  *
  *****************************************************************************/
-int osd_path_normalize( const char *path, char resolved_path[], int size );
-int osd_path_split( const char *path, char dir[], char file[], int size );
-int osd_path_join( const char *dir, const char *file, char path[], int size );
+int osd_path_normalize(const char *path, char resolved_path[], int size);
+int osd_path_split(const char *path, char dir[], char file[], int size);
+int osd_path_join(const char *dir, const char *file, char path[], int size);
 
 
 

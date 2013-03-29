@@ -10,12 +10,19 @@
 
 extern	int	mouse_mode;		/* マウス 0:No 1:Yes 2:Joy	*/
 
+extern	int	mouse_sensitivity;	/* マウス感度			*/
+extern	int	mouse_swap_button;	/* マウスボタンを入れ替える  	*/
+
 extern	int	mouse_key_mode;		/* マウス入力をキーに反映	*/
 extern	int	mouse_key_assign[6];
 
 extern	int	joy_key_mode;		/* ジョイ入力をキーに反映	*/
 extern	int	joy_swap_button;	/* ボタンのABを入れ替える  	*/
 extern	int	joy_key_assign[12];
+
+extern	int	joy2_key_mode;		/* ジョイ２入力をキーに反映	*/
+extern	int	joy2_swap_button;	/* ボタンのABを入れ替える  	*/
+extern	int	joy2_key_assign[12];
 
 extern	int	cursor_key_mode;	/* カーソルキーを別キーに反映	*/
 extern	int	cursor_key_assign[4];
@@ -86,27 +93,64 @@ extern	char	*file_rec;			/* キー入力記録のファイル名 */
 extern	char	*file_pb;			/* キー入力再生のファイル名 */
 
 
-void	keyboard_init( void );
-void	scan_keyboard( void );
+void	keyboard_reset(void);
+void	keyboard_update(void);
+void	keyboard_switch(void);
 
-void	keyboard_start( void );
-void	keyboard_stop( void );
+void	init_serial_mouse_data(void);
+int	get_serial_mouse_data(void);
 
-void	key_record_playback_init( void );
-void	key_record_playback_term( void );
+void	key_record_playback_init(void);
+void	key_record_playback_exit(void);
 
-void	jop1_init( void );
-void	jop1_strobe( void );
-
-
-int	is_key_pressed( int code );		/* メニューのソフトキー用 */
-void	do_key_press( int code );
-void	do_key_release( int code );
-void	do_key_all_release( void );
-void	do_key_bug( void );
+void	keyboard_jop1_reset(void);
+void	keyboard_jop1_strobe(void);
 
 
-int	convert_str2key88( const char *str );
+int	softkey_is_pressed(int code);		/* メニューのソフトキー用 */
+void	softkey_press(int code);
+void	softkey_release(int code);
+void	softkey_release_all(void);
+void	softkey_bug(void);
+
+
+void	quasi88_cfg_key_numlock(int on);
+void	quasi88_cfg_key_kana(int on);
+void	quasi88_cfg_key_romaji(int on);
+
+
+
+
+/* キーバインディング変更時の、指定した値の指す内容 */
+
+#define	KEYCODE_INVALID	(0)	/* 指定した値は、無効             */
+#define	KEYCODE_SYM	(1)	/* 指定した値は、キーシンボル値   */
+#define	KEYCODE_SCAN	(2)	/* 指定した値は、スキャンコード値 */
+
+
+/* キーシンボルの文字列 (XK_xxx や SDLK_xxx) を int値に変換するテーブル */
+
+typedef struct {
+    char	*name;		/* keysym (キーシンボル) 文字列 */
+    int		val;		/* 対応する、 int値		*/
+} T_SYMBOL_TABLE;
+
+
+int		keyboard_str2key88(const char *str);
+const char	*keyboard_key882str(int key88);
+
+int	config_read_keyconf_file(
+			const char *keyconf_filename,
+			const char *(*identify_callback)(const char *parm1,
+							 const char *parm2,
+							 const char *parm3),
+			const T_SYMBOL_TABLE table_symbol2int[],
+			int                  table_size,
+			int                  table_ignore_case,
+			const char *(*setting_callback)(int type,
+							int code,
+							int key88,
+							int numlock_key88));
 
 
 
@@ -119,8 +163,11 @@ int	convert_str2key88( const char *str );
  *		・QUASI88 の制御にあると便利なキー
  *----------------------------------------------------------------------*/
 
-#define	KEY88_PAD_NUM	(8)
-#define	KEY88_MENU_NUM	(31)
+#define	KEY88_PAD_OFFSET	(12)
+#define	KEY88_PAD_MAX		(2)
+#define	KEY88_PAD_BUTTON_MAX	(8)
+
+/*#define	KEY88_MENU_NUM		(31)*/
 
 enum {
 
@@ -327,21 +374,34 @@ enum {
 
   /* ジョイパッド用の定義 */
 
-  KEY88_PAD_UP		= 224,
-  KEY88_PAD_DOWN	= 225,
-  KEY88_PAD_LEFT	= 226,
-  KEY88_PAD_RIGHT	= 227,
-  KEY88_PAD_A		= 228,
-  KEY88_PAD_B		= 229,
-  KEY88_PAD_C		= 230,
-  KEY88_PAD_D		= 232,
-  KEY88_PAD_E		= 233,
-  KEY88_PAD_F		= 234,
-  KEY88_PAD_G		= 235,
-  KEY88_PAD_H		= 236,
+  KEY88_PAD1_UP		= 224,
+  KEY88_PAD1_DOWN	= 225,
+  KEY88_PAD1_LEFT	= 226,
+  KEY88_PAD1_RIGHT	= 227,
+  KEY88_PAD1_A		= 228,
+  KEY88_PAD1_B		= 229,
+  KEY88_PAD1_C		= 230,
+  KEY88_PAD1_D		= 231,
+  KEY88_PAD1_E		= 232,
+  KEY88_PAD1_F		= 233,
+  KEY88_PAD1_G		= 234,
+  KEY88_PAD1_H		= 235,
+
+  KEY88_PAD2_UP		= 236,
+  KEY88_PAD2_DOWN	= 237,
+  KEY88_PAD2_LEFT	= 238,
+  KEY88_PAD2_RIGHT	= 239,
+  KEY88_PAD2_A		= 240,
+  KEY88_PAD2_B		= 241,
+  KEY88_PAD2_C		= 242,
+  KEY88_PAD2_D		= 243,
+  KEY88_PAD2_E		= 244,
+  KEY88_PAD2_F		= 245,
+  KEY88_PAD2_G		= 246,
+  KEY88_PAD2_H		= 247,
 
 
-  /* 248〜255 はシステム御用にリサーブしておく */
+  /* 248〜255 はシステム用にリサーブしておく */
 
   KEY88_SYS_STATUS	= 254,
   KEY88_SYS_MENU	= 255,

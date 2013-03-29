@@ -5,117 +5,129 @@
 #include "beep.h"
 
 
+#define	SCALE	(1)
+
 /* ---------- work of BEEP emulator ----------- */
-typedef struct beep_f {
-  int		status;
-  int		clock;			/* 2400Hz */
-  int		sample_rate;		/* 44100/22050 Hz */
-  int		sample_bit_8;		/* TRUE / FALSE */
-  int		cnt;			/* 0...	*/
-  int		cnt_of_clock;		/* sample_rate/clock */
-  unsigned char	port40;			/* Output value of port 40 */
-} Beep;
-
-
-static Beep BEEP[MAX_BEEP88];
+typedef struct beep88_f {
+	void			*param;
+	int				clock;			/* 2400Hz */
+	int				sample_rate;	/* 44100/22050 Hz */
+	int				sample_bit_8;	/* TRUE / FALSE */
+	int				cnt;			/* 0...	*/
+	int				cnt_of_clock;	/* sample_rate/clock */
+	int				cmd_sing;		/* TRUE / FALSE */
+	unsigned char	port40;			/* Output value of port 40 */
+} BEEP88;
 
 
 /* ---------- update one of chip ----------- */
-void BEEP88UpdateOne(int num, INT16 *buffer, int length)
+void BEEP88UpdateOne(void *chip, stream_sample_t *buffer, int length)
 {
-  int	i, data;
-#if 0
-  unsigned char	 *buf8  = (unsigned char *)buffer;
+	BEEP88 *BEEP = chip;
+
+	int	i, data, on_level;
+
+	if (BEEP->sample_bit_8) {
+		on_level = 0x20;
+	} else {
+		on_level = 0x2000;
+	}
+
+#if 1
+	for (i=0; i < length ; i++) {
+		if (BEEP->port40 & 0x20) {
+			BEEP->cnt += SCALE;
+			if      (BEEP->cnt < BEEP->cnt_of_clock/2) data = on_level;
+			else if (BEEP->cnt < BEEP->cnt_of_clock  ) data = 0x0000;
+			else {   BEEP->cnt -= BEEP->cnt_of_clock;  data = on_level; }
+		} else {
+			data = 0x0000;
+		}
+		if (BEEP->cmd_sing) {
+			if (BEEP->port40 & 0x80) data = on_level;
+		}
+		*buffer ++ = data;
+	}
+#else
+	for (i=0; i < length ; i++) {
+		BEEP->cnt ++;
+		if (BEEP->cnt >= BEEP->cnt_of_clock) {
+			BEEP->cnt = 0;
+		}
+		if (BEEP->port40 & 0x20) {
+			if      (BEEP->cnt < BEEP->cnt_of_clock/2) data = on_level;
+			else                                       data = 0x0000;
+		} else {
+			data = 0x0000;
+		}
+		if (BEEP->cmd_sing) {
+			if (BEEP->port40 & 0x80) data = on_level;
+		}
+		*buffer ++ = data;
+	}
 #endif
-  unsigned short *buf16 = (unsigned short *)buffer;
-
-  /*printf("Beep Update %d %d %d < %d\n",num, length, BEEP[num].cnt, BEEP[num].cnt_of_clock);*/
-  /*printf("Beep Update %d=%d %d %dHz %d %d<%d %02x\n",num,BEEP[num].status,BEEP[num].clock,BEEP[num].sample_rate,BEEP[num].sample_bit_8,BEEP[num].cnt,BEEP[num].cnt_of_clock,BEEP[num].port40);*/
-
-
-#if 0
-  if( BEEP[num].sample_bit_8 ){
-    for( i=0; i < length ; i++ ){
-      if( BEEP[num].port40 & 0x20 ){
-	BEEP[num].cnt ++;
-	if     ( BEEP[num].cnt < BEEP[num].cnt_of_clock/2 ) data = 0x20;
-	else if( BEEP[num].cnt < BEEP[num].cnt_of_clock   ) data = 0x00;
-	else{    BEEP[num].cnt -= BEEP[num].cnt_of_clock;   data = 0x00; }
-      }else{
-	data = 0x00;
-      }
-      if( BEEP[num].port40 & 0x80 ) data = 0x20;
-      *buf8 ++ = data;
-    }
-  }else
-#endif
-  {
-    for( i=0; i < length ; i++ ){
-      if( BEEP[num].port40 & 0x20 ){
-	BEEP[num].cnt ++;
-	if     ( BEEP[num].cnt < BEEP[num].cnt_of_clock/2 ) data = 0x2000;
-	else if( BEEP[num].cnt < BEEP[num].cnt_of_clock   ) data = 0x0000;
-	else{    BEEP[num].cnt -= BEEP[num].cnt_of_clock;   data = 0x0000; }
-      }else{
-	data = 0x0000;
-      }
-      if( BEEP[num].port40 & 0x80 ) data = 0x2000;
-      *buf16 ++ = data;
-    }
-  }
 }
 
 
 /* ---------- reset one of chip ---------- */
-void BEEP88ResetChip(int num)
+void BEEP88ResetChip(void *chip)
 {
-  /*printf("Beep Reset %d\n",num);*/
+    BEEP88 *BEEP = chip;
 
-  BEEP[num].cnt = 0;
-  BEEP[num].port40 = 0;
+    BEEP->cnt = 0;
+    BEEP->port40 = 0;
 }
 
 
 /* ----------  Initialize BEEP emulator(s) ---------- */
-int BEEP88Init(int num, int clock, int sample_rate )
+void * BEEP88Init(void *param, int index, int clock, int sample_rate)
 {
-  int	i;
-  /*printf("Beep Init ");*/
+	BEEP88 *BEEP;
 
-  if (num>MAX_BEEP88) return (-1);
+	/* allocate beep88 state space */
+	if( (BEEP = (BEEP88 *)malloc(sizeof(BEEP88)))==NULL)
+	return NULL;
+	/* clear */
+	memset(BEEP,0,sizeof(BEEP88));
 
-  /* clear */
-  memset(BEEP,0,sizeof(Beep) * num);
+	BEEP->param  = param;
+	BEEP->clock	 = clock;
+	BEEP->sample_rate  = sample_rate;
+	BEEP->sample_bit_8 = FALSE;   /* ...always false... */
+	BEEP->cnt_of_clock = sample_rate * SCALE / clock;
+	BEEP->cmd_sing = TRUE;
+	BEEP88ResetChip(BEEP);
 
-  for ( i = 0 ; i < num; i++ ) {
-    BEEP[i].status	 = i;
-    BEEP[i].clock	 = clock;
-    BEEP[i].sample_rate  = sample_rate;
-    BEEP[i].sample_bit_8 = FALSE;   /* ...always false... */
-    BEEP[i].cnt_of_clock = sample_rate / clock;
-  }
-
-  /*printf(" %d %d %d %d %d\n",num, clock,sample_rate,sample_bits,BEEP[0].cnt_of_clock);*/
-  return(0);
+	return BEEP;
 }
 
 
 /* ---------- shut down BEEP emulator ----------- */
-void BEEP88Shutdown(void)
+void BEEP88Shutdown(void *chip)
 {
-  /*printf("Beep Shutdown\n");*/
+	BEEP88 *BEEP = chip;
+
+	free(BEEP);
 }
 
 
 /* ---------- BEEP I/O interface ---------- */
-void BEEP88Write(int n,int v)
+void BEEP88Write(void *chip,int v)
 {
-  /*printf("Beep Write %x\n",v);*/
+	BEEP88 *BEEP = chip;
 
-  BEEP88UpdateRequest(n);
+	BEEP88UpdateRequest(BEEP->param);
 
-  if( !(BEEP[n].port40 & 0x20) && (v & 0x20) ){
-    BEEP[n].cnt = 0;
-  }
-  BEEP[n].port40 = v;
+	if( !(BEEP->port40 & 0x20) && (v & 0x20) ){
+		BEEP->cnt = 0;
+	}
+	BEEP->port40 = v;
+}
+
+
+void BEEP88Control(void *chip,int v)
+{
+	BEEP88 *BEEP = chip;
+
+	BEEP->cmd_sing = v;
 }

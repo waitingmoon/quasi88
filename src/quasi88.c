@@ -1,19 +1,21 @@
 /************************************************************************/
 /* QUASI88 --- PC-8801 emulator						*/
-/*	Copyright (c) 1998-2006 Showzoh Fukunaga			*/
+/*	Copyright (c) 1998-2012 Showzoh Fukunaga			*/
 /*	All rights reserved.						*/
 /*									*/
 /*	  このソフトは、UNIX + X Window System の環境で動作する、	*/
 /*	PC-8801 のエミュレータです。					*/
 /*									*/
 /*	  このソフトの作成にあたり、Marat Fayzullin氏作の fMSX、	*/
-/*	Nicola Salmoria氏 ( MAME/XMAME project) 作の mame/xmame、	*/
+/*	Nicola Salmoria氏 (MAME/XMAME project) 作の MAME/XMAME、	*/
 /*	ゆみたろ氏作の PC6001V のソースを参考にさせてもらいました。	*/
 /*									*/
 /*	＊注意＊							*/
-/*	  サウンドドライバは、mame/xmame のソースを流用しています。	*/
-/*	この部分のソースの著作権は、mame/xmame チームあるいはソースに	*/
+/*	  サウンドドライバは、MAME/XMAME のソースを流用しています。	*/
+/*	この部分のソースの著作権は、MAME/XMAME チームあるいはソースに	*/
 /*	記載してある著作者にあります。					*/
+/*	  FM音源ジェネレータは、fmgen のソースを流用しています。	*/
+/*	この部分のソースの著作権は、 cisc氏 にあります。		*/
 /*									*/
 /************************************************************************/
 
@@ -44,6 +46,9 @@
 #include "soundbd.h"
 #include "screen.h"
 #include "menu.h"
+#include "pause.h"
+#include "z80.h"
+#include "intr.h"
 
 
 int	verbose_level	= DEFAULT_VERBOSE;	/* 冗長レベル		*/
@@ -56,747 +61,530 @@ int	verbose_wait	= FALSE;		/* ウエイト時の異常を報告 */
 int	verbose_suspend = FALSE;		/* サスペンド時の異常を報告 */
 int	verbose_snd	= FALSE;		/* サウンドのメッセージ	*/
 
-char	file_disk[2][QUASI88_MAX_FILENAME];	/*ディスクイメージファイル名*/
-int	image_disk[2];	 	  		/*イメージ番号0〜31,-1は自動*/
-int	readonly_disk[2];			/*リードオンリーで開くなら真*/
-
-char	file_tape[2][QUASI88_MAX_FILENAME];	/* テープ入出力のファイル名 */
-char	file_prn[QUASI88_MAX_FILENAME];		/* パラレル出力のファイル名 */
-char	file_sin[QUASI88_MAX_FILENAME];		/* シリアル出力のファイル名 */
-char	file_sout[QUASI88_MAX_FILENAME];	/* シリアル入力のファイル名 */
-
-int	file_coding = 0;			/* ファイル名の漢字コード   */
-int	filename_synchronize = TRUE;		/* ファイル名を同調させる   */
-
-
-
-static	void	disk_set( void );
-static	void	bootup_work_init( void );
-
-/*----------------------------------------------------------------------*/
-/* ログを取るための準備／片付け						*/
-/*----------------------------------------------------------------------*/
-
-#if defined(PIO_FILE) || defined(FDC_FILE) || defined(MAIN_FILE) || defined(SUB_FILE)
-FILE	*LOG = NULL;
-#endif
-
-static	void	debug_log_init( void )
-{
-#if defined(PIO_FILE) || defined(FDC_FILE) || defined(MAIN_FILE) || defined(SUB_FILE)
-  LOG = fopen("log","w");
-#endif
-  if( verbose_proc ){
-#if	defined( PIO_DISP ) || defined( PIO_FILE )
-    printf("+ Support PIO logging. set variable \"pio_debug\" to 1.\n");
-#endif
-#if	defined( FDC_DISP ) || defined( FDC_FILE )
-    printf("+ Support FDC logging. set variable \"fdc_debug\" to 1.\n");
-#endif
-#if	defined( MAIN_DISP ) || defined( MAIN_FILE )
-    printf("+ Support Main Z80 logging. set variable \"main_debug\" to 1.\n");
-#endif
-#if	defined( SUB_DISP ) || defined( SUB_FILE )
-    printf("+ Support Sub Z80 logging. set variable \"sub_debug\" to 1.\n");
-#endif
-  }
-}
-
-static	void	debug_log_finish( void )
-{
-#if defined(PIO_FILE) || defined(FDC_FILE) || defined(MAIN_FILE) || defined(SUB_FILE)
-  if( LOG ) fclose(LOG);
-#endif
-}
-
-
+static	void	imagefile_all_open(int stateload);
+static	void	imagefile_all_close(void);
+static	void	status_override(void);
 
 /***********************************************************************
  *
  *			QUASI88 メイン関数
  *
  ************************************************************************/
-static	int	proc;
-int	quasi88( void )
+void	quasi88(void)
 {
-  verbose_proc	= verbose_level & 0x01;
-  verbose_z80	= verbose_level & 0x02;
-  verbose_io	= verbose_level & 0x04;
-  verbose_pio	= verbose_level & 0x08;
-  verbose_fdc	= verbose_level & 0x10;
-  verbose_wait	= verbose_level & 0x20;
-  verbose_suspend=verbose_level & 0x40;
-  verbose_snd	= verbose_level & 0x80;
+    quasi88_start();
+    quasi88_main();
+    quasi88_stop(TRUE);
+}
 
-  if( verbose_proc ) printf("\n"); fflush(NULL);
-  proc = 0;
+/* =========================== メイン処理の初期化 ========================== */
 
+#define	SET_PROC(n)	proc = n; if (verbose_proc) printf("\n"); fflush(NULL);
+static	int	proc = 0;
 
-  stateload_init();			/* ステートロード関連初期化         */
-  screen_snapshot_init();		/* 画面スナップショット関連初期化   */
+void	quasi88_start(void)
+{
+    stateload_init();			/* ステートロード関連初期化	*/
+    drive_init();			/* ディスク制御のワーク初期化	*/
+    /* ↑ これらは、ステートロード開始までに初期化しておくこと		*/
 
-  status_init();			/* ステータス表示のワーク初期化     */
-  drive_init();				/* フロッピードライブのワーク初期化 */
+    SET_PROC(1);
 
-  event_handle_init();
+					/* エミュレート用メモリの確保	*/
+    if (memory_allocate() == FALSE) { quasi88_exit(-1); }
 
+    if (resume_flag) {			/* ステートロード		*/
+	SET_PROC(2);
+	if (stateload() == FALSE) {
+	    fprintf(stderr, "stateload: Failed ! (filename = %s)\n",
+		    filename_get_state());
+	    quasi88_exit(-1);
+	}
+	if (verbose_proc) printf("Stateload...OK\n"); fflush(NULL);
+    }
+    SET_PROC(3);
 
-  if( memory_allocate() ){		/* エミュレート用メモリの確保	*/
-    if( verbose_proc ) printf("\n"); fflush(NULL);
-    proc = 1;
+					/* グラフィックシステム初期化	*/
+    if (screen_init() == FALSE) { quasi88_exit(-1); }
+    SET_PROC(4);
+
+					/* システムイベント初期化	*/
+    event_init();			/* (screen_init の後で！)	*/
+
+    					/* サウンドドライバ初期化	*/
+    if (xmame_sound_start() == FALSE) {	quasi88_exit(-1); }
+    SET_PROC(5);
+
+   					/* ウエイト用タイマー初期化	*/
+    if (wait_vsync_init() == FALSE) { quasi88_exit(-1); }
+    SET_PROC(6);
+
 
     set_signal();			/* INTシグナルの処理を設定	*/
 
-    if( resume_flag ){			/* ステートロード		*/
-      if( stateload() == FALSE ){
-	fprintf( stderr, "stateload: Failed ! (filename = %s)\n", file_state );
-	quasi88_exit();
-      }
-      if( verbose_proc ) printf("stateload...OK\n\n"); fflush(NULL);
-    }
+    imagefile_all_open(resume_flag);	/* イメージファイルを全て開く	*/
 
-    if( graphic_system_init() ){	/* グラフィックシステム初期化	*/
-      if( verbose_proc ) printf("\n"); fflush(NULL);
-      proc = 2;
+    					/* エミュ用ワークを順次初期化	*/
+    pc88main_init((resume_flag) ? INIT_STATELOAD : INIT_POWERON);
+    pc88sub_init ((resume_flag) ? INIT_STATELOAD : INIT_POWERON);
 
-      screen_buf_init();
+    key_record_playback_init();		/* キー入力記録/再生 初期化	*/
 
-      if( xmame_sound_start() ){	/* サウンドドライバ初期化	*/
-	if( verbose_proc ) printf("\n"); fflush(NULL);
-	proc = 3;
-
-	disk_set();
-	bootup_work_init();
-
-	if( file_tape[CLOAD][0] ) sio_open_tapeload( file_tape[CLOAD] );
-	if( file_tape[CSAVE][0] ) sio_open_tapesave( file_tape[CSAVE] );
-	if( file_sin[0] )         sio_open_serialin( file_sin );
-	if( file_sout[0] )        sio_open_serialout( file_sout );
-	if( file_prn[0] )         printer_open( file_prn );
-					/* ステートロード時は 各々SEEK ? */
-
-	key_record_playback_init();
-
-	pc88main_init( (resume_flag) ? INIT_STATELOAD : INIT_POWERON );
-	pc88sub_init(  (resume_flag) ? INIT_STATELOAD : INIT_POWERON );
+    screen_snapshot_init();		/* スナップショット関連初期化   */
 
 
-	if( wait_vsync_init() ){	/* ウエイト用タイマー初期化	*/
-	  if( verbose_proc ) printf("\n"); fflush(NULL);
-	  proc = 4;
+    debuglog_init();
+    profiler_init();
 
-	  if( verbose_proc ) printf( "Running QUASI88...\n" );
+    emu_breakpoint_init();
 
-	  if( resume_flag == 0 ) indicate_bootup_logo();
-	  else                   indicate_stateload_logo();
-
-	  debug_log_init();
-	  {
-	    emu();			/* エミュレート メイン */
-	  }
-	  debug_log_finish();
-
-	  if( verbose_proc ) printf( "Shutting down.....\n" );
-	  wait_vsync_term();
-	}
-
-	pc88main_term();
-	pc88sub_term();
-
-	disk_eject( 0 );
-	disk_eject( 1 );
-
-	sio_close_tapeload();
-	sio_close_tapesave();
-	sio_close_serialin();
-	sio_close_serialout();
-	printer_close();
-
-	key_record_playback_term();
-
-	xmame_sound_stop();
-      }
-      graphic_system_term();
-    }
-    memory_free();
-  }
-
-
-
-	/* 詳細表示をしないかった場合の、エラー表示 */
-
-  if( !verbose_proc ){
-    switch( proc ){
-    case 0: printf( "memory allocate failed!\n" );		break;
-    case 1: printf( "graphic system initialize failed!\n" );	break;
-    case 2: printf( "sound system initialize failed!\n" );	break;
-    case 3: printf( "timer initialize failed!\n" );		break;
-    }
-  }
-
-  return 0;
+    if (verbose_proc) printf("Running QUASI88...\n");
 }
 
+/* ======================== メイン処理のメインループ ======================= */
 
+void	quasi88_main(void)
+{
+    for (;;) {
+
+	/* 終了の応答があるまで、繰り返し呼び続ける */
+
+	if (quasi88_loop() == QUASI88_LOOP_EXIT) {
+	    break;
+	}
+
+    }
+
+    /* quasi88_loop() は、 1フレーム (VSYNC 1周期分≒1/60秒) おきに、
+       QUASI88_LOOP_ONE を返してくる。
+       この戻り値を判断して、なんらかの処理を加えてもよい。
+
+       また、内部処理の事情で QUASI88_LOOP_BUSY を返してくることもあるが、
+       この場合は気にせずに、繰り返し呼び出しを続行すること */
+
+}
+
+/* ========================== メイン処理の後片付け ========================= */
+
+void	quasi88_stop(int normal_exit)
+{
+    if (normal_exit) {
+	if (verbose_proc) printf("Shutting down.....\n");
+    }
+
+    /* 初期化途中の場合、verbose による詳細表示がなければ、エラー表示する */
+#define ERR_DISP(n)	((proc == (n)) && (verbose_proc == 0))
+
+    switch (proc) {
+    case 6:			/* 初期化 正常に終わっている */
+	profiler_exit();
+	debuglog_exit();
+	screen_snapshot_exit();
+	key_record_playback_exit();
+	pc88main_term();
+	pc88sub_term();
+	imagefile_all_close();
+	wait_vsync_exit();
+	/* FALLTHROUGH */
+
+    case 5:			/* タイマーの初期化でNG */
+	if (ERR_DISP(5)) printf("timer initialize failed!\n");
+	xmame_sound_stop();
+	/* FALLTHROUGH */
+
+    case 4:			/* サウンドの初期化でNG */
+	if (ERR_DISP(4)) printf("sound system initialize failed!\n");
+	event_exit();
+	screen_exit();
+	/* FALLTHROUGH */
+
+    case 3:			/* グラフィックの初期化でNG */
+	if (ERR_DISP(3)) printf("graphic system initialize failed!\n");
+	/* FALLTHROUGH */
+
+    case 2:			/* ステートロードでNG */
+	/* FALLTHROUGH */
+
+    case 1:			/* メモリの初期化でNG */
+	if (ERR_DISP(2)) printf("memory allocate failed!\n");
+	memory_free();
+	/* FALLTHROUGH */
+
+    case 0:			/* 終了処理 すでに完了 */
+	break;
+    }
+
+    proc = 0;	/* この関数を続けて呼んでも問題無いように、クリアしておく */
+}
 
 
 /***********************************************************************
  * QUASI88 途中終了処理関数
  *	exit() の代わりに呼ぼう。
  ************************************************************************/
-static	void (*exit_function)(void) = NULL;
 
-void	quasi88_atexit( void (*function)(void) )
+#define	MAX_ATEXIT	(32)
+static	void (*exit_function[MAX_ATEXIT])(void);
+
+/*
+ * 関数を最大 MAX_ATEXIT 個、登録できる。ここで登録した関数は、
+ * quasi88_exit() を呼び出した時に、登録した順と逆順で、呼び出される。
+ */
+void	quasi88_atexit(void (*function)(void))
 {
-  exit_function = function;
-}
-
-void	quasi88_exit( void )
-{
-  switch( proc ){
-  case 4:
-    debug_log_finish();
-    wait_vsync_term();			/* FALLTHROUGH */
-  case 3:
-    pc88main_term();
-    pc88sub_term();
-    disk_eject( 0 );
-    disk_eject( 1 );
-    sio_close_tapeload();
-    sio_close_tapesave();
-    sio_close_serialin();
-    sio_close_serialout();
-    printer_close();
-    key_record_playback_term();
-    xmame_sound_stop();			/* FALLTHROUGH */
-  case 2:
-    graphic_system_term();
-  case 1:
-    memory_free();			/* FALLTHROUGH */
-  }
-
-  if( exit_function ){
-    (*exit_function)();
-  }
-
-  exit( -1 );
-}
-
-
-
-
-
-/***********************************************************************
- * QUASI88 起動中のリセット処理関数
- *
- ************************************************************************/
-void	quasi88_reset( void )
-{
-  int	empty[2];
-
-  pc88main_term();
-  pc88sub_term();
-
-  bootup_work_init();
-
-  pc88main_init( INIT_RESET );
-  pc88sub_init(  INIT_RESET );
-
-  empty[0] = drive_check_empty(0);
-  empty[1] = drive_check_empty(1);
-  drive_reset();
-  if( empty[0] ) drive_set_empty(0);
-  if( empty[1] ) drive_set_empty(1);
-  if( use_sound ) xmame_sound_reset();
-
-  emu_reset();
-}
-
-
-
-
-/***********************************************************************
- * QUASI88 起動中のステートロード処理関数
- *
- ************************************************************************/
-int	quasi88_stateload( void )
-{
-  int now_board, success;
-
-  sio_close_tapeload();			/* イメージファイルを全て閉じる */
-  sio_close_tapesave();
-  sio_close_serialin();
-  sio_close_serialout();
-  printer_close();
-
-  disk_eject( 0 );
-  disk_eject( 1 );
-  quasi88_reset();
-
-
-  now_board = sound_board;
-
-  success = stateload();		/* ステートロード実行 */
-
-  if( now_board != sound_board ){ 	/* サウンドボードが変わったら */
-    xmame_sound_resume();		/* 中断したサウンドを復帰後に */
-    xmame_sound_stop();			/* サウンドを停止させる。     */
-    xmame_sound_start();		/* そして、サウンド再初期化   */
-  }
-
-
-  if( success ){			/* ステートロード成功したら・・・ */
-
-    disk_set();					/* イメージファイルを全て開く*/
-    bootup_work_init();
-
-    if( file_tape[CLOAD][0] ) sio_open_tapeload( file_tape[CLOAD] );
-    if( file_tape[CSAVE][0] ) sio_open_tapesave( file_tape[CSAVE] );
-    if( file_sin[0] )         sio_open_serialin( file_sin );
-    if( file_sout[0] )        sio_open_serialout( file_sout );
-    if( file_prn[0] )         printer_open( file_prn );
-
-    pc88main_init( INIT_STATELOAD );		/* 各種ワーク初期化 */
-    pc88sub_init(  INIT_STATELOAD );
-
-  }else{				/* ステートロード失敗したら・・・ */
-
-    quasi88_reset();				/* とりあえずリセット */
-  }
-
-  return success;
-}
-
-
-
-
-
-
-
-
-/*----------------------------------------------------------------------
- * file_disk[][] に設定されているディスクイメージをセットする
- *	( 起動時、およびステートロード時 )
- *----------------------------------------------------------------------*/
-static	void	disk_set( void )
-{
-  int err0 = TRUE;
-  int err1 = TRUE;
-
-  if( file_disk[0][0] &&	/* ドライブ1,2 ともイメージ指定済みの場合 */
-      file_disk[1][0] ){		/*	% quasi88 file file       */
-					/*	% quasi88 file m m        */
-					/*	% quasi88 file n file     */
-					/*	% quasi88 file file m     */
-					/*	% quasi88 file n file m   */
-    int same = (strcmp( file_disk[0], file_disk[1] )==0) ? TRUE : FALSE;
-
-    err0 = disk_insert( DRIVE_1,		/* ドライブ 1 をセット */
-			file_disk[0],
-			(image_disk[0]<0) ? 0 : image_disk[0],
-			readonly_disk[0] );
-
-    if( same ){					/* 同一ファイルの場合は */
-
-      if( err0 == FALSE ){				/* 1: → 2: 転送 */
-	err1 = disk_insert_A_to_B( DRIVE_1, DRIVE_2, 
-				   (image_disk[1]<0) ? 0 : image_disk[1] );
-      }
-
-    }else{					/* 別ファイルの場合は */
-
-      err1 = disk_insert( DRIVE_2,			/* ドライブ2 セット */
-			  file_disk[1],
-			  (image_disk[1]<0) ? 0 : image_disk[1],
-			  readonly_disk[1] );
-    }
-
-    /* 両ドライブで同じファイル かつ イメージ指定自動の場合の処理 */
-    if( err0 == FALSE && err1 == FALSE &&
-	drive[DRIVE_1].fp == drive[DRIVE_2].fp  && 
-	image_disk[0] < 0 && image_disk[1] < 0 ){
-      disk_change_image( DRIVE_2, 1 );			/* 2: は イメージ2へ */
-    }
-
-  }else if( file_disk[0][0] ){	/* ドライブ1 だけ イメージ指定済みの場合 */
-					/*	% quasi88 file		 */
-					/*	% quasi88 file num       */
-    err0 = disk_insert( DRIVE_1,
-			file_disk[0],
-			(image_disk[0]<0) ? 0 : image_disk[0],
-			readonly_disk[0] );
-
-    if( err0 == FALSE ){
-      if( image_disk[0] < 0 &&			/* イメージ番号指定なしなら */
-	  disk_image_num( DRIVE_1 ) >= 2 ){	/* ドライブ2にもセット      */
-
-	err1 = disk_insert_A_to_B( DRIVE_1, DRIVE_2, 1 );
-	if( err1 == FALSE ){
-	  memcpy( file_disk[1], file_disk[0], QUASI88_MAX_FILENAME );
-	}
-      }
-    }
-
-  }else if( file_disk[1][0] ){	/* ドライブ2 だけ イメージ指定済みの場合 */
-					/*	% quasi88 noexist file	 */
-    err1 = disk_insert( DRIVE_2,
-			file_disk[1],
-			(image_disk[1]<0) ? 0 : image_disk[1],
-			readonly_disk[1] );
-  }
-
-
-
-  /* オープンしなかった(出来なかった)場合は、ファイル名をクリア */
-  if( err0 ) memset( file_disk[ 0 ], 0, QUASI88_MAX_FILENAME );
-  if( err1 ) memset( file_disk[ 1 ], 0, QUASI88_MAX_FILENAME );
-
-
-  /* ファイル名にあわせて、スナップショットファイル名も設定 */
-  if( filename_synchronize ){
-    if( err0 == FALSE || err1 == FALSE ){
-      set_state_filename( FALSE );
-      set_snapshot_filename( FALSE );
-    }
-  }
-
-  if( verbose_proc ){
     int i;
-    for( i=0; i<2; i++ ){
-      if( disk_image_exist(i) ){
-	printf("DRIVE %d: <= %s [%d]\n", i+1,
-	     /*drive[i].filename, disk_image_selected(i)+1 );*/
-	       file_disk[i],      disk_image_selected(i)+1 );
-      }else{
-	printf("DRIVE %d: <= (empty)\n", i+1 );
-      }
+    for (i=0; i<MAX_ATEXIT; i++) {
+	if (exit_function[i] == NULL) {
+	    exit_function[i] = function;
+	    return;
+	}
     }
-  }
+    printf("quasi88_atexit: out of array\n");
+    quasi88_exit(-1);
 }
 
-
-
-
-/*----------------------------------------------------------------------
- * 各種変数初期化 (引数やPC8801のバージョンによって、変わるもの)
- *
- *----------------------------------------------------------------------*/
-static	void	bootup_work_init( void )
+/*
+ * quasi88 を強制終了する。
+ * quasi88_atexit() で登録した関数を呼び出した後に、 exit() する
+ */
+void	quasi88_exit(int status)
 {
+    int i;
 
-	/* V1モードのバージョンの小数点以下を強制変更する */
+    quasi88_stop(FALSE);
 
-  if( set_version ) ROM_VERSION = set_version;
+    for (i=MAX_ATEXIT-1; i>=0; i--) {
+	if (exit_function[i]) {
+	    (*exit_function[i])();
+	    exit_function[i] = NULL;
+	}
+    }
 
-
-
-	/* 起動デバイス(ROM/DISK)未定の時 */
-
-  if( boot_from_rom==BOOT_AUTO ){
-    if( disk_image_exist(0) ) boot_from_rom = FALSE; /* ディスク挿入時はDISK */
-    else                      boot_from_rom = TRUE;  /* それ以外は、    ROM  */
-  }
-
-
-	/* 起動時の BASICモード未定の時	  */
-
-  if( boot_basic==BASIC_AUTO ){			
-    if( ROM_VERSION >= '4' )			/* SR 以降は、V2	  */
-      boot_basic = BASIC_V2;
-    else					/* それ以前は、V1S	  */
-      boot_basic = BASIC_V1S;
-  }
-
-
-	/* サウンド(I/II)のポートを設定	 */
-
-  if( sound_board == SOUND_II ){
-
-    if     ( ROM_VERSION >= '8' )		/* FH/MH 以降は、44〜47H */
-      sound_port = SD_PORT_44_45 | SD_PORT_46_47;
-    else if( ROM_VERSION >= '4' )		/* SR 以降は、44〜45,A8〜ADH */
-      sound_port = SD_PORT_44_45 | SD_PORT_A8_AD;
-    else					/* それ以前は、  A8〜ADH */
-      sound_port = SD_PORT_A8_AD;
-
-  }else{
-
-    if( ROM_VERSION >= '4' )			/* SR以降は、44〜45H	 */
-      sound_port = SD_PORT_44_45;
-    else					/* それ以前は、？？？	 */
-      sound_port = SD_PORT_A8_AD;		/*	対応しないなら 0 */
-  }
-
+    exit(status);
 }
 
 
+
+
+
+/***********************************************************************
+ * QUASI88メインループ制御
+ *	QUASI88_LOOP_EXIT が返るまで、無限に呼び出すこと。
+ * 戻り値
+ *	QUASI88_LOOP_EXIT … 終了時
+ *	QUASI88_LOOP_ONE  … 1フレーム経過時 (ウェイトが正確ならば約1/60秒周期)
+ *	QUASI88_LOOP_BUSY … 上記以外の、なんらかのタイミング
+ ************************************************************************/
+int	quasi88_event_flags = EVENT_MODE_CHANGED;
+static	int mode	= EXEC;		/* 現在のモード */
+static	int next_mode	= EXEC;		/* モード切替要求時の、次モード */
+
+int	quasi88_loop(void)
+{
+    static enum {
+	INIT,
+	MAIN,
+	WAIT,
+    } step = INIT, step_after_wait = INIT;
+
+    int stat;
+
+    switch (step) {
+
+    /* ======================== イニシャル処理 ======================== */
+    case INIT:
+	profiler_lapse( PROF_LAPSE_RESET );
+
+	/* モード変更時は、必ずここに来る。モード変更フラグをクリア */
+	quasi88_event_flags &= ~EVENT_MODE_CHANGED;
+	mode = next_mode;
+
+	/* 例外的なモード変更時の処理 */
+	switch (mode) {
+#ifndef	USE_MONITOR
+	case MONITOR:	/* ありえないけど、念のため */
+	    mode = PAUSE;
+	    break;
+#endif
+	case QUIT:	/* QUIT なら、メインループ終了 */
+	    return FALSE;
+	}
+
+	/* モード別イニシャル処理 */
+	if (mode == EXEC) { xmame_sound_resume(); }
+	else              { xmame_sound_suspend();}
+
+	screen_switch();
+	event_switch();
+	keyboard_switch();
+
+	switch (mode) {
+	case EXEC:	emu_init();		break;
+
+	case MENU:	menu_init();		break;
+#ifdef	USE_MONITOR
+	case MONITOR:	monitor_init();		break;
+#endif
+	case PAUSE:	pause_init();		break;
+	}
+
+	status_override();
+
+	wait_vsync_switch();
+
+
+	/* イニシャル処理が完了したら、MAIN に遷移 */
+	step = MAIN;
+
+	/* 遷移するため、一旦関数を抜ける (FALLTHROUGHでもいいけど) */
+	return QUASI88_LOOP_BUSY;
+
+
+    /* ======================== メイン処理 ======================== */
+    case MAIN:
+	switch (mode) {
+
+	case EXEC:	profiler_lapse( PROF_LAPSE_RESET );
+			emu_main();		break;
+#ifdef	USE_MONITOR
+	case MONITOR:	monitor_main();		break;
+#endif
+	case MENU:	menu_main();		break;
+
+	case PAUSE:	pause_main();		break;
+	}
+
+	/* モード変更が発生していたら、(WAIT後に) INIT へ遷移する */
+	/* そうでなければ、            (WAIT後に) MAIN へ遷移する */
+	if (quasi88_event_flags & EVENT_MODE_CHANGED) {
+	    step_after_wait = INIT;
+	} else {
+	    step_after_wait = MAIN;
+	}
+
+	/* 描画タイミングならばここで描画。その後 WAIT へ  */
+	/* そうでなければ、                WAIT せずに遷移 */
+	if (quasi88_event_flags & EVENT_FRAME_UPDATE) {
+	    quasi88_event_flags &= ~EVENT_FRAME_UPDATE;
+	    screen_update();
+	    step = WAIT;
+	} else {
+	    step = step_after_wait;
+	}
+
+	/* モニター遷移時や終了時は、 WAIT せずに即ちに INIT へ */
+	if (quasi88_event_flags & (EVENT_DEBUG | EVENT_QUIT)) {
+	    step = INIT;
+	}
+
+	/* 遷移するため、一旦関数を抜ける (WAIT時はFALLTHROUGHでもいいけど) */
+	return QUASI88_LOOP_BUSY;
+
+
+    /* ======================== ウェイト処理 ======================== */
+    case WAIT:
+	stat = WAIT_JUST;
+
+	switch (mode) {
+	case EXEC:
+	    profiler_lapse( PROF_LAPSE_IDLE );
+	    if (! no_wait) { stat = wait_vsync_update(); }
+	    break;
+
+	case MENU:
+	case PAUSE:
+	    /* Esound の場合、 MENU/PAUSE でも stream を流しておかないと
+	       複数起動時に、 MENU/PAUSE してないほうが音がでなくなる。
+	       が、このままだと、現在の音が流れっぱなしになるので、
+	       無音を流すようにしないと。 */
+	    xmame_sound_update();		/* サウンド出力 */
+	    xmame_update_video_and_audio();	/* サウンド出力 その2 */
+	    stat = wait_vsync_update();
+	    break;
+	}
+
+	if (stat == WAIT_YET) { return QUASI88_LOOP_BUSY; }
+
+
+	/* ウェイト時間を元に、フレームスキップの有無を決定 */
+	if (mode == EXEC) {
+	    frameskip_check((stat == WAIT_JUST) ? TRUE : FALSE);
+	}
+
+	/* ウェイト処理が完了したら、次 (INIT か MAIN) に遷移 */
+	step = step_after_wait;
+	return QUASI88_LOOP_ONE;
+    }
+
+    /* ここには来ない ! */
+    return QUASI88_LOOP_EXIT;
+}
+
+
+
+/*======================================================================
+ * QUASI88 のモード制御
+ *	モードとは QUASI88 の状態のことで、 EXEC (実行)、PAUSE (一時停止)、
+ *	MENU (メニュー画面)、 MONITOR (対話型デバッガ)、 QUIT(終了) がある。
+ *======================================================================*/
+/* QUASI88のモードを設定する */
+static	void	set_mode(int newmode)
+{
+    if (mode != newmode) {
+
+	if (mode == MENU) {		/* メニューから他モードの切替は */
+	    q8tk_event_quit();		/* Q8TK の終了が必須            */
+	}
+
+	next_mode = newmode;
+	quasi88_event_flags |= EVENT_MODE_CHANGED;
+	CPU_BREAKOFF();
+    }
+}
+
+/* QUASI88のモードを切り替える */
+void	quasi88_exec(void)
+{
+    set_mode(EXEC);
+    set_emu_exec_mode(GO);
+}
+
+void	quasi88_exec_step(void)
+{
+    set_mode(EXEC);
+    set_emu_exec_mode(STEP);
+}
+
+void	quasi88_exec_trace(void)
+{
+    set_mode(EXEC);
+    set_emu_exec_mode(TRACE);
+}
+
+void	quasi88_exec_trace_change(void)
+{
+    set_mode(EXEC);
+    set_emu_exec_mode(TRACE_CHANGE);
+}
+
+void	quasi88_menu(void)
+{
+    set_mode(MENU);
+}
+
+void	quasi88_pause(void)
+{
+    set_mode(PAUSE);
+}
+
+void	quasi88_monitor(void)
+{
+#ifdef	USE_MONITOR
+    set_mode(MONITOR);
+#else
+    set_mode(PAUSE);
+#endif
+}
+
+void	quasi88_debug(void)
+{
+#ifdef	USE_MONITOR
+    set_mode(MONITOR);
+    quasi88_event_flags |= EVENT_DEBUG;
+#else
+    set_mode(PAUSE);
+#endif
+}
+
+void	quasi88_quit(void)
+{
+    set_mode(QUIT);
+    quasi88_event_flags |= EVENT_QUIT;
+}
+
+/* QUASI88のモードを取得する */
+int	quasi88_is_exec(void)
+{
+  return (mode == EXEC) ? TRUE : FALSE;
+}
+int	quasi88_is_menu(void)
+{
+  return (mode == MENU) ? TRUE : FALSE;
+}
+int	quasi88_is_pause(void)
+{
+  return (mode == PAUSE) ? TRUE : FALSE;
+}
+int	quasi88_is_monitor(void)
+{
+  return (mode == MONITOR) ? TRUE : FALSE;
+}
+
+
+
+
+
+/***********************************************************************
+ *	適切な位置に移動せよ
+ ************************************************************************/
+void	wait_vsync_switch(void)
+{
+    long dt;
+
+    /* dt < 1000000us (1sec) でないとダメ */
+    if (quasi88_is_exec()) {
+	dt = (long)((1000000.0 / (CONST_VSYNC_FREQ * wait_rate/100)));
+	wait_vsync_setup(dt, wait_by_sleep);
+    } else {
+	dt = (long)(1000000.0 / CONST_VSYNC_FREQ);
+	wait_vsync_setup(dt, TRUE);
+    }
+}
+
+
+static	void	status_override(void)
+{
+    static int first_fime = TRUE;
+
+    if (first_fime) {
+
+	/* EMUモードで起動した場合のみ、ステータスの表示を変える */
+	if (mode == EXEC) {
+
+	    status_message(0, STATUS_INFO_TIME, Q_TITLE " " Q_VERSION);
+
+	    if (resume_flag == 0) {
+		if (status_imagename == FALSE) {
+		    status_message_default(1, "<F12> key to MENU");
+		}
+	    } else {
+		status_message(1, STATUS_INFO_TIME, "State-Load Successful");
+	    }
+	}
+	first_fime = FALSE;
+    }
+}
+
+
+
+/***********************************************************************
+ *	デバッグ用
+ ************************************************************************/
+#include "debug.c"
 
 
 
 /***********************************************************************
  *	雑多な関数
  ************************************************************************/
-#include <string.h>
-
-/*===========================================================================
- * 大文字・小文字の区別なく、文字列比較 (stricmp/strcasecmp ?)
- *	戻り値: 一致時 == 0, 不一致時 != 0 (大小比較はなし)
- *===========================================================================*/
-int	my_strcmp( const char *s, const char *d )
-{
-  if( s==NULL || d==NULL ) return 1;
-
-  while( tolower(*s) == tolower(*d) ){
-    if( *s == '\0' ) return 0;
-    s++;
-    d++;
-  }
-  return 1;
-}
-
-/*===========================================================================
- * 文字列 ct を 文字列 s に コピー (strlcpy ?)
- *	s の文字列終端は、必ず '\0' となり、s の長さは n-1 文字以下に収まる。
- *	余分な領域は \0 で埋められない。
- *	戻り値: なし
- *===========================================================================*/
-void	my_strncpy( char *s, const char *ct, unsigned long n )
-{
-  s[0] = '\0';
-  strncat( s, ct, n-1 );
-}
-
-/*===========================================================================
- * 文字列 ct を 文字列 s に 連結 (strlcat ?)
- *	s の文字列終端は、必ず '\0' となり、s の長さは n-1 文字以下に収まる。
- *	戻り値: なし
- *===========================================================================*/
-void	my_strncat( char *s, const char *ct, unsigned long n )
-{
-  size_t used = strlen(s) + 1;
-
-  if( n > used )
-    strncat( s, ct, n - used );
-}
-
-/*===========================================================================
- * SJIS を EUC に変換 (かなり適当)
- *	*sjis_p の文字列を EUC に変換して、*euc_p に格納する。
- *
- *	注意！）この関数は、バッファあふれをチェックしていない。
- *		*euc_p は、*sjis_p の倍以上の長さがないと危険
- *===========================================================================*/
-void	sjis2euc( char *euc_p, const char *sjis_p )
-{
-  int	h,l, h2, l2;
-
-  while( ( h = (unsigned char)*sjis_p++ ) ){
-
-    if( h < 0x80 ){				/* ASCII */
-
-      *euc_p ++ = h;
-
-    }else if( 0xa1 <= h && h <= 0xdf ){		/* 半角カナ */
-
-      *euc_p ++ = (char)0x8e;
-      *euc_p ++ = h;
-
-    }else{					/* 全角文字 */
-
-      if( ( l = (unsigned char)*sjis_p++ ) ){
-
-	if( l <= 0x9e ){
-	  if( h <= 0x9f ) h2 = (h - 0x71) *2 +1;
-	  else            h2 = (h - 0xb1) *2 +1;
-	  if( l >= 0x80 ) l2 = l - 0x1f -1;
-	  else            l2 = l - 0x1f;
-	}else{
-	  if( h <= 0x9f ) h2 = (h - 0x70) *2;
-	  else            h2 = (h - 0xb0) *2;
-	  l2 = l - 0x7e;
-	}
-	*euc_p++ = 0x80 | h2;
-	*euc_p++ = 0x80 | l2;
-
-      }else{
-	break;
-      }
-
-    }
-  }
-
-  *euc_p = '\0';
-}
+#include "utility.c"
 
 
-/*===========================================================================
- * EUC を SJIS に変換 (かなり適当)
- *	*euc_p の文字列を SJIS に変換して、*sjis_p に格納する。
- *
- *	注意！）この関数は、バッファあふれをチェックしていない。
- *		*sjis_p は、*euc_p と同等以上の長さがないと危険
- *===========================================================================*/
 
-void	euc2sjis( char *sjis_p, const char *euc_p )
-{
-  int	h,l;
-
-  while( ( h = (unsigned char)*euc_p++ ) ){
-
-    if( h < 0x80 ){				/* ASCII */
-
-      *sjis_p ++ = h;
-
-    }else if( h==0x8e ){			/* 半角カナ */
-
-      if( ( h = (unsigned char)*euc_p++ ) ){
-
-	if( 0xa1 <= h && h <= 0xdf )
-	  *sjis_p ++ = h;
-
-      }else{
-	break;
-      }
-
-    }else if( h & 0x80 ){			/* 全角文字 */
-
-      if( ( l = (unsigned char)*euc_p++ ) ){
-
-	if( l & 0x80 ){
-
-	  h = (h & 0x7f) - 0x21;
-	  l = (l & 0x7f) - 0x21;
-
-	  if( h & 0x01 ) l += 0x9e;
-	  else           l += 0x40;
-	  if( l >= 0x7f ) l += 1;
-
-	  h = (h>>1) + 0x81;
-
-	  if( h >= 0xa0 ) h += 0x40;
-
-	  *sjis_p++ = h;
-	  *sjis_p++ = l;
-
-	}
-
-      }else{
-	break;
-      }
-
-    }
-  }
-
-  *sjis_p = '\0';
-}
-
-
-/*===========================================================================
- * EUC文字列の長さを計算 (けっこう適当)
- *	ASCII・半角カナは1文字、全角漢字は2文字とする。
- *	文字列末の、\0 は長さに含めない。
- *===========================================================================*/
-
-int	euclen( const char *euc_p )
-{
-  int	i = 0, h;
-
-  while( ( h = (unsigned char)*euc_p++ ) ){
-
-    if( h < 0x80 ){				/* ASCII */
-
-      i++;
-
-    }else if( h == 0x8e ){			/* 半角カナ */
-
-      euc_p ++;
-      i++;
-
-    }else{					/* 漢字 */
-
-      euc_p ++;
-      i += 2;
-
-    }
-  }
-
-  return i;
-}
-
-/*===========================================================================
- * 文字列 src をトークンに分割する。
- *	区切り文字は、スペースとタブ。先頭のスペース・タブは無視される。
- *	分割したトークンは ( \0 を付加して ) dst にコピーし、
- *	src の残りの文字列部分の先頭アドレスを返す。
- *	これ以上分割できない場合は dst には "\0" をコピーし、NULLを返す。
- *
- *	トークンに分割する際のルール
- *	  ・ 改行(\r or \n) ないし 終端(\0) で文字列は終わりとみなす。
- *	特別な文字
- *	  ・ スペースとタブは、区切り文字とする
- *	  ・ # はコメント文字とし、終端文字と同様に扱う。
- *	  ・ \ はエスケープ文字とする。スペース、タブ、#、"、\ の前に \ が
- *	     ある場合、これらは特別な文字とせずに通常の文字と同様に扱う。
- *	     他の文字の前に \ がある場合、単に \ はスキップされる。
- *	  ・ " は引用符文字とする。この文字で囲まれた部分の文字列について、
- *	     スペース、タブ、#、\ は特別な文字とみなされない。
- *	     ただし、 "" の2文字が続いている場合に限り、" とみなす。
- *===========================================================================*/
-#define	COMMENT		'#'
-#define	ESCAPE		'\\'
-#define	QUOTE		'\"'
-char	*my_strtok( char *dst, char *src )
-{
-  char *p = &src[0];
-  char *q = &dst[0];
-
-  int esc   = FALSE;			/* エスケープシーケンス処理中 */
-  int quote = FALSE;			/* クォート文字処理中         */
-
-  *q = '\0';
-
-  while( *p==' ' || *p=='\t' ){		/* 先頭のスペース・タブをスキップ */
-    p ++;
-  }
-
-  while(1){
-
-    if( quote == FALSE ){		/* 通常部分の処理 */
-
-      if( esc == FALSE ){
-	if     ( *p=='\0' ||
-		 *p=='\r' ||
-		 *p=='\n' ||
-		 *p==' '  ||
-		 *p=='\t' ||
-		 *p==COMMENT ){ *q = '\0';   break; }
-	else if( *p==QUOTE   ){         p++; quote = TRUE; }
-	else if( *p==ESCAPE  ){         p++; esc = TRUE;   }
-	else                  { *q++ = *p++;               }
-      }else{
-	if     ( *p=='\0' ||
-		 *p=='\r' ||
-		 *p=='\n' )   { *q = '\0'; break; }
-	else                  { *q++ = *p++; esc = FALSE;  }
-      }
-
-    }else{				/* " " で囲まれた部分の処理 */
-
-	if     ( *p=='\0' ||
-		 *p=='\r' ||
-		 *p=='\n'   ){ *q = '\0';   break; }
-	else if( *p==QUOTE  )
-	  if( *(p+1)==QUOTE ){ *q++ = QUOTE; p+=2; quote = FALSE; }
-	  else               {               p++;  quote = FALSE; }
-	else                 { *q++ = *p++;                }
-
-    }
-  }
-
-  if( *dst == '\0' ) return NULL;
-  else               return p;
-}
-
+/***********************************************************************
+ *			ファイル名制御／管理
+ ************************************************************************/
+#include "fname.c"
 
 
 
@@ -810,398 +598,530 @@ char	*my_strtok( char *dst, char *src )
  *	ので、メニュー中は呼び出さないように。エミュ実行中に呼び出すのが
  *	一番安全。うーん、いまいち。
  *
- *	if( get_emu_mode() == EXEC ){
+ *	if( mode == EXEC ){
  *	    quasi88_disk_insert_and_reset( file, FALSE );
  *	}
  *
  ************************************************************************/
 
-#include "intr.h"
-#include "q8tk.h"
-
-/*======================================================================
- * 画面表示切り替え			MENU/MONITOR でも可
- *======================================================================*/
-void	quasi88_change_screen( void )
+/***********************************************************************
+ * QUASI88 起動中のリセット処理関数
+ ************************************************************************/
+void	quasi88_get_reset_cfg(T_RESET_CFG *cfg)
 {
-  if( graphic_system_restart() ){
-    screen_buf_init();
-  }
-
-  if( get_emu_mode() == MENU ) q8tk_misc_redraw();
-  else                         draw_screen_force();
+    cfg->boot_basic	= boot_basic;
+    cfg->boot_dipsw	= boot_dipsw;
+    cfg->boot_from_rom	= boot_from_rom;
+    cfg->boot_clock_4mhz= boot_clock_4mhz;
+    cfg->set_version	= set_version;
+    cfg->baudrate_sw	= baudrate_sw;
+    cfg->use_extram	= use_extram;
+    cfg->use_jisho_rom	= use_jisho_rom;
+    cfg->sound_board	= sound_board;
 }
 
-/*======================================================================
+void	quasi88_reset(const T_RESET_CFG *cfg)
+{
+    int sb_changed = FALSE;
+    int empty[2];
+
+    if (verbose_proc) printf("Reset QUASI88...start\n");
+
+    pc88main_term();
+    pc88sub_term();
+
+    if (cfg) {
+	if (sound_board	!= cfg->sound_board) {
+	    sb_changed = TRUE;
+	}
+
+	boot_basic	= cfg->boot_basic;
+	boot_dipsw	= cfg->boot_dipsw;
+	boot_from_rom	= cfg->boot_from_rom;
+	boot_clock_4mhz	= cfg->boot_clock_4mhz;
+	set_version	= cfg->set_version;
+	baudrate_sw	= cfg->baudrate_sw;
+	use_extram	= cfg->use_extram;
+	use_jisho_rom	= cfg->use_jisho_rom;
+	sound_board	= cfg->sound_board;
+    }
+
+    /* メモリの再確保が必要なら、処理する */
+    if (memory_allocate_additional() == FALSE) {
+	quasi88_exit(-1);	/* 失敗！ */
+    }
+
+    /* サウンド出力のリセット */
+    if (sb_changed == FALSE) {
+	xmame_sound_reset();
+    } else {
+	menu_sound_restart(FALSE);	/* サウンドドライバの再初期化 */
+    }
+
+    /* ワークの初期化 */
+    pc88main_init(INIT_RESET);
+    pc88sub_init(INIT_RESET);
+
+    /* FDCの初期化 */
+    empty[0] = drive_check_empty(0);
+    empty[1] = drive_check_empty(1);
+    drive_reset();
+    if (empty[0]) drive_set_empty(0);
+    if (empty[1]) drive_set_empty(1);
+
+    /*if (xmame_has_sound()) xmame_sound_reset();*/
+
+    emu_reset();
+
+    if (verbose_proc) printf("Reset QUASI88...done\n");
+}
+
+
+
+/***********************************************************************
+ * QUASI88 起動中のステートロード処理関数
+ *	TODO 引数で、ファイル名指定？
+ ************************************************************************/
+int	quasi88_stateload(int serial)
+{
+    int now_board, success;
+
+    if (serial >= 0) {			/* 連番指定あり (>=0) なら */
+	filename_set_state_serial(serial);	/* 連番を設定する */
+    }
+
+    if (verbose_proc) printf("Stateload...start (%s)\n",filename_get_state());
+
+    if (stateload_check_file_exist() == FALSE) {	/* ファイルなし */
+	if (quasi88_is_exec()) {
+	    status_message(1, STATUS_INFO_TIME, "State-Load file not found !");
+	} /* メニューではダイアログ表示するので、ステータス表示は無しにする */
+
+	if (verbose_proc) printf("State-file not found\n");
+	return FALSE;
+    }
+
+
+    pc88main_term();			/* 念のため、ワークを終了状態に */
+    pc88sub_term();
+    imagefile_all_close();		/* イメージファイルを全て閉じる */
+
+    /*xmame_sound_reset();*/		/* 念のため、サウンドリセット */
+    /*quasi88_reset();*/		/* 念のため、全ワークリセット */
+
+
+    now_board = sound_board;
+
+    success = stateload();		/* ステートロード実行 */
+
+    if (now_board != sound_board) { 	/* サウンドボードが変わったら */
+	menu_sound_restart(FALSE);	/* サウンドドライバの再初期化 */
+    }
+
+    if (verbose_proc) {
+	if (success) printf("Stateload...done\n");
+	else         printf("Stateload...Failed, Reset start\n");
+    }
+
+
+    if (success) {			/* ステートロード成功したら・・・ */
+
+	imagefile_all_open(TRUE);		/* イメージファイルを全て開く*/
+
+	pc88main_init(INIT_STATELOAD);
+	pc88sub_init(INIT_STATELOAD);
+
+    } else {				/* ステートロード失敗したら・・・ */
+
+	quasi88_reset(NULL);			/* とりあえずリセット */
+    }
+
+
+    if (quasi88_is_exec()) {
+	if (success) {
+	    status_message(1, STATUS_INFO_TIME, "State-Load Successful");
+	} else {
+	    status_message(1, STATUS_INFO_TIME, "State-Load Failed !  Reset done ...");
+	}
+
+	/* quasi88_loop の内部状態を INIT にするため、モード変更扱いとする */
+	quasi88_event_flags |= EVENT_MODE_CHANGED;
+    }
+    /* メニューではダイアログ表示するので、ステータス表示は無しにする */
+
+    return success;
+}
+
+
+
+/***********************************************************************
+ * QUASI88 起動中のステートセーブ処理関数
+ *	TODO 引数で、ファイル名指定？
+ ************************************************************************/
+int	quasi88_statesave(int serial)
+{
+    int success;
+
+    if (serial >= 0) {			/* 連番指定あり (>=0) なら */
+	filename_set_state_serial(serial);	/* 連番を設定する */
+    }
+
+    if (verbose_proc) printf("Statesave...start (%s)\n",filename_get_state());
+
+    success = statesave();		/* ステートセーブ実行 */
+
+    if (verbose_proc) {
+	if (success) printf("Statesave...done\n");
+	else         printf("Statesave...Failed, Reset done\n");
+    }
+
+
+    if (quasi88_is_exec()) {
+	if (success) {
+	    status_message(1, STATUS_INFO_TIME, "State-Save Successful");
+	} else {
+	    status_message(1, STATUS_INFO_TIME, "State-Save Failed !");
+	}
+    }	/* メニューではダイアログ表示するので、ステータス表示は無しにする */
+
+    return success;
+}
+
+
+
+/***********************************************************************
  * 画面スナップショット保存
- *======================================================================*/
-void	quasi88_snapshot( void )
+ *	TODO 引数で、ファイル名指定？
+ ************************************************************************/
+int	quasi88_screen_snapshot(void)
 {
-  if( get_emu_mode() == EXEC ){
-    if( save_screen_snapshot() ){
-      status_message( 1, 60, "Snapshot saved" );
-    }else{
-      status_message( 1, 60, "Snapshot failed!" );
-    }
-  }
-}
+    int success;
 
-/*======================================================================
- * ステータス表示切り替え		MENU/MONITOR でも可
- *======================================================================*/
-void	quasi88_status( void )
-{
-  int result;
-
-  show_status = ( now_status ) ? FALSE : TRUE;	/* 表示有無状態を反転 */
-
-  result = set_status_window();			/* ステータス(非)表示 */
-
-  if( result ){					/* その結果・・・ */
-
-    status_reset( now_status );	/* ステータスのワークを再初期化 */
-
-    status_buf_init();		/* 全画面時ステータス無しなら、消す必要あり */
-
-    if( get_emu_mode() == MENU ){		/* 異様に醜い処理だ・・・ */
-      if( result > 1 ) q8tk_misc_redraw();
-      else             draw_status();
-    }else{
-      if( result > 1 ) draw_screen_force();
-    }
-  }
-}
-
-/*======================================================================
- * メニュー・ポーズ
- *======================================================================*/
-void	quasi88_menu( void )
-{
-  if( get_emu_mode() != MENU ){
-    set_emu_mode( MENU );
-  }
-}
-
-void	quasi88_pause( void )
-{
-  if( get_emu_mode() == EXEC ){
-    set_emu_mode( PAUSE );
-  }
-}
+    success = screen_snapshot_save();
 
 
-
-
-/*======================================================================
- * フレームスキップ数変更 : -frameskip の値を、変更する。
- *		変更した後は、しばらく画面にフレームレートを表示させる
- *======================================================================*/
-static void change_framerate( int sign )
-{
-  int	i;
-  char	str[32];
-
-  static const char next[] = { 1, 2, 3, 4, 5, 6, 10, 12, 15, 20, 30, 60, };
-  static const char prev[] = { 60, 30, 20, 15, 12, 10, 6, 5, 4, 3, 2, 1, };
-
-  if( sign < 0 ){
-
-    for( i=0; i<COUNTOF(next)-1; i++ )
-      if( frameskip_rate <= next[i] ){ frameskip_rate = next[i+1];  break; }
-    if( i==COUNTOF(next)-1 ) frameskip_rate = next[0];	/* ループさせよう */
-
-  }else if( sign > 0 ){
-
-    for( i=0; i<COUNTOF(prev)-1; i++ )
-      if( frameskip_rate >= prev[i] ){ frameskip_rate = prev[i+1]; break; }
-    if( i==COUNTOF(prev)-1 ) frameskip_rate = prev[0];	/* ループさせよう */
-
-  }
-
-  blink_ctrl_update();
-  reset_frame_counter();
-
-  sprintf( str, "FRAME RATE = %2d/sec", 60/frameskip_rate );
-  status_message( 1, 60, str );					/* 1 sec */
-}
-void	quasi88_framerate_up( void )  { change_framerate( +1 ); }
-void	quasi88_framerate_down( void ){ change_framerate( -1 ); }
-
-
-/*======================================================================
- * ボリューム変更 : -vol の値を、変更する。
- *		変更した後は、しばらく画面に音量を表示させる
- *======================================================================*/
-static void change_volume( int sign )
-{
-  char	str[32];
-
-#ifdef USE_SOUND
-  if( use_sound ){
-    int diff = (sign>0) ? +1 : ( (sign<0)?-1:0);
-    if (diff){
-      int vol = xmame_get_sound_volume() + diff;
-      if( vol >   0 ) vol = 0;
-      if( vol < -32 ) vol = -32;
-      xmame_set_sound_volume( vol );
-    }
-    
-    sprintf( str, "VOLUME  %3d[db]", xmame_get_sound_volume() );
-  }else
-#endif
-  {
-    sprintf( str, "Sound not available !" );
-  }
-  status_message( 1, 60, str );					/* 1 sec */
-}
-void	quasi88_volume_up( void )  { change_volume( -1 ); }
-void	quasi88_volume_down( void ){ change_volume( +1 ); }
-
-
-/*======================================================================
- * ウェイト量変更 : -nowait, -speed の値を、変更する。
- *		変更した後は、速度比を表示させる。が、
- *		表示時間は速度比依存なので、結局表示時間は不定になる。
- *======================================================================*/
-static void change_wait( int sign )
-{
-  int	time = 60;
-  char	str[32];
-
-  if( sign==0 ){
-
-    no_wait ^= 1;
-    if( no_wait ){sprintf( str, "WAIT  OFF" ); time *= 10; }
-    else          sprintf( str, "WAIT  ON" );
-
-  }else{
-
-    if( sign < 0 ){
-      wait_rate -= 10;
-      if( wait_rate < 10 ) wait_rate = 10;
-    }else{
-      wait_rate += 10;
-      if( wait_rate > 200 ) wait_rate = 200;
+    if (success) {
+	status_message(1, STATUS_INFO_TIME, "Screen Capture Saved");
+    } else {
+	status_message(1, STATUS_INFO_TIME, "Screen Capture Failed !");
     }
 
-    sprintf( str, "WAIT  %4d[%%]", wait_rate );
-
-    wait_vsync_reset();
-  }
-
-  status_message( 1, time, str );				/* 1 sec */
+    return success;
 }
-void	quasi88_wait_up( void )  { change_wait( +1 ); }
-void	quasi88_wait_down( void ){ change_wait( -1 ); }
-void	quasi88_wait_none( void ){ change_wait(  0 ); }
 
 
 
-/*======================================================================
- * 速度変更 (speed/clock/boost)
- *
- *======================================================================*/
-void	quasi88_max_speed( int new_speed )
+/***********************************************************************
+ * サウンドデータのファイル出力
+ *	TODO 引数で、ファイル名指定？
+ ************************************************************************/
+int	quasi88_waveout(int start)
 {
-  char	str[32];
+    int success;
 
-  if( !( 5<=new_speed || new_speed<=5000 ) ) new_speed = 1600;
+    if (start) {
+	success = waveout_save_start();
 
-  if( wait_rate < new_speed ) wait_rate = new_speed;
-  else                        wait_rate = 100;
-  wait_vsync_reset();
-  no_wait = 0;
+	if (success) {
+	    status_message(1, STATUS_INFO_TIME, "Sound Record Start ...");
+	} else {
+	    status_message(1, STATUS_INFO_TIME, "Sound Record Failed !");
+	}
 
-  sprintf( str, "WAIT  %4d[%%]", wait_rate );
-  status_message( 1, 60, str );					/* 1 sec */
+    } else {
+
+	success = TRUE;
+
+	waveout_save_stop();
+	status_message(1, STATUS_INFO_TIME, "Sound Record Stopped");
+    }
+
+    return success;
 }
-void	quasi88_max_clock( double new_clock )
+
+
+
+/***********************************************************************
+ * ドラッグアンドドロップ
+ *	TODO 戻り値をもう一工夫
+ ************************************************************************/
+int	quasi88_drag_and_drop(const char *filename)
 {
-  double def_clock = (boot_clock_4mhz ? CONST_4MHZ_CLOCK : CONST_8MHZ_CLOCK );
-  char	str[32];
+    if (quasi88_is_exec() ||
+	quasi88_is_pause()) {
 
-  if( !( 0.1<=new_clock && new_clock<1000.0) ) new_clock = CONST_4MHZ_CLOCK*16;
+	if (quasi88_disk_insert_all(filename, FALSE)) {
 
-  if( cpu_clock_mhz < new_clock ) cpu_clock_mhz = new_clock;
-  else                            cpu_clock_mhz = def_clock;
-  interval_work_init_all();
+	    status_message(1, STATUS_INFO_TIME, "Disk Image Set and Reset");
+	    quasi88_reset(NULL);
 
-  sprintf( str, "CLOCK %8.4f[MHz]", cpu_clock_mhz );
-  status_message( 1, 60, str );					/* 1 sec */
+	    if (quasi88_is_pause()) {
+		quasi88_exec();
+	    }
+
+	} else {
+
+	    status_message(1, STATUS_WARN_TIME, "D&D Failed !  Disk Unloaded ...");
+	}
+
+	return TRUE;
+    }
+
+    return FALSE;
 }
-void	quasi88_max_boost( int new_boost )
+
+
+
+/***********************************************************************
+ * ウェイトの比率設定
+ * ウェイトの有無設定
+ ************************************************************************/
+int	quasi88_cfg_now_wait_rate(void)
 {
-  char	str[32];
-
-  if( !( 1<=new_boost || new_boost<=100 ) ) new_boost = 16;
-
-  if( boost < new_boost ) boost_change( new_boost );
-  else                    boost_change( 1 );
-  
-
-  sprintf( str, "BOOST [x%2d]", boost );
-  status_message( 1, 60, str );					/* 1 sec */
+    return wait_rate;
 }
-
-
-
-/*======================================================================
- * ドライブを一時的に空の状態にする
- *		画面にメッセージを常時表示しておく
- *======================================================================*/
-static void change_image_empty( int drv )
+void	quasi88_cfg_set_wait_rate(int rate)
 {
-  char	str[48];
+    int time = STATUS_INFO_TIME;
+    char str[32];
+    long dt;
 
-  if( disk_image_exist( drv ) ){
+    if (rate < 5)    rate = 5;
+    if (rate > 5000) rate = 5000;
 
-    drive_set_empty( drv );
-    sprintf( str, "DRIVE %d:  <<<< Eject >>>>         ", drv+1 );
-  }else{
-    sprintf( str, "DRIVE %d:   --  No Disk  --        ", drv+1 );
-  }
+    if (wait_rate != rate) {
+	wait_rate = rate;
 
-  status_message( 1, 0, str );				/* ∞ sec */
+	if (quasi88_is_exec()) {
+
+	    sprintf(str, "WAIT  %4d[%%]", wait_rate);
+
+	    status_message(1, time, str);
+	    /* ↑ ウェイト変更したので、表示時間はウェイト倍になる */
+
+	    dt = (long)((1000000.0 / (CONST_VSYNC_FREQ * wait_rate / 100)));
+	    wait_vsync_setup(dt, wait_by_sleep);
+	}
+    }
 }
-void	quasi88_drv1_image_empty( void ){ change_image_empty( 0 ); }
-void	quasi88_drv2_image_empty( void ){ change_image_empty( 1 ); }
-
-/*======================================================================
- * ドライブのイメージを次(前)のイメージに変更する
- *		変更した後は、しばらく画面にイメージ名を表示させる
- *======================================================================*/
-static void change_image_change( int drv, int direction )
+int	quasi88_cfg_now_no_wait(void)
 {
-  char	str[48];
-  int	img;
-
-  if( disk_image_exist( drv ) ){
-
-    img = disk_image_selected(drv);
-    img += direction;
-    if( img < 0 ) img = disk_image_num(drv)-1;
-    if( img >= disk_image_num(drv) ) img = 0;
-
-    drive_unset_empty( drv );
-    disk_change_image( drv, img );
-
-
-    sprintf( str, "DRIVE %d:  %-16s   %s  ",
-	     drv+1,
-	     drive[drv].image[ disk_image_selected(drv) ].name,
-	     (drive[drv].image[ disk_image_selected(drv) ].protect)
-							? "(p)" : "   " );
-  }else{
-    sprintf( str, "DRIVE %d:   --  No Disk  --        ", drv+1 );
-  }
-
-  status_message( 1, 60+60+30, str );			/* 2.5 sec */
+    return no_wait;
 }
-void	quasi88_drv1_image_next( void ){ change_image_change( 0, +1 ); }
-void	quasi88_drv1_image_prev( void ){ change_image_change( 0, -1 ); }
-void	quasi88_drv2_image_next( void ){ change_image_change( 1, +1 ); }
-void	quasi88_drv2_image_prev( void ){ change_image_change( 1, -1 ); }
+void	quasi88_cfg_set_no_wait(int enable)
+{
+    int time = STATUS_INFO_TIME;
+    char str[32];
+    long dt;
+
+    if (no_wait != enable) {
+	no_wait = enable;
+
+	if (quasi88_is_exec()) {
+
+	    if (no_wait) { sprintf(str, "WAIT  OFF");    time *= 10; }
+	    else           sprintf(str, "WAIT  ON");
+
+	    status_message(1, time, str);
+	    /* ↑ ウェイトなしなので、表示時間は実際のところ不定 */
+
+	    dt = (long)((1000000.0 / (CONST_VSYNC_FREQ * wait_rate / 100)));
+	    wait_vsync_setup(dt, wait_by_sleep);
+	}
+    }
+}
 
 
-/*======================================================================
+
+/***********************************************************************
  * ディスクイメージファイル設定
- *		・両ドライブに挿入して、リセット
- *		・両ドライブに挿入
- *		・指定ドライブに挿入
- *		・反対ドライブのイメージファイルを、挿入
- *		・両ドライブ取り出し
- *		・指定ドライブ取り出し
- *======================================================================*/
-int	quasi88_disk_insert_and_reset( const char *filename, int ro )
+ *	・両ドライブに挿入
+ *	・指定ドライブに挿入
+ *	・反対ドライブのイメージファイルを、挿入
+ *	・両ドライブ取り出し
+ *	・指定ドライブ取り出し
+ ************************************************************************/
+int	quasi88_disk_insert_all(const char *filename, int ro)
 {
-  if( quasi88_disk_insert_all( filename, ro ) ){
-    quasi88_reset();
-    return TRUE;
-  }
-  return FALSE;
-}
-int	quasi88_disk_insert_all( const char *filename, int ro )
-{
-  quasi88_disk_eject_all();
+    int success;
 
-  if( quasi88_disk_insert( DRIVE_1, filename, 0, ro ) ){
+    quasi88_disk_eject_all();
 
-    boot_from_rom = FALSE;
+    success = quasi88_disk_insert(DRIVE_1, filename, 0, ro);
 
-    if( disk_image_num( DRIVE_1 ) > 1 ){
-      quasi88_disk_insert_A_to_B( DRIVE_1, DRIVE_2, 1 );
-    }
-    return TRUE;
-  }
-  return FALSE;
-}
-int	quasi88_disk_insert( int drv, const char *filename, int image, int ro )
-{
-  int err;
+    if (success) {
 
-  quasi88_disk_eject( drv );
-
-  if( strlen( filename ) < QUASI88_MAX_FILENAME ){
-
-    err = disk_insert( drv, filename, image, ro );
-
-    if( err == FALSE ){
-      strcpy( file_disk[ drv ], filename );
-      readonly_disk[ drv ] = ro;
-
-      if( filename_synchronize ){
-	set_state_filename( FALSE );
-	set_snapshot_filename( FALSE );
-      }
+	if (disk_image_num(DRIVE_1) > 1) {
+	    quasi88_disk_insert_A_to_B(DRIVE_1, DRIVE_2, 1);
+	}
     }
 
-    return err ? FALSE : TRUE;
-  }
-
-  return FALSE;
-}
-int	quasi88_disk_insert_A_to_B( int src, int dst, int img )
-{
-  int err;
-
-  quasi88_disk_eject( dst );
-
-  err = disk_insert_A_to_B( src, dst, img );
-
-  if( err == FALSE ){
-    strcpy( file_disk[ dst ], file_disk[ src ] );
-    readonly_disk[ dst ] = readonly_disk[ src ];
-
-    if( filename_synchronize ){
-      set_state_filename( FALSE );
-      set_snapshot_filename( FALSE );
+    if (quasi88_is_exec()) {
+	status_message_default(1, NULL);
     }
-  }
-
-  return err ? FALSE : TRUE;
+    return success;
 }
-void	quasi88_disk_eject_all( void )
+int	quasi88_disk_insert(int drv, const char *filename, int image, int ro)
 {
-  int drv;
+    int success = FALSE;
 
-  for( drv=0; drv<2; drv++ ){
-    quasi88_disk_eject( drv );
-  }
+    quasi88_disk_eject(drv);
 
-  boot_from_rom = TRUE;
-}
-void	quasi88_disk_eject( int drv )
-{
-  if( disk_image_exist( drv ) ){
-    disk_eject( drv );
-    memset( file_disk[ drv ], 0, QUASI88_MAX_FILENAME );
+    if (strlen(filename) < QUASI88_MAX_FILENAME) {
 
-    if( filename_synchronize ){
-      set_state_filename( FALSE );
-      set_snapshot_filename( FALSE );
+	if (disk_insert(drv, filename, image, ro) == 0) success = TRUE;
+	else                                            success = FALSE;
+
+	if (success) {
+
+	    if (drv == DRIVE_1) boot_from_rom = FALSE;
+
+	    strcpy(file_disk[ drv ], filename);
+	    readonly_disk[ drv ] = ro;
+
+	    if (filename_synchronize) {
+		filename_init_state(TRUE);
+		filename_init_snap(TRUE);
+		filename_init_wav(TRUE);
+	    }
+	}
     }
-  }
+
+    if (quasi88_is_exec()) {
+	status_message_default(1, NULL);
+    }
+    return success;
 }
+int	quasi88_disk_insert_A_to_B(int src, int dst, int img)
+{
+    int success;
+
+    quasi88_disk_eject(dst);
+
+    if (disk_insert_A_to_B(src, dst, img) == 0) success = TRUE;
+    else                                        success = FALSE;
+
+    if (success) {
+	strcpy(file_disk[ dst ], file_disk[ src ]);
+	readonly_disk[ dst ] = readonly_disk[ src ];
+
+	if (filename_synchronize) {
+	    filename_init_state(TRUE);
+	    filename_init_snap(TRUE);
+	    filename_init_wav(TRUE);
+	}
+    }
+
+    if (quasi88_is_exec()) {
+	status_message_default(1, NULL);
+    }
+    return success;
+}
+void	quasi88_disk_eject_all(void)
+{
+    int drv;
+
+    for (drv = 0; drv<2; drv++) {
+	quasi88_disk_eject(drv);
+    }
+
+    boot_from_rom = TRUE;
+
+    if (quasi88_is_exec()) {
+	status_message_default(1, NULL);
+    }
+}
+void	quasi88_disk_eject(int drv)
+{
+    if (disk_image_exist(drv)) {
+	disk_eject(drv);
+	memset(file_disk[ drv ], 0, QUASI88_MAX_FILENAME);
+
+	if (filename_synchronize) {
+	    filename_init_state(TRUE);
+	    filename_init_snap(TRUE);
+	    filename_init_wav(TRUE);
+	}
+    }
+
+    if (quasi88_is_exec()) {
+	status_message_default(1, NULL);
+    }
+}
+
+/***********************************************************************
+ * ディスクイメージファイル設定
+ *	・ドライブを一時的に空の状態にする
+ *	・ドライブのイメージを変更する
+ *	・ドライブのイメージを前のイメージに変更する
+ *	・ドライブのイメージを次のイメージに変更する
+ ************************************************************************/
+enum { TYPE_SELECT, TYPE_EMPTY, TYPE_NEXT, TYPE_PREV };
+
+static void disk_image_sub(int drv, int type, int img)
+{
+    int d;
+    char str[48];
+
+    if (disk_image_exist(drv)) {
+	switch (type) {
+
+	case TYPE_EMPTY:
+	    drive_set_empty(drv);
+	    sprintf(str, "DRIVE %d:  <<<< Eject >>>>         ", drv + 1);
+	    break;
+
+	case TYPE_NEXT:
+	case TYPE_PREV:
+	    if (type == TYPE_NEXT) d = +1;
+	    else                   d = -1;
+
+	    img = disk_image_selected(drv) + d;
+	    /* FALLTHROUGH */
+
+	default:
+	    if (img < 0) img = disk_image_num(drv)-1;
+	    if (img >= disk_image_num(drv)) img = 0;
+
+	    drive_unset_empty(drv);
+	    disk_change_image(drv, img);
+
+	    sprintf(str, "DRIVE %d:  %-16s   %s  ",
+		    drv + 1,
+		    drive[drv].image[ disk_image_selected(drv) ].name,
+		    (drive[drv].image[ disk_image_selected(drv) ].protect)
+							? "(p)" : "   ");
+	    break;
+	}
+    } else {
+	sprintf(str, "DRIVE %d:   --  No Disk  --        ", drv + 1);
+    }
+
+    if (quasi88_is_exec()) {
+	status_message_default(1, NULL);
+    }
+    status_message(1, STATUS_INFO_TIME, str);
+}
+void	quasi88_disk_image_select(int drv, int img)
+{
+    disk_image_sub(drv, TYPE_SELECT, img);
+}
+void	quasi88_disk_image_empty(int drv)
+{
+    disk_image_sub(drv, TYPE_EMPTY, 0);
+}
+void	quasi88_disk_image_next(int drv)
+{
+    disk_image_sub(drv, TYPE_NEXT, 0);
+}
+void	quasi88_disk_image_prev(int drv)
+{
+    disk_image_sub(drv, TYPE_PREV, 0);
+}
+
+
+
+
 
 
 /*======================================================================
@@ -1212,52 +1132,52 @@ void	quasi88_disk_eject( int drv )
  *		・セーブ用テープイメージファイルセット
  *		・セーブ用テープイメージファイル取り外し
  *======================================================================*/
-int	quasi88_load_tape_insert( const char *filename )
+int	quasi88_load_tape_insert(const char *filename)
 {
-  quasi88_load_tape_eject();
+    quasi88_load_tape_eject();
 
-  if( strlen( filename ) < QUASI88_MAX_FILENAME &&
-      sio_open_tapeload( filename ) ){
+    if (strlen(filename) < QUASI88_MAX_FILENAME &&
+	sio_open_tapeload(filename)) {
 
-    strcpy( file_tape[ CLOAD ], filename );
-    return TRUE;
+	strcpy(file_tape[ CLOAD ], filename);
+	return TRUE;
 
-  }
-  return FALSE;
+    }
+    return FALSE;
 }
-int	quasi88_load_tape_rewind( void )
+int	quasi88_load_tape_rewind(void)
 {
-  if( sio_tape_rewind() ){
+    if (sio_tape_rewind()) {
 
-    return TRUE;
+	return TRUE;
 
-  }
-  quasi88_load_tape_eject();
-  return FALSE;
+    }
+    quasi88_load_tape_eject();
+    return FALSE;
 }
-void	quasi88_load_tape_eject( void )
+void	quasi88_load_tape_eject(void)
 {
-  sio_close_tapeload();
-  memset( file_tape[ CLOAD ], 0, QUASI88_MAX_FILENAME );
+    sio_close_tapeload();
+    memset(file_tape[ CLOAD ], 0, QUASI88_MAX_FILENAME);
 }
 
-int	quasi88_save_tape_insert( const char *filename )
+int	quasi88_save_tape_insert(const char *filename)
 {
-  quasi88_save_tape_eject();
+    quasi88_save_tape_eject();
 
-  if( strlen( filename ) < QUASI88_MAX_FILENAME &&
-      sio_open_tapesave( filename ) ){
+    if (strlen(filename) < QUASI88_MAX_FILENAME &&
+	sio_open_tapesave(filename)) {
 
-    strcpy( file_tape[ CSAVE ], filename );
-    return TRUE;
+	strcpy(file_tape[ CSAVE ], filename);
+	return TRUE;
 
-  }
-  return FALSE;
+    }
+    return FALSE;
 }
-void	quasi88_save_tape_eject( void )
+void	quasi88_save_tape_eject(void)
 {
-  sio_close_tapesave();
-  memset( file_tape[ CSAVE ], 0, QUASI88_MAX_FILENAME );
+    sio_close_tapesave();
+    memset(file_tape[ CSAVE ], 0, QUASI88_MAX_FILENAME);
 }
 
 /*======================================================================
@@ -1322,339 +1242,4 @@ void	quasi88_printer_remove( void )
 {
   printer_close();
   memset( file_prn, 0, QUASI88_MAX_FILENAME );
-}
-
-
-
-
-
-
-
-
-
-
-
-/***********************************************************************
- * 各種ファイルのフルパスを取得
- *	各種設定の処理 (機種依存部) から呼び出される・・・ハズ
- *
- *		指定の ディスクイメージ名の、フルパスを取得
- *		指定の ROMイメージ名の、     フルパスを取得
- *		指定の 共通設定ファイル名の、フルパスを取得
- *		指定の 個別設定ファイル名の、フルパスを取得
- *
- *	成功時は、 char * (mallocされた領域)、失敗時は NULL
- ************************************************************************/
-
-/*
- * あるイメージのファイル名 imagename のディレクトリ部と拡張子部を
- * 取り除いたベース名を取り出し、
- * basedir と ベース名 と suffix を結合したファイル名を返す。
- * この返ってくる領域は、静的な領域なので注意 !
- */
-
-static	char *get_concatenate_filename( const char *imagename,
-					const char *basedir,
-					const char *suffix )
-{
-  char *p;
-  static char buf[ OSD_MAX_FILENAME ];
-        char file[ OSD_MAX_FILENAME ];
-
-  if( osd_path_split( imagename, buf, file, OSD_MAX_FILENAME ) ){
-
-    size_t len = strlen( file );
-
-    if( len >= 4 ){
-      if      ( strcmp( &file[ len-4 ], ".d88" ) == 0 ||
-		strcmp( &file[ len-4 ], ".D88" ) == 0 ){
-
-	file[ len-4 ] = '\0';
-      }
-/*
-      else if( strcmp( &file[ len-4 ], ".t88" ) == 0 ||
-	       strcmp( &file[ len-4 ], ".T88" ) == 0 ||
-	       strcmp( &file[ len-4 ], ".cmt" ) == 0 ||
-	       strcmp( &file[ len-4 ], ".CMT" ) == 0 ){
-
-	file[ len-4 ] = '\0';
-      }
-*/
-    }
-
-    if( strlen(file) + strlen(suffix) + 1 < OSD_MAX_FILENAME ){
-
-      strcat( file, suffix );
-
-      if( osd_path_join( basedir, file, buf, OSD_MAX_FILENAME ) ){
-	return buf;
-      }
-    }
-  }
-
-  return NULL;
-}
-
-/* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -*/
-
-char	*alloc_diskname( const char *filename )
-{
-  char *p;
-  char dir [ OSD_MAX_FILENAME ];
-  char file[ OSD_MAX_FILENAME ];
-  const char *base;
-  OSD_FILE *fp;
-  int step;
-
-		/* filename を dir と file に分ける */
-
-  if( osd_path_split( filename, dir, file, OSD_MAX_FILENAME ) ){
-
-    if( dir[0] == '\0' ){
-		/* dir が空、つまり filename にパスの区切りが含まれない */
-
-      step = 0;		/* dir_disk + filename で ファイル有無を判定	*/
-
-    }else{
-		/* filename にパス区切りが含まれる	または		*/
-		/* 上記 step 0 で、ファイルが無かった場合		*/
-
-      step = 1;		/* dir_cwd + filename で ファイル有無をチェック */
-			/*	( filenameが絶対パスなら、 filename     */
-			/*	  そのものでファイル有無チェックとなる)	*/
-    }
-
-  }else{
-    return NULL;
-  }
-
-
-		/* step 0 → step 1 の順に、ファイル有無チェック */
-
-  for( ; step < 2; step ++ ){
-
-    if( step == 0 ) base = osd_dir_disk();
-    else            base = osd_dir_cwd();
-
-    if( base==NULL ) continue;
-
-    if( osd_path_join( base, filename, file, OSD_MAX_FILENAME ) == FALSE ){
-      return NULL;
-    }
-
-			/* 実際に open できるかをチェックする */
-    fp = osd_fopen( FTYPE_DISK, file, "rb" );
-    if( fp ){
-      osd_fclose( fp );
-
-      p = (char *)malloc( strlen(file) + 1 );
-      if( p ){
-	strcpy( p, file );
-	return p;
-      }
-      break;
-    }
-  }
-
-  return NULL;
-}
-
-
-
-
-
-char	*alloc_romname( const char *filename )
-{
-  char *p;
-  char buf[ OSD_MAX_FILENAME ];
-  OSD_FILE *fp;
-  int step;
-  const char *dir = osd_dir_rom(); 
-
-	/* step 0 … filenameがあるかチェック			*/
-	/* step 1 … dir_rom に、 filename があるかチェック	*/
-
-  for( step=0; step<2; step++ ){
-
-    if( step==0 ){
-
-      if( OSD_MAX_FILENAME <= strlen(filename) ) return NULL;
-      strcpy( buf, filename );
-
-    }else{
-
-      if( dir == NULL ||
-	  osd_path_join( dir, filename, buf, OSD_MAX_FILENAME ) == FALSE ){
-
-	return NULL;
-      }
-    }
-
-		/* 実際に open できるかをチェックする */
-    fp = osd_fopen( FTYPE_ROM, buf, "rb" );
-    if( fp ){
-      osd_fclose( fp );
-
-      p = (char *)malloc( strlen(buf) + 1 );
-      if( p ){
-	strcpy( p, buf );
-	return p;
-      }
-      break;
-    }
-  }
-  return NULL;
-}
-
-
-
-
-
-char	*alloc_global_cfgname( void )
-{
-  const char *dir  = osd_dir_gcfg();
-  const char *file = CONFIG_FILENAME  CONFIG_SUFFIX;
-  char *p;
-  char buf[ OSD_MAX_FILENAME ];
-
-
-  if( dir == NULL ||
-      osd_path_join( dir, file, buf, OSD_MAX_FILENAME ) == FALSE )
-
-    return NULL;
-
-  p = (char *)malloc( strlen(buf) + 1 );
-  if( p ){
-    strcpy( p, buf );
-    return p;
-  }
-
-  return NULL;
-}
-
-char	*alloc_keyboard_cfgname( void )
-{
-  const char *dir  = osd_dir_gcfg();
-  const char *file = KEYCONF_FILENAME  CONFIG_SUFFIX;
-  char *p;
-  char buf[ OSD_MAX_FILENAME ];
-
-
-  if( dir == NULL ||
-      osd_path_join( dir, file, buf, OSD_MAX_FILENAME ) == FALSE )
-
-    return NULL;
-
-  p = (char *)malloc( strlen(buf) + 1 );
-  if( p ){
-    strcpy( p, buf );
-    return p;
-  }
-
-  return NULL;
-}
-
-char	*alloc_local_cfgname( const char *imagename )
-{
-  char *p   = NULL;
-  char *buf;
-  const char *dir = osd_dir_lcfg();
-
-  if( dir==NULL ) return NULL;
-
-  buf = get_concatenate_filename( imagename, dir, CONFIG_SUFFIX );
-
-  if( buf ){
-    p = (char *)malloc( strlen(buf) + 1 );
-    if( p ){
-      strcpy( p, buf );
-    }
-  }
-  return p;
-}
-
-
-
-
-/***********************************************************************
- * ステートファイル、スナップショットファイルのファイル名に、
- * 初期文字列をセットする。
- *
- *
- *
- *
- ************************************************************************/
-
-int	set_state_filename( int init )
-{
-  int result = FALSE;
-  char *s, *buf;
-  const char *dir;
-
-  dir = osd_dir_state();
-  if( dir==NULL ) dir = osd_dir_cwd();
-
-  memset( file_state, 0, QUASI88_MAX_FILENAME );
-
-  if( init == FALSE ){
-    if     ( file_disk[0][0]     != '\0' ) s = file_disk[0];
-    else if( file_disk[1][0]     != '\0' ) s = file_disk[1];
-/*  else if( file_tape[CLOAD][0] != '\0' ) s = file_tape[CLOAD];*/
-    else                                   s = STATE_FILENAME;
-  }else{
-    s = STATE_FILENAME;
-  }
-
-  buf = get_concatenate_filename( s, dir, STATE_SUFFIX );
-
-  if( buf ){
-    if( strlen( buf ) < QUASI88_MAX_FILENAME ){
-
-      strcpy( file_state, buf );
-      result = TRUE;
-    }
-  }
-
-  if( result == FALSE ){
-    strcpy( file_state, STATE_FILENAME STATE_SUFFIX );
-  }
-  return result;
-}
-
-
-
-int	set_snapshot_filename( int init )
-{
-  int result = FALSE;
-  char *s, *buf;
-  const char *dir;
-
-  dir = osd_dir_snap();
-  if( dir==NULL ) dir = osd_dir_cwd();
-
-  memset( file_snap, 0, QUASI88_MAX_FILENAME );
-
-  if( init == FALSE ){
-    if     ( file_disk[0][0]     != '\0' ) s = file_disk[0];
-    else if( file_disk[1][0]     != '\0' ) s = file_disk[1];
-/*  else if( file_tape[CLOAD][0] != '\0' ) s = file_tape[CLOAD];*/
-    else                                   s = SNAPSHOT_FILENAME;
-  }else{
-    s = SNAPSHOT_FILENAME;
-  }
-
-  buf = get_concatenate_filename( s, dir, "" );
-
-  if( buf ){
-    if( strlen( buf ) < QUASI88_MAX_FILENAME ){
-
-      strcpy( file_snap, buf );
-      result = TRUE;
-    }
-  }
-
-  if( result == FALSE ){
-    strcpy( file_snap, SNAPSHOT_FILENAME );
-  }
-  return result;
 }

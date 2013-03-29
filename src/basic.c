@@ -481,7 +481,7 @@ int basic_decode_list(FILE *fp)
 {
     char buf[BASIC_MAX_LINE];
     int i;
-    int size;
+    int size = 0;
     int text_line_num;
     long loop;
     word line_top_addr, line_end_addr;

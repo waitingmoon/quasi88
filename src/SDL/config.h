@@ -10,15 +10,6 @@
 #include <SDL_byteorder.h>
 
 
-/* エンディアンネスをチェック */
-#if	( SDL_BYTEORDER == SDL_LIL_ENDIAN )
-#define	LSB_FIRST
-#else
-#undef	LSB_FIRST
-#endif
-
-
-
 /* SDL版 QUASI88 のための識別用 */
 
 #ifndef	QUASI88_SDL
@@ -27,19 +18,33 @@
 
 
 
-/* メニューの タイトル・バージョン表示にて追加で表示する言葉 */
+/* エンディアンネスをチェック */
 
-#define	Q_COMMENT	"SDL version"
+#if	(SDL_BYTEORDER == SDL_LIL_ENDIAN)
+#define	LSB_FIRST
+#else
+#undef	LSB_FIRST
+#endif
 
 
 
-/* SDL版は 16bpp(bit per pixel) 固定とする */
+/* メニューのタイトル／バージョン表示にて追加で表示する言葉 (任意の文字列) */
+
+#define	Q_COMMENT	"SDL port"
+
+
+
+/* 画面の bpp の定義。SDL版は 16bpp/32bpp のみをサポートする */
+
+#undef	SUPPORT_8BPP
 
 #ifndef	SUPPORT_16BPP
 #define	SUPPORT_16BPP
 #endif
-#undef	SUPPORT_8BPP
-#undef	SUPPORT_32BPP
+
+#ifndef	SUPPORT_32BPP
+#define	SUPPORT_32BPP
+#endif
 
 
 

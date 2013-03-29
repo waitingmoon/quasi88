@@ -38,10 +38,6 @@ double	vsync_freq_hz   = DEFAULT_VSYNC_FREQ_HZ;   /* VSYNC 割込周期   [Hz]  */
 int	wait_rate     = 100;			/* ウエイト調整 比率    [%]  */
 int	wait_by_sleep = TRUE;			/* ウエイト調整時 sleep する */
 
-long	wait_sleep_min_us = 100;		/* 残り idle時間がこの us以下の
-						   場合は、 sleep せずに待つ。
-						   (MAX 1秒 = 1,000,000us) */
-
 
 
 #define	CPU_CLOCK_MHZ		cpu_clock_mhz
@@ -125,6 +121,8 @@ static	int	sd2_BRDY_intr_timer;
 static	int	sd2_EOS_intr_base;
 static	int	sd2_EOS_intr_timer;
 
+static	int	vsync_count;		/* test (計測用) */
+
 
 
 
@@ -139,11 +137,11 @@ static	int	sd2_EOS_intr_timer;
  */
 static	void	interval_work_init_generic( void )
 {
-  vsync_intr_timer = vsync_intr_base = CPU_CLOCK / VSYNC_FREQ_HZ;
-  vrtc_timer       = vrtc_base       = (vsync_intr_base * VRTC_TOP);
-                     vrtc_base2      = (vsync_intr_base * VRTC_DISP);
+  vsync_intr_timer = vsync_intr_base = (int) (CPU_CLOCK / VSYNC_FREQ_HZ);
+  vrtc_timer       = vrtc_base       = (int) (vsync_intr_base * VRTC_TOP);
+                     vrtc_base2      = (int) (vsync_intr_base * VRTC_DISP);
 
-  rtc_intr_timer   = rtc_intr_base   = CPU_CLOCK / RTC_FREQ_HZ;
+  rtc_intr_timer   = rtc_intr_base   = (int) (CPU_CLOCK / RTC_FREQ_HZ);
 
   state_of_vsync = vsync_intr_base;
   state_of_cpu   = 0;
@@ -368,24 +366,17 @@ void	interval_work_set_EOS( int length )
 
 static	void	vsync( void )
 {
+  vsync_count++;			/* test (計測用) */
+
   if( ++ boost_cnt >= boost ){
     boost_cnt = 0;
   }
  
   if( boost_cnt == 0 ){
-
-    xmame_sound_update();		/* サウンド出力 */
-
-    if( !no_wait ) wait_vsync();	/* 実時間でウエイトを取る */
-
-    xmame_update_video_and_audio();	/* サウンド出力 その2 */
-
-    event_handle();			/* イベント処理		*/
-
-    scan_keyboard();			/* キースキャン処理	*/
-
+    CPU_BREAKOFF();
+    quasi88_event_flags |= EVENT_AUDIO_UPDATE;
 #ifdef	DRAW_SCREEN_AT_VSYNC_START
-    draw_screen();			/* 画面出力		*/
+    quasi88_event_flags |= EVENT_FRAME_UPDATE;
 #endif
   }
 
@@ -395,12 +386,17 @@ static	void	vsync( void )
   state_of_cpu -= state_of_vsync;	/* (== vsync_intr_base) */
 }
 
+int	quasi88_info_vsync_count(void)
+{
+  return vsync_count;
+}
 
 
 
 
 
-INLINE	void	set_INT_active( void )
+
+static	void	set_INT_active( void )
 {
   if( intr_level==0 ){				/* レベル設定 0 */
     z80main_cpu.INT_active = FALSE;		/*    割り込みは受け付けない */
@@ -478,7 +474,8 @@ void	main_INT_update( void )
 
 #ifndef	DRAW_SCREEN_AT_VSYNC_START
       if( boost_cnt == 0 ){
-	draw_screen();				/* 画面出力		*/
+	CPU_BREAKOFF();
+	quasi88_event_flags |= EVENT_FRAME_UPDATE;
       }
 #endif
     }
@@ -510,7 +507,7 @@ void	main_INT_update( void )
   if( sound_LOAD_A ){
     sd_A_intr_timer -= z80main_cpu.state0;
     if( sd_A_intr_timer < 0 ){
-      xmame_sound_timer_over(0);
+      xmame_dev_sound_timer_over(0);
       sd_A_intr_timer += sd_A_intr_base;
       if( sound_ENABLE_A ){
 	if( sound2_MSK_TA ) sound_FLAG_A = 0;
@@ -526,7 +523,7 @@ void	main_INT_update( void )
   if( sound_LOAD_B ){
     sd_B_intr_timer -= z80main_cpu.state0;
     if( sd_B_intr_timer < 0 ){
-      xmame_sound_timer_over(1);
+      xmame_dev_sound_timer_over(1);
       sd_B_intr_timer += sd_B_intr_base;
       if( sound_ENABLE_B ){
 	if( sound2_MSK_TB ) sound_FLAG_B = 0;
@@ -619,7 +616,9 @@ void	main_INT_update( void )
 
 	/* メニューへの遷移などは、ここで確認 */
 
-  if( next_emu_mode() != EXEC ) CPU_BREAKOFF();
+  if (quasi88_event_flags & EVENT_MODE_CHANGED) {
+    CPU_BREAKOFF();
+  }
 }
 
 
@@ -644,6 +643,7 @@ void	main_INT_init( void )
 
   interval_work_init_all();
   ctrl_vrtc = 1;
+  sio_data_clear();
 
 /*
 printf("CPU    %f\n",cpu_clock_mhz);
@@ -723,6 +723,8 @@ int	main_INT_chk( void )
 /***********************************************************************
  * ステートロード／ステートセーブ
  ************************************************************************/
+static	int	wait_by_sleep_dummy;
+static	int	wait_sleep_min_us_dummy;
 
 #define	SID	"INTR"
 #define	SID2	"INT2"
@@ -742,8 +744,8 @@ static	T_SUSPEND_W	suspend_intr_work[]=
   { TYPE_DOUBLE,&vsync_freq_hz,		},
 
   { TYPE_INT,	&wait_rate,		},
-  { TYPE_INT,	&wait_by_sleep,		},
-  { TYPE_LONG,	&wait_sleep_min_us,	},
+  { TYPE_INT,	&wait_by_sleep_dummy,		},
+  { TYPE_LONG,	&wait_sleep_min_us_dummy,	},
 
   { TYPE_INT,	&state_of_cpu,		},
   { TYPE_INT,	&state_of_vsync,	},
@@ -858,7 +860,7 @@ int	stateload_intr( void )
 
 
  NOT_HAVE_SID2:
-  vrtc_base2 = vsync_intr_base * VRTC_DISP;
+  vrtc_base2 = (int) (vsync_intr_base * VRTC_DISP);
   if( ctrl_vrtc == 0 ) ctrl_vrtc = 2;
 
 

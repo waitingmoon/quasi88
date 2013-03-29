@@ -21,6 +21,9 @@
 #define __RC_H
 
 #include <stdio.h>
+#if 0 /* osd_rc_ functions are no longer used */
+#include "fileio.h"
+#endif
 #include "begin_code.h"
 
 struct rc_struct;
@@ -66,6 +69,11 @@ int rc_unregister(struct rc_struct *rc, struct rc_option *option);
 int rc_load(struct rc_struct *rc, const char *name, int priority,
    int continue_on_errors);
 int rc_save(struct rc_struct *rc, const char *name, int append);
+#if 0 /* osd_rc_ functions are no longer used */
+int osd_rc_read(struct rc_struct *rc, mame_file *f, const char *description,
+   int priority, int continue_on_errors);
+int osd_rc_write(struct rc_struct *rc, mame_file *f, const char *description);
+#endif
 int rc_read(struct rc_struct *rc, FILE *f, const char *description,
    int priority, int continue_on_errors);
 int rc_write(struct rc_struct *rc, FILE *f, const char *description);
@@ -116,14 +124,11 @@ struct rc_option *rc_get_option2(struct rc_option *option, const char *name);
 /* gimmi the entire tree, I want todo all the parsing myself */
 struct rc_option *rc_get_options(struct rc_struct *rc);
 
-/* various utility functions which don't really belong to the rc object,
-   but seem to fit here well */
-int rc_check_and_create_dir(const char *name);
-char *rc_get_home_dir(void);
-
-#if 1	/* forQUASI88 */
-int rc_quasi88( struct rc_struct *rc, char *arg1, char *arg2, int priority );
-#endif
+#if 1	/* QUASI88 */
+int rc_quasi88(struct rc_struct *rc, char *arg1, char *arg2, int priority);
+int rc_quasi88_save(struct rc_option *option,
+		void (*real_write)(const char *opt_name, const char *opt_arg));
+#endif	/* QUASI88 */
 
 #include "end_code.h"
 #endif /* ifndef __RC_H */

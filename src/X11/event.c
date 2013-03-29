@@ -17,10 +17,9 @@
 #include <ctype.h>
 
 #include "quasi88.h"
+#include "getconf.h"
 #include "keyboard.h"
 #include "joystick.h"
-
-#include "graph.h"	/* now_screen_size		*/
 
 #include "drive.h"
 
@@ -33,17 +32,31 @@
 
 
 
+#ifdef	XDEEP32
+int	x11_get_focus = TRUE;
+#else
+int	x11_get_focus;			/* 現在、フォーカスありかどうか	*/
+#endif
+
+int	x11_scaling = FALSE;		/* マウス座標のスケーリング有無	*/
+int	x11_scale_x_num = 0;		/* 以下、その際のパラメータ	*/
+int	x11_scale_x_den = 1;
+int	x11_scale_y_num = 0;
+int	x11_scale_y_den = 1;
+
+
+
 int	keyboard_type = 1;		/* キーボードの種類                */
 char	*file_keyboard = NULL;		/* キー設定ファイル名		   */
 
 int	use_xdnd = TRUE;		/* XDnD に対応するかどうか	   */
 int	use_joydevice = TRUE;		/* ジョイスティックデバイスを開く? */
 
-int	get_focus;			/* 現在、フォーカスありかどうか	*/
 
 static	int mouse_jumped = FALSE;
 
 
+static	const char *debug_x11keysym(int code); /* デバッグ用 */
 /*==========================================================================
  * キー配列について
  *
@@ -69,11 +82,33 @@ static	int mouse_jumped = FALSE;
  *	mac ?     Ctrl      Opt (Cmd)  スペース      (cmd) (Opt)        (Ctrl)
  *
  *===========================================================================*/
+
+/* ソフトウェアNumLock をオンした際の、キーバインディング変更テーブル */
+
+typedef struct {
+    int		type;		/* KEYCODE_INVALID / SYM / SCAN		*/
+    int		code;		/* キーシンボル、ないし、スキャンコード	*/
+    int		new_key88;	/* NumLock ON 時の QUASI88キーコード	*/
+    int		org_key88;	/* NumLock OFF時の QUASI88キーコード	*/
+} T_BINDING;
+
+
+/* キーバインディングをデフォルト(初期値)から変更する際の、テーブル */
+
+typedef struct {
+    int		type;		/* KEYCODE_INVALID / SYM / SCAN		*/
+    int		code;		/* キーシンボル、ないし、スキャンコード	*/
+    int		key88;		/* 変更する QUASI88キーコード           */
+} T_REMAPPING;
+
+
+/* X11 の keysym を 0〜511 の範囲に丸める */
+
 #define	LOCAL_KEYSYM(ks)						    \
-	((((ks) & 0xff00) == 0xff00 )			/* XK_MISCELLANY */ \
-		? ( ((ks) & 0x00ff) | 0x100 )				    \
-		: ( (((ks) & 0xff00) == 0x0000)		/* XK_LATIN1 */	    \
-				? (ks) : -1) )
+	((((ks) & 0xff00) == 0xff00)			/* XK_MISCELLANY */ \
+		? (((ks) & 0x00ff) | 0x100)				    \
+		: ((((ks) & 0xff00) == 0x0000)		/* XK_LATIN1 */	    \
+					? (ks) : 0))
 
 /*----------------------------------------------------------------------
  * X11 の keysym を QUASI88 の キーコードに変換するテーブル
@@ -81,6 +116,9 @@ static	int mouse_jumped = FALSE;
  *
  *	キーシンボル XK_xxx が押されたら、 
  *	keysym2key88[ XK_xxx ] が押されたとする。
+ *
+ *	keysym2key88[] には、 KEY88_xxx をセットしておく。
+ *	初期値は keysym2key88_default[] と同じ
  *----------------------------------------------------------------------*/
 static int keysym2key88[ 256 + 256 ];
 
@@ -91,26 +129,25 @@ static int keysym2key88[ 256 + 256 ];
  *
  *	スキャンコード code が押されたら、
  *	keycode2key88[ code ] が押されたとする。
- *	(keysym2key88[]に優先する。スキャンコードの値は 0〜配列maxまで)
+ *
+ *	keycode2key88[] には、 KEY88_xxx または -1 をセットしておく。
+ *	これは keysym2key88[] に優先される。(ただし -1 の場合は無効)
+ *	初期値は 全て -1、変換可能なスキャンコードは 0〜255までに制限。
  *----------------------------------------------------------------------*/
 static int scancode2key88[ 256 ];
 
  
 
 /*----------------------------------------------------------------------
- * ソフトウェア NumLock オン/オフ 時のマッピング変更テーブル
+ * ソフトウェア NumLock オン時の キーコード変換情報
  *
- *	binding[].code が押されたら、
- *	binding[].new_key88 が押されたことにする。
- *	(変更できるキーの個数は、配列maxまで)
+ *	binding[].code (X11 の keysym ないし keycode) が押されたら、
+ *	binding[].new_key88 (KEY88_xxx) が押されたことにする。
+ *
+ *	ソフトウェア NumLock オン時は、この情報にしたがって、
+ *	keysym2key88[] 、 keycode2key88[] を書き換える。
+ *	変更できるキーの個数は、64個まで (これだけあればいいだろう)
  *----------------------------------------------------------------------*/
-typedef struct{
-  int type;		/* 0:終端 / 1:keysym / 2:scancode	*/
-  int code;		/* キーシンボル、ないし、スキャンコード	*/
-  int org_key88;	/* NumLock OFF時の QUASI88キーコード	*/
-  int new_key88;	/* NumLock ON 時の QUASI88キーコード	*/
-} T_BINDING;
-
 static T_BINDING binding[ 64 ];
 
 
@@ -118,10 +155,10 @@ static T_BINDING binding[ 64 ];
 
 
 /*----------------------------------------------------------------------
- * XL_xxx → KEY88_xxx 変換テーブル (デフォルト)
+ * XK_xxx → KEY88_xxx 変換テーブル (デフォルト)
  *----------------------------------------------------------------------*/
 
-static int keysym2key88_default[ 256 + 256 ] =
+static const int keysym2key88_default[ 256 + 256 ] =
 {
   /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -*/
   /* from XK_LATIN1					0x0000〜0x00FF	*/
@@ -427,172 +464,156 @@ static int keysym2key88_default[ 256 + 256 ] =
 
 
 /*----------------------------------------------------------------------
- * keysym2key88[] と scancode2key88[] の一部を、変更するテーブル
+ * keysym2key88[]   の初期値は、keysym2key88_default[] と同じ、
+ * scancode2key88[] の初期値は、全て -1 (未使用) であるが、
+ * キーボードの種類に応じて、keysym2key88[] と scancode2key88[] の一部を
+ * 変更することにする。以下は、その変更の情報。
  *----------------------------------------------------------------------*/
 
-typedef struct{
-  int type;		/* 0:終端 / 1:keysym / 2:scancode	*/
-  int code;		/* キーシンボル、ないし、スキャンコード	*/
-  int key88;
-} T_REMAPPING;
-
-
-const T_REMAPPING remapping_106[] =
+static const T_REMAPPING remapping_106[] =
 {
-  {	1,  XK_Super_L,		KEY88_KANA,		},
-  {	1,  XK_Alt_R,		KEY88_ZENKAKU,		},
-  {	1,  XK_Meta_R,		KEY88_ZENKAKU,		},
-  {	1,  XK_Menu,		KEY88_SYS_MENU,		},
-/*{	1,  XK_Control_R,       KEY88_UNDERSCORE,	},*/
+    {	KEYCODE_SYM,  XK_Super_L,	KEY88_KANA,	    },
+    {	KEYCODE_SYM,  XK_Alt_R,		KEY88_ZENKAKU,	    },
+    {	KEYCODE_SYM,  XK_Meta_R,	KEY88_ZENKAKU,	    },
+    {	KEYCODE_SYM,  XK_Menu,		KEY88_SYS_MENU,	    },
+/*  {	KEYCODE_SYM,  XK_Control_R,	KEY88_UNDERSCORE,   },*/
 
-  {	2,   19,		KEY88_0,		},	/* 0        */
-  {	2,  123,		KEY88_UNDERSCORE,	},	/* \ _ ロ   */
+    {	KEYCODE_SCAN,	  19,		KEY88_0,	    },   /* 0        */
+    {	KEYCODE_SCAN,	 123,		KEY88_UNDERSCORE,   },   /* \ _ ロ   */
 
-  {	0,  0,			0,			},
+    {	KEYCODE_INVALID, 0,		0,		    },
 };
 
-const T_REMAPPING remapping_101[] =
+static const T_REMAPPING remapping_101[] =
 {
-  {	1,  XK_Super_L,		KEY88_KANA,		},
-  {	1,  XK_Alt_R,		KEY88_ZENKAKU,		},
-  {	1,  XK_Meta_R,		KEY88_ZENKAKU,		},
-  {	1,  XK_Menu,		KEY88_SYS_MENU,		},
-  {	1,  XK_Control_R,       KEY88_UNDERSCORE,	},
+    {	KEYCODE_SYM,  XK_Super_L,	KEY88_KANA,	    },
+    {	KEYCODE_SYM,  XK_Alt_R,		KEY88_ZENKAKU,	    },
+    {	KEYCODE_SYM,  XK_Meta_R,	KEY88_ZENKAKU,	    },
+    {	KEYCODE_SYM,  XK_Menu,		KEY88_SYS_MENU,	    },
+    {	KEYCODE_SYM,  XK_Control_R,	KEY88_UNDERSCORE,   },
 
-  {	1,  XK_grave,           KEY88_YEN,		},
-  {	1,  XK_asciitilde,      KEY88_BAR,		},
-  {	1,  XK_at,              KEY88_QUOTEDBL,		},
-  {	1,  XK_asciicircum,     KEY88_AMPERSAND,	},
-  {	1,  XK_ampersand,       KEY88_APOSTROPHE,	},
-  {	1,  XK_asterisk,        KEY88_PARENLEFT,	},
-  {	1,  XK_parenleft,       KEY88_PARENRIGHT,	},
-  {	1,  XK_parenright,      KEY88_0,		},
-  {	1,  XK_underscore,      KEY88_EQUAL,		},
-  {	1,  XK_equal,           KEY88_CARET,		},
-  {	1,  XK_plus,            KEY88_TILDE,		},
-  {	1,  XK_bracketleft,     KEY88_AT,		},
-  {	1,  XK_braceleft,       KEY88_BACKQUOTE,	},
-  {	1,  XK_bracketright,    KEY88_BRACKETLEFT,	},
-  {	1,  XK_braceright,      KEY88_BRACELEFT,	},
-  {	1,  XK_backslash,       KEY88_BRACKETRIGHT,	},
-  {	1,  XK_bar,             KEY88_BRACERIGHT,	},
-  {	1,  XK_colon,           KEY88_PLUS,		},
-  {	1,  XK_apostrophe,      KEY88_COLON,		},
-  {	1,  XK_quotedbl,        KEY88_ASTERISK,		},
-  {	0,  0,			0,			},
+    {	KEYCODE_SYM,  XK_grave,		KEY88_YEN,	    },
+    {	KEYCODE_SYM,  XK_asciitilde,	KEY88_BAR,	    },
+    {	KEYCODE_SYM,  XK_at,		KEY88_QUOTEDBL,	    },
+    {	KEYCODE_SYM,  XK_asciicircum,	KEY88_AMPERSAND,    },
+    {	KEYCODE_SYM,  XK_ampersand,	KEY88_APOSTROPHE,   },
+    {	KEYCODE_SYM,  XK_asterisk,	KEY88_PARENLEFT,    },
+    {	KEYCODE_SYM,  XK_parenleft,	KEY88_PARENRIGHT,   },
+    {	KEYCODE_SYM,  XK_parenright,	KEY88_0,	    },
+    {	KEYCODE_SYM,  XK_underscore,	KEY88_EQUAL,	    },
+    {	KEYCODE_SYM,  XK_equal,		KEY88_CARET,	    },
+    {	KEYCODE_SYM,  XK_plus,		KEY88_TILDE,	    },
+    {	KEYCODE_SYM,  XK_bracketleft,	KEY88_AT,	    },
+    {	KEYCODE_SYM,  XK_braceleft,	KEY88_BACKQUOTE,    },
+    {	KEYCODE_SYM,  XK_bracketright,	KEY88_BRACKETLEFT,  },
+    {	KEYCODE_SYM,  XK_braceright,	KEY88_BRACELEFT,    },
+    {	KEYCODE_SYM,  XK_backslash,	KEY88_BRACKETRIGHT, },
+    {	KEYCODE_SYM,  XK_bar,		KEY88_BRACERIGHT,   },
+    {	KEYCODE_SYM,  XK_colon,		KEY88_PLUS,	    },
+    {	KEYCODE_SYM,  XK_apostrophe,	KEY88_COLON,	    },
+    {	KEYCODE_SYM,  XK_quotedbl,	KEY88_ASTERISK,	    },
+    {	KEYCODE_INVALID, 0,		0,		    },
 };
 
 
 
 /*----------------------------------------------------------------------
- * ソフトウェア NumLock オン/オフ 時のマッピング変更テーブル
+ * ソフトウェア NumLock オン時の キーコード変換情報 (デフォルト)
  *----------------------------------------------------------------------*/
 
 static const T_BINDING binding_106[] =
 {
-  {	1,	XK_5,		0,      KEY88_HOME,		},
-  {	1,	XK_6,		0,      KEY88_HELP,		},
-  {	1,	XK_7,		0,      KEY88_KP_7,		},
-  {	1,	XK_8,		0,      KEY88_KP_8,		},
-  {	1,	XK_9,		0,      KEY88_KP_9,		},
-  {	2,	19,		0,      KEY88_KP_MULTIPLY,	},
-  {	1,	XK_minus,	0,      KEY88_KP_SUB,		},
-  {	1,	XK_asciicircum,	0,      KEY88_KP_DIVIDE,	},
-  {	1,	XK_u,		0,      KEY88_KP_4,		},
-  {	1,	XK_i,		0,      KEY88_KP_5,		},
-  {	1,	XK_o,		0,      KEY88_KP_6,		},
-  {	1,	XK_p,		0,      KEY88_KP_ADD,		},
-  {	1,	XK_j,		0,      KEY88_KP_1,		},
-  {	1,	XK_k,		0,      KEY88_KP_2,		},
-  {	1,	XK_l,		0,      KEY88_KP_3,		},
-  {	1,	XK_semicolon,	0,      KEY88_KP_EQUAL,		},
-  {	1,	XK_m,		0,      KEY88_KP_0,		},
-  {	1,	XK_comma,	0,      KEY88_KP_COMMA,		},
-  {	1,	XK_period,	0,      KEY88_KP_PERIOD,	},
-  {	1,	XK_slash,	0,      KEY88_RETURNR,		},
+    {	KEYCODE_SYM,	XK_5,		KEY88_HOME,		0,	},
+    {	KEYCODE_SYM,	XK_6,		KEY88_HELP,		0,	},
+    {	KEYCODE_SYM,	XK_7,		KEY88_KP_7,		0,	},
+    {	KEYCODE_SYM,	XK_8,		KEY88_KP_8,		0,	},
+    {	KEYCODE_SYM,	XK_9,		KEY88_KP_9,		0,	},
+    {	KEYCODE_SCAN,	19,		KEY88_KP_MULTIPLY,	0,	},
+    {	KEYCODE_SYM,	XK_minus,	KEY88_KP_SUB,		0,	},
+    {	KEYCODE_SYM,	XK_asciicircum,	KEY88_KP_DIVIDE,	0,	},
+    {	KEYCODE_SYM,	XK_u,		KEY88_KP_4,		0,	},
+    {	KEYCODE_SYM,	XK_i,		KEY88_KP_5,		0,	},
+    {	KEYCODE_SYM,	XK_o,		KEY88_KP_6,		0,	},
+    {	KEYCODE_SYM,	XK_p,		KEY88_KP_ADD,		0,	},
+    {	KEYCODE_SYM,	XK_j,		KEY88_KP_1,		0,	},
+    {	KEYCODE_SYM,	XK_k,		KEY88_KP_2,		0,	},
+    {	KEYCODE_SYM,	XK_l,		KEY88_KP_3,		0,	},
+    {	KEYCODE_SYM,	XK_semicolon,	KEY88_KP_EQUAL,		0,	},
+    {	KEYCODE_SYM,	XK_m,		KEY88_KP_0,		0,	},
+    {	KEYCODE_SYM,	XK_comma,	KEY88_KP_COMMA,		0,	},
+    {	KEYCODE_SYM,	XK_period,	KEY88_KP_PERIOD,	0,	},
+    {	KEYCODE_SYM,	XK_slash,	KEY88_RETURNR,		0,	},
 
-  {	1,	XK_percent,	0,      KEY88_HOME,		},
-  {	1,	XK_ampersand,	0,      KEY88_HELP,		},
-  {	1,	XK_apostrophe,	0,      KEY88_KP_7,		},
-  {	1,	XK_parenleft,	0,      KEY88_KP_8,		},
-  {	1,	XK_parenright,	0,      KEY88_KP_9,		},
-  {	1,	XK_equal,	0,      KEY88_KP_SUB,		},
-  {	1,	XK_asciitilde,	0,      KEY88_KP_DIVIDE,	},
-  {	1,	XK_U,		0,      KEY88_KP_4,		},
-  {	1,	XK_I,		0,      KEY88_KP_5,		},
-  {	1,	XK_O,		0,      KEY88_KP_6,		},
-  {	1,	XK_P,		0,      KEY88_KP_ADD,		},
-  {	1,	XK_J,		0,      KEY88_KP_1,		},
-  {	1,	XK_K,		0,      KEY88_KP_2,		},
-  {	1,	XK_L,		0,      KEY88_KP_3,		},
-  {	1,	XK_plus,	0,      KEY88_KP_EQUAL,		},
-  {	1,	XK_M,		0,      KEY88_KP_0,		},
-  {	1,	XK_less,	0,      KEY88_KP_COMMA,		},
-  {	1,	XK_greater,	0,      KEY88_KP_PERIOD,	},
-  {	1,	XK_question,	0,      KEY88_RETURNR,		},
+    {	KEYCODE_SYM,	XK_percent,	KEY88_HOME,		0,	},
+    {	KEYCODE_SYM,	XK_ampersand,	KEY88_HELP,		0,	},
+    {	KEYCODE_SYM,	XK_apostrophe,	KEY88_KP_7,		0,	},
+    {	KEYCODE_SYM,	XK_parenleft,	KEY88_KP_8,		0,	},
+    {	KEYCODE_SYM,	XK_parenright,	KEY88_KP_9,		0,	},
+    {	KEYCODE_SYM,	XK_equal,	KEY88_KP_SUB,		0,	},
+    {	KEYCODE_SYM,	XK_asciitilde,	KEY88_KP_DIVIDE,	0,	},
+    {	KEYCODE_SYM,	XK_U,		KEY88_KP_4,		0,	},
+    {	KEYCODE_SYM,	XK_I,		KEY88_KP_5,		0,	},
+    {	KEYCODE_SYM,	XK_O,		KEY88_KP_6,		0,	},
+    {	KEYCODE_SYM,	XK_P,		KEY88_KP_ADD,		0,	},
+    {	KEYCODE_SYM,	XK_J,		KEY88_KP_1,		0,	},
+    {	KEYCODE_SYM,	XK_K,		KEY88_KP_2,		0,	},
+    {	KEYCODE_SYM,	XK_L,		KEY88_KP_3,		0,	},
+    {	KEYCODE_SYM,	XK_plus,	KEY88_KP_EQUAL,		0,	},
+    {	KEYCODE_SYM,	XK_M,		KEY88_KP_0,		0,	},
+    {	KEYCODE_SYM,	XK_less,	KEY88_KP_COMMA,		0,	},
+    {	KEYCODE_SYM,	XK_greater,	KEY88_KP_PERIOD,	0,	},
+    {	KEYCODE_SYM,	XK_question,	KEY88_RETURNR,		0,	},
 
-  {	0,	0,		0,	0,			},
+    {	KEYCODE_INVALID,0,		0,			0,	},
 };
 
 static const T_BINDING binding_101[] = 
 {
-  {	1,	XK_5,		0,      KEY88_HOME,		},
-  {	1,	XK_6,		0,      KEY88_HELP,		},
-  {	1,	XK_7,		0,      KEY88_KP_7,		},
-  {	1,	XK_8,		0,      KEY88_KP_8,		},
-  {	1,	XK_9,		0,      KEY88_KP_9,		},
-  {	2,	19,		0,      KEY88_KP_MULTIPLY,	},
-  {	1,	XK_minus,	0,      KEY88_KP_SUB,		},
-  {	1,	XK_equal,	0,      KEY88_KP_DIVIDE,	},
-  {	1,	XK_u,		0,      KEY88_KP_4,		},
-  {	1,	XK_i,		0,      KEY88_KP_5,		},
-  {	1,	XK_o,		0,      KEY88_KP_6,		},
-  {	1,	XK_p,		0,      KEY88_KP_ADD,		},
-  {	1,	XK_j,		0,      KEY88_KP_1,		},
-  {	1,	XK_k,		0,      KEY88_KP_2,		},
-  {	1,	XK_l,		0,      KEY88_KP_3,		},
-  {	1,	XK_semicolon,	0,      KEY88_KP_EQUAL,		},
-  {	1,	XK_m,		0,      KEY88_KP_0,		},
-  {	1,	XK_comma,	0,      KEY88_KP_COMMA,		},
-  {	1,	XK_period,	0,      KEY88_KP_PERIOD,	},
-  {	1,	XK_slash,	0,      KEY88_RETURNR,		},
+    {	KEYCODE_SYM,	XK_5,		KEY88_HOME,		0,	},
+    {	KEYCODE_SYM,	XK_6,		KEY88_HELP,		0,	},
+    {	KEYCODE_SYM,	XK_7,		KEY88_KP_7,		0,	},
+    {	KEYCODE_SYM,	XK_8,		KEY88_KP_8,		0,	},
+    {	KEYCODE_SYM,	XK_9,		KEY88_KP_9,		0,	},
+    {	KEYCODE_SCAN,	19,		KEY88_KP_MULTIPLY,	0,	},
+    {	KEYCODE_SYM,	XK_minus,	KEY88_KP_SUB,		0,	},
+    {	KEYCODE_SYM,	XK_equal,	KEY88_KP_DIVIDE,	0,	},
+    {	KEYCODE_SYM,	XK_u,		KEY88_KP_4,		0,	},
+    {	KEYCODE_SYM,	XK_i,		KEY88_KP_5,		0,	},
+    {	KEYCODE_SYM,	XK_o,		KEY88_KP_6,		0,	},
+    {	KEYCODE_SYM,	XK_p,		KEY88_KP_ADD,		0,	},
+    {	KEYCODE_SYM,	XK_j,		KEY88_KP_1,		0,	},
+    {	KEYCODE_SYM,	XK_k,		KEY88_KP_2,		0,	},
+    {	KEYCODE_SYM,	XK_l,		KEY88_KP_3,		0,	},
+    {	KEYCODE_SYM,	XK_semicolon,	KEY88_KP_EQUAL,		0,	},
+    {	KEYCODE_SYM,	XK_m,		KEY88_KP_0,		0,	},
+    {	KEYCODE_SYM,	XK_comma,	KEY88_KP_COMMA,		0,	},
+    {	KEYCODE_SYM,	XK_period,	KEY88_KP_PERIOD,	0,	},
+    {	KEYCODE_SYM,	XK_slash,	KEY88_RETURNR,		0,	},
 
-  {	1,	XK_percent,	0,      KEY88_HOME,		},
-  {	1,	XK_asciicircum,	0,      KEY88_HELP,		},
-  {	1,	XK_ampersand,	0,      KEY88_KP_7,		},
-  {	1,	XK_asterisk,	0,      KEY88_KP_8,		},
-  {	1,	XK_parenleft,	0,      KEY88_KP_9,		},
-  {	1,	XK_parenright,	0,      KEY88_KP_MULTIPLY,	},
-  {	1,	XK_underscore,	0,      KEY88_KP_SUB,		},
-  {	1,	XK_plus,	0,      KEY88_KP_DIVIDE,	},
-  {	1,	XK_U,		0,      KEY88_KP_4,		},
-  {	1,	XK_I,		0,      KEY88_KP_5,		},
-  {	1,	XK_O,		0,      KEY88_KP_6,		},
-  {	1,	XK_P,		0,      KEY88_KP_ADD,		},
-  {	1,	XK_J,		0,      KEY88_KP_1,		},
-  {	1,	XK_K,		0,      KEY88_KP_2,		},
-  {	1,	XK_L,		0,      KEY88_KP_3,		},
-  {	1,	XK_colon,	0,      KEY88_KP_EQUAL,		},
-  {	1,	XK_M,		0,      KEY88_KP_0,		},
-  {	1,	XK_less,	0,      KEY88_KP_COMMA,		},
-  {	1,	XK_greater,	0,      KEY88_KP_PERIOD,	},
-  {	1,	XK_question,	0,      KEY88_RETURNR,		},
+    {	KEYCODE_SYM,	XK_percent,	KEY88_HOME,		0,	},
+    {	KEYCODE_SYM,	XK_asciicircum,	KEY88_HELP,		0,	},
+    {	KEYCODE_SYM,	XK_ampersand,	KEY88_KP_7,		0,	},
+    {	KEYCODE_SYM,	XK_asterisk,	KEY88_KP_8,		0,	},
+    {	KEYCODE_SYM,	XK_parenleft,	KEY88_KP_9,		0,	},
+    {	KEYCODE_SYM,	XK_parenright,	KEY88_KP_MULTIPLY,	0,	},
+    {	KEYCODE_SYM,	XK_underscore,	KEY88_KP_SUB,		0,	},
+    {	KEYCODE_SYM,	XK_plus,	KEY88_KP_DIVIDE,	0,	},
+    {	KEYCODE_SYM,	XK_U,		KEY88_KP_4,		0,	},
+    {	KEYCODE_SYM,	XK_I,		KEY88_KP_5,		0,	},
+    {	KEYCODE_SYM,	XK_O,		KEY88_KP_6,		0,	},
+    {	KEYCODE_SYM,	XK_P,		KEY88_KP_ADD,		0,	},
+    {	KEYCODE_SYM,	XK_J,		KEY88_KP_1,		0,	},
+    {	KEYCODE_SYM,	XK_K,		KEY88_KP_2,		0,	},
+    {	KEYCODE_SYM,	XK_L,		KEY88_KP_3,		0,	},
+    {	KEYCODE_SYM,	XK_colon,	KEY88_KP_EQUAL,		0,	},
+    {	KEYCODE_SYM,	XK_M,		KEY88_KP_0,		0,	},
+    {	KEYCODE_SYM,	XK_less,	KEY88_KP_COMMA,		0,	},
+    {	KEYCODE_SYM,	XK_greater,	KEY88_KP_PERIOD,	0,	},
+    {	KEYCODE_SYM,	XK_question,	KEY88_RETURNR,		0,	},
 
-  {	0,	0,		0,	0,			},
+    {	KEYCODE_INVALID,0,		0,			0,	},
 };
 
-
-
-/******************************************************************************
- * メニューに入る際のキーの名称を返す
- *	とりあえず、起動時のステータスの表示にて使用。
- *	本当はメニューモードの中でも反映させる必要があるのだが ………
- *		面倒なので、実装は今後の課題にしよう
- *****************************************************************************/
-const	char	*get_keysym_menu( void )
-{
-  return	"F12";
-}
 
 
 /******************************************************************************
@@ -600,91 +621,107 @@ const	char	*get_keysym_menu( void )
  *
  *	1/60毎に呼び出される。
  *****************************************************************************/
-static	int	analyze_keyconf_file( void );
+static	int	analyze_keyconf_file(void);
+
+static	void	xdnd_receive_drag(XClientMessageEvent *E);
+static	void	xdnd_receive_drop(XSelectionEvent *E);
 
 /*
  * これは 起動時に1回だけ呼ばれる
  */
-void	event_handle_init( void )
+void	event_init(void)
 {
-  const T_REMAPPING *map;
-  const T_BINDING   *bin;
-  int i;
+    const T_REMAPPING *map;
+    const T_BINDING   *bin;
+    int i;
 
+    /* ジョイスティック初期化 */
 
-  memset( keysym2key88, 0, sizeof(keysym2key88) );
-  for( i=0; i<COUNTOF(scancode2key88); i++ ){
-    scancode2key88[ i ] = -1;
-  }
-  memset( binding, 0, sizeof(binding) );
-
-  function_f[ 11 ] = FN_STATUS;
-  function_f[ 12 ] = FN_MENU;
-
-
-
-  switch( keyboard_type ){
-
-  case 0:					/* デフォルトキーボード */
-    if( analyze_keyconf_file() ){
-      ;
-    }else{
-      memcpy( keysym2key88, keysym2key88_default,sizeof(keysym2key88_default));
-      memcpy( binding, binding_106, sizeof(binding_106) );
-    }
-    break;
-
-
-  case 1:					/* 106日本語キーボード */
-  case 2:					/* 101英語キーボード ? */
-    memcpy( keysym2key88, keysym2key88_default, sizeof(keysym2key88_default) );
-
-    if( keyboard_type == 1 ){ map = remapping_106;	bin = binding_106; }
-    else                    { map = remapping_101;	bin = binding_101; }
-
-    for( ;  map->type;  map ++ ){
-
-      if      ( map->type == 1 ){
-
-	keysym2key88[ LOCAL_KEYSYM(map->code) ] = map->key88;
-
-      }else if( map->type == 2 ){
-
-	scancode2key88[ map->code ] = map->key88;
-
-      }
+    if (use_joydevice) {
+	joystick_init();
     }
 
-    for( i=0; i<COUNTOF(binding); i++ ){
-      if( bin->type == 0 ) break;
 
-      binding[ i ].type      = bin->type;
-      binding[ i ].code      = bin->code;
-      binding[ i ].org_key88 = bin->org_key88;
-      binding[ i ].new_key88 = bin->new_key88;
-      bin ++;
+    /* キーマッピング初期化 */
+
+    memset(keysym2key88, 0, sizeof(keysym2key88));
+    for (i=0; i<COUNTOF(scancode2key88); i++) {
+	scancode2key88[ i ] = -1;
     }
-    break;
-  }
+    memset(binding, 0, sizeof(binding));
 
 
 
-  /* ソフトウェアNumLock 時のキー差し替えの準備 */
+    switch (keyboard_type) {
 
-  for( i=0; i<COUNTOF(binding); i++ ){
+    case 0:					/* デフォルトキーボード */
+	if (analyze_keyconf_file()) {
+	    ;
+	} else {
+	    memcpy(keysym2key88,
+		   keysym2key88_default, sizeof(keysym2key88_default));
+	    memcpy(binding,
+		   binding_106, sizeof(binding_106));
+	}
+	break;
 
-    if      ( binding[i].type == 1 ){
 
-      binding[i].org_key88 = keysym2key88[ LOCAL_KEYSYM(binding[i].code) ];
+    case 1:					/* 106日本語キーボード */
+    case 2:					/* 101英語キーボード ? */
+	memcpy(keysym2key88,
+	       keysym2key88_default, sizeof(keysym2key88_default));
 
-    }else if( binding[i].type == 2 ){
+	if (keyboard_type == 1) {
+	    map = remapping_106;
+	    bin = binding_106;
+	} else {
+	    map = remapping_101;
+	    bin = binding_101;
+	}
 
-      binding[i].org_key88 = scancode2key88[ binding[i].code ];
+	for ( ; map->type; map ++) {
 
-    }else{
-      break;
+	    if        (map->type == KEYCODE_SYM) {
+
+		keysym2key88[ LOCAL_KEYSYM(map->code) ] = map->key88;
+
+	    } else if (map->type == KEYCODE_SCAN) {
+
+		scancode2key88[ map->code ] = map->key88;
+
+	    }
+	}
+
+	for (i=0; i<COUNTOF(binding); i++) {
+	    if (bin->type == KEYCODE_INVALID) break;
+
+	    binding[ i ].type      = bin->type;
+	    binding[ i ].code      = bin->code;
+	    binding[ i ].org_key88 = bin->org_key88;
+	    binding[ i ].new_key88 = bin->new_key88;
+	    bin ++;
+	}
+	break;
     }
-  }
+
+
+
+    /* ソフトウェアNumLock 時のキー差し替えの準備 */
+
+    for (i=0; i<COUNTOF(binding); i++) {
+
+	if        (binding[i].type == KEYCODE_SYM) {
+
+	    binding[i].org_key88 = keysym2key88[LOCAL_KEYSYM(binding[i].code)];
+
+	} else if (binding[i].type == KEYCODE_SCAN) {
+
+	    binding[i].org_key88 = scancode2key88[ binding[i].code ];
+
+	} else {
+	    break;
+	}
+    }
 
 }
 
@@ -693,212 +730,220 @@ void	event_handle_init( void )
 /*
  * 約 1/60 毎に呼ばれる
  */
-void	event_handle( void )
+void	event_update(void)
 {
-  XEvent E;
-  KeySym keysym;
-  char	 dummy[4];
-  int    key88, x, y;
+    XEvent E;
+    KeySym keysym;
+    char   dummy[4];
+    int    key88, x, y;
 
-  while( XPending( display ) ){
+    while (XPending(x11_display)) {
 
-    XNextEvent( display, &E );
+	XNextEvent(x11_display, &E);
 
-    switch( E.type ){
+	switch (E.type) {
 
-
-    case ButtonPress:		/*------------------------------------------*/
-    case ButtonRelease:
-
-      /* マウス移動イベントも同時に処理する必要があるなら、
-	 pc88_mouse_moved_abs/rel 関数をここで呼び出しておく */
-
-      if     ( E.xbutton.button==Button1 ) key88 = KEY88_MOUSE_L;
-      else if( E.xbutton.button==Button2 ) key88 = KEY88_MOUSE_M;
-      else if( E.xbutton.button==Button3 ) key88 = KEY88_MOUSE_R;
-      else if( E.xbutton.button==Button4 ) key88 = KEY88_MOUSE_WUP;
-      else if( E.xbutton.button==Button5 ) key88 = KEY88_MOUSE_WDN;
-      else break;
-
-      pc88_mouse( key88, (E.type==ButtonPress) );
-      break;
-
-
-    case MotionNotify:		/*------------------------------------------*/
-      switch( mouse_rel_move ){
-
-      case 1:
-	/* DGAの場合、マウス移動イベントは常に相対移動量がセットされる */
-
-	x = E.xbutton.x;
-	y = E.xbutton.y;
-
-	if( x || y ){
-	  pc88_mouse_moved_rel( x, y );
-	}
-	break;
-
-      case -1:
-	/* ウインドウグラブ時は、マウスがウインドウの端にたどり着くとそれ以上
-	   動けなくなる。そこで、マウスを常にウインドウの中央にジャンプさせる
-	   ことで、無限にマウスを動かすことができるかのようにする。
-	   この時、マウスを非表示にしておかないと、無様な様子が見えるので注意。
-	   なお、XWarpPointer でポインタを移動させると、それに応じて
-	   MotionNotify が発生するので、無視すること。*/
-
-	if( mouse_jumped ){ mouse_jumped = FALSE; break; }
-
-	x = E.xbutton.x - WIDTH/2;
-	y = E.xbutton.y - HEIGHT/2;
-#if 0
-	if( get_emu_mode()==EXEC ){
-	  x /= 10;			/* ここで、マウスの速度が調整できる */
-	  y /= 10;
-	}
-#endif
-	if( x || y ){
-	  pc88_mouse_moved_rel( x, y );
-	}
-      
-	XWarpPointer( display, None, window, 0, 0, 0, 0, WIDTH/2, HEIGHT/2 );
-	mouse_jumped = TRUE;
-	break;
-
-      default:
-	/* 通常、マウス移動イベントは、マウスのウインドウ座標がセットされる */
-
-	x = E.xbutton.x;
-	y = E.xbutton.y;
-
-	x -= SCREEN_DX;
-	y -= SCREEN_DY;
-	if     ( now_screen_size == SCREEN_SIZE_HALF )  { x *= 2; y *= 2; }
-#ifdef	SUPPORT_DOUBLE
-	else if( now_screen_size == SCREEN_SIZE_DOUBLE ){ x /= 2; y /= 2; }
-#endif
-	pc88_mouse_moved_abs( x, y );
-      }
-/*printf("%d %d\n",E.xbutton.x,E.xbutton.y);*/
-      break;
-
-
-    case KeyPress:		/*------------------------------------------*/
-    case KeyRelease:
+	case KeyPress:		/*------------------------------------------*/
+	case KeyRelease:
 
 	/* 以下のどっちを使うのが正解？ 取得出来る keysym が違うのだが …… */
 #if 0
-      keysym = XLookupKeysym( (XKeyEvent *)&E, 0 );
-	/* ・Shift + TAB は XK_TAB が返る				*/
-	/* ・Shift + \ (シフトの左のキー) は XK_backslash が返る	*/
+	    keysym = XLookupKeysym((XKeyEvent *)&E, 0);
+	    /* ・Shift + TAB は XK_TAB が返る				*/
+	    /* ・Shift + \ (シフトの左のキー) は XK_backslash が返る	*/
 #else
-      XLookupString( (XKeyEvent *)&E, dummy, 0, &keysym, NULL );
-	/* ・Shift + TAB は XK_ISO_Left_Tab が返る			*/
-	/* ・Shift + \ (シフトの左のキー) は XK_underscore が返る	*/
+	    XLookupString((XKeyEvent *)&E, dummy, 0, &keysym, NULL);
+	    /* ・Shift + TAB は XK_ISO_Left_Tab が返る			*/
+	    /* ・Shift + \ (シフトの左のキー) は XK_underscore が返る	*/
 #endif
 
-      if( get_emu_mode() == EXEC ){
+	    if (quasi88_is_exec()) {
 
-	if( E.xkey.keycode < COUNTOF(scancode2key88) &&
-	    scancode2key88[ E.xkey.keycode ] >= 0 ){
+		/* scancode2key88[] が定義済なら、そのキーコードを優先する */
+		if (E.xkey.keycode < COUNTOF(scancode2key88) &&
+		    scancode2key88[ E.xkey.keycode ] >= 0) {
 
-	  key88 = scancode2key88[ E.xkey.keycode ];
+		    key88 = scancode2key88[ E.xkey.keycode ];
 
-	}else{
+		} else {
+		    if ((keysym & 0xff00) == 0xff00) {	    /* XK_MISCELLANY */
 
-	  if( (keysym & 0xff00) == 0xff00 ){		/* XK_MISCELLANY */
+			key88 = keysym2key88[ (keysym & 0x00ff) | 0x100 ];
 
-	    key88 = keysym2key88[ (keysym & 0x00ff) | 0x100 ];
+		    } else if ((keysym & 0xff00) == 0x0000) {	/* XK_LATIN1 */
 
-	  }else if( (keysym & 0xff00) == 0x0000 ){	/* XK_LATIN1 */
+			key88 = keysym2key88[ (keysym) ];
 
-	    key88 = keysym2key88[ (keysym) ];
+		    } else if (keysym == XK_ISO_Left_Tab) {	/* 0xFE20 */
 
-	  }else if( keysym == XK_ISO_Left_Tab ){	/* 0xFE20 */
+			key88 = KEY88_TAB;
 
-	    key88 = KEY88_TAB;
+		    } else {					/* else... */
 
-	  }else{					/* else... */
+			key88 = 0;
 
-	    key88 = 0;
+		    }
+		}
 
-	  }
+	    } else {			/* (メニューなど) */
+
+		if ((keysym & 0xff00) == 0xff00) {	    /* XK_MISCELLANY */
+
+		    key88 = keysym2key88[ (keysym & 0x00ff) | 0x100 ];
+
+		} else if ((keysym & 0xff00) == 0x0000) {	/* XK_LATIN1 */
+
+		    key88 = keysym;
+
+		} else if (keysym == XK_ISO_Left_Tab) {		/* 0xFE20 */
+
+		    key88 = KEY88_TAB;
+
+		} else {					/* else... */
+
+		    key88 = 0;
+
+		}
+
+	    }
+
+	    /*if (E.type==KeyPress)
+		printf("scan=%3d : %04x=%-16s -> %d\n", E.xkey.keycode, keysym,
+		       debug_x11keysym(keysym), key88);*/
+	    /*printf("%d %d %d\n",key88,keysym,E.xkey.keycode);*/
+
+	    if (key88) {
+		quasi88_key(key88, (E.type == KeyPress));
+	    }
+	    break;
+
+	case MotionNotify:	/*------------------------------------------*/
+	    switch (x11_mouse_rel_move) {
+
+	    case 1:
+		/* DGA：マウス移動イベントは常に相対移動量がセットされる */
+
+		x = E.xmotion.x;
+		y = E.xmotion.y;
+
+		if (x || y) {
+		    quasi88_mouse_moved_rel(x, y);
+		}
+		break;
+
+	    case -1:
+		/* ウインドウグラブ時は、マウスがウインドウの端にたどり着くと
+		   それ以上動けなくなる。
+		   そこで、マウスを常にウインドウの中央にジャンプさせることで、
+		   無限にマウスを動かすことができるかのようにする。
+		   この時、マウスを非表示にしておかないと、無様な様子が見える
+		   ので注意。
+		   なお、XWarpPointer でポインタを移動させると、それに応じて
+		   MotionNotify が発生するので、無視すること。*/
+
+		if (mouse_jumped) { mouse_jumped = FALSE; break; }
+
+		x = E.xmotion.x - x11_width  / 2;
+		y = E.xmotion.y - x11_height / 2;
+
+		if (x11_scaling) {
+		    x = x * x11_scale_x_num / x11_scale_x_den;
+		    y = y * x11_scale_y_num / x11_scale_y_den;
+		}
+
+		if (x || y) {
+		    quasi88_mouse_moved_rel(x, y);
+		}
+      
+		XWarpPointer(x11_display, None, x11_window, 0, 0, 0, 0,
+			     x11_width / 2, x11_height / 2);
+		mouse_jumped = TRUE;
+		break;
+
+	    default:
+		/* 通常：マウス移動イベントは、ウインドウ座標がセットされる */
+
+		x = E.xmotion.x;
+		y = E.xmotion.y;
+
+		if (x11_scaling) {
+		    x = x * x11_scale_x_num / x11_scale_x_den;
+		    y = y * x11_scale_y_num / x11_scale_y_den;
+		}
+
+		quasi88_mouse_moved_abs(x, y);
+	    }
+	    /*printf("%d %d -> (%d, %d)\n",E.xmotion.x,E.xmotion.y,x,y);*/
+	    break;
+
+	case ButtonPress:	/*------------------------------------------*/
+	case ButtonRelease:
+	    /* マウス移動イベントも同時に処理する必要があるなら、
+	       quasi88_mouse_moved_abs/rel 関数をここで呼び出しておく */
+
+	    if      (E.xbutton.button == Button1) key88 = KEY88_MOUSE_L;
+	    else if (E.xbutton.button == Button2) key88 = KEY88_MOUSE_M;
+	    else if (E.xbutton.button == Button3) key88 = KEY88_MOUSE_R;
+	    else if (E.xbutton.button == Button4) key88 = KEY88_MOUSE_WUP;
+	    else if (E.xbutton.button == Button5) key88 = KEY88_MOUSE_WDN;
+	    else break;
+
+	    quasi88_mouse(key88, (E.type == ButtonPress));
+	    break;
+
+	case ClientMessage:	/*------------------------------------------*/
+	    /* ウインドウが破壊された場合は、ここで終了 */
+	    if (E.xclient.message_type == x11_atom_kill_type &&
+		(Atom)E.xclient.data.l[0] == x11_atom_kill_data) {
+
+		if (verbose_proc) printf("Window Closed !\n");
+		quasi88_quit();
+		break;
+	    }
+
+	    /* Drag & Drop のチェック */
+	    if (use_xdnd)
+		xdnd_receive_drag((XClientMessageEvent *)&E);
+	    break;
+
+	case SelectionNotify:	/*------------------------------------------*/
+	    /* Drag & Drop のチェック */
+	    if (use_xdnd)
+		xdnd_receive_drop((XSelectionEvent *)&E);
+	    break; 
+
+	case FocusIn:		/*------------------------------------------*/
+	    quasi88_focus_in();
+	    x11_get_focus = TRUE;
+	    x11_set_attribute_focus_in();
+	    break;
+
+	case FocusOut:		/*------------------------------------------*/
+	    quasi88_focus_out();
+	    x11_get_focus = FALSE;
+	    x11_set_attribute_focus_out();
+	    break;
+
+	case Expose:		/*------------------------------------------*/
+	    quasi88_expose();
+	    break;
 	}
-
-      }else{
-
-	if( (keysym & 0xff00) == 0xff00 ){		/* XK_MISCELLANY */
-
-	  key88 = keysym2key88[ (keysym & 0x00ff) | 0x100 ];
-
-	}else if( (keysym & 0xff00) == 0x0000 ){	/* XK_LATIN1 */
-
-	  key88 = keysym;
-
-	}else if( keysym == XK_ISO_Left_Tab ){		/* 0xFE20 */
-
-	  key88 = KEY88_TAB;
-
-	}else{						/* else... */
-
-	  key88 = 0;
-
-	}
-
-      }
-/*printf("%d %d %d\n",key88,keysym,E.xkey.keycode );*/
-
-      if( key88 ){
-	pc88_key( key88, (E.type==KeyPress) );
-      }
-      break;
-
-
-    case ClientMessage:		/*------------------------------------------*/
-      /* ウインドウが破壊された場合は、ここで終了 */
-      if(       E.xclient.message_type == atom_WM_close_type &&
-	  (Atom)E.xclient.data.l[0]    == atom_WM_close_data ){
-
-	if( verbose_proc ) printf( "Window Closed.....\n" );
-	pc88_quit();
-      }
-
-      /* Drag & Drop のチェック */
-      if( use_xdnd )
-	xdnd_receive_drag( (XClientMessageEvent *)&E );
-      break;
-
-
-    case SelectionNotify:	/*------------------------------------------*/
-      /* Drag & Drop のチェック */
-      if( use_xdnd )
-	xdnd_receive_drop( (XSelectionEvent *)&E );
-      break; 
-
-
-    case FocusIn:		/*------------------------------------------*/
-      pc88_focus_in();
-      get_focus = TRUE;
-      set_mouse_state();		/* オートリピート再設定のため */
-      break;
-
-
-    case FocusOut:		/*------------------------------------------*/
-      pc88_focus_out();
-      get_focus = FALSE;
-      set_mouse_state();		/* オートリピート再設定のため */
-      break;
-
-
-    case Expose:		/*------------------------------------------*/
-      put_image_all();			/* EXPOSE 時は 勝手に再描画しておく */
-      break;
     }
-  }
 
-  /* X11 には標準でジョイステックイベントが発生しない。
-     なので、ここでジョイステック状態をポーリングして処理する */
+    /* X11 には標準でジョイステックイベントが発生しない。
+       なので、ここでジョイステック状態をポーリングして処理する */
 
-  joystick_event();
+    joystick_update();
+}
+
+
+
+/*
+ * これは 終了時に1回だけ呼ばれる
+ */
+void	event_exit(void)
+{
+    joystick_exit();
 }
 
 
@@ -909,42 +954,37 @@ void	event_handle( void )
  *	現在のマウスの絶対座標を *x, *y にセット
  ************************************************************************/
 
-void	init_mouse_position( int *x, int *y )
+void	event_get_mouse_pos(int *x, int *y)
 {
-  if( mouse_rel_move ){
+    if (x11_mouse_rel_move) {
 
-    /* DGAおよびウインドウグラブ時は、マウスの絶対座標は存在しない。 */
+	/* DGAおよびウインドウグラブ時は、マウスの絶対座標は存在しない。 */
 
-  }else{
+    } else {
 
-    Window root_return;				/* ルートウインドウID     */
-    Window child_return;			/* 子ウインドウID(あれば) */
-    int    root_x, root_y;			/* ルートウインドウの座標 */
-    int    win_x,  win_y;			/* 指定ウインドウの座標   */
-    unsigned int button;			/* マウスボタンの押下状況 */
+	Window root_return;			/* ルートウインドウID     */
+	Window child_return;			/* 子ウインドウID(あれば) */
+	int    root_x, root_y;			/* ルートウインドウの座標 */
+	int    win_x,  win_y;			/* 指定ウインドウの座標   */
+	unsigned int button;			/* マウスボタンの押下状況 */
 
-    if( XQueryPointer( display, window, &root_return, &child_return,
-		       &root_x, &root_y, 
-		       &win_x,  &win_y, 
-		       &button ) ){
-      win_x -= SCREEN_DX;
-      win_y -= SCREEN_DY;
-      if     ( now_screen_size == SCREEN_SIZE_HALF )  {win_x *= 2; win_y *= 2;}
-#ifdef	SUPPORT_DOUBLE
-      else if( now_screen_size == SCREEN_SIZE_DOUBLE ){win_x /= 2; win_y /= 2;}
-#endif
-      *x = win_x;
-      *y = win_y;
+	if (XQueryPointer(x11_display, x11_window, &root_return, &child_return,
+			  &root_x, &root_y, 
+			  &win_x,  &win_y, 
+			  &button)) {
 
-      return;
+	    *x = win_x;
+	    *y = win_y;
+
+	    return;
+	}
+
     }
 
-  }
+    /* 絶対座標が無い場合は、とりあえず画面中央の座標を返すことにしよう */
 
-  /* 絶対座標が無い場合は、とりあえず画面中央の座標を返すことにしよう */
-
-  *x = 640/2;
-  *y = 400/2;
+    *x = x11_width  / 2;
+    *y = x11_height / 2;
 }
 
 
@@ -955,38 +995,39 @@ void	init_mouse_position( int *x, int *y )
  *
  *****************************************************************************/
 
-INLINE	void	numlock_setup( int enable )
+static	void	numlock_setup(int enable)
 {
-  int i;
-  int keysym;
+    int i;
+    int keysym;
 
-  for (i=0; i<COUNTOF(binding); i++ ){
-    if      ( binding[i].type == 1 ){
+    for (i=0; i<COUNTOF(binding); i++) {
 
-      keysym = LOCAL_KEYSYM( binding[i].code );
+	if        (binding[i].type == KEYCODE_SYM) {
 
-      if( enable ){
-	keysym2key88[ keysym ] = binding[i].new_key88;
-      }else{
-	keysym2key88[ keysym ] = binding[i].org_key88;
-      }
+	    keysym = LOCAL_KEYSYM(binding[i].code);
 
-    }else if( binding[i].type == 2 ){
+	    if (enable) {
+		keysym2key88[ keysym ] = binding[i].new_key88;
+	    } else {
+		keysym2key88[ keysym ] = binding[i].org_key88;
+	    }
 
-      if( enable ){
-	scancode2key88[ binding[i].code ] = binding[i].new_key88;
-      }else{
-	scancode2key88[ binding[i].code ] = binding[i].org_key88;
-      }
+	} else if (binding[i].type == KEYCODE_SCAN) {
 
-    }else{
-      break;
+	    if (enable) {
+		scancode2key88[ binding[i].code ] = binding[i].new_key88;
+	    } else {
+		scancode2key88[ binding[i].code ] = binding[i].org_key88;
+	    }
+
+	} else {
+	    break;
+	}
     }
-  }
 }
 
-int	numlock_on ( void ){ numlock_setup( TRUE );  return TRUE; }
-void	numlock_off( void ){ numlock_setup( FALSE ); }
+int	event_numlock_on (void) { numlock_setup(TRUE);  return TRUE; }
+void	event_numlock_off(void) { numlock_setup(FALSE); }
 
 
 
@@ -995,29 +1036,27 @@ void	numlock_off( void ){ numlock_setup( FALSE ); }
  *
  *****************************************************************************/
 
-void	event_init( void )
+void	event_switch(void)
 {
 #if 1
-  /* 既存のイベントをすべて破棄 */
-  XEvent E;
-  while( XCheckWindowEvent( display, window,
-			   ExposureMask|KeyPressMask|KeyReleaseMask|
-			   ButtonPressMask|ButtonReleaseMask|PointerMotionMask,
-			   &E) );
+    /* 既存のイベントをすべて破棄 */
+    XEvent E;
+    while (XCheckWindowEvent(x11_display, x11_window,
+			     ExposureMask|KeyPressMask|KeyReleaseMask|
+			     ButtonPressMask|ButtonReleaseMask|
+			     PointerMotionMask,
+			     &E));
 #endif
 
 
-  /* マウス表示、グラブの設定 (ついでにキーリピートも) */
-  set_mouse_state();
+    /* ウインドウグラブ中は、マウスを画面中央へ移動 */
+    if (x11_mouse_rel_move == -1) {
+	XWarpPointer(x11_display, None, x11_window, 0, 0, 0, 0,
+		     x11_width / 2, x11_height / 2);
+	mouse_jumped = TRUE;
+    }
 
-
-  /* ウインドウグラブ中は、マウスを画面中央へ移動 */
-  if( mouse_rel_move == -1 ){
-    XWarpPointer( display, None, window, 0, 0, 0, 0, WIDTH/2, HEIGHT/2 );
-    mouse_jumped = TRUE;
-  }
-
-  XFlush( display );
+    XFlush(x11_display);
 }
 
 
@@ -1026,32 +1065,34 @@ void	event_init( void )
 /***********************************************************************
  * 強制終了のイベントを生成
  ************************************************************************/
-void	event_quit_signal( void )
+void	event_quit_signal(void)
 {
-  XClientMessageEvent E;
+    XClientMessageEvent E;
 
-  E.type    = ClientMessage;
-  E.display = display;
-  E.window  = window;
-  E.message_type = atom_sigint;
-  E.format       = 32;
+    E.type    = ClientMessage;
+    E.display = x11_display;
+    E.window  = x11_window;
+    E.message_type = atom_sigint;
+    E.format       = 32;
 
-  if( XSendEvent( display, window, False, ExposureMask, (XEvent*)&E ) ){
-    XFlush( display );
-  }
+    if (XSendEvent(x11_display, x11_window, False, ExposureMask, (XEvent*)&E)){
+	XFlush(x11_display);
+    }
 }
 #endif
 
 
 /****************************************************************************
+ ****************************************************************************
  *
  *	XDnD を適当に実装してみた。実装にはあまり自信なし。
  *
+ ****************************************************************************
  *****************************************************************************/
 
 #include <X11/Xatom.h>
 
-static int drop_filename( const char *buf, int size );
+static int drop_filename(const char *buf, int size);
 
 static const int my_xdnd_ver = 5;
 
@@ -1077,51 +1118,51 @@ static Atom MIME_text_uri_list;
 /*
  *	起動時に1回だけ呼び出す。(Atomを取得or設定する)
  */
-void	xdnd_initialize( void )
+void	xdnd_initialize(void)
 {
-  if( use_xdnd == FALSE ) return;
+    if (use_xdnd == FALSE) return;
 
-  XA_XdndAware		= XInternAtom(display, "XdndAware",		False);
-  XA_XdndProxy		= XInternAtom(display, "XdndProxy",		False);
-  XA_XdndEnter		= XInternAtom(display, "XdndEnter",		False);
-  XA_XdndPosition	= XInternAtom(display, "XdndPosition",		False);
-  XA_XdndStatus		= XInternAtom(display, "XdndStatus",		False);
-  XA_XdndLeave		= XInternAtom(display, "XdndLeave",		False);
-  XA_XdndDrop		= XInternAtom(display, "XdndDrop",		False);
-  XA_XdndFinished	= XInternAtom(display, "XdndFinished",		False);
+    XA_XdndAware	= XInternAtom(x11_display, "XdndAware",		False);
+    XA_XdndProxy	= XInternAtom(x11_display, "XdndProxy",		False);
+    XA_XdndEnter	= XInternAtom(x11_display, "XdndEnter",		False);
+    XA_XdndPosition	= XInternAtom(x11_display, "XdndPosition",	False);
+    XA_XdndStatus	= XInternAtom(x11_display, "XdndStatus",	False);
+    XA_XdndLeave	= XInternAtom(x11_display, "XdndLeave",		False);
+    XA_XdndDrop		= XInternAtom(x11_display, "XdndDrop",		False);
+    XA_XdndFinished	= XInternAtom(x11_display, "XdndFinished",	False);
 
-  XA_XdndActionCopy	= XInternAtom(display, "XdndActionCopy",	False);
-  XA_XdndActionMove	= XInternAtom(display, "XdndActionMove",	False);
-  XA_XdndActionLink	= XInternAtom(display, "XdndActionLink",	False);
-  XA_XdndActionPrivate	= XInternAtom(display, "XdndActionPrivate",	False);
-  XA_XdndActionAsk	= XInternAtom(display, "XdndActionAsk",		False);
+    XA_XdndActionCopy	= XInternAtom(x11_display, "XdndActionCopy",	False);
+    XA_XdndActionMove	= XInternAtom(x11_display, "XdndActionMove",	False);
+    XA_XdndActionLink	= XInternAtom(x11_display, "XdndActionLink",	False);
+    XA_XdndActionPrivate= XInternAtom(x11_display, "XdndActionPrivate",	False);
+    XA_XdndActionAsk	= XInternAtom(x11_display, "XdndActionAsk",	False);
 
-  XA_XdndTypeList	= XInternAtom(display, "XdndTypeList",		False);
-  XA_XdndSelection	= XInternAtom(display, "XdndSelection",		False);
-  XV_DND_SELECTION	= XInternAtom(display, "XV_DND_SELECTION",	False);
+    XA_XdndTypeList	= XInternAtom(x11_display, "XdndTypeList",	False);
+    XA_XdndSelection	= XInternAtom(x11_display, "XdndSelection",	False);
+    XV_DND_SELECTION	= XInternAtom(x11_display, "XV_DND_SELECTION",	False);
 
-  MIME_text_plain	= XInternAtom(display, "text/plain",		False);
-  MIME_text_uri_list	= XInternAtom(display, "text/uri-list",		False);
+    MIME_text_plain	= XInternAtom(x11_display, "text/plain",	False);
+    MIME_text_uri_list	= XInternAtom(x11_display, "text/uri-list",	False);
 
 #if 0
-  printf("XA_XdndAware          %d\n",XA_XdndAware          );
-  printf("XA_XdndProxy          %d\n",XA_XdndProxy          );
-  printf("XA_XdndEnter          %d\n",XA_XdndEnter          );
-  printf("XA_XdndPosition       %d\n",XA_XdndPosition       );
-  printf("XA_XdndStatus         %d\n",XA_XdndStatus         );
-  printf("XA_XdndLeave          %d\n",XA_XdndLeave          );
-  printf("XA_XdndDrop           %d\n",XA_XdndDrop           );
-  printf("XA_XdndFinished       %d\n",XA_XdndFinished       );
-  printf("XA_XdndActionCopy     %d\n",XA_XdndActionCopy     );
-  printf("XA_XdndActionMove     %d\n",XA_XdndActionMove     );
-  printf("XA_XdndActionLink     %d\n",XA_XdndActionLink     );
-  printf("XA_XdndActionPrivate  %d\n",XA_XdndActionPrivate  );
-  printf("XA_XdndActionAsk      %d\n",XA_XdndActionAsk      );
-  printf("XA_XdndTypeList       %d\n",XA_XdndTypeList       );
-  printf("XA_XdndSelection      %d\n",XA_XdndSelection      );
-  printf("XV_DND_SELECTION      %d\n",XV_DND_SELECTION      );
-  printf("MIME_text_plain       %d\n",MIME_text_plain       );
-  printf("MIME_text_uri_list    %d\n",MIME_text_uri_list    );
+    printf("XA_XdndAware          %d\n", XA_XdndAware        );
+    printf("XA_XdndProxy          %d\n", XA_XdndProxy        );
+    printf("XA_XdndEnter          %d\n", XA_XdndEnter        );
+    printf("XA_XdndPosition       %d\n", XA_XdndPosition     );
+    printf("XA_XdndStatus         %d\n", XA_XdndStatus       );
+    printf("XA_XdndLeave          %d\n", XA_XdndLeave        );
+    printf("XA_XdndDrop           %d\n", XA_XdndDrop         );
+    printf("XA_XdndFinished       %d\n", XA_XdndFinished     );
+    printf("XA_XdndActionCopy     %d\n", XA_XdndActionCopy   );
+    printf("XA_XdndActionMove     %d\n", XA_XdndActionMove   );
+    printf("XA_XdndActionLink     %d\n", XA_XdndActionLink   );
+    printf("XA_XdndActionPrivate  %d\n", XA_XdndActionPrivate);
+    printf("XA_XdndActionAsk      %d\n", XA_XdndActionAsk    );
+    printf("XA_XdndTypeList       %d\n", XA_XdndTypeList     );
+    printf("XA_XdndSelection      %d\n", XA_XdndSelection    );
+    printf("XV_DND_SELECTION      %d\n", XV_DND_SELECTION    );
+    printf("MIME_text_plain       %d\n", MIME_text_plain     );
+    printf("MIME_text_uri_list    %d\n", MIME_text_uri_list  );
 #endif
 }
 
@@ -1129,12 +1170,12 @@ void	xdnd_initialize( void )
 /*
  *	ウインドウ生成時に呼び出す (XDndの使用を宣言する)
  */
-void	xdnd_start( void )
+void	xdnd_start(void)
 {
-  if( use_xdnd == FALSE ) return;
+    if (use_xdnd == FALSE) return;
 
-  XChangeProperty( display, window, XA_XdndAware, XA_ATOM, 32,
-		   PropModeReplace,(unsigned char*) &my_xdnd_ver, 1);
+    XChangeProperty(x11_display, x11_window, XA_XdndAware, XA_ATOM, 32,
+		    PropModeReplace,(unsigned char*) &my_xdnd_ver, 1);
 }
 
 
@@ -1148,306 +1189,305 @@ static Window	xdnd_from;
 static Window	xdnd_to;
 static Atom	xdnd_type;
 static int	xdnd_accept;
-static enum{ YET, ENTER, POS, DROP } xdnd_step = YET;
+static enum { YET, ENTER, POS, DROP } xdnd_step = YET;
 
-void	xdnd_receive_drag( XClientMessageEvent *E )
+static	void	xdnd_receive_drag(XClientMessageEvent *E)
 {
-  if( E->message_type == XA_XdndEnter ){
-    /*
-      ■■■■ 最初：マウスがウインドウに入ってきた時のイベント ■■■■
+    if (E->message_type == XA_XdndEnter) {
+	/*
+	  ■■■■ 最初：マウスがウインドウに入ってきた時のイベント ■■■■
 
-      E->data.l[0]	ソースウィンドウの XID
-      E->data.l[1]	上位 8bit プロトコルバージョン
-     			bit 0 が真なら3個以上のデータタイプあり
-      E->data.l[2]-[4]	データタイプ 1個目、2個目、3個目
-    */
+	  E->data.l[0]		ソースウィンドウの XID
+	  E->data.l[1]		上位 8bit プロトコルバージョン
+     				bit 0 が真なら3個以上のデータタイプあり
+	  E->data.l[2]-[4]	データタイプ 1個目、2個目、3個目
+	*/
 
-    xdnd_from = (Window)E->data.l[0];
-    xdnd_to   =         E->window;
-    xdnd_ver  = E->data.l[1] >> 24;
-    xdnd_step = ENTER;
-    xdnd_type = None;
+	xdnd_from = (Window)E->data.l[0];
+	xdnd_to   =         E->window;
+	xdnd_ver  = E->data.l[1] >> 24;
+	xdnd_step = ENTER;
+	xdnd_type = None;
 
-    if( (E->data.l[1] & 1) == 0 ){	/* データタイプは3個以内 */
+	if ((E->data.l[1] & 1) == 0) {	/* データタイプは3個以内 */
 
-      if      ( (Atom)E->data.l[2] == MIME_text_uri_list ||
-		(Atom)E->data.l[3] == MIME_text_uri_list ||
-		(Atom)E->data.l[4] == MIME_text_uri_list ){
+	    if        ((Atom)E->data.l[2] == MIME_text_uri_list ||
+		       (Atom)E->data.l[3] == MIME_text_uri_list ||
+		       (Atom)E->data.l[4] == MIME_text_uri_list) {
 
-	xdnd_type = MIME_text_uri_list;
-      }else if( (Atom)E->data.l[2] == MIME_text_plain ||
-		(Atom)E->data.l[3] == MIME_text_plain ||
-		(Atom)E->data.l[4] == MIME_text_plain ){
+		xdnd_type = MIME_text_uri_list;
+	    } else if ((Atom)E->data.l[2] == MIME_text_plain ||
+		       (Atom)E->data.l[3] == MIME_text_plain ||
+		       (Atom)E->data.l[4] == MIME_text_plain) {
 
-	xdnd_type = MIME_text_plain;
-      }
+		xdnd_type = MIME_text_plain;
+	    }
 
-    }else{				/* データタイプもっとある */
-      Atom type;
-      int format;
-      unsigned long nitems, bytes, i;
-      Atom* prop;
+	} else {			/* データタイプもっとある */
+	    Atom type;
+	    int format;
+	    unsigned long nitems, bytes, i;
+	    Atom* prop;
 
-      if( XGetWindowProperty( display, E->data.l[0], XA_XdndTypeList,
-			      0, 8192, False, XA_ATOM, &type, &format,
-			      &nitems, &bytes, (unsigned char **) &prop )
-	  == Success ){
+	    if (XGetWindowProperty(x11_display, E->data.l[0], XA_XdndTypeList,
+				   0, 8192, False, XA_ATOM, &type, &format,
+				   &nitems, &bytes, (unsigned char **) &prop)
+		== Success) {
 
-	for( i = 0; i < nitems; i ++ ){
-	  if( prop[i] == MIME_text_uri_list ||
-	      prop[i] == MIME_text_plain    ){
-	    xdnd_type = prop[i];
-	    break;
-	  }
+		for (i = 0; i < nitems; i ++) {
+		    if (prop[i] == MIME_text_uri_list ||
+			prop[i] == MIME_text_plain) {
+			xdnd_type = prop[i];
+			break;
+		    }
+		}
+		XFree(prop);
+	    }
 	}
-	XFree( prop );
-      }
-    }
 
-  }else if( E->message_type == XA_XdndPosition ){
+    } else if (E->message_type == XA_XdndPosition) {
 
-    /*
-      ■■■■ 途中：マウスがウインドウ内を動く時のイベント ■■■■
+	/*
+	  ■■■■ 途中：マウスがウインドウ内を動く時のイベント ■■■■
 
-      E->data.l[0]	ソースウィンドウの XID
-      E->data.l[1]	予約
-      E->data.l[2]	マウスの座標 (x << 16) | y
-      E->data.l[3]	タイムスタンプ
-      E->data.l[4]	リクエストアクション
-    */
+	  E->data.l[0]	ソースウィンドウの XID
+	  E->data.l[1]	予約
+	  E->data.l[2]	マウスの座標 (x << 16) | y
+	  E->data.l[3]	タイムスタンプ
+	  E->data.l[4]	リクエストアクション
+	*/
 
-    if( xdnd_from != (Window)E->data.l[0] ||
-	xdnd_to   !=         E->window    ){
-      /* ん？ 違うぞ？ */
-      ;
-    }else if( xdnd_step == ENTER || xdnd_step == POS ){
+	if (xdnd_from != (Window)E->data.l[0] ||
+	    xdnd_to   !=         E->window) {
+	    /* ん？ 違うぞ？ */
+	    ;
+	} else if (xdnd_step == ENTER || xdnd_step == POS) {
 
-      xdnd_step   = POS;
-      xdnd_accept = 0;
+	    xdnd_step   = POS;
+	    xdnd_accept = 0;
 
-      if( get_emu_mode()==EXEC ){
-	if( xdnd_type != None ){
-	  if( (Atom)E->data.l[4] == XA_XdndActionCopy ){
-	    xdnd_accept = 1;
-	  }
+	    if (quasi88_is_exec()) {
+		if (xdnd_type != None) {
+		    if ((Atom)E->data.l[4] == XA_XdndActionCopy) {
+			xdnd_accept = 1;
+		    }
+		}
+	    }
+
+	    {
+		XClientMessageEvent S;
+
+		S.type		= ClientMessage;
+		S.display	= x11_display;
+		S.window	= xdnd_from;
+		S.message_type	= XA_XdndStatus;
+		S.format	= 32;
+		S.data.l[0]	= xdnd_to;
+		S.data.l[1]	= xdnd_accept;
+		S.data.l[2]	= 0; /* (x << 16) | y; */
+		S.data.l[3]	= 0; /* (w << 16) | h; */
+		S.data.l[4]	= (xdnd_accept) ? E->data.l[4] : None;
+
+		XSendEvent(x11_display, S.window, False, 0, (XEvent*)&S);
+	    }
 	}
-      }
 
-      {
-	XClientMessageEvent S;
+    } else if (E->message_type == XA_XdndLeave) {
+	/*
+	  ■■■■ 最後：マウスがウインドウを出た時のイベント ■■■■
 
-	S.type		= ClientMessage;
-	S.display	= display;
-	S.window	= xdnd_from;
-	S.message_type	= XA_XdndStatus;
-	S.format	= 32;
-	S.data.l[0]	= xdnd_to;
-	S.data.l[1]	= xdnd_accept;
-	S.data.l[2]	= 0; /* (x << 16) | y; */
-	S.data.l[3]	= 0; /* (w << 16) | h; */
-	S.data.l[4]	= (xdnd_accept) ? E->data.l[4] : None;
+	  E->data.l[0]	ソースウィンドウの XID
+	  E->data.l[1]	予約
+	*/
 
-	XSendEvent( display, S.window, False, 0, (XEvent*)&S );
-      }
-    }
-
-  }else if( E->message_type == XA_XdndLeave ){
-    /*
-      ■■■■ 最後：マウスがウインドウを出た時のイベント ■■■■
-
-      E->data.l[0]	ソースウィンドウの XID
-      E->data.l[1]	予約
-    */
-
-    if( xdnd_from != (Window)E->data.l[0] ||
-	xdnd_to   !=         E->window    ){
-      /* ん？ 違うぞ？ */
-      ;
-    }else{
-      xdnd_step = YET;
-    }
-
-  }else if( E->message_type == XA_XdndDrop ){
-    /*
-      ■■■■ 実行：ウインドウ内でドロップされた時のイベント ■■■■
-
-      E->data.l[0]	ソースウィンドウの XID
-      E->data.l[1]	予約
-    */
-
-    if( xdnd_from != (Window)E->data.l[0] ||
-	xdnd_to   !=         E->window    ){
-      /* ん？ 違うぞ？ */
-      ;
-    }else{
-      if( xdnd_step == POS ){
-	XConvertSelection( display, XA_XdndSelection, xdnd_type,
-			   XV_DND_SELECTION, xdnd_to, E->data.l[2] );
-
-	xdnd_step = DROP;
-      }else{
-	if( xdnd_ver >= 5 ){
-	  XClientMessageEvent S;
-
-	  S.type	= ClientMessage;
-	  S.display	= display;
-	  S.window	= xdnd_from;
-	  S.message_type= XA_XdndFinished;
-	  S.format	= 32;
-	  S.data.l[0]	= xdnd_to;
-	  S.data.l[1]	= 0;
-	  S.data.l[2]	= None;
-	  S.data.l[3]	= 0;
-	  S.data.l[4]	= 0;
-
-	  XSendEvent( display, S.window, False, 0, (XEvent*)&S );
+	if (xdnd_from != (Window)E->data.l[0] ||
+	    xdnd_to   !=         E->window) {
+	    /* ん？ 違うぞ？ */
+	    ;
+	} else {
+	    xdnd_step = YET;
 	}
-	xdnd_step = YET;
-      }
-    }
 
-  }else{
-    /* 困った。わからない……… */
-    ;
-  }
+    } else if (E->message_type == XA_XdndDrop) {
+	/*
+	  ■■■■ 実行：ウインドウ内でドロップされた時のイベント ■■■■
+
+	  E->data.l[0]	ソースウィンドウの XID
+	  E->data.l[1]	予約
+	*/
+
+	if (xdnd_from != (Window)E->data.l[0] ||
+	    xdnd_to   !=         E->window) {
+	    /* ん？ 違うぞ？ */
+	    ;
+	} else {
+	    if (xdnd_step == POS) {
+		XConvertSelection(x11_display, XA_XdndSelection, xdnd_type,
+				  XV_DND_SELECTION, xdnd_to, E->data.l[2]);
+
+		xdnd_step = DROP;
+	    } else {
+		if (xdnd_ver >= 5) {
+		    XClientMessageEvent S;
+
+		    S.type	= ClientMessage;
+		    S.display	= x11_display;
+		    S.window	= xdnd_from;
+		    S.message_type= XA_XdndFinished;
+		    S.format	= 32;
+		    S.data.l[0]	= xdnd_to;
+		    S.data.l[1]	= 0;
+		    S.data.l[2]	= None;
+		    S.data.l[3]	= 0;
+		    S.data.l[4]	= 0;
+
+		    XSendEvent(x11_display, S.window, False, 0, (XEvent*)&S);
+		}
+		xdnd_step = YET;
+	    }
+	}
+
+    } else {
+	/* 困った。わからない……… */
+	;
+    }
 }
 
 
 
-void	xdnd_receive_drop( XSelectionEvent *E )
+static	void	xdnd_receive_drop(XSelectionEvent *E)
 {
-  unsigned long	bytes_after;
-  XTextProperty	prop;
-  int		ret;
+    unsigned long	bytes_after;
+    XTextProperty	prop;
+    int			ret;
 
     /*
       ■■■■ 結末：ドロップ後に通知されるイベント ■■■■
     */
 
-  if( E->property == XV_DND_SELECTION ){
-    if( xdnd_step == DROP ){
+    if (E->property == XV_DND_SELECTION) {
+	if (xdnd_step == DROP) {
 
-      ret = XGetWindowProperty( display, E->requestor,
-				E->property, 0L, 0x1fffffffL,
-				True, AnyPropertyType,
-				&prop.encoding, &prop.format, &prop.nitems,
-				&bytes_after, &prop.value );
+	    ret = XGetWindowProperty(x11_display, E->requestor,
+				     E->property, 0L, 0x1fffffffL,
+				     True, AnyPropertyType,
+				     &prop.encoding, &prop.format,
+				     &prop.nitems,
+				     &bytes_after, &prop.value);
 
-      if( ret           == Success &&
-	  prop.encoding != None    &&
-	  prop.format   == 8       &&
-	  prop.nitems   != 0       &&
-	  prop.value    != NULL    ){
+	    if (ret           == Success &&
+		prop.encoding != None    &&
+		prop.format   == 8       &&
+		prop.nitems   != 0       &&
+		prop.value    != NULL) {
 
-	drop_filename( (char *)prop.value, (int)prop.nitems );
+		drop_filename((char *)prop.value, (int)prop.nitems);
 
-	XFree( prop.value );
-      }
+		XFree(prop.value);
+	    }
 
-      {
-	XClientMessageEvent S;
-	xdnd_accept = TRUE;
+	    {
+		XClientMessageEvent S;
+		xdnd_accept = TRUE;
 
-	S.type		= ClientMessage;
-	S.display	= display;
-	S.window	= xdnd_from;
-	S.message_type	= XA_XdndFinished;
-	S.format	= 32;
-	S.data.l[0]	= xdnd_to;
-	S.data.l[1]	= xdnd_accept;
-	S.data.l[2]	= xdnd_accept ? XA_XdndActionCopy : None;
-	S.data.l[3]	= 0;
-	S.data.l[4]	= 0;
+		S.type		= ClientMessage;
+		S.display	= x11_display;
+		S.window	= xdnd_from;
+		S.message_type	= XA_XdndFinished;
+		S.format	= 32;
+		S.data.l[0]	= xdnd_to;
+		S.data.l[1]	= xdnd_accept;
+		S.data.l[2]	= xdnd_accept ? XA_XdndActionCopy : None;
+		S.data.l[3]	= 0;
+		S.data.l[4]	= 0;
 
-	XSendEvent( display, S.window, False, 0, (XEvent*)&S );
-      }
+		XSendEvent(x11_display, S.window, False, 0, (XEvent*)&S);
+	    }
 
-      xdnd_step = YET;
+	    xdnd_step = YET;
+	}
     }
-  }
 }
 
 
 
-static int drop_filename( const char *buf, int size )
+static int drop_filename(const char *buf, int size)
 {
-  char filename[ OSD_MAX_FILENAME ];
-  char *d;
-  const char *s;
-  int i, len;
+    char filename[ OSD_MAX_FILENAME ];
+    char *d;
+    const char *s;
+    int i, len;
 
 #if 0
-  const char *c = buf;
-  int l = 0;
+    const char *c = buf;
+    int l = 0;
     
-  fprintf(stderr,"XdndSelection: dump property %d bytes.",size);
-  while (l < size) {
-    if (!(l & 15))
-      fprintf(stderr, "\n  %04x|", l);
-    if (*c > ' ' && *c <= '~')
-      fprintf(stderr, "  %c", *c);
-    else 
-      fprintf(stderr, " %02x", *c);
-    l ++;
-    c ++;
-  }
-  fputc('\n', stderr);
+    fprintf(stderr, "XdndSelection: dump property %d bytes.", size);
+    while (l < size) {
+	if (!(l & 15))
+	    fprintf(stderr, "\n  %04x|", l);
+	if (*c > ' ' && *c <= '~')
+	    fprintf(stderr, "  %c", *c);
+	else 
+	    fprintf(stderr, " %02x", *c);
+	l ++;
+	c ++;
+    }
+    fputc('\n', stderr);
 #endif
 
-  s = NULL;
-  if      ( strncmp( buf, "file://localhost/", 17 )==0 ){
-    s = &buf[ 16 ];
-    size -= 16;
-  }else if( strncmp( buf, "file:///",           8 )==0 ){
-    s = &buf[ 7 ];
-    size -= 7;
-  }else if( strncmp( buf, "file://",            7 )==0 ){
-    s = &buf[ 6 ];
-    size -= 6;
-  }else if( strncmp( buf, "file:/",             6 )==0 ){
-    s = &buf[ 5 ];
-    size -= 5;
-  }
-
-  if( s ){
-    d = filename;
-    len = sizeof(filename)-1;
-
-    while( len && size ){
-      if( *s == '\r' ||
-	  *s == '\n' ||
-	  *s == '\0' ) break;
-
-      if( *s == '%' ){
-	if( size <= 2 ) return 0;
-	s ++;
-	if     ( '0' <= (*s) && (*s) <= '9' ) i  = (*s) - '0';
-	else if( 'A' <= (*s) && (*s) <= 'F' ) i  = (*s) - 'A' + 10;
-	else return 0;
-	i *= 16;
-	s ++;
-	if     ( '0' <= (*s) && (*s) <= '9' ) i += (*s) - '0';
-	else if( 'A' <= (*s) && (*s) <= 'F' ) i += (*s) - 'A' + 10;
-	else return 0;
-	size -= 2;
-      }else{
-	i = *s;
-      }
-      *d ++ = i; len  --;
-      s ++;      size --;
-    }
-    *d = '\0';
-
-/*printf("%s\n", filename );*/
-
-    if( get_emu_mode() == EXEC ){
-      if( quasi88_disk_insert_and_reset( filename, FALSE ) ){
-	status_message( 1, 180, "Disk Image Set and Reset" );
-      }
+    s = NULL;
+    if        (strncmp(buf, "file://localhost/", 17) == 0) {
+	s = &buf[ 16 ];
+	size -= 16;
+    } else if (strncmp(buf, "file:///",           8) == 0) {
+	s = &buf[ 7 ];
+	size -= 7;
+    } else if (strncmp(buf, "file://",            7) == 0) {
+	s = &buf[ 6 ];
+	size -= 6;
+    } else if (strncmp(buf, "file:/",             6) == 0) {
+	s = &buf[ 5 ];
+	size -= 5;
     }
 
-  }
-  return 1;
+    if (s) {
+	d = filename;
+	len = sizeof(filename)-1;
+
+	while (len && size) {
+	    if (*s == '\r' ||
+		*s == '\n' ||
+		*s == '\0') break;
+
+	    if (*s == '%') {
+		if (size <= 2) return 0;
+		s ++;
+		if      ('0' <= (*s) && (*s) <= '9') i  = (*s) - '0';
+		else if ('A' <= (*s) && (*s) <= 'F') i  = (*s) - 'A' + 10;
+		else if ('a' <= (*s) && (*s) <= 'f') i  = (*s) - 'a' + 10;
+		else return 0;
+		i *= 16;
+		s ++;
+		if      ('0' <= (*s) && (*s) <= '9') i += (*s) - '0';
+		else if ('A' <= (*s) && (*s) <= 'F') i += (*s) - 'A' + 10;
+		else if ('a' <= (*s) && (*s) <= 'f') i += (*s) - 'a' + 10;
+		else return 0;
+		size -= 2;
+	    } else {
+		i = *s;
+	    }
+	    *d ++ = i; len  --;
+	    s ++;      size --;
+	}
+	*d = '\0';
+
+	/*printf("%s\n", filename);*/
+
+	quasi88_drag_and_drop(filename);
+
+    }
+    return 1;
 }
 
 
@@ -1460,181 +1500,10 @@ static int drop_filename( const char *buf, int size )
  *	設定ファイルが無ければ偽、あれば処理して真を返す
  *****************************************************************************/
 
-/* キー設定ファイル1行あたりの最大文字数 */
-#define	MAX_KEYFILE_LINE	(256)
+/* X11 の keysym の文字列を int 値に変換するテーブル */
 
-static	int	convert_str2keysym( const char *str );
-static	int	analyze_keyconf_file( void )
+static const T_SYMBOL_TABLE x11keysym_list[] =
 {
-  FILE *fp = NULL;
-  int	enable = FALSE;
-  int	initialized = FALSE;
-
-  int  line_cnt = 0;
-  int  binding_cnt = 0;
-  int  code, key88, chg = -1;
-  char   line[ MAX_KEYFILE_LINE ];
-  char buffer[ MAX_KEYFILE_LINE ];
-  char *parm1, *parm2, *parm3, *parm4;
-
-
-	/* キー設定ファイルを開く */
-
-  if( file_keyboard == NULL ){			/* キー設定ファイル名取得 */
-    file_keyboard = alloc_keyboard_cfgname();
-  }
-
-  if( file_keyboard ){
-    fp = fopen( file_keyboard, "r" );		/* キー設定ファイルを開く */
-    if( verbose_proc ){
-      if( fp ){
-	printf( "\"%s\" read and initialize\n", file_keyboard );
-      }else{
-	printf( "can't open keyboard configuration file \"%s\"\n",
-		file_keyboard );
-	printf( "\n" );
-      }
-      fflush(stdout); fflush(stderr);
-    }
-    free( file_keyboard );
-  }
-
-  if( fp == NULL ) return 0;			/* 開けなかったら偽を返す */
-
-
-
-	/* キー設定ファイルを1行づつ解析 */
-
-  while( fgets( line, MAX_KEYFILE_LINE, fp ) ){
-
-    line_cnt ++;
-    parm1 = parm2 = parm3 = parm4 = NULL;
-
-	/* パラメータを parm1〜parm4 にセット */
-
-    { char *str = line;
-      char *b; {             b = &buffer[0];    str = my_strtok( b, str ); }
-      if( str ){ parm1 = b;  b += strlen(b)+1;  str = my_strtok( b, str ); }
-      if( str ){ parm2 = b;  b += strlen(b)+1;  str = my_strtok( b, str ); }
-      if( str ){ parm3 = b;  b += strlen(b)+1;  str = my_strtok( b, str ); }
-      if( str ){ parm4 = b;  }
-    }
-
-
-	/* パラメータがなければ次の行へ、あれば解析処理 */
-
-    if      ( parm1 == NULL ){			/* パラメータなし */
-      ;
-
-    }else if( parm2 == NULL ){			/* パラメータ 1個 */
-
-      if( parm1[0] == '[' ){
-
-	if( my_strcmp( parm1, "[X11]" ) == 0 ){
-
-	  enable      = TRUE;
-	  initialized = TRUE;
-	  if( verbose_proc ) printf( "(read start in line %d)\n", line_cnt );
-
-	}else{
-	  if( enable ){
-	    if(verbose_proc) printf( "(read end   in line %d)\n", line_cnt-1);
-	  }
-	  enable = FALSE;
-	}
-
-      }else if( enable ){
-	fprintf( stderr, "warning: error in line %d (ignored)\n", line_cnt );
-      }
-
-    }else if( parm3 == NULL ||			/* パラメータ 2個 */
-	      parm4 == NULL ){			/* パラメータ 3個 */
-
-      if( parm3 == NULL   &&
-	  parm1[0] == '[' ){
-
-	if( enable ){
-	  if( verbose_proc ) printf( "(read end   in line %d)\n", line_cnt-1);
-	}
-	enable = FALSE;
-
-	if( my_strcmp( parm1, "[X11]" ) == 0 ){
-	  fprintf( stderr, "warning: error in line %d (ignored)\n", line_cnt );
-	}
-
-      }else if( enable ){
-
-	code  = convert_str2keysym( parm1 );
-	key88 = convert_str2key88( parm2 );
-
-	if( parm3 ) chg = convert_str2key88( parm3 );
-
-
-	if( code  < 0 ||
-	    key88 < 0 ||
-	    (parm3 && chg < 0) ){
-	  fprintf( stderr, "warning: error in line %d (ignored)\n", line_cnt );
-
-	}else{
-
-	  if( parm1[0] == '<' ){
-	    scancode2key88[ code ] = key88;
-	  }else{
-	    keysym2key88[ LOCAL_KEYSYM(code) ]   = key88;
-	  }
-
-	  if( parm3 ){
-	    if( binding_cnt >= COUNTOF(binding) ){
-	      fprintf( stderr,
-		"warning: too many NumLock-code in %d (ignored)\n", line_cnt );
-
-	    }else{
-	      binding[ binding_cnt ].type      = ( parm1[0] == '<' ) ? 2 : 1;
-	      binding[ binding_cnt ].code      = code;
-	      binding[ binding_cnt ].new_key88 = chg;
-	      binding_cnt ++;
-	    }
-	  }
-	}
-      }
-
-    }else{					/* パラメータ いっぱい */
-
-      if( enable ){
-	fprintf( stderr, "warning: too many argument in line %d\n", line_cnt );
-      }
-
-    }
-
-  }
-  fclose(fp);
-
-
-  if( enable ){
-    if(verbose_proc) printf( "(read end   in line %d)\n", line_cnt-1);
-  }
-
-  if( initialized == FALSE ){
-    fprintf( stderr, "warning: not configured (use initial config)\n" );
-  }
-
-  if( verbose_proc ){
-    printf( "\n" );
-  }
-  fflush(stdout); fflush(stderr);
-
-  return (initialized) ? 1 : 0;
-}
-
-
-/*---------------------------------------------------------------------------
- *---------------------------------------------------------------------------*/
-static	int	convert_str2keysym( const char *str )
-{
-  const struct{
-    char *name;    int val;
-  }
-  list[] = {
     {	"XK_space",		XK_space                }, /*	0x020	*/
     {	"XK_exclam",		XK_exclam               }, /*	0x021	*/
     {	"XK_quotedbl",		XK_quotedbl             }, /*	0x022	*/
@@ -2002,28 +1871,72 @@ static	int	convert_str2keysym( const char *str )
     {	"XK_Super_R",		XK_Super_R              }, /*	0xFFEC	*/
     {	"XK_Hyper_L",		XK_Hyper_L              }, /*	0xFFED	*/
     {	"XK_Hyper_R",		XK_Hyper_R              }, /*	0xFFEE	*/
-  };
-
-  char *conv_end;
-  unsigned long i;
-
-  if(  str==NULL ) return -1;
-  if( *str=='\0' ) return -1;
-
-  if( str[0] == '<' ){				/* <数字> の場合 */
-    i = strtoul( &str[1], &conv_end, 0 );
-    if( *conv_end == '>' &&
-	i < COUNTOF(scancode2key88) ){
-      return i;
+};
+/* デバッグ用 */
+static	const char *debug_x11keysym(int code)
+{
+    int i;
+    for (i=0; i<COUNTOF(x11keysym_list); i++) {
+	if (code == x11keysym_list[i].val)
+	    return x11keysym_list[i].name;
     }
-    return -1;
-  }
-					/* 定義文字列に合致するのを探す */
-  for( i=0; i<COUNTOF(list); i++ ){
-    if( strcmp( list[i].name, str ) == 0 ){
-      return list[i].val;
-    }
-  }
+    return "invalid";
+}
 
-  return -1;
+
+/* キー設定ファイルの、識別タグをチェックするコールバック関数 */
+
+static const char *identify_callback(const char *parm1,
+				     const char *parm2,
+				     const char *parm3)
+{
+    if (my_strcmp(parm1, "[X11]") == 0) {
+	return NULL;				/* 有効 */
+    }
+
+    return "";					/* 無効 */
+}
+
+/* キー設定ファイルの、設定を処理するコールバック関数 */
+
+static const char *setting_callback(int type,
+				    int code,
+				    int key88,
+				    int numlock_key88)
+{
+    static int binding_cnt = 0;
+
+    if (type == KEYCODE_SCAN) {
+	if (code >= COUNTOF(scancode2key88)) {
+	    return "scancode too large";	/* 無効 */
+	}
+	scancode2key88[ code ] = key88;
+    } else {
+	keysym2key88[ LOCAL_KEYSYM(code) ] = key88;
+    }
+
+    if (numlock_key88 >= 0) {
+	if (binding_cnt >= COUNTOF(binding)) {
+	    return "too many NumLock-code";	/* 無効 */
+	}
+	binding[ binding_cnt ].type      = type;
+	binding[ binding_cnt ].code      = code;
+	binding[ binding_cnt ].new_key88 = numlock_key88;
+	binding_cnt ++;
+    }
+
+    return NULL;				/* 有効 */
+}
+
+/* キー設定ファイルの処理関数 */
+
+static	int	analyze_keyconf_file(void)
+{
+    return
+	config_read_keyconf_file(file_keyboard,		  /* キー設定ファイル*/
+				 identify_callback,	  /* 識別タグ行 関数 */
+				 x11keysym_list,	  /* 変換テーブル    */
+				 COUNTOF(x11keysym_list), /* テーブルサイズ  */
+				 TRUE,			  /* 大小文字無視    */
+				 setting_callback);	  /* 設定行 関数     */
 }

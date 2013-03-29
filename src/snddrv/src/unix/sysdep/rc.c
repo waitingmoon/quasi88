@@ -31,7 +31,6 @@ Version 0.3, Februari 2000
 */
 #include <stdlib.h>
 #include <string.h>
-#include <pwd.h>
 #include <unistd.h>
 #include <errno.h>
 #include <sys/types.h>
@@ -40,13 +39,18 @@ Version 0.3, Februari 2000
 #include "rc_priv.h"
 #include "misc.h"
 
+/* some tricks to support mame_file and normal
+   FILE streams */
+typedef char * (*fgets_func)(char *s, int size, void *stream);
+typedef int (*fprintf_func)(FILE *stream, const char *format, ...);
+
 /* private variables */
 static int rc_requires_arg[] = {0, 1, 1, 1, 1, 0, 0, 1, 1, 0, 0 };
 
 /* private methods */
 static int rc_verify(struct rc_option *option, float value)
 {
-   if(option->min == option->max)
+   if((option->min == 0.0) && (option->max == 0.0))
       return 0;
       
    if( (value < option->min) || (value > option->max) )
@@ -87,8 +91,8 @@ static void rc_free_stuff(struct rc_option *option)
             rc_free_stuff(option[i].dest);
             break;
          case rc_string:
-            if(*(char **)option[i].dest)
-               free(*(char **)option[i].dest);
+            free(*(char **)option[i].dest);
+            *(char **)option[i].dest = NULL;
             break;
          case rc_file:
             if(*(FILE **)option[i].dest)
@@ -117,10 +121,11 @@ void rc_destroy(struct rc_struct *rc)
    if(rc->option)
    {
       rc_free_stuff(rc->option);
-      free (rc->option);
+      free(rc->option);
+      rc->option = NULL;
    }
-   if(rc->arg)
-      free(rc->arg);
+   free(rc->arg);
+   rc->arg = NULL;
    free(rc);
 }
 
@@ -202,31 +207,48 @@ int rc_save(struct rc_struct *rc, const char *name, int append)
    return rc_write(rc, f, name);
 }
 
-int rc_read(struct rc_struct *rc, FILE *f, const char *description,
-   int priority, int continue_on_errors)
+int rc_real_read(struct rc_struct *rc, void *f, const char *description,
+   int priority, int continue_on_errors, fgets_func fgets_f)
 {
    char buf[BUF_SIZE];
    int line = 0;
-   
-   while(fgets(buf, BUF_SIZE, f))
+
+   while(fgets_f(buf, BUF_SIZE, f))
    {
       struct rc_option *option;
       char *name, *tmp, *arg = NULL;
-      
+
       line ++;
-      
+
+      /* get option name */
       if(!(name = strtok(buf, " \t\r\n")))
          continue;
       if(name[0] == '#')
          continue;
-         
+
+      /* get complete rest of line */
+      arg = strtok(NULL, "\r\n");
+
+      if (arg)
+      {
+      /* ignore white space */
+      for (; (*arg == '\t' || *arg == ' '); arg++) {}
+
+      /* deal with quotations */
+      if (arg[0] == '"')
+         arg = strtok (arg, "\"");
+      else if (arg[0] == '\'')
+         arg = strtok (arg, "'");
+      else
+         arg = strtok (arg, " \t\r\n");
+      }
+
       if(!(option = rc_get_option2(rc->option, name)))
       {
          fprintf(stderr, "error: unknown option %s, on line %d of file: %s\n",
             name, line, description);
       }
-      else if (rc_requires_arg[option->type] &&
-         !(arg = strtok(NULL, " \t\r\n")))
+      else if (rc_requires_arg[option->type] && !arg)
       {
          fprintf(stderr,
             "error: %s requires an argument, on line %d of file: %s\n",
@@ -240,7 +262,7 @@ int rc_read(struct rc_struct *rc, FILE *f, const char *description,
       }
       else if (!rc_set_option3(option, arg, priority))
          continue;
-      
+
       if (continue_on_errors)
          fprintf(stderr, "   ignoring line\n");
       else
@@ -249,60 +271,89 @@ int rc_read(struct rc_struct *rc, FILE *f, const char *description,
    return 0;
 }
 
-/* needed to walk the tree */
-static int rc_real_write(struct rc_option *option, FILE *f,
-   const char *description)
+#if 0 /* osd_rc_ functions are no longer used */
+int osd_rc_read(struct rc_struct *rc, mame_file *f, const char *description,
+   int priority, int continue_on_errors)
 {
-   int i;
-   
-   if (description)
-      fprintf(f, "### %s ###\n", description);   
-   
-   for(i=0; option[i].type; i++)
-   {
-      switch (option[i].type)
-      {
-         case rc_seperator:
-            fprintf(f, "\n### %s ###\n", option[i].name);
-            break;
-         case rc_link:
-            if(rc_real_write(option[i].dest, f, NULL))
-               return -1;
-            break;
-         case rc_string:
-            if(!*(char **)option[i].dest)
-            {
-               fprintf(f, "# %-19s   <NULL> (not set)\n", option[i].name);
-               break;
-            }
-         case rc_bool:
-         case rc_int:
-         case rc_float:
-            fprintf(f, "%-21s   ", option[i].name);
-            switch(option[i].type)
-            {
-               case rc_bool:
-               case rc_int:
-                  fprintf(f, "%d\n", *(int *)option[i].dest);
-                  break;
-               case rc_float:
-                  fprintf(f, "%f\n", *(float *)option[i].dest);
-                  break;
-               case rc_string:
-                  fprintf(f, "%s\n", *(char **)option[i].dest);
-                  break;
-            }
-            break;
-      }
-   }
-   if (description)
-      fprintf(f, "\n");   
-   return 0;
+   return rc_real_read(rc, f, description, priority,
+             continue_on_errors, (fgets_func)mame_fgets);
 }
+#endif
+
+int rc_read(struct rc_struct *rc, FILE *f, const char *description,
+   int priority, int continue_on_errors)
+{
+   return rc_real_read(rc, f, description, priority,
+             continue_on_errors, (fgets_func)fgets);
+}
+
+/* needed to walk the tree */
+static int rc_real_write(struct rc_option *option, void *f,
+		const char *description, fprintf_func fprintf_f)
+{
+	int i;
+
+	if (description)
+		fprintf_f(f, "### %s ###\n", description);
+
+	for(i=0; option[i].type; i++)
+	{
+		switch (option[i].type)
+		{
+			case rc_seperator:
+				fprintf_f(f, "\n### %s ###\n", option[i].name);
+				break;
+
+			case rc_link:
+				if (rc_real_write(option[i].dest, f, NULL, fprintf_f))
+					return -1;
+				break;
+
+			case rc_string:
+				if(!*(char **)option[i].dest)
+				{
+					fprintf_f(f, "# %-19s   <NULL> (not set)\n", option[i].name);
+					break;
+				}
+				/* fall through */
+
+			case rc_bool:
+			case rc_int:
+			case rc_float:
+				fprintf_f(f, "%-21s   ", option[i].name);
+				switch(option[i].type)
+				{
+					case rc_bool:
+					case rc_int:
+						fprintf_f(f, "%d\n", *(int *)option[i].dest);
+						break;
+					case rc_float:
+						fprintf_f(f, "%f\n", *(float *)option[i].dest);
+						break;
+					case rc_string:
+						fprintf_f(f, "%s\n", *(char **)option[i].dest);
+						break;
+				}
+				break;
+		}
+	}
+	if (description)
+		fprintf_f(f, "\n");
+	return 0;
+}
+
+#if 0 /* osd_rc_ functions are no longer used */
+int osd_rc_write(struct rc_struct *rc, mame_file *f, const char *description)
+{
+   return rc_real_write(rc->option, f, description,
+      (fprintf_func)mame_fprintf);
+}
+#endif
 
 int rc_write(struct rc_struct *rc, FILE *f, const char *description)
 {
-   return rc_real_write(rc->option, f, description);
+   return rc_real_write(rc->option, f, description,
+      (fprintf_func)fprintf);
 }
 
 int rc_parse_commandline(struct rc_struct *rc, int argc, char *argv[],
@@ -417,7 +468,7 @@ static void rc_real_print_help(struct rc_option *option, FILE *f)
             rc_real_print_help(option[i].dest, f);
             break;
          default:
-#if 0	/* forQUASI88 */
+#if 0		/* QUASI88 */
             snprintf(buf, BUF_SIZE, "-%s%s%s%s%s%s",
                (option[i].type == rc_bool)? "[no]":"",
                option[i].name,
@@ -425,7 +476,7 @@ static void rc_real_print_help(struct rc_option *option, FILE *f)
                (option[i].shortname && (option[i].type == rc_bool))? "[no]":"",
                (option[i].shortname)? option[i].shortname:"",
                type_name[option[i].type]);
-#else	/* forQUASI88 */
+#else		/* QUASI88 */
             {
                const char *s1 = (option[i].type == rc_bool)? "[no]":"";
                const char *s2 = option[i].name;
@@ -444,7 +495,7 @@ static void rc_real_print_help(struct rc_option *option, FILE *f)
                    sprintf(buf,"-%s%s%s%s%s%s",s1,s2,s3,s4,s5,s6);
                }
             }
-#endif	/* forQUASI88 */
+#endif		/* QUASI88 */
             fprint_columns(f, buf,
                (option[i].help)? option[i].help:"no help available");
       }
@@ -500,13 +551,16 @@ int rc_verify_power_of_2(struct rc_option *option, const char *arg,
    
    value = *(int *)option->dest;
    
-   for(i=0; i<(sizeof(int)*8); i++)
-      if(((int)0x01 << i) == value)
-         break;
-   if(i == (sizeof(int)*8))
+   if (value)
    {
-      fprintf(stderr, "error invalid value for %s: %s\n", option->name, arg);
-      return -1;
+      for(i=0; i<(sizeof(int)*8); i++)
+         if(((int)0x01 << i) == value)
+            break;
+      if(i == (sizeof(int)*8))
+      {
+         fprintf(stderr, "error invalid value for %s: %s\n", option->name, arg);
+         return -1;
+      }
    }
    
    option->priority = priority;
@@ -596,8 +650,7 @@ int rc_set_option3(struct rc_option *option, const char *arg, int priority)
                return -1;
             }
             strcpy(str, arg);
-            if(*(char **)option->dest)
-               free(*(char **)option->dest);
+            free(*(char **)option->dest);
             *(char **)option->dest = str;
          }
          break;
@@ -608,7 +661,7 @@ int rc_set_option3(struct rc_option *option, const char *arg, int priority)
             x = strtol(arg, &end, 0);
             if (*end || rc_verify(option, x))
             {
-               fprintf(stderr, "error invalid value for %s: %s\n", option->name, arg);
+               fprintf(stderr, "error: invalid value for %s: %s\n", option->name, arg);
                return -1;
             }
             *(int *)option->dest = x;
@@ -620,7 +673,7 @@ int rc_set_option3(struct rc_option *option, const char *arg, int priority)
             x = strtod(arg, &end);
             if (*end || rc_verify(option, x))
             {
-               fprintf(stderr, "error invalid value for %s: %s\n", option->name, arg);
+               fprintf(stderr, "error: invalid value for %s: %s\n", option->name, arg);
                return -1;
             }
             *(float *)option->dest = x;
@@ -698,82 +751,12 @@ struct rc_option *rc_get_options(struct rc_struct *rc)
    return rc->option;
 }
 
-/* various utility methods which don't really belong to the rc object,
-   but seem to fit here well */
 
-/* locate user's home directory */
-char *rc_get_home_dir(void)
+#if 1		/* QUASI88 */
+/* Based on rc_parse_commandline() */
+int rc_quasi88(struct rc_struct *rc, char *arg1, char *arg2, int priority)
 {
-   struct passwd *pw;
-   char *s;
-   
-   if (!(pw=getpwuid(getuid())))
-   { 
-      fprintf(stderr, "Who are you? Not found in passwd database!!\n");
-      return NULL;
-   }
-   if (!(s=malloc(strlen(pw->pw_dir)+1)))
-   {
-      fprintf(stderr, "error: malloc faild for homedir string\n");
-      return NULL;
-   }
-   strcpy(s, pw->pw_dir);
-   return s;
-}
-
-/* 
- * check and if nescesarry create dir
- */
-int rc_check_and_create_dir(const char *name)
-{
-   struct stat stat_buffer;
-
-   if (stat(name, &stat_buffer))
-   {
-      /* error check if it doesn't exist or something else is wrong */
-      if (errno == ENOENT)
-      {
-         /* doesn't exist letts create it ;) */
-#ifdef BSD43
-	 if (mkdir(name, 0775))
-#else
-         if (mkdir(name, S_IRWXU|S_IRWXG|S_IROTH|S_IXOTH))
-#endif
-         {
-            fprintf(stderr, "Error creating dir %s", name);
-            perror(" ");
-            return -1;
-         }
-      }
-      else
-      {
-         /* something else went wrong yell about it */
-         fprintf(stderr, "Error opening %s", name);
-         perror(" ");
-         return -1;
-      }
-   }
-   else
-   {
-      /* file exists check it's a dir otherwise yell about it */
-#ifdef BSD43
-      if(!(S_IFDIR & stat_buffer.st_mode))
-#else
-      if(!S_ISDIR(stat_buffer.st_mode))
-#endif
-      {
-         fprintf(stderr,"Error %s exists but isn't a dir\n", name);
-         return -1;
-      }
-   }
-   return 0;
-}
-
-
-#if 1	/* forQUASI88 */
-int rc_quasi88( struct rc_struct *rc, char *arg1, char *arg2, int priority )
-{
-      int num = 1;
+    int num = 1;
 
       if(arg1[0] == '-')
       {
@@ -815,16 +798,79 @@ int rc_quasi88( struct rc_struct *rc, char *arg1, char *arg2, int priority )
          }
          else
          {
-	   /* fprintf(stderr, "error: unknown option %s\n", arg1); */
+            /* fprintf(stderr, "error: unknown option %s\n", arg1); */
             return 0;
          }
          
          if(rc_set_option3(option, arg, priority))
             return -1;
 
-	 return num;
-      }else{
-	 return 0;
+         return num;
+      }
+      else
+      {
+         return 0;
       }
 }
-#endif
+
+/* Based on rc_real_write() */
+int rc_quasi88_save(struct rc_option *option,
+		void (*real_write)(const char *opt_name, const char *opt_arg))
+{
+	const char *opt_name;
+    char buf[ 256 ];
+	int i;
+
+	for(i=0; option[i].type; i++)
+	{
+		switch (option[i].type)
+		{
+			case rc_seperator:
+				/* fprintf_f(f, "\n### %s ###\n", option[i].name); */
+				break;
+
+			case rc_link:
+				if (rc_quasi88_save(option[i].dest, real_write))
+					return -1;
+				break;
+
+			case rc_string:
+				if(!*(char **)option[i].dest)
+				{
+					/* fprintf_f(f, "# %-19s   <NULL> (not set)\n", option[i].name); */
+					sprintf(buf, "%-19s   <NULL> (not set)", option[i].name);
+					(real_write)(NULL, buf);
+					break;
+				}
+				/* fall through */
+
+			case rc_int:
+			case rc_float:
+				opt_name = option[i].name;
+				switch(option[i].type)
+				{
+					case rc_bool:
+					case rc_int:
+						sprintf(buf, "%d", *(int *)option[i].dest);
+						break;
+					case rc_float:
+						sprintf(buf, "%f", *(float *)option[i].dest);
+						break;
+					case rc_string:
+						sprintf(buf, "%s", *(char **)option[i].dest);
+						break;
+				}
+				(real_write)(opt_name, buf);
+				break;
+
+			case rc_bool:
+				sprintf(buf, "%s%s", 
+						(*(int *)option[i].dest) ? "" : "no",
+						option[i].name);
+				(real_write)(buf, NULL);
+				break;
+		}
+	}
+	return 0;
+}
+#endif		/* QUASI88 */

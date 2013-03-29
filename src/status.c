@@ -12,22 +12,36 @@
 #include "status.h"
 
 #include "pc88main.h"		/* boot_basic	*/
-#include "graph.h"
-#include "memory.h"		/* font_rom	*/
+#include "memory.h"		/* font_mem	*/
+#include "keyboard.h"		/* key_scan	*/
 #include "screen.h"
+#include "menu.h"
 
-#include "drive.h"
-#include "snddrv.h"		/* xmame_get_sound_volume()	*/
-#include "wait.h"		/* wait_rate			*/
-#include "intr.h"		/* no_wait			*/
-#include "menu.h"		/* menu_lang			*/
-#include "event.h"		/* get_keysym_menu()		*/
+#include "drive.h"		/* get_drive_ready()	*/
+#include "event.h"		/* get_keysym_menu()	*/
 
-#include "emu.h"
-#include "q8tk.h"
 
 
 /*---------------------------------------------------------------------------*/
+
+int	status_imagename	= FALSE;	/* イメージ名表示有無 */
+
+
+#define	STATUS_LENGTH	(48)
+
+/*
+ * 表示するステータスのイメージ用バッファ
+ *	バッファは8ドットフォント48文字分あるが、実際の表示はもっと小さい
+ */
+#define	PIXMAP_WIDTH	(STATUS_LENGTH * 8)
+#define	PIXMAP_HEIGHT	(16)
+
+static	byte	pixmap[3][ PIXMAP_WIDTH * PIXMAP_HEIGHT ];
+
+
+
+/* 実際の表示処理は、以下のワークを経由して、
+   表示するステータスのイメージ用バッファと、そのサイズを取得する */
 
 T_STATUS_INFO	status_info[3];			/* ステータスイメージ */
 
@@ -36,23 +50,31 @@ T_STATUS_INFO	status_info[3];			/* ステータスイメージ */
 /*
  * ローカルなワーク
  */
-static	int	stat_draw[3];
-static	int	stat_msg_exist[3];
-static	int	stat_msg_timer[3];
-static	int	stat_var[3] = { -1, -1, -1 };
+enum {
+    STATUS_DISP_MSG,		/* 文字列表示				*/
+    STATUS_DISP_MODE,		/* BASICモード表示			*/
+    STATUS_DISP_FDD,		/* FDDランプ表示			*/
+    STATUS_DISP_TIMEUP		/* 制限時間つき文字列表示		*/
+};
 
-#define		stat_mode	stat_var[0]
-#define		stat_fdd	stat_var[2]
+static struct {
+    int  dirty;			/* 真で表示の必要あり			*/
 
-/*
- * 表示するステータスのイメージ用バッファ
- *	バッファは8ドットフォント48文字分あるが、実際の表示はもっと小さい
- */
-#define	PIXMAP_WIDTH	(48*8)
-#define	PIXMAP_HEIGHT	(16)
+    int  disp;			/* 現在表示している内容			*/
+				/*	STATUS_DISP_XXX			*/
 
-static	byte	pixmap[3][ PIXMAP_WIDTH * PIXMAP_HEIGHT ];
+    int  timer;			/* STATUS_DISP_TIMEUP のタイマー	*/
+    int  timeup_disp;		/* タイムアップ後の表示内容		*/
 
+    char msg[STATUS_LENGTH + 1];/* STATUS_DISP_MSG  の表示内容 +1は'\0'	*/
+    int  mode;			/* STATUS_DISP_MODE の表示内容		*/
+    int  fdd;			/* STATUS_DISP_FDD  の表示内容		*/
+
+    int  default_disp;		/* デフォルトの表示内容			*/
+				/*	左側 ： STATUS_DISP_MODE	*/
+				/*	中央 ： STATUS_DISP_MSG		*/
+				/*	右側 ： STATUS_DISP_FDD		*/
+} status_wk[3];
 
 
 /*
@@ -631,72 +653,76 @@ static	const	byte	status_font[ 0x20 ][ 8*16 ] =
 
 
 /*
- * 文字列をステータスのイメージ用バッファに転送
+ * 文字列をステータスのイメージ用バッファ (status_info) に転送
  */
-static	void	status_puts( int type, const unsigned char *str )
+static	void	status_puts(int pos, const char *str)
 {
-  int i, j, k, c, w, h16;
-  const byte *p;
-  byte mask;
-  byte *dst = status_info[ type ].pixmap;
+    int i, j, k, c, w, h16;
+    const byte *p;
+    byte mask;
+    byte *dst = status_info[ pos ].pixmap;
   
-  if( str ){
-    w = MIN( strlen((char *)str) * 8, PIXMAP_WIDTH );
+    if (str) {
+	w = MIN(strlen(str) * 8, PIXMAP_WIDTH);
 
-    for( i=0; i<w; i+=8 ){
-      c = *str ++;
-      if( c=='\0' ) break;
+	for (i=0; i<w; i+=8) {
+	    c = *(const byte *)str;
+	    str ++;
+	    if (c=='\0') break;
 
-      if( c < 0xe0 ){
+	    if (c < 0xe0) {
 
-	if( has_kanji_rom && 			/* 漢字ROMあり */
-	    (( 0x20 <= c && c <= 0x7f ) ||	/* ASCII    */
-	     ( 0xa0 <= c && c <= 0xdf ) )  ){	/* カタカナ */
-	  p = &kanji_rom[0][ c*8 ][0];
-	  h16 = TRUE;
-	}else{
-	  p = &font_mem[ c*8 ];
-	  h16 = FALSE;
+		if (has_kanji_rom && 			/* 漢字ROMあり */
+		    ((0x20 <= c && c <= 0x7f) ||	/* ASCII    */
+		     (0xa0 <= c && c <= 0xdf))) {	/* カタカナ */
+		    p = &kanji_rom[0][ c*8 ][0];
+		    h16 = TRUE;
+		} else {
+		    p = &font_mem[ c*8 ];
+		    h16 = FALSE;
+		}
+		for (j=0; j<16; j++) {
+		    for (mask=0x80, k=0;  k<8;  k++, mask>>=1) {
+			if (*p & mask) dst[ j*w +i +k ] = STATUS_FG;
+			else           dst[ j*w +i +k ] = STATUS_BG;
+		    }
+		    if (h16 || j&1) p++;
+		}
+
+	    } else {		/* 0xe0〜0xff は ローカルなフォントを使用 */
+
+		p = &status_font[ (c-0xe0) ][0];
+		for (j=0; j<16; j++) {
+		    for (k=0;  k<8;  k++) {
+			dst[ j*w +i +k ] = *p;
+			p++;
+		    }
+		}
+
+	    }
 	}
-	for( j=0; j<16; j++ ){
-	  for( mask=0x80, k=0;  k<8;  k++, mask>>=1 ){
-	    if( *p & mask ) dst[ j*w +i +k ] = STATUS_FG;
-	    else            dst[ j*w +i +k ] = STATUS_BG;
-	  }
-	  if( h16 || j&1 ) p++;
-	}
-
-      }else{		/* 0xe0〜0xff は ローカルなフォントを使用 */
-
-	p = &status_font[ (c-0xe0) ][0];
-	for( j=0; j<16; j++ ){
-	  for( k=0;  k<8;  k++ ){
-	    dst[ j*w +i +k ] = *p;
-	    p++;
-	  }
-	}
-
-      }
+	status_info[ pos ].w = i;
+    } else {
+	status_info[ pos ].w = 0;
     }
-    status_info[ type ].w = i;
-  }else{
-    status_info[ type ].w = 0;
-  }
 }
 
+
+
+#if 0	/* ステータス部に任意の画像を表示したくなったら、考えよう */
 /*
  * ピックスマップをステータスのイメージ用バッファに転送
  */
-static	void	status_bitmap( int type, const byte bitmap[], int size )
+static	void	status_bitmap(int pos, const byte bitmap[], int size)
 {
-  if( bitmap ){
-    memcpy( status_info[ type ].pixmap, bitmap, size );
-    status_info[ type ].w = size / PIXMAP_HEIGHT;
-  }else{
-    status_info[ type ].w = 0;
-  }
+    if (bitmap) {
+	memcpy(status_info[ pos ].pixmap, bitmap, size);
+	status_info[ pos ].w = size / PIXMAP_HEIGHT;
+    } else {
+	status_info[ pos ].w = 0;
+    }
 }
-
+#endif
 
 
 
@@ -704,18 +730,29 @@ static	void	status_bitmap( int type, const byte bitmap[], int size )
 /***************************************************************************
  * ステータス関係のワーク類を初期化
  ****************************************************************************/
-void	status_init( void )
+void	status_init(void)
 {
-  int i;
-  for( i=0; i<3; i++ ){
-    stat_draw[i] = TRUE;
-    stat_msg_exist[i] = FALSE;
-    stat_var[i] = -1;
+    int i, disp;
+    for (i=0; i<3; i++) {
 
-    status_info[i].pixmap = &pixmap[i][0];
-    status_info[i].w      = 0;
-    status_info[i].h      = PIXMAP_HEIGHT;
-  }
+	if      (i==0) disp = STATUS_DISP_MODE;
+	else if (i==1) disp = STATUS_DISP_MSG;
+	else           disp = STATUS_DISP_FDD;
+
+	status_wk[i].dirty        = TRUE;
+	status_wk[i].disp         = disp;
+	status_wk[i].timer        = 0;
+	status_wk[i].timeup_disp  = disp;
+	status_wk[i].default_disp = disp;
+
+	status_wk[i].msg[0] = '\0';
+	status_wk[i].mode   = -1;
+	status_wk[i].fdd    = -1;
+
+	status_info[i].pixmap = &pixmap[i][0];
+	status_info[i].w      = 0;
+	status_info[i].h      = PIXMAP_HEIGHT;
+    }
 }
 
 
@@ -723,39 +760,95 @@ void	status_init( void )
 /***************************************************************************
  * ステータス表示・非表示切替の際の、ワーク再初期化
  ****************************************************************************/
-
-void	status_reset( int show )
+void	status_setup(int show)
 {
-  if( show ){						/* 表示するなら  */
-    stat_draw[0] = stat_draw[1] = stat_draw[2] = TRUE;	/* 描画フラグON  */
-
-  }else{						/* 非表示なら    */
-    stat_var[0]  = stat_var[1]  = stat_var[2]  = -1;	/* メッセージOFF */
-  }
+    int i;
+    if (show) {						/* 表示するなら  */
+	for (i=0; i<3; i++) status_wk[i].dirty = TRUE;	/* 描画フラグON  */
+    }
 }
 
 
 
 
 /***************************************************************************
- * ステータスにメッセージ(文字列)表示
- *	kind	… ステータスの番号 0 〜 2
- *	frames	… 表示する時間(フレーム数) 60で約1秒
- *		   0 で無限に表示。 <0 で消去
- *	msg	… 表示する文字列。 NULL は "" とみなす。
+ * ステータスにメッセージ(文字列)表示。
+ * (このメッセージをデフォルトとする)
+ *	msg	表示するデフォルトの文字列
+ *		NULL の場合は、既定の内容を表示する。
+ *		(既定の内容 … 左:BASICモード / 中:空白 / 右:FDD状態)
  ****************************************************************************/
-void	status_message( int kind, int frames, const char *msg )
+static const char *status_get_filename(void);
+void	status_message_default(int pos, const char *msg)
 {
-  status_puts( kind, (const unsigned char *)msg );
+    if (msg) {			/* メッセージ指定ある場合 */
 
-  if( frames >= 0 ){ stat_msg_exist[ kind ] = TRUE;   }
-  else             { stat_msg_exist[ kind ] = FALSE;  stat_var[ kind ] = -1; }
+	status_puts(pos, msg);
+	status_wk[ pos ].dirty = TRUE;
 
-  stat_msg_timer[ kind ] = frames;
-  stat_draw[ kind ] = TRUE;
+	status_wk[ pos ].disp        = STATUS_DISP_MSG;
+	status_wk[ pos ].timeup_disp = STATUS_DISP_MSG;
+
+	status_wk[ pos ].msg[0] = '\0';
+	strncat(status_wk[ pos ].msg, msg, STATUS_LENGTH);
+
+    } else {			/* NULL を指定された場合 */
+
+	switch (status_wk[ pos ].default_disp) {
+
+	case STATUS_DISP_MSG:
+	    if (status_imagename == FALSE) {
+		status_puts(pos, "");
+		status_wk[ pos ].dirty = TRUE;
+
+		status_wk[ pos ].msg[0] = '\0';
+	    } else {
+		const char *s = status_get_filename();
+		status_puts(pos, s);
+		status_wk[ pos ].dirty = TRUE;
+
+		strcpy(status_wk[ pos ].msg, s);
+	    }
+	    break;
+
+	case STATUS_DISP_MODE:
+	    status_wk[ pos ].mode = -1;
+	    break;
+
+	case STATUS_DISP_FDD:
+	    status_wk[ pos ].fdd = -1;
+	    break;
+	}
+	    
+	status_wk[ pos ].disp        = status_wk[ pos ].default_disp;
+	status_wk[ pos ].timeup_disp = status_wk[ pos ].default_disp;
+    }
 }
 
 
+
+/***************************************************************************
+ * ステータスにメッセージ(文字列)表示。
+ * (一定時間経過で、デフォルトのメッセージに戻す)
+ *	frames	表示する時間。 0 なら、 msg に関係なくデフォルト表示となる
+ *	msg	表示する文字列。NULLなら、空白とする
+ ****************************************************************************/
+void	status_message(int pos, int frames, const char *msg)
+{
+    if (frames) {
+
+	status_puts(pos, msg);
+	status_wk[ pos ].dirty = TRUE;
+
+	status_wk[ pos ].disp        = STATUS_DISP_TIMEUP;
+	status_wk[ pos ].timer       = frames;
+
+    } else {
+
+	status_message_default(pos, NULL);
+
+    }
+}
 
 
 
@@ -768,186 +861,201 @@ void	status_message( int kind, int frames, const char *msg )
  *		  セットされる。(ビットが 1 ならそのステータスは更新)
  ****************************************************************************/
 
-INLINE void status_mode( void )
+static void status_mode(int pos)
 {
-  int mode = 0;		/* bit :  ....  num kana caps 8mhz basic basic */
-  byte buf[16];
-  static const char *mode_str[] = {
-    "N   4MHz       ", "V1S 4MHz       ", "V1H 4MHz       ", "V2  4MHz       ",
-    "N   8MHz       ", "V1S 8MHz       ", "V1H 8MHz       ", "V2  8MHz       ",
-  };
-  switch( boot_basic ){
-  case BASIC_N:		mode = 0;	break;
-  case BASIC_V1S:	mode = 1;	break;
-  case BASIC_V1H:	mode = 2;	break;
-  case BASIC_V2:	mode = 3;	break;
-  }
-  if( boot_clock_4mhz == FALSE ) mode += 4;
+    int mode = 0;	/* bit :  ....  num kana caps 8mhz basic basic */
+    byte buf[16];
+    static const char *mode_str[] =
+    {
+	"N   4MHz       ",
+	"V1S 4MHz       ",
+	"V1H 4MHz       ",
+	"V2  4MHz       ",
+	"N   8MHz       ",
+	"V1S 8MHz       ",
+	"V1H 8MHz       ",
+	"V2  8MHz       ",
+    };
 
-  if( (key_scan[0x0a] & 0x80) == 0 ) mode += 8;
-  if( (key_scan[0x08] & 0x20) == 0 ) mode += 16;
-  if( numlock_emu ) mode += 32;
-
-  if( stat_mode != mode ){	/* モードが変更したら表示更新 */
-    stat_mode = mode;
-
-    strcpy( (char *)buf, mode_str[ mode & 0x7 ] );
-    if( mode & 8 ){
-      buf[ 9] = FNT_CAP_1;
-      buf[10] = FNT_CAP_2;
+    switch (boot_basic) {
+    case BASIC_N:	mode += 0;	break;
+    case BASIC_V1S:	mode += 1;	break;
+    case BASIC_V1H:	mode += 2;	break;
+    case BASIC_V2:	mode += 3;	break;
     }
-    if( mode & 16 ){
-      if( romaji_input_mode ){
-	buf[11] = FNT_RMJ_1;
-	buf[12] = FNT_RMJ_2;
-      }else{
-	buf[11] = FNT_KAN_1;
-	buf[12] = FNT_KAN_2;
-      }
-    }
-    if( mode & 32 ){
-	buf[13] = FNT_NUM_1;
-	buf[14] = FNT_NUM_2;
-    }
+    if (boot_clock_4mhz == FALSE) mode += 4;
 
-    status_puts( 0, (const unsigned char *)buf );
-    stat_draw[ 0 ] = TRUE;
-  }
+    if ((key_scan[0x0a] & 0x80) == 0) mode += 8;
+    if ((key_scan[0x08] & 0x20) == 0) mode += 16;
+    if (numlock_emu) mode += 32;
+
+    if (status_wk[pos].mode != mode) {		/* ワーク変更したら表示更新 */
+	status_wk[pos].mode = mode;
+
+	strcpy((char *)buf, mode_str[ mode & 0x7 ]);
+	if (mode & 8) {
+	    buf[ 9] = FNT_CAP_1;
+	    buf[10] = FNT_CAP_2;
+	}
+	if (mode & 16) {
+	    if (romaji_input_mode) {
+		buf[11] = FNT_RMJ_1;
+		buf[12] = FNT_RMJ_2;
+	    } else {
+		buf[11] = FNT_KAN_1;
+		buf[12] = FNT_KAN_2;
+	    }
+	}
+	if (mode & 32) {
+	    buf[13] = FNT_NUM_1;
+	    buf[14] = FNT_NUM_2;
+	}
+
+	status_puts(pos, (const char *)buf);
+	status_wk[ pos ].dirty = TRUE;
+    }
 }
 
-INLINE void status_fdd( void )
+static void status_fdd(int pos)
 {
-  byte *p, buf[16];
-  int fdd = 0;		/* bit :  ....  tape tape drv2 drv1 */
+    byte *p, buf[16];
+    int fdd = 0;	/* bit :  ....  tape tape drv2 drv1 */
 
-  if( ! get_drive_ready(0) ){ fdd |= 1<<0; }	/* FDDランプON */
-  if( ! get_drive_ready(1) ){ fdd |= 1<<1; }
-  /* drive_check_empty(n) でディスクの有無もわかるけど… */
+    if (! get_drive_ready(0)) { fdd |= 1 << 0; }	/* FDD 1: ランプON */
+    if (! get_drive_ready(1)) { fdd |= 1 << 1; }	/* FDD 2: ランプON */
+    /* drive_check_empty(n) でディスクの有無もわかるけど… */
 
-  if     ( tape_writing() ) fdd |= 3<<2;
-  else if( tape_reading() ) fdd |= 2<<2;
-  else if( tape_exist() )   fdd |= 1<<2;
+    if      (tape_writing()) fdd |= (3 << 2);
+    else if (tape_reading()) fdd |= (2 << 2);
+    else if (tape_exist())   fdd |= (1 << 2);
 
-  if( stat_fdd != fdd ){
-    stat_fdd = fdd;
+    if (status_wk[pos].fdd != fdd) {		/* ワーク変更したら表示更新 */
+	status_wk[pos].fdd = fdd;
 
-    p = buf;
+	p = buf;
 
-    switch( fdd >> 2 ){
-    case 1:
-      *p ++ = FNT_T__1;
-      *p ++ = FNT_T__2;
-      *p ++ = FNT_T__3;
-      *p ++ = ' ';
-      break;
-    case 2:
-      *p ++ = FNT_TR_1;
-      *p ++ = FNT_TR_2;
-      *p ++ = FNT_TR_3;
-      *p ++ = ' ';
-      break;
-    case 3:
-      *p ++ = FNT_TW_1;
-      *p ++ = FNT_TW_2;
-      *p ++ = FNT_TW_3;
-      *p ++ = ' ';
-      break;
+	switch ((fdd >> 2) & 3) {
+	case 1:
+	    *p ++ = FNT_T__1;
+	    *p ++ = FNT_T__2;
+	    *p ++ = FNT_T__3;
+	    *p ++ = ' ';
+	    break;
+	case 2:
+	    *p ++ = FNT_TR_1;
+	    *p ++ = FNT_TR_2;
+	    *p ++ = FNT_TR_3;
+	    *p ++ = ' ';
+	    break;
+	case 3:
+	    *p ++ = FNT_TW_1;
+	    *p ++ = FNT_TW_2;
+	    *p ++ = FNT_TW_3;
+	    *p ++ = ' ';
+	    break;
+	}
+
+	if (fdd & (1<<1)) {
+	    *p ++ = FNT_2D_1;
+	    *p ++ = FNT_2D_2;
+	    *p ++ = FNT_2D_3;
+	} else {
+	    *p ++ = FNT_2__1;
+	    *p ++ = FNT_2__2;
+	    *p ++ = FNT_2__3;
+	}
+
+	if (fdd & (1<<0)) {
+	    *p ++ = FNT_1D_1;
+	    *p ++ = FNT_1D_2;
+	    *p ++ = FNT_1D_3;
+	} else {
+	    *p ++ = FNT_1__1;
+	    *p ++ = FNT_1__2;
+	    *p ++ = FNT_1__3;
+	}
+
+	*p = '\0';
+
+	status_puts(pos, (const char *)buf);
+	status_wk[ pos ].dirty = TRUE;
+    }
+}
+
+static const char *status_get_filename(void)
+{
+    static char buf[STATUS_LENGTH + 1];
+    int i, drv;
+    char str[2][25];
+
+    for (i=0; i<2; i++) {
+	if (menu_swapdrv == FALSE) {
+	    if (i == 0) drv = DRIVE_1;
+	    else        drv = DRIVE_2;
+	} else {
+	    if (i == 0) drv = DRIVE_2;
+	    else        drv = DRIVE_1;
+	}
+
+	if (disk_image_exist(drv) &&
+	    drive_check_empty(drv) == FALSE) {
+
+	    sprintf(str[i], "%1d: %-16s",
+		    drv + 1,
+		    drive[drv].image[ disk_image_selected(drv) ].name);
+	} else {
+	    sprintf(str[i], "%1d:    (No Disk)    ", drv + 1);
+	}
     }
 
-    if( fdd & (1<<1) ){
-      *p ++ = FNT_2D_1;
-      *p ++ = FNT_2D_2;
-      *p ++ = FNT_2D_3;
-    }else{
-      *p ++ = FNT_2__1;
-      *p ++ = FNT_2__2;
-      *p ++ = FNT_2__3;
-    }
+    strcpy(buf, str[0]);
+    strcat(buf, str[1]);
 
-    if( fdd & (1<<0) ){
-      *p ++ = FNT_1D_1;
-      *p ++ = FNT_1D_2;
-      *p ++ = FNT_1D_3;
-    }else{
-      *p ++ = FNT_1__1;
-      *p ++ = FNT_1__2;
-      *p ++ = FNT_1__3;
-    }
-
-    *p = '\0';
-
-    status_puts( 2, (const unsigned char *)buf );
-    stat_draw[ 2 ] = TRUE;
-  }
+    return buf;
 }
 
 
 
 /*
- *
+ *	VSYNC毎に呼び出す
  */
-int	status_update( int force )
+void	status_update(void)
 {
-  int i, ret = 0;
+    int i;
 
-  for( i=0; i<3; i++ ){
+    for (i = 0; i < 3; i++) {
 
-    if( stat_msg_exist[i] ){		/* メッセージ指定あり */
-      if( stat_msg_timer[i] ){			/* タイマー指定時は   */
-	if( -- stat_msg_timer[i]==0 ){		/* タイムアウトで     */
-	  status_message( i, -1, NULL );	/* メッセージ指定消す */
-	  stat_var[i] = -1;
+	if (status_wk[i].disp == STATUS_DISP_TIMEUP) {	/* タイマー指定時は */
+	    if (--status_wk[i].timer < 0) {		/* タイムアウトで   */
+		switch (status_wk[i].timeup_disp) {	/* 表示内容を変更   */
+
+		case STATUS_DISP_MSG:
+		    status_puts(i, status_wk[i].msg);
+		    status_wk[ i ].dirty = TRUE;
+		    break;
+
+		case STATUS_DISP_MODE:
+		    status_wk[ i ].mode = -1;
+		    break;
+
+		case STATUS_DISP_FDD:
+		    status_wk[ i ].fdd = -1;
+		    break;
+		}
+
+		status_wk[i].disp = status_wk[i].timeup_disp;
+	    }
 	}
-      }
+
+	switch (status_wk[i].disp) {
+	case STATUS_DISP_MODE:	status_mode(i);		break;
+	case STATUS_DISP_FDD:	status_fdd(i);		break;
+	}
+
+	if (status_wk[i].dirty) {		/* 結果、表示内容に変化あり */
+	    status_wk[i].dirty = FALSE;
+	    screen_dirty_status |= 1 << i;
+	}
+
     }
-
-    if( stat_msg_exist[i] == FALSE ){	/* メッセージ指定なし */
-      if     ( i==0 ){ status_mode(); }		/* 0 はモード表示  */
-      else if( i==2 ){ status_fdd();  }		/* 2 はFDD状態表示 */
-    }
-
-  }
-
-  if( now_status ){
-    for( i=0; i<3; i++ ){
-      if( stat_draw[i] || force ){
-	stat_draw[i] = FALSE;
-	ret |= 1<<i;
-      }
-    }
-  }
-  return ret;
-}
-
-
-
-
-
-
-
-
-
-
-/************************************************************************/
-/* タイトル・バージョンを表示する。					*/
-/*		起動時にのみ、この関数を呼びだそう。			*/
-/************************************************************************/
-void	indicate_bootup_logo( void )
-{
-  char menu_msg[24];
-  const char *keysym = get_keysym_menu();
-
-  if( keysym ){
-    sprintf( menu_msg, "<%.8s> key to MENU", keysym );
-
-    status_message( 0, 60*4, Q_TITLE " " Q_VERSION );
-    status_message( 1, 0,    menu_msg );
-  }
-}
-
-
-void	indicate_stateload_logo( void )
-{
-  status_message( 0, 60*4, Q_TITLE " " Q_VERSION );
-  status_message( 1, 60*4, "State Load Successful !" );
 }

@@ -1548,7 +1548,7 @@ void	z80_debug( z80arch *z80, char *mes )
 
 
 
-#if	defined( MAIN_DISP ) || defined( MAIN_FILE ) || defined( SUB_DISP ) || defined( SUB_FILE )
+#ifdef	DEBUGLOG
 
 
 static 	void	log_printf_head( z80arch *z80, word pc, int num )
@@ -1647,31 +1647,23 @@ static	int	log_line_disasm( z80arch *z80, word pc )
 
 
 
-#if	defined( MAIN_DISP ) || defined( MAIN_FILE )
-extern	int	main_debug;
-#endif
-#if	defined( SUB_DISP ) || defined( SUB_FILE )
-extern	int	sub_debug;
-#endif
-void	z80_logging( z80arch *z80 )
+void	z80_logging(z80arch *z80)
 {
-  extern z80arch z80main_cpu;
-  extern z80arch z80sub_cpu;
+    extern z80arch z80main_cpu;
+    extern z80arch z80sub_cpu;
 
-#if	defined( MAIN_DISP ) || defined( MAIN_FILE )
-  if( z80==&z80main_cpu && main_debug){
-    logz80("[MAIN] ");
-    log_line_disasm( z80, z80->PC.W );
-    logz80("\n");
-  }
-#endif
-#if	defined( SUB_DISP ) || defined( SUB_FILE )
-  if( z80==&z80sub_cpu && sub_debug){
-    logz80("[SUB]  ");
-    log_line_disasm( z80, z80->PC.W );
-    logz80("\n");
-  }
-#endif
+    if (main_debug && z80 == &z80main_cpu) {
+	logz80_target(main_debug);
+	logz80("[MAIN] ");
+	log_line_disasm(z80, z80->PC.W);
+	logz80("\n");
+    }
 
+    if (sub_debug && z80 == &z80sub_cpu) {
+	logz80_target(sub_debug);
+	logz80("[SUB]  ");
+	log_line_disasm(z80, z80->PC.W);
+	logz80("\n");
+    }
 }
 #endif

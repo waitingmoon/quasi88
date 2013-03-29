@@ -420,7 +420,7 @@ int	d88_write_unformat( OSD_FILE *fp, int drv, int img )
   long	current;
   long	offset = 0;
   int	result;
-  long	i, st, sz, len;
+  long	st, sz, len;
 
 
 	/* 現在のファイル位置を覚えておく。(あとで、戻すため) */

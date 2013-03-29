@@ -56,6 +56,9 @@
 #include "graph.h"
 
 
+/*----------------------------------------------------------------------*/
+/* メニュー画面のソフトウェアカーソルの字形				*/
+/*----------------------------------------------------------------------*/
 #if 0		/* 矢印カーソル */
 byte menu_cursor_on[]  = { 0x80, 0xc0, 0xe0, 0xf0, 0xf8, 0xfc, 0xfe, 0xff,
 			   0xd8, 0xa8, 0x0c, 0x0c, 0x06, 0x06, 0x03, 0x03 };
@@ -71,92 +74,38 @@ int	menu_cursor_x;
 int	menu_cursor_y;
 
 
-static	int	menu_need_trans_palette = TRUE;
-
-
 /*----------------------------------------------------------------------*/
 /* メニュー表示用パレットを設定し、システムに転送			*/
 /*----------------------------------------------------------------------*/
-static	void	menu_palette( void )
+void	screen_get_menu_palette(PC88_PALETTE_T pal[16])
 {
-  int     i;
-  SYSTEM_PALETTE_T	syspal[16];
+    int i;
 
-  static const struct {
-    int pal;
-    int col;
-  } pal[ 16 ] = {
-    { Q8GR_PALETTE_FOREGROUND, MENU_COLOR_FOREGROUND,	},
-    { Q8GR_PALETTE_BACKGROUND, MENU_COLOR_BACKGROUND,	},
-    { Q8GR_PALETTE_LIGHT,      MENU_COLOR_LIGHT,	},
-    { Q8GR_PALETTE_SHADOW,     MENU_COLOR_SHADOW,	},
-    { Q8GR_PALETTE_FONT_FG,    MENU_COLOR_FONT_FG,	},
-    { Q8GR_PALETTE_FONT_BG,    MENU_COLOR_FONT_BG,	},
-    { Q8GR_PALETTE_LOGO_FG,    MENU_COLOR_LOGO_FG,	},
-    { Q8GR_PALETTE_LOGO_BG,    MENU_COLOR_LOGO_BG,	},
-    { Q8GR_PALETTE_BLACK,      0x000000,		},
-    { Q8GR_PALETTE_SCALE_SLD,  MENU_COLOR_SCALE_SLD,	},
-    { Q8GR_PALETTE_SCALE_BAR,  MENU_COLOR_SCALE_BAR,	},
-    { Q8GR_PALETTE_SCALE_ACT,  MENU_COLOR_SCALE_ACT,	},
-    { Q8GR_PALETTE_RED,        0xff0000,		},
-    { Q8GR_PALETTE_GREEN,      0x00ff00,		},
-    { Q8GR_PALETTE_BLUE,       0x0000ff,		},
-    { Q8GR_PALETTE_WHITE,      0xffffff,		},
-  };
+    static const struct {
+	int index;
+	int col;
+    } menupal[ 16 ] = {
+	{ Q8GR_PALETTE_FOREGROUND, MENU_COLOR_FOREGROUND,	},
+	{ Q8GR_PALETTE_BACKGROUND, MENU_COLOR_BACKGROUND,	},
+	{ Q8GR_PALETTE_LIGHT,      MENU_COLOR_LIGHT,		},
+	{ Q8GR_PALETTE_SHADOW,     MENU_COLOR_SHADOW,		},
+	{ Q8GR_PALETTE_FONT_FG,    MENU_COLOR_FONT_FG,		},
+	{ Q8GR_PALETTE_FONT_BG,    MENU_COLOR_FONT_BG,		},
+	{ Q8GR_PALETTE_LOGO_FG,    MENU_COLOR_LOGO_FG,		},
+	{ Q8GR_PALETTE_LOGO_BG,    MENU_COLOR_LOGO_BG,		},
+	{ Q8GR_PALETTE_BLACK,      0x000000,			},
+	{ Q8GR_PALETTE_SCALE_SLD,  MENU_COLOR_SCALE_SLD,	},
+	{ Q8GR_PALETTE_SCALE_BAR,  MENU_COLOR_SCALE_BAR,	},
+	{ Q8GR_PALETTE_SCALE_ACT,  MENU_COLOR_SCALE_ACT,	},
+	{ Q8GR_PALETTE_RED,        0xff0000,			},
+	{ Q8GR_PALETTE_GREEN,      0x00ff00,			},
+	{ Q8GR_PALETTE_BLUE,       0x0000ff,			},
+	{ Q8GR_PALETTE_WHITE,      0xffffff,			},
+    };
 
-  for( i=0; i<COUNTOF(pal); i++ ){
-    syspal[ pal[i].pal ].red   = (pal[i].col >> 16) & 0xff;
-    syspal[ pal[i].pal ].green = (pal[i].col >>  8) & 0xff;
-    syspal[ pal[i].pal ].blue  = (pal[i].col >>  0) & 0xff;
-  }
-
-
-  trans_palette( syspal );
-}
-
-
-
-/************************************************************************/
-/* Q8TK から呼ばれる描画表示関数					*/
-/************************************************************************/
-
-/*
- *	ステータスも含んだ強制再描画を指示
- */
-static	int	menu_draw_force = FALSE;
-
-void	menu_set_status( void )
-{
-  menu_draw_force = TRUE;
-}
-
-
-/*
- *	パレット転送を指示
- */
-void	menu_trans_palette( void )
-{
-  menu_need_trans_palette = TRUE;
-}
-
-
-
-/*
- *	画面転送
- */
-void	menu_draw_screen( void )
-{
-  if( menu_need_trans_palette ){
-    menu_palette();
-    menu_need_trans_palette = FALSE;
-  }
-
-  if( menu_draw_force ){
-    draw_menu_screen_force();
-    menu_draw_force = FALSE;
-  }else{
-    draw_menu_screen();
-  }
-
-  menu_screen_current ^= 1;
+    for (i=0; i<COUNTOF(menupal); i++) {
+	pal[ menupal[i].index ].red   = (menupal[i].col >> 16) & 0xff;
+	pal[ menupal[i].index ].green = (menupal[i].col >>  8) & 0xff;
+	pal[ menupal[i].index ].blue  = (menupal[i].col >>  0) & 0xff;
+    }
 }

@@ -32,6 +32,11 @@ Version 0.1, January 2000
 #include "sysdep/sysdep_dsp_priv.h"
 #include "sysdep/plugin_manager.h"
 
+#if 1		/* QUASI88 */
+extern int verbose_proc;
+#define fprintf     if (verbose_proc) fprintf
+#endif		/* QUASI88 */
+
 /* #define ESOUND_DEBUG */
 
 /* our per instance private data struct */

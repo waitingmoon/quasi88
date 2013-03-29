@@ -23,7 +23,9 @@
 #include "soundbd.h"
 #include "fdc.h"		/* disk_ex_drv */
 
+#include "event.h"
 #include "emu.h"
+#include "drive.h"
 #include "snddrv.h"
 #include "suspend.h"
 #include "status.h"
@@ -43,6 +45,7 @@ int	boot_basic     =DEFAULT_BASIC;	/* 起動時の BASICモード		*/
 int	boot_dipsw     =DEFAULT_DIPSW;	/* 起動時のディップ設定		*/
 int	boot_from_rom  =DEFAULT_BOOT;	/* 起動デバイスの設定		*/
 int	boot_clock_4mhz=DEFAULT_CLOCK;	/* 起動時の CPUクロック		*/
+
 int	monitor_15k    =0x00;		/* 15k モニター 2:Yes 0:No	*/
 
 z80arch	z80main_cpu;			/* Z80 CPU ( main system )	*/
@@ -50,13 +53,14 @@ z80arch	z80main_cpu;			/* Z80 CPU ( main system )	*/
 int	high_mode;			/* 高速モード 1:Yes 0:No	*/
 
 
-byte	dipsw_1;			/* IN[30] ディップスイッチ 1	*/
-byte	dipsw_2;			/* IN[31] ディップスイッチ 2	*/
-byte	ctrl_boot;			/* IN[40] ディスクブート情報	*/
-int	memory_bank;			/* OUT[5C-5F] IN[5C] メモリバンク*/
-byte	cpu_clock;			/* IN[6E] CPU クロック		*/
+static	byte	dipsw_1;		/* IN[30] ディップスイッチ 1	*/
+static	byte	dipsw_2;		/* IN[31] ディップスイッチ 2	*/
+static	byte	ctrl_boot;		/* IN[40] ディスクブート情報	*/
+static	byte	cpu_clock;		/* IN[6E] CPU クロック		*/
 
-byte	common_out_data;		/* OUT[10] PRT/時計		*/
+int	memory_bank;			/* OUT[5C-5F] IN[5C] メモリバンク*/
+
+static	byte	common_out_data;	/* OUT[10] PRT/時計		*/
 byte	misc_ctrl;			/* I/O[32] 各種Ctrl		*/
 byte	ALU1_ctrl;			/* OUT[34] ALU Ctrl 1		*/
 byte	ALU2_ctrl;			/* OUT[35] ALU Ctrl 2		*/
@@ -67,15 +71,15 @@ byte	ext_rom_bank;			/* I/O[71] 拡張ROM BANK		*/
 byte	ext_ram_ctrl;			/* I/O[E2] 拡張RAM制御		*/
 byte	ext_ram_bank;			/* I/O[E3] 拡張RAMセレクト	*/
 
-pair	kanji1_addr;			/* OUT[E8-E9] 漢字ROM(第1) ADDR	*/
-pair	kanji2_addr;			/* OUT[EC-ED] 漢字ROM(第2) ADDR	*/
+static	pair	kanji1_addr;		/* OUT[E8-E9] 漢字ROM(第1) ADDR	*/
+static	pair	kanji2_addr;		/* OUT[EC-ED] 漢字ROM(第2) ADDR	*/
 
 byte	jisho_rom_bank;			/* OUT[F0] 辞書ROMセレクト	*/
 byte	jisho_rom_ctrl;			/* OUT[F1] 辞書ROMバンク	*/
 
 
 int	calendar_stop = FALSE;		/* 時計停止フラグ		*/
-char	calendar_data[7] =		/* 時計停止時刻 (年月日曜時分秒)*/
+static	char	calendar_data[7] =	/* 時計停止時刻 (年月日曜時分秒)*/
 { 85, 0, 1, 0, 0, 0, 0, };
 
 
@@ -86,7 +90,8 @@ int	cmt_wait  = TRUE;		/* 真で、テープ読込ウェイトあり	*/
 
 int	highspeed_mode = FALSE;		/* 真で、高速 BASIC 処理あり 	*/
 
-int	memory_wait = FALSE;		/* メモリウェイトの有無		*/
+
+int	use_siomouse = FALSE;		/* 真で、シリアルマウスあり	*/
 
 
 /* 以下はテープイメージのファイル依存情報なので、ステートセーブしない */
@@ -505,7 +510,7 @@ INLINE	byte	vram_read( word addr )
 /*------------------------------*/
 INLINE	void	vram_write( word addr, byte data )
 {
-  set_screen_update( addr );
+  screen_set_dirty_flag(addr);
 
   main_vram[addr][ memory_bank ] = data;
 }
@@ -554,9 +559,9 @@ INLINE	byte	ALU_read( word addr )
 /*------------------------------*/
 INLINE	void	ALU_write( word addr, byte data )
 {
-  int	i, mode;
+  int i, mode;
 
-  set_screen_update( addr );
+  screen_set_dirty_flag(addr);
 
   switch( ALU2_ctrl&ALU2_CTRL_MODE ){
 
@@ -789,12 +794,16 @@ void	main_io_out( byte port, byte data )
 	/* システムコントロール出力 */
   case 0x30:
     if( (sys_ctrl^data) & (SYS_CTRL_80) ){	/* SYS_CTRL_MONO は無視 */
-      set_screen_update_force();		/* (テキストのカラーは  */
+      screen_set_dirty_all();			/* (テキストのカラーは  */
     }						/*  CRTC設定にて決定)   */
 
     if( sio_tape_readable() ){
       if( (sys_ctrl & 0x08) && !(data & 0x08) ) sio_check_cmt_error();
     }
+
+    /* カセットモーターリレー音 */
+    if ((~sys_ctrl &  data) & 0x08) { xmame_dev_sample_motoron();  }
+    if (( sys_ctrl & ~data) & 0x08) { xmame_dev_sample_motoroff(); }
 
     sys_ctrl = data;
     sio_set_intr_base();
@@ -811,10 +820,10 @@ printf("CMT %02x, %s: Motor %s: CDS %d\n",data,
 
 		/* GRPH_CTRL_25 は無視 (テキスト25行は CRTC設定にて決定) */
     if( chg & (GRPH_CTRL_200|GRPH_CTRL_VDISP|GRPH_CTRL_COLOR) ){
-      set_screen_update_force();
+      screen_set_dirty_all();
 
       if( chg & GRPH_CTRL_COLOR ){
-	set_screen_update_palette();
+	screen_set_dirty_palette();
       }
     }
 
@@ -833,7 +842,7 @@ printf("CMT %02x, %s: Motor %s: CDS %d\n",data,
   case 0x32:
     chg = misc_ctrl ^ data;
     if( chg & MISC_CTRL_ANALOG ){
-      set_screen_update_palette();
+      screen_set_dirty_palette();
     }
     if( sound_port & SD_PORT_44_45 ){
       intr_sound_enable = (data & INTERRUPT_MASK_SOUND) ^ INTERRUPT_MASK_SOUND;
@@ -909,7 +918,7 @@ printf("CMT %02x, %s: Motor %s: CDS %d\n",data,
       vram_bg_palette.blue  = new_pal.blue;
       vram_bg_palette.red   = new_pal.red;
       vram_bg_palette.green = new_pal.green;
-      set_screen_update_palette();
+      screen_set_dirty_palette();
     }
     return;
 
@@ -917,7 +926,7 @@ printf("CMT %02x, %s: Motor %s: CDS %d\n",data,
   case 0x53:
     grph_pile = data;
     set_text_display();
-    set_screen_update_force();
+    screen_set_dirty_all();
     return;
 
 	/* パレット設定 */
@@ -939,7 +948,7 @@ printf("CMT %02x, %s: Motor %s: CDS %d\n",data,
 	vram_bg_palette.blue  = new_pal.blue;
 	vram_bg_palette.red   = new_pal.red;
 	vram_bg_palette.green = new_pal.green;
-	set_screen_update_palette();
+	screen_set_dirty_palette();
       }
       return;
     }	/* else no return; (.. continued) */
@@ -979,7 +988,7 @@ printf("CMT %02x, %s: Motor %s: CDS %d\n",data,
       vram_palette[ port-0x54 ].blue  = new_pal.blue;
       vram_palette[ port-0x54 ].red   = new_pal.red;
       vram_palette[ port-0x54 ].green = new_pal.green;
-      set_screen_update_palette();
+      screen_set_dirty_palette();
     }
     return;
 
@@ -1089,8 +1098,36 @@ printf("CMT %02x, %s: Motor %s: CDS %d\n",data,
     }
     return;
   case 0xe3:
+/*printf("OUT E3 <=  %02X\n",data);*/
     if( use_extram ){
-      ext_ram_bank = data;
+      if( linear_ext_ram ){		/* 出力値の通りにバンクを割り振る */
+	ext_ram_bank = data;
+      }else{				/* 実機っぽく(?)バンクを割り振る */
+	ext_ram_bank = 0xff;
+	if (use_extram <= 4) {				/* 128KB*4以下 */
+	    if ((data & 0x0f) < use_extram * 4) {
+		ext_ram_bank = data & 0x0f;
+	    }
+	} else if (use_extram == 8) {			/* 1MB */
+	    /* 設定 00-07h, 10-17h, 20-27h, 30-37h とする */
+	    if ((data & 0xc8) == 0x00) {
+		ext_ram_bank = ((data & 0x30) >> 1) | (data & 0x07);
+	    }
+	} else if (use_extram <= 10) {			/* 1MB + 128KB*2以下 */
+	    /* 設定 08-0Fh, 18-1Fh, 28-2Fh, 38-3Fh とする */
+	    if ((data & 0xc8) == 0x08) {
+		ext_ram_bank = ((data & 0x30) >> 1) | (data & 0x07);
+	    } else if ((data & 0x0f) < (use_extram - 8) * 4) {
+		ext_ram_bank = (data & 0x0f) + 0x20;
+	    }
+	} else if (use_extram == 16) {			/* 2MB */
+	    /* 設定 08-0Fh, 18-1Fh, 28-2Fh, 38-3Fh とする */
+	    /* 設定 48-4Fh, 58-5Fh, 68-6Fh, 78-7Fh とする */
+	    if ((data & 0x88) == 0x08) {
+		ext_ram_bank = ((data & 0x70) >> 1) | (data & 0x07);
+	    }
+	}
+      }
       main_memory_mapping_0000_7fff();
     }
     return;
@@ -1115,7 +1152,7 @@ printf("CMT %02x, %s: Motor %s: CDS %d\n",data,
     intr_vsync_enable = data & INTERRUPT_MASK_VSYNC;
     intr_rtc_enable   = data & INTERRUPT_MASK_RTC;
 
-    if( intr_sio_enable   == FALSE ) RS232C_flag = FALSE;
+    if( intr_sio_enable   == FALSE ){RS232C_flag = FALSE; sio_data_clear(); }
     if( intr_vsync_enable == FALSE ) VSYNC_flag  = FALSE;
     if( intr_rtc_enable   == FALSE ) RTC_flag    = FALSE;
 
@@ -1367,9 +1404,40 @@ byte	main_io_in( byte port )
     if( use_extram ) return ~ext_ram_ctrl | 0xee;
     return 0xff;
   case 0xe3:
-    if( use_extram &&
+    if( linear_ext_ram ){		/* 出力値の通りにバンクを割り振った */
+      if( use_extram &&
 	(ext_ram_bank < use_extram*4) ) return ext_ram_bank;
-    return 0xff;
+      return 0xff;
+    }else{				/* 実機っぽく(?)バンクを割り振った */
+	byte ret = 0xff;
+	if (use_extram && (ext_ram_bank != 0xff)) {
+	    if (use_extram <= 4) {			/* 128KB*4以下 */
+		ret = (ext_ram_bank | 0xf0);
+	    } else if (use_extram == 8) {		/* 1MB */
+		/* 設定 00-07h, 10-17h, 20-27h, 30-37h とする */
+		if (ext_ram_bank < 8) {
+		    ret = (ext_ram_bank | 0xf0);
+		} else {
+		    ret = ((ext_ram_bank & 0x18) << 1) | (ext_ram_bank & 0x07);
+		}
+	    } else if (use_extram <= 10) {		/* 1MB + 128KB*2以下 */
+		/* 設定 08-0Fh, 18-1Fh, 28-2Fh, 38-3Fh とする */
+		if (ext_ram_bank < 0x20) {
+		    ret = ((ext_ram_bank & 0x18) << 1) | 0x08 |
+							 (ext_ram_bank & 0x07);
+		} else {
+		    ret = ((ext_ram_bank - 0x20) | 0xf0);
+		}
+	    } else if (use_extram == 16) {		/* 2MB */
+		/* 設定 08-0Fh, 18-1Fh, 28-2Fh, 38-3Fh とする */
+		/* 設定 48-4Fh, 58-5Fh, 68-6Fh, 78-7Fh とする */
+		ret = ((ext_ram_bank & 0x38) << 1) | 0x08 |
+							(ext_ram_bank & 0x07);
+	    }
+	}
+/*printf("IN E3 -----> %02X\n",ret);*/
+	return ret;
+    }
 
 
 	/* サウンド入力(オプション) */
@@ -1503,6 +1571,11 @@ static	int	cmt_stateload_skip = 0;		/* ステートロード時 skip */
 
 static	int	sio_getc( int is_cmt, int *tick );
 
+void	sio_data_clear(void)
+{
+    sio_data_exist = FALSE;
+}
+
 
 /*-------- ロード用テープイメージファイルを "rb" で開く --------*/
 
@@ -1516,7 +1589,7 @@ int	sio_open_tapeload( const char *filename )
     return sio_tape_rewind();
 
   }else{
-    if( get_emu_mode() != MENU )
+    if (quasi88_is_menu() == FALSE)
       printf("\n[[[ %s : Tape load image can't open ]]]\n\n", filename );
   }
   cmt_stateload_chars = 0;
@@ -1541,7 +1614,7 @@ int	sio_open_tapesave( const char *filename )
     return TRUE;
 
   }else{
-    if( get_emu_mode() != MENU )
+    if (quasi88_is_menu() == FALSE)
       printf("\n[[[ %s : Tape save image can't open ]]]\n\n", filename );
   }
   return FALSE;
@@ -1572,7 +1645,7 @@ int	sio_open_serialin( const char *filename )
   if( fp_si ){
       printf("\n[[[ Serial input image access error ]]]\n\n" );
   }else{
-    if( get_emu_mode() != MENU )
+    if (quasi88_is_menu() == FALSE)
       printf("\n[[[ %s : Serial input file can't open ]]]\n\n", filename );
   }
   sio_close_serialin();
@@ -1597,7 +1670,7 @@ int	sio_open_serialout( const char *filename )
     return TRUE;
 
   }else{
-    if( get_emu_mode() != MENU )
+    if (quasi88_is_menu() == FALSE)
       printf("\n[[[ %s : Serial output file can't open ]]]\n\n", filename );
   }
   return FALSE;
@@ -1605,6 +1678,16 @@ int	sio_open_serialout( const char *filename )
 void	sio_close_serialout( void )
 {
   if( fp_so ){ osd_fclose( fp_so ); fp_so = NULL; }
+}
+
+/*-------- シリアルマウスを初期化/終了する --------*/
+
+void	sio_mouse_init(int initial)
+{
+  if (initial) {
+    init_serial_mouse_data();
+  }
+  sio_set_intr_base();
 }
 
 /*-------- 開いているテープイメージを巻き戻す --------*/
@@ -1686,7 +1769,7 @@ int	sio_tape_pos( long *cur, long *end )
 
 int	sio_com_pos( long *cur, long *end )
 {
-  long v,w;
+  long v;
 
   if( fp_si ){
     if( com_EOF ){		/* 終端なら、位置=0/終端=0 にし、真を返す */
@@ -1722,15 +1805,18 @@ static	int	sio_getc( int is_cmt, int *tick )
 
   if( is_cmt==FALSE ){			/* シリアル入力 */
 
+    if (use_siomouse) {
+      c = get_serial_mouse_data();
+      return c;
+    }
+
     if( fp_si==NULL ) return EOF;
     if( com_EOF )     return EOF;
 
     c = osd_fgetc( fp_si );
     if( c==EOF ){
-      if( get_emu_mode() != MENU ){
-	printf(" (( %s : Serial input file EOF ))\n", file_sin );
-	status_message( 1, 60*10, "Serial input  [EOF]" );
-      }
+      printf(" (( %s : Serial input file EOF ))\n", file_sin );
+      status_message( 1, STATUS_WARN_TIME, "Serial input  [EOF]" );
       com_EOF = TRUE;
     }
     return c;
@@ -1814,7 +1900,7 @@ static	int	sio_getc( int is_cmt, int *tick )
 
     if( c==EOF ){
       cmt_EOF = TRUE;
-      if( get_emu_mode()!=MENU ) status_message( 1, 60*10, "Tape Read  [EOF]");
+      status_message( 1, STATUS_WARN_TIME, "Tape Read  [EOF]");
     }else{
       cmt_read_chars ++;
     }
@@ -1843,7 +1929,7 @@ static	void	sio_check_cmt_error( void )
 
       if( c==EOF ){
 	cmt_EOF = TRUE;
-	if( get_emu_mode()!=MENU ) status_message(1,60*10, "Tape Read  [EOF]");
+	status_message(1, STATUS_WARN_TIME, "Tape Read  [EOF]");
       }else{
 	cmt_read_chars ++;
       }
@@ -1952,7 +2038,7 @@ static void sio_set_intr_base( void )
      RS232C (I/O 30h:bit5=ON) か、CMTかつモータON (I/O 30h:bit5=OFF,bit3=ON)
      の時に、周期的に割り込みを発生させる。その周期を計算する。 */
 
-  if( (fp_si || fp_ti) &&
+  if( (fp_si || fp_ti || use_siomouse) &&
       (sio_command & 0x04) &&
       ( (sys_ctrl & 0x20) || (sys_ctrl & 0x08) ) ){
 
@@ -2189,6 +2275,16 @@ int	tape_exist( void )
   return (fp_ti || fp_to);
 }
 
+int	tape_readable( void )
+{
+  return (fp_ti) ? TRUE : FALSE;
+}
+
+int	tape_writable( void )
+{
+  return (fp_to) ? TRUE : FALSE;
+}
+
 int	tape_reading( void )
 {
   return( fp_ti &&
@@ -2218,7 +2314,7 @@ int	printer_open( const char *filename )
     return TRUE;
 
   }else{
-    if( get_emu_mode() != MENU )
+    if (quasi88_is_menu() == FALSE)
       printf("\n[[[ %s : Printer output file can't open ]]]\n\n", filename );
   }
   return FALSE;
@@ -2428,11 +2524,11 @@ void	out_ctrl_signal( byte data )
   else		    clr_crtc_sync_bit();
 
   if( (trg_on & (0x80|0x20)) || (trg_off & (0x80|0x20)) ){
-    xmame_beep_out_data( data );
+    xmame_dev_beep_out_data( data );
   }
 
-  if( trg_on  & 0x40 ) jop1_strobe();
-  if( trg_off & 0x40 ) jop1_strobe();
+  if( trg_on  & 0x40 ) keyboard_jop1_strobe();
+  if( trg_off & 0x40 ) keyboard_jop1_strobe();
 
   ctrl_signal = data;
 }
@@ -2571,9 +2667,59 @@ void	power_on_ram_init( void )
 /************************************************************************/
 /* PC88 メインシステム 初期化						*/
 /************************************************************************/
+
+static	void	bootup_work_init(void)
+{
+	/* V1モードのバージョンの小数点以下を強制変更する */
+
+    if (set_version) ROM_VERSION = set_version;
+    else             ROM_VERSION = rom_version;
+
+	/* 起動デバイス(ROM/DISK)未定の時 */
+
+    if (boot_from_rom == BOOT_AUTO) {
+	if (disk_image_exist(0))	/* ディスク挿入時はDISK */
+	    boot_from_rom = FALSE;
+	else				/* それ以外は、    ROM  */
+	    boot_from_rom = TRUE;
+    }
+
+	/* 起動時の BASICモード未定の時	  */
+
+    if (boot_basic == BASIC_AUTO) {			
+	if (ROM_VERSION >= '4')			/* SR 以降は、V2	  */
+	    boot_basic = BASIC_V2;
+	else					/* それ以前は、V1S	  */
+	    boot_basic = BASIC_V1S;
+    }
+
+	/* サウンド(I/II)のポートを設定	 */
+
+    if (sound_board == SOUND_II) {
+
+	if      (ROM_VERSION >= '8')		/* FH/MH 以降は、44〜47H */
+	    sound_port = SD_PORT_44_45 | SD_PORT_46_47;
+	else if (ROM_VERSION >= '4')		/* SR 以降は、44〜45,A8〜ADH */
+	    sound_port = SD_PORT_44_45 | SD_PORT_A8_AD;
+	else					/* それ以前は、  A8〜ADH */
+	    sound_port = SD_PORT_A8_AD;
+
+    } else {
+
+	if (ROM_VERSION >= '4')			/* SR以降は、44〜45H	 */
+	    sound_port = SD_PORT_44_45;
+	else					/* それ以前は、？？？	 */
+	  /*sound_port = SD_PORT_A8_AD;*/
+	    sound_port = 0;			/*	対応しないなら 0 */
+    }
+}
+
+
 void	pc88main_init( int init )
 {
   int i;
+
+  bootup_work_init();
 
 	/* CPU ワーク初期化 */
 
@@ -2590,7 +2736,7 @@ void	pc88main_init( int init )
   z80main_cpu.break_if_halt = FALSE;		/* for debug */
   z80main_cpu.PC_prev   = z80main_cpu.PC;	/* dummy for monitor */
 
-#if	defined( MAIN_DISP ) || defined( MAIN_FILE )
+#ifdef	DEBUGLOG
   z80main_cpu.log	= TRUE;
 #else
   z80main_cpu.log	= FALSE;
@@ -2617,7 +2763,7 @@ void	pc88main_init( int init )
 	/* キーボード初期化 */
 
   if( init == INIT_POWERON  ||  init == INIT_STATELOAD ){
-    keyboard_init();
+    keyboard_reset();
   }
 
 
@@ -2633,8 +2779,8 @@ void	pc88main_init( int init )
     crtc_init();
     dmac_init();
     calendar_init();
-    jop1_init();
-    sound_init();
+    keyboard_jop1_reset();
+    sound_board_init();
     pio_init();
 
 
@@ -2712,9 +2858,13 @@ void	pc88main_init( int init )
 
 
   /* CRTC/DMAC関連による初期化 */
-
   set_text_display();
-  blink_ctrl_update();
+  frameskip_blink_reset();
+
+  /* シリアルマウス初期化 */
+  if (use_siomouse) {
+    sio_mouse_init(TRUE);
+  }
 
   /* サウンドについて・・・ */
   if( init == INIT_STATELOAD ){
@@ -2749,14 +2899,14 @@ INLINE	void	check_break_point( int type, word addr, byte data, char *str )
 {
   int	i;
 
-  if ( get_emu_mode() == MONITOR ) return; /* モニターモード時はスルー */
+  if (quasi88_is_monitor())  return; /* モニターモード時はスルー */
   for( i=0; i<NR_BP; i++ ){
     if( break_point[BP_MAIN][i].type == type &&
         break_point[BP_MAIN][i].addr == addr ){
       printf( "*** Break at %04x *** "
 	      "( MAIN - #%d [ %s %04XH , data = %02XH ]\n",
 	      z80main_cpu.PC.W, i+1, str, addr, data );
-      set_emu_mode( MONITOR );
+      quasi88_debug();
       break;
     }
   }
@@ -2858,6 +3008,7 @@ void	pc88main_bus_setup( void )
  ************************************************************************/
 
 #define	SID	"MAIN"
+#define	SID2	"MAI2"
 
 static	T_SUSPEND_W	suspend_pc88main_work[]=
 {
@@ -2970,18 +3121,37 @@ static	T_SUSPEND_W	suspend_pc88main_work[]=
   { TYPE_END,	0			},
 };
 
+static	T_SUSPEND_W	suspend_pc88main_work2[]=
+{
+  { TYPE_INT,	&use_siomouse,		},
+  { TYPE_END,	0			},
+};
+
 
 int	statesave_pc88main( void )
 {
 /*if( fp_ti ) printf("%d\n",osd_ftell(fp_ti));*/
 
-  if( statesave_table( SID, suspend_pc88main_work ) == STATE_OK ) return TRUE;
-  else                                                            return FALSE;
+  if( statesave_table( SID, suspend_pc88main_work ) != STATE_OK ) return FALSE;
+
+  if( statesave_table(SID2, suspend_pc88main_work2) != STATE_OK ) return FALSE;
+
+  return TRUE;
 }
 
 int	stateload_pc88main( void )
 {
   if( stateload_table( SID, suspend_pc88main_work ) != STATE_OK ) return FALSE;
+
+  if( stateload_table(SID2, suspend_pc88main_work2) != STATE_OK ) {
+
+    /* 旧バージョンなら、みのがす */
+
+    printf( "stateload : Statefile is old. (ver 0.6.0, 1, 2 or 3?)\n" );
+
+    use_siomouse = FALSE;
+  }
+
 
   cmt_stateload_chars = cmt_read_chars;
   cmt_read_chars = 0;

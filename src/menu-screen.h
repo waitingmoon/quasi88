@@ -29,13 +29,4 @@ extern	byte	menu_cursor_off[16];
 
 
 
-/************************************************************************/
-/* メニューモードので、表示を行なう関数					*/
-/************************************************************************/
-
-void	menu_trans_palette( void );
-void	menu_draw_screen( void );
-void	menu_set_status( void );
-
-
 #endif	/* MENU_SCREEN_H_INCLUDED */

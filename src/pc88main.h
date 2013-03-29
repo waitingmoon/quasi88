@@ -12,7 +12,7 @@ extern char file_sin[QUASI88_MAX_FILENAME];	/* シリアル出力のファイル名 */
 extern char file_sout[QUASI88_MAX_FILENAME];	/* シリアル入力のファイル名 */
 #endif
 
-
+	/**** ブート状態 (I/Oに反映) ****/
 
 extern	int	boot_basic;			/* 起動時の BASICモード	*/
 extern	int	boot_dipsw;			/* 起動時のディップ設定	*/
@@ -22,8 +22,6 @@ extern	int	boot_clock_4mhz;		/* 起動時の CPUクロック	*/
 extern	int	monitor_15k;			/* 15k モニター 1:Yes 0:No  */
 
 extern	int	high_mode;			/* 高速モード 1:Yes 0:No     */
-
-extern	int	calendar_stop;			/* 時計停止フラグ	*/
 
 	/**** ディップスイッチ ****/
 
@@ -35,14 +33,13 @@ extern	int	calendar_stop;			/* 時計停止フラグ	*/
 #define	SW_ROMBOOT	(0x08)			/* 1: ROM  / 0: DISK	*/
 #define	SW_4MHZ		(0x80)			/* 1: 4MHz / 0: 8MHz	*/
 
-
 	/**** Ｉ／Ｏポート ****/
 
-extern	byte	dipsw_1;			/* IN[30] ディップスイッチ 1 */
-extern	byte	dipsw_2;			/* IN[31] ディップスイッチ 2 */
-extern	byte	ctrl_boot;			/* IN[40] ディスクブート情報 */
+/*extern byte	dipsw_1;			 * IN[30] ディップスイッチ 1 */
+/*extern byte	dipsw_2;			 * IN[31] ディップスイッチ 2 */
+/*extern byte	ctrl_boot;			 * IN[40] ディスクブート情報 */
+/*extern byte	cpu_clock;			 * IN[6E] CPU クロック       */
 extern	int	memory_bank;			/* OUT[5C-5F] IN[5C] バンク  */
-extern	byte	cpu_clock;			/* IN[6E] CPU クロック       */
 
 extern	byte	misc_ctrl;			/* I/O[32] 各種Ctrl       */
 extern	byte	ALU1_ctrl;			/* OUT[34] ALU Ctrl 1     */
@@ -51,7 +48,6 @@ extern	byte	ctrl_signal;			/* OUT[40] コントロール信号*/
 extern	byte	baudrate_sw;			/* I/O[6F] ボーレート     */
 extern	word	window_offset;			/* I/O[70] WINDOW オフセット*/
 extern	byte	ext_rom_bank;			/* I/O[71] 拡張ROM BANK   */
-
 extern	byte	ext_ram_ctrl;			/* I/O[E2] 拡張RAM制御	  */
 extern	byte	ext_ram_bank;			/* I/O[E3] 拡張RAMセレクト*/
 
@@ -91,22 +87,16 @@ extern	byte	jisho_rom_ctrl;			/* OUT[F1] 辞書ROMバンク  */
 #define	JISHO_BANK		(0x1f)		/* 辞書ROMバンク	   */
 
 
+	/**** カレンダー ****/
+
+extern	int	calendar_stop;			/* 時計停止フラグ	*/
 
 
-	/**** 関数 ****/
+	/**** シリアル、パラレル ****/
 
-
-
-void	pc88main_init( int init );
-void	pc88main_term( void );
-void	pc88main_bus_setup( void );
-void	power_on_ram_init( void );
-
-byte	main_mem_read( word addr );
-void	main_mem_write( word addr, byte data );
-byte	main_io_in( byte port );
-void	main_io_out( byte port, byte data );
-
+extern	int	cmt_speed;	/* テープ速度 0で自動   */
+extern	int	cmt_intr;	/* 割込でテープ処理する */
+extern	int	cmt_wait;	/* 真で、テープ読込ウェイトあり(T88のみ) */
 
 
 	/**** 高速 BASIC モード ****/
@@ -120,12 +110,26 @@ extern int highspeed_flag;
 extern int highspeed_mode;	/* 高速 BASIC 処理 するなら 真      */
 
 
+	/**** シリアルマウス ****/
 
-	/**** シリアル、パラレル ****/
+extern int use_siomouse;	/* 真で、シリアルマウスあり	*/
 
-extern	int	cmt_speed;	/* テープ速度 0で自動   */
-extern	int	cmt_intr;	/* 割込でテープ処理する */
-extern	int	cmt_wait;	/* 真で、テープ読込ウェイトあり(T88のみ) */
+
+
+
+
+	/**** 関数 ****/
+
+void	pc88main_init( int init );
+void	pc88main_term( void );
+void	pc88main_bus_setup( void );
+void	power_on_ram_init( void );
+
+byte	main_mem_read( word addr );
+void	main_mem_write( word addr, byte data );
+byte	main_io_in( byte port );
+void	main_io_out( byte port, byte data );
+
 
 int	sio_open_tapeload( const char *filename );
 void	sio_close_tapeload( void );
@@ -137,13 +141,17 @@ int	sio_open_serialout( const char *filename );
 void	sio_close_serialout( void );
 int	printer_open( const char *filename );
 void	printer_close( void );
+void	sio_mouse_init(int initial);
 int	sio_tape_rewind( void );
 
 int	sio_tape_pos( long *cur, long *end );
 int	sio_com_pos( long *cur, long *end );
 int	sio_intr( void );
+void	sio_data_clear(void);
 
 int	tape_exist( void );
+int	tape_readable(void);
+int	tape_writable(void);
 int	tape_reading( void );
 int	tape_writing( void );
 
