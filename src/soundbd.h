@@ -57,7 +57,11 @@ extern	int	sound2_notice_EOS;		/* EOSチェックの要不要	*/
 
 
 
-void	sound_init( void );
+extern	int	use_cmdsing;			/* 真で、CMD SING有効	*/
+
+
+
+void	sound_board_init( void );
 
 void	sound_out_reg( byte data );
 void	sound_out_data( byte data );

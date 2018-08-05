@@ -37,6 +37,12 @@
 #define	SNAPSHOT_FILENAME	"save"
 #endif
 
+/* サウンド出力のファイル名(ベース) */
+
+#ifndef	WAVEOUT_FILENAME
+#define	WAVEOUT_FILENAME	"wave"
+#endif
+
 
 
 /* パス・ファイル名の最大長さ ? */

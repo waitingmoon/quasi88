@@ -795,7 +795,7 @@ int	z80_emu( z80arch *z80, int state_of_exec )
 
     do{
 
-#if	defined( MAIN_DISP ) || defined( MAIN_FILE ) || defined( SUB_DISP ) || defined( SUB_FILE )
+#ifdef	DEBUGLOG
       if( z80->log ) z80_logging( z80 );	/* ログを記録 */
 #endif
 

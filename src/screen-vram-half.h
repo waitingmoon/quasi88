@@ -1,76 +1,70 @@
-#undef	IF_LINE200_OR_EVEN_LINE
-#undef	DST_DEFINE
-#undef	DST_NEXT_LINE
-#undef	DST_RESTORE_LINE
-#undef	DST_NEXT_CHARA
-#undef	DST_NEXT_TOP_CHARA
+#include "screen-vram-base.h"
 
-#if	defined( LINE200 )
-/*=============================================================================
-  低解像度(200ライン)モードの場合 (以下は、テキスト25行の例)
+/*======================================================================
+ * 描画先の変数定義 (dst)
+ *======================================================================*/
 
-	  vram		バッファ	vram     1ライン につき
-	    +--+	    +--+	バッファ 1ライン を描画する。
-	 8  |  |	 8  |  |
-	    +--+	    +--+	vram 処理ライン数は 8。
-					フォントデータは vram 1ライン毎に必要
+#if	defined (LINE200)	/*-------------------------------------------*/
+#define IF_LINE200_OR_EVEN_LINE()	    /* nothing */
 
-=============================================================================*/
-#define	IF_LINE200_OR_EVEN_LINE()	    /* nothing */
+#define DST_DEFINE()		int	dst_w = SCREEN_WIDTH;		\
+				TYPE	*dst  = (TYPE *) SCREEN_START;
 
-#define	DST_DEFINE()		int	dst_w = SCREEN_WIDTH;		\
-				TYPE	*dst  = (TYPE *)SCREEN_START;
+#define DST_NEXT_LINE()		dst  += (dst_w);
 
+#define DST_RESTORE_LINE()	dst  -= CHARA_LINES * dst_w;
 
+#define DST_NEXT_CHARA()	dst  += 4 * COLUMN_SKIP;
 
+#define DST_NEXT_TOP_CHARA()	dst  += CHARA_LINES * dst_w - 320;
 
-#define	DST_NEXT_LINE()		dst  += (dst_w);
+#elif	defined (LINE400)	/*-------------------------------------------*/
+#define IF_LINE200_OR_EVEN_LINE()	if (k & 1) continue;
 
+#define DST_DEFINE()		int	dst_w = SCREEN_WIDTH;		\
+				TYPE	*dst  = (TYPE *) SCREEN_START;
 
+#define DST_NEXT_LINE()		dst  += dst_w;
 
+#define DST_RESTORE_LINE()	dst  -= (CHARA_LINES / 2) * dst_w;
 
-#define	DST_RESTORE_LINE()	dst  -= CHARA_LINES * dst_w;
+#define DST_NEXT_CHARA()	dst  += 4 * COLUMN_SKIP;
 
+#define DST_NEXT_TOP_CHARA()	dst  += (CHARA_LINES / 2) * dst_w - 320;
+#endif
 
+/*======================================================================
+ * 描画マクロ定義 (MASK_DOT, TRANS_DOT, STORE_DOT, COPY_DOT)
+ *======================================================================*/
 
+#if	defined (LINE200)
+#if	    defined (INTERPOLATE)	/*-----------------------------------*/
 
-#define	DST_NEXT_CHARA()	dst  += 4*COLUMN_SKIP;
+#define COPY_8DOT()
+#define COPY_16DOT()
 
+#include "screen-vram-200h-p.h"			/*****************/
 
+#else	    /* ! INTERPOLATE */		/*-----------------------------------*/
 
+#define COPY_8DOT()
+#define COPY_16DOT()
 
-#define	DST_NEXT_TOP_CHARA()	dst  += CHARA_LINES * dst_w - 320;
-
-
-
-
-#elif	defined( LINE400 )
-/*=============================================================================
-  高解像度(400ライン)モードの場合 (以下は、テキスト25行の例)
-
-	  vram		バッファ	vram     2ライン につき
-	    +--+	    +--+	バッファ 1ライン を描画する。
-	16  |  |	 8  |  |
-	    |  |	    +--+	vram 処理ライン数は 16 だが、
-	    +--+			  ライン毎にスキップし、8ラインだけ処理
-					フォントデータは vram 2ライン毎に必要
-=============================================================================*/
-#define	IF_LINE200_OR_EVEN_LINE()	if( k&1 ) continue;
-
-#define	DST_DEFINE()		int	dst_w = SCREEN_WIDTH;		\
-				TYPE	*dst  = (TYPE *)SCREEN_START;
-
-
-#define	DST_NEXT_LINE()		dst  += dst_w;
-
-
-#define	DST_RESTORE_LINE()	dst  -= (CHARA_LINES/2) * dst_w;
-
-
-#define	DST_NEXT_CHARA()	dst  += 4*COLUMN_SKIP;
-
-
-#define	DST_NEXT_TOP_CHARA()	dst  += (CHARA_LINES/2) * dst_w - 320;
-
+#include "screen-vram-200h.h"			/*****************/
 
 #endif
+
+#elif	defined (LINE400)	/*-------------------------------------------*/
+
+#define COPY_8DOT()
+#define COPY_16DOT()
+
+#include "screen-vram-400h.h"			/*****************/
+
+#endif
+
+/*======================================================================
+ * 描画関数定義
+ *======================================================================*/
+
+#include "screen-vram.h"

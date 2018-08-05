@@ -4,7 +4,7 @@
 /*	このファイルは、 joystick.c からインクルードされます		*/
 /*									*/
 /************************************************************************/
-#if	defined( JOY_LINUX_USB )
+#if	defined(JOY_LINUX_USB)
 
 /*
   以下のコードは、引地さん [eiichi@licorp.co.jp] により提供されました。
@@ -114,13 +114,13 @@ void joystick_init(void)
 	joystick_device = NULL;
     }
 
-    if( verbose_proc ) printf( "%s\n", enable_joystick ? "OK" : "FAILED" );
+    if (verbose_proc) printf("%s\n", enable_joystick ? "OK" : "FAILED");
 }
 
 
 
 
-void joystick_term(void)
+void joystick_exit(void)
 {
     if (enable_joystick == FALSE ) { return; }
 
@@ -137,7 +137,7 @@ void joystick_term(void)
 static int press_up_down = 0;           /* コントローラ上下ボタン押下状態 */
 static int press_right_left = 0;        /* コントローラ左右ボタン押下状態 */
 
-void joystick_event(void)
+void joystick_update(void)
 {
     int i;
     int j;
@@ -180,11 +180,11 @@ void joystick_event(void)
 	  }
 	  if (joy_button[i].button == JOY_BUTTON_A) {
 
-	    pc88_pad( KEY88_PAD_A, (joy_button[i].is_press) );
+	    quasi88_pad( KEY88_PAD1_A, (joy_button[i].is_press) );
 
 	  } else if (joy_button[i].button == JOY_BUTTON_B) {
 
-	    pc88_pad( KEY88_PAD_B, (joy_button[i].is_press) );
+	    quasi88_pad( KEY88_PAD1_B, (joy_button[i].is_press) );
 
 	  } else if (joy_button[i].button == JOY_BUTTON_UP) {
 	    if (joy_button[i].is_press) {
@@ -214,24 +214,30 @@ void joystick_event(void)
 	}
 
 	/* 上下ボタン */
-	pc88_pad( KEY88_PAD_UP,    FALSE );
-	pc88_pad( KEY88_PAD_DOWN,  FALSE );
+	quasi88_pad( KEY88_PAD1_UP,    FALSE );
+	quasi88_pad( KEY88_PAD1_DOWN,  FALSE );
 	if (press_up_down == 1) {
-	  pc88_pad( KEY88_PAD_UP,    TRUE );
+	  quasi88_pad( KEY88_PAD1_UP,    TRUE );
 	} else if (press_up_down == 2) {
-	  pc88_pad( KEY88_PAD_DOWN,  TRUE );
+	  quasi88_pad( KEY88_PAD1_DOWN,  TRUE );
 	}
 
 	/* 左右ボタン */
-	pc88_pad( KEY88_PAD_RIGHT, FALSE );
-	pc88_pad( KEY88_PAD_LEFT,  FALSE );
+	quasi88_pad( KEY88_PAD1_RIGHT, FALSE );
+	quasi88_pad( KEY88_PAD1_LEFT,  FALSE );
 	if (press_right_left == 1) {
-	  pc88_pad( KEY88_PAD_RIGHT, TRUE );
+	  quasi88_pad( KEY88_PAD1_RIGHT, TRUE );
 	} else if (press_right_left == 2) {
-	  pc88_pad( KEY88_PAD_LEFT,  TRUE );
+	  quasi88_pad( KEY88_PAD1_LEFT,  TRUE );
 	}
     }
 }
 
 
-#endif
+
+int	event_get_joystick_num(void)
+{
+    return (enable_joystick) ? 1 :0;
+}
+
+#endif	/* JOY_LINUX_USB */

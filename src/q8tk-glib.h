@@ -49,73 +49,78 @@
 
 
 
-void	q8gr_init( void );
+void	q8gr_init(void);
 
 
-void	q8gr_set_cursor_exist( int exist_flag );
-int	q8gr_get_cursor_exist( void );
-int	q8gr_get_cursor_blink( void );
-void	q8gr_set_cursor_blink( void );
+void	q8gr_set_cursor_exist(int exist_flag);
+int	q8gr_get_cursor_exist(void);
+int	q8gr_get_cursor_blink(void);
+void	q8gr_set_cursor_blink(void);
 
 
-void	q8gr_clear_screen( void );
+void	q8gr_clear_screen(void);
 
-void	q8gr_clear_focus_screen( void );
-void	q8gr_set_focus_screen( int x, int y, int sx, int sy, void *p );
-void	*q8gr_get_focus_screen( int x, int y );
-int	q8gr_scan_focus_screen( void *p );
-void	q8gr_set_screen_mask( int x, int y, int sx, int sy );
-void	q8gr_reset_screen_mask( void );
+extern	Q8tkWidget	dummy_widget_window; /* ダミーの未使用ウィジット */
+#define	Q8GR_WIDGET_NONE	(NULL)
+#define	Q8GR_WIDGET_WINDOW	((void *)&dummy_widget_window)
 
-void	q8gr_draw_mouse( int x, int y );
+void	q8gr_clear_focus_screen(void);
+void	q8gr_set_focus_screen(int x, int y, int sx, int sy, void *p);
+void	*q8gr_get_focus_screen(int x, int y);
+int	q8gr_scan_focus_screen(void *p);
+void	q8gr_set_screen_mask(int x, int y, int sx, int sy);
+void	q8gr_reset_screen_mask(void);
+
+void	q8gr_draw_mouse(int x, int y);
 
 
-void	q8gr_draw_window( int x, int y, int sx, int sy, int shadow_type );
-void	q8gr_draw_button( int x, int y, int sx, int sy, int condition,void *p);
-void	q8gr_draw_check_button( int x, int y, int condition, void *p );
-void	q8gr_draw_radio_button( int x, int y, int condition, void *p );
-void	q8gr_draw_notebook( int x, int y, int sx, int sy );
-void	q8gr_draw_notepage( int code, const char *tag,
-			    int select_flag, int active_flag, void *p );
-void	q8gr_draw_vseparator( int x, int y, int height );
-void	q8gr_draw_hseparator( int x, int y, int width );
-void	q8gr_draw_frame( int x, int y, int sx, int sy, int shadow_type,
-			 int code, const char *str );
-void	q8gr_draw_combo( int x, int y, int width, int active, void *p );
-void	q8gr_draw_list_item( int x, int y, int width, int active,
-			     int reverse, int underline,
-			     int code, const char *text, void *p );
+void	q8gr_draw_window(int x, int y, int sx, int sy, int shadow_type,
+			 void *p);
+void	q8gr_draw_button(int x, int y, int sx, int sy, int condition, void *p);
+void	q8gr_draw_check_button(int x, int y, int condition, void *p);
+void	q8gr_draw_radio_button(int x, int y, int condition, void *p);
+void	q8gr_draw_notebook(int x, int y, int sx, int sy,
+			   Q8tkWidget *notebook, void *p);
+void	q8gr_draw_notepage(int code, const char *tag,
+			   int select_flag, int active_flag,
+			   Q8tkWidget *notebook, void *p);
+void	q8gr_draw_vseparator(int x, int y, int height);
+void	q8gr_draw_hseparator(int x, int y, int width);
+void	q8gr_draw_frame(int x, int y, int sx, int sy, int shadow_type,
+			int code, const char *str, void *p);
+void	q8gr_draw_combo(int x, int y, int width, int active, void *p);
+void	q8gr_draw_list_item(int x, int y, int width, int active,
+			    int reverse, int underline,
+			    int code, const char *text, void *p);
 
-void	q8gr_draw_hscale( int x, int y, Q8Adjust *adj, int active,
-			  int draw_value, int value_pos, void *p );
-void	q8gr_draw_vscale( int x, int y, Q8Adjust *adj, int active,
-			  int draw_value, int value_pos, void *p );
+void	q8gr_draw_hscale(int x, int y, Q8Adjust *adj, int active,
+			 int draw_value, int value_pos, void *p);
+void	q8gr_draw_vscale(int x, int y, Q8Adjust *adj, int active,
+			 int draw_value, int value_pos, void *p);
 
-void	q8gr_draw_entry( int x, int y, int width, int code, const char *text,
-			 int disp_pos, int cursor_pos, void *p );
+void	q8gr_draw_entry(int x, int y, int width, int code, const char *text,
+			int disp_pos, int cursor_pos, void *p);
 
-void	q8gr_draw_option_menu( int x, int y, int sx, int sy, int button,
-			       void *p );
-void	q8gr_draw_radio_menu_item( int x, int y, int width, int underline,
-				   int code, const char *text, void *p );
+void	q8gr_draw_option_menu(int x, int y, int sx, int sy, int button,
+			      void *p);
+void	q8gr_draw_radio_menu_item(int x, int y, int width, int underline,
+				  int code, const char *text, void *p);
 
-void	q8gr_draw_scrolled_window( int x, int y, int sx, int sy,
-				   int shadow_type, void *p );
+void	q8gr_draw_scrolled_window(int x, int y, int sx, int sy,
+				  int shadow_type, void *p);
 
-void	q8gr_draw_logo( int x, int y );
+void	q8gr_draw_logo(int x, int y);
 
-void	q8gr_putc( int x, int y, int fg, int bg,
-		   int reverse, int underline, int c );
-int	q8gr_puts( int x, int y, int fg, int bg, int reverse, int underline,
-		   int code, const char *str );
-int	q8gr_strings( int x, int y, int fg, int bg, int reverse, int underline,
-		      int cursor_pos, 
-		      int code, const char *str, int start, int width );
+int	q8gr_draw_label(int x, int y, int fg, int bg,
+			int reverse, int underline, int code, const char *str,
+			void *p);
 
-int	q8gr_strlen( int code, const char *str );
-int	q8gr_strchk( int code, const char *str, int pos );
-int	q8gr_strdel( int code, char *str, int del_pos );
-void	q8gr_strncpy( int code, char *dst, const char *src, int size );
+int	q8gr_strlen(int code, const char *str);
+int	q8gr_strchk(int code, const char *str, int pos);
+int	q8gr_strdel(int code, char *str, int del_pos);
+int	q8gr_stradd(int code, char *str, int add_pos, int add_chr);
+void	q8gr_strncpy(int code, char *dst, const char *src, int size);
+int	q8gr_strcode(const char *buffer, int size);
 
 
 #endif	/* Q8TK_GLIB_H_INCLUDED */

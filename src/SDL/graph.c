@@ -12,718 +12,547 @@
 #include "graph.h"
 #include "device.h"
 
-#include "screen.h"
-#include "emu.h"	/* get_emu_mode() */
-
-
-
-
-#define	BIT_OF_DEPTH	16		/* 色は、16bpp で固定		*/
-#define	SIZE_OF_DEPTH	2
-
 /************************************************************************/
 
-int	now_screen_size;		/* 現在の、画面サイズ		*/
-
-int	enable_fullscreen = 1;		/* 全画面表示可能かどうか	*/
-					/*    1:可 0:不可 -1:全画面のみ	*/
-int	now_fullscreen	  = FALSE;	/* 現在、全画面表示中なら真	*/
-
-int	enable_half_interp = TRUE;	/* HALF時、色補間可能かどうか	*/
-int	now_half_interp    = FALSE;	/* 現在、色補完中なら真		*/
+/*#define	DEBUG_PRINTF*/
 
 
+/* 以下は static な変数。オプションで変更できるのでグローバルにしてある */
+
+    int	use_hwsurface	= TRUE;		/* HW SURFACE を使うかどうか	*/
+    int	use_doublebuf	= FALSE;	/* ダブルバッファを使うかどうか	*/
 
 
-static	int	screen_bx;		/* ボーダー(枠)サイズ x(ドット)	*/
-static	int	screen_by;		/*		      y(ドット)	*/
+/* 以下は、 event.c などで使用する、 OSD なグローバル変数 */
 
-	int	SCREEN_DX = 0;		/* ウインドウ左上と、		*/
-	int	SCREEN_DY = 0;		/* 画面エリア左上とのオフセット	*/
-
-
-
-int	now_status = FALSE;		/* 現在、ステータス表示中なら真	*/
-int	status_fg = 0x000000;		/* ステータス前景色		*/
-int	status_bg = 0xd6d6d6;		/* ステータス背景色		*/
-
-
-int	mouse_rel_move;			/* マウス相対移動量検知可能か	*/
-int	use_hwsurface	= TRUE;		/* HW SURFACE を使うかどうか	*/
-int	use_doublebuf	= FALSE;	/* ダブルバッファを使うかどうか	*/
-int	use_swcursor	= TRUE;		/* メニューでカーソル表示するか	*/
-
-
-
-static	SDL_Surface	*display;
-	SDL_Surface	*offscreen;
-
-/******************************************************************************
-
-                          WIDTH
-	 ←───────────────────→
-	┌────────────────────┐ ↑
-	│              ↑                        │ │
-	│              │SCREEN_DY               │ │
-	│              ↓                        │ │
-	│←─────→┌─────────┐    │ │
-	│   SCREEN_DX  │  ↑              │    │ │
-	│              │←───────→│    │ │HEIGHT
-	│              │  │   SCREEN_SX  │    │ │
-	│              │  │              │    │ │
-	│              │  │SCREEN_SY     │    │ │
-	│              │  ↓              │    │ │
-	│              └─────────┘    │ │
-	│                                        │ ↓
-	├──────┬──────┬──────┤ ↑
-	│ステータス0 │ステータス1 │ステータス2 │ │STATUS_HEIGHT
-	└──────┴──────┴──────┘ ↓
-	    ステータス0〜2のサイズ比率は、 1:3:1
-
-******************************************************************************/
-
-static	int	open_display( int first_time );
-/*static void	close_display( void );*/
+    int	sdl_mouse_rel_move;		/* マウス相対移動量検知可能か	*/
 
 
 
 /************************************************************************/
-/* SDL システム初期化							*/
-/************************************************************************/
-void	sdl_system_init( void )
+
+static	T_GRAPH_SPEC	graph_spec;		/* 基本情報		*/
+
+static	int		graph_exist;		/* 真で、画面生成済み	*/
+static	T_GRAPH_INFO	graph_info;		/* その時の、画面情報	*/
+
+
+/************************************************************************
+ *	SDLの初期化
+ *	SDLの終了
+ ************************************************************************/
+
+int	sdl_init(void)
 {
-  if( SDL_Init( SDL_INIT_VIDEO | SDL_INIT_AUDIO ) < 0 ){
-    fprintf( stderr, "SDL Error: %s\n",SDL_GetError() );
-  }
-}
+    const SDL_version *libver;
+    libver = SDL_Linked_Version();
 
-
-
-
-/************************************************************************/
-/* SDL システム終了							*/
-/************************************************************************/
-void	sdl_system_term( void )
-{
-  SDL_Quit();
-}
-
-
-
-
-/************************************************************************/
-/* グラフィックシステムの初期化						*/
-/************************************************************************/
-int	graphic_system_init( void )
-{
-  int w, h;
-
-  black_pixel   = 0x00000000;
-  DEPTH         = BIT_OF_DEPTH;
-
-
-  /* screen_size, WIDTH, HEIGHT にコマンドラインで指定したウインドウサイズが
-     セット済みなので、それをもとにボーダー(枠)のサイズを算出する */
-
-  w = screen_size_tbl[ screen_size ].w;
-  h = screen_size_tbl[ screen_size ].h;
-
-  screen_bx = ( ( MAX( WIDTH,  w ) - w ) / 2 ) & ~7;	/* 8の倍数 */
-  screen_by = ( ( MAX( HEIGHT, h ) - h ) / 2 ) & ~1;	/* 2の倍数 */
-
-  return open_display( TRUE );
-}
-
-
-#define	SET_STATUS_COLOR( n, r, g, b )				\
-		status_pixel[ n ] = (((r)>>3) & 0x1f) << 11 |	\
-				    (((g)>>3) & 0x1f) <<  6 |	\
-				    (((b)>>3) & 0x1f)
-
-
-
-static	int	open_display( int first_time )
-{
-  char video_driver[16];
-  int size;
-  Uint32 flags;
-
-  if( verbose_proc ){
-    if( first_time ) printf("Initializing Graphic System (SDL)");
-    else             printf("Restarting Graphic System (SDL)");
-  }
-
-
-	/* ディスプレイを開く */
-
-  if( ! SDL_WasInit( SDL_INIT_VIDEO ) ){
-    if( SDL_InitSubSystem( SDL_INIT_VIDEO ) != 0 ){
-      if( verbose_proc ) printf(" ... FAILED\n");
-      return 0;
+    if (verbose_proc) {
+	printf("Initializing SDL (%d.%d.%d) ... ",
+	       libver->major, libver->minor, libver->patch); fflush(NULL);
     }
-  }
-  if( verbose_proc ) printf("\n");
 
-  video_driver[0] = '\0';
-  SDL_VideoDriverName( video_driver, sizeof(video_driver) );
-  if( verbose_proc ){
-    printf( "  VideoDriver ... %s\n",
-	    video_driver[0] ? video_driver : "???" );
-  }
+    if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_AUDIO) < 0) {
+
+	if (verbose_proc) printf("Failed\n");
+	fprintf(stderr, "SDL Error: %s\n", SDL_GetError());
+
+	return FALSE;
+
+    } else {
+
+	if (verbose_proc) printf("OK\n");
+	return TRUE;
+    }
+}
+
+/************************************************************************/
+
+void	sdl_exit(void)
+{
+    SDL_Quit();
+}
 
 
-  /* 全画面専用ドライバの場合、変更可能な画面サイズをここで確定させる */
+/************************************************************************
+ *	グラフィック処理の初期化
+ *	グラフィック処理の動作
+ *	グラフィック処理の終了
+ ************************************************************************/
 
-  if( first_time &&			/* 全画面専用のドライバを以下に列記 */
-      (  strcmp( video_driver, "dga" )     == 0
-      || strcmp( video_driver, "svgalib" ) == 0
-      || strcmp( video_driver, "DSp" )     == 0
-      ) ){
-    int i, j;
-    SDL_Rect **modes;
+static	char	sdl_vname[16];
+static	int	sdl_depth;
+static	int	sdl_byte_per_pixel;
 
-    if( use_hwsurface ) flags = SDL_HWPALETTE | SDL_HWSURFACE | SDL_FULLSCREEN;
-    else                flags = SDL_HWPALETTE | SDL_SWSURFACE | SDL_FULLSCREEN;
-    if( use_doublebuf ) flags |= SDL_DOUBLEBUF;
+static	SDL_Rect **sdl_mode;
+static	Uint32	   sdl_mode_flags;
 
-    modes = SDL_ListModes( NULL, flags );
 
-    if      ( modes == (SDL_Rect**) 0 ){	/* 全モード不可 */
-      screen_size_max = SCREEN_SIZE_FULL;			/* sigh...*/
-    }else if( modes == (SDL_Rect**)-1 ){	/* 全モード可 */
-      screen_size_max = SCREEN_SIZE_END - 1;
-    }else{					/* 各モードをチェック */
-      screen_size_max = -1;
-      for( i=0; modes[i]; i++ ){
-	for( j=0; j<SCREEN_SIZE_END; j++ ){
-	  if( modes[i]->w >= screen_size_tbl[j].w + 0             * 2 &&
-	      modes[i]->h >= screen_size_tbl[j].h + STATUS_HEIGHT * 2 ){
+const T_GRAPH_SPEC	*graph_init(void)
+{
+    int	win_w, win_h;
+    int	ful_w, ful_h;
+    int i;
+    const SDL_VideoInfo *vi;
 
-	    if( screen_size_max < j ) screen_size_max = j;
-	  }
+    sdl_vname[0] = '\0';
+    SDL_VideoDriverName(sdl_vname, sizeof(sdl_vname));
+    vi = SDL_GetVideoInfo();
+
+    if (verbose_proc) {
+	printf("Initializing Graphic System (SDL:%s) ... \n", sdl_vname);
+    }
+
+    /* 色深度と、ピクセルあたりのバイト数をチェック */
+
+    sdl_depth          = vi->vfmt->BitsPerPixel;
+    sdl_byte_per_pixel = vi->vfmt->BytesPerPixel;
+
+#if	defined(SUPPORT_16BPP) && defined(SUPPORT_32BPP)
+    if        (sdl_byte_per_pixel == 2 ||
+	       sdl_byte_per_pixel == 4) {
+	/* OK */ ;
+    } else {
+	sdl_depth          = 16;
+	sdl_byte_per_pixel = 2;
+    }
+#elif	defined(SUPPORT_16BPP)
+	sdl_depth          = 16;
+	sdl_byte_per_pixel = 2;
+#elif	defined(SUPPORT_32BPP)
+	sdl_depth          = 32;
+	sdl_byte_per_pixel = 4;
+#endif
+
+
+
+#ifdef	DEBUG_PRINTF
+    printf("  <VideoInfo> %s\n", sdl_vname);
+    printf("  hw_available  %d  ", vi->hw_available);
+    printf("  wm_available  %d\n", vi->wm_available);
+    printf("  blit_hw       %d  ", vi->blit_hw     );
+    printf("  blit_hw_CC    %d  ", vi->blit_hw_CC  );
+    printf("  blit_hw_A     %d\n", vi->blit_hw_A   );
+    printf("  blit_sw       %d  ", vi->blit_sw     );
+    printf("  blit_sw_CC    %d  ", vi->blit_sw_CC  );
+    printf("  blit_sw_A     %d\n", vi->blit_sw_A   );
+    printf("  blit_fill     %d  ", vi->blit_fill   );
+    printf("  video_mem     %d\n", vi->video_mem   );
+    printf("  palette       %p\n", vi->vfmt->palette       );
+    printf("  BitsPerPixel  %2d  ", vi->vfmt->BitsPerPixel  );
+    printf("  BytesPerPixel %2d\n", vi->vfmt->BytesPerPixel );
+    printf("  Rmask   %8x  ", vi->vfmt->Rmask         );
+    printf("  Gmask   %8x  ", vi->vfmt->Gmask         );
+    printf("  Bmask   %8x  ", vi->vfmt->Bmask         );
+    printf("  Amask   %8x\n", vi->vfmt->Amask         );
+    printf("  Rshift        %2d  ", vi->vfmt->Rshift        );
+    printf("  Gshift        %2d  ", vi->vfmt->Gshift        );
+    printf("  Bshift        %2d  ", vi->vfmt->Bshift        );
+    printf("  Ashift        %2d\n", vi->vfmt->Ashift        );
+    printf("  Rloss          %d  ", vi->vfmt->Rloss         );
+    printf("  Gloss          %d  ", vi->vfmt->Gloss         );
+    printf("  Bloss          %d  ", vi->vfmt->Bloss         );
+    printf("  Aloss          %d\n", vi->vfmt->Aloss         );
+    printf("  colorkey       %x  ", vi->vfmt->colorkey      );
+    printf("  alpha          %d\n", vi->vfmt->alpha         );
+    printf("\n");
+#endif
+
+    /* 利用可能なウインドウのサイズを調べておく */
+    for (i = 0; i < 2; i++) {
+	Uint32 flags = 0;
+	int w, h;
+
+	if (i == 0) flags = 0;			/* 1回目はウインドウ、     */
+	else        flags = SDL_FULLSCREEN;	/* 2回目は全画面をチェック */
+
+	if (use_hwsurface) flags |= SDL_HWPALETTE | SDL_HWSURFACE;
+	else               flags |= SDL_HWPALETTE | SDL_SWSURFACE;
+
+	if (use_doublebuf) flags |= SDL_DOUBLEBUF;
+
+	/* 利用可能な最大サイズを取得 */
+	sdl_mode = SDL_ListModes(NULL, flags);
+
+	if        (sdl_mode == (SDL_Rect**) 0) {	/* 全モード不可 */
+	    w = 0;
+	    h = 0;
+	} else if (sdl_mode == (SDL_Rect**)-1) {	/* 全モード可 */
+	    w = 10000;
+	    h = 10000;
+	} else {					/* モードをチェック */
+	    w = sdl_mode[0]->w;					/* 最初が   */
+	    h = sdl_mode[0]->h;					/*   最大値 */
+
+#ifdef	DEBUG_PRINTF
+	    {
+	      int j;
+	      for (j=0; sdl_mode[j]; j++)
+		printf("  %sSize %3d:  %4d x %4d  (%.4f)\n",
+		       (i==0) ? "Window" : "Fullscreen", j, sdl_mode[j]->w,
+		       sdl_mode[j]->h, (double)sdl_mode[j]->w/sdl_mode[j]->h);
+	    }
+#endif
 	}
-      }
-      if( screen_size_max < 0 ){			/* 全サイズ不可 */
-	screen_size_max = SCREEN_SIZE_FULL;			/* sigh...*/
-      }
+
+	if (i == 0) { win_w = w;  win_h = h; }
+	else        { ful_w = w;  ful_h = h; }
+
+	sdl_mode_flags = flags;
     }
+    /* この時点で、 sdl_mode には、全画面時のモード一覧がセットされている。
+       sdl_mode_flags には、全画面時のモードのフラグがセットされている。*/
+
+    graph_spec.window_max_width      = win_w;
+    graph_spec.window_max_height     = win_h;
+    graph_spec.fullscreen_max_width  = ful_w;
+    graph_spec.fullscreen_max_height = ful_h;
+    graph_spec.forbid_status         = FALSE;
+    graph_spec.forbid_half           = FALSE;
+
+    if (verbose_proc)
+	printf("  INFO:%dbpp(%dbyte), Maxsize=win(%d,%d),full(%d,%d)\n",
+	       sdl_depth, sdl_byte_per_pixel, win_w, win_h, ful_w, ful_h);
+
+    return &graph_spec;
+}
+
+/************************************************************************/
+
+static	int	search_mode(int w, int h, double aspect);
+
+static	SDL_Surface	*sdl_display;
+static	SDL_Surface	*sdl_offscreen;
 
 
-    enable_fullscreen = -1;
-    use_fullscreen    = TRUE;
-    have_mouse_cursor = FALSE;
-  }
+const T_GRAPH_INFO	*graph_setup(int width, int height,
+				     int fullscreen, double aspect)
+{
+    Uint32 flags;
 
+    /* サイズ変更や、ウインドウ⇔全画面切替の際は、再度 SDL_SetVideoMode() を
+       呼ぶが、その前に一旦ビデオサブシステムを終了させる必要があるらしい(?)。
+       (ビデオドライバ依存か？ x11, windib, directx は、終了は不要) */
 
-#if 0
-  {
-    FILE *fp = stdout; /*fopen("/tmp/sdl.log","w");*/
-    SDL_Rect **modes; int i, j;
-    if( fp ){
-      for( j=0; j<2; j++ ){
-	if(j==0) i = SDL_DOUBLEBUF|SDL_HWPALETTE|SDL_HWSURFACE;
-	else     i = SDL_DOUBLEBUF|SDL_HWPALETTE|SDL_HWSURFACE|SDL_FULLSCREEN;
-	modes = SDL_ListModes(NULL,i);
-	fprintf(fp,"%s modes\n",(j==0)?"Window":"Fullscreen");
-	if     ( modes==(SDL_Rect**) 0){ fprintf(fp,"  No modes\n");  }
-	else if( modes==(SDL_Rect**)-1){ fprintf(fp,"  All modes\n"); }
-	else{
-	  for(i=0;modes[i];i++){
-	    fprintf(fp,"  %2d: %d %d\n",i,modes[i]->w,modes[i]->h);
-	  }
+    if (graph_exist) {
+	if (verbose_proc) printf("Re-Initializing Graphic System (SDL:%s) ...",
+				 sdl_vname);
+
+	if ((graph_info.fullscreen == FALSE && fullscreen == FALSE) &&
+	    (! (sdl_display->flags & SDL_FULLSCREEN))) {
+
+	    /* ウインドウのサイズ変更時は、終了の必要はなさそうだが…… */
+	    if (verbose_proc) printf("\n");
+
+	} else {
+	    SDL_QuitSubSystem(SDL_INIT_VIDEO);
+	    graph_exist = FALSE;
 	}
-      }
     }
-  }
+
+
+    /* VIDEOを一旦終了したなら、VIDEOの再初期化 */
+    if (! SDL_WasInit(SDL_INIT_VIDEO)) {
+	if (SDL_InitSubSystem(SDL_INIT_VIDEO) != 0) {
+	    if (verbose_proc) printf(" FAILED\n");
+	    return NULL;
+	}
+	/* VIDEOを一旦終了すると、 sdl_mode が無効になる。(デバイスによる？) */
+	sdl_mode = SDL_ListModes(NULL, sdl_mode_flags);
+
+		/* sdl_mode の内容が、以前と変わってしまったらどうしよう？ */
+
+	if (verbose_proc) printf(" OK\n");
+    }
+
+
+    /* 全画面モードの場合、適切なモードを選択 */
+    if (fullscreen) {
+	int fit = search_mode(width, height, aspect);
+	if (fit < 0) {
+	    fullscreen = FALSE;
+	} else {
+	    width  = sdl_mode[fit]->w;
+	    height = sdl_mode[fit]->h;
+	}
+    }
+
+    /* ウインドウ（全画面）を開く */
+    if (verbose_proc) {
+	if (fullscreen) printf("  Trying full screen mode ... ");
+	else            printf("  Opening window ... ");
+    }
+
+    if (fullscreen) flags = SDL_FULLSCREEN;
+    else            flags = 0;
+
+    if (use_hwsurface) flags |= SDL_HWPALETTE | SDL_HWSURFACE;
+    else               flags |= SDL_HWPALETTE | SDL_SWSURFACE;
+
+    if (use_doublebuf) flags |= SDL_DOUBLEBUF;
+
+    sdl_display = SDL_SetVideoMode(width, height, sdl_depth, flags);
+
+    if (verbose_proc)
+	printf("%s (%dx%d)\n", (sdl_display ? "OK" : "FAILED"), width, height);
+
+    if (sdl_display == NULL) return NULL;
+
+
+    /* スクリーンバッファを確保 */
+
+    if (verbose_proc) printf("  Allocating screen buffer ... ");
+
+    sdl_offscreen = SDL_CreateRGBSurface(SDL_SWSURFACE,
+					 width, height, sdl_depth,
+					 0, 0, 0, 0);
+    if (verbose_proc) printf("%s\n", (sdl_offscreen ? "OK" : "FAILED"));
+
+    if (sdl_offscreen == NULL) return NULL;
+
+
+
+    /* 画面情報をセットして、返す */
+
+    graph_info.fullscreen	= fullscreen;
+    graph_info.width		= sdl_offscreen->w;
+    graph_info.height		= sdl_offscreen->h;
+    graph_info.byte_per_pixel	= sdl_byte_per_pixel;
+    graph_info.byte_per_line	= sdl_offscreen->pitch;
+    graph_info.buffer		= sdl_offscreen->pixels;
+    graph_info.nr_color		= 255;
+    graph_info.write_only	= FALSE;
+    graph_info.broken_mouse	= FALSE;
+    graph_info.draw_start	= NULL;
+    graph_info.draw_finish	= NULL;
+    graph_info.dont_frameskip	= FALSE;
+
+    graph_exist = TRUE;
+
+    if (verbose_proc)
+	printf("    VideoMode %dx%d -> %dx%dx%d(%d)  %c%c%c%c  R:%x G:%x B:%x\n",
+	       width, height, sdl_display->w, sdl_display->h,
+	       sdl_display->format->BitsPerPixel,
+	       sdl_display->format->BytesPerPixel,
+	       (sdl_display->flags & SDL_SWSURFACE) ? 'S' : '-',
+	       (sdl_display->flags & SDL_HWSURFACE) ? 'H' : 'S',
+	       (sdl_display->flags & SDL_DOUBLEBUF) ? 'D' : '-',
+	       (sdl_display->flags & SDL_FULLSCREEN) ? 'F' : '-',
+	       sdl_display->format->Rmask,
+	       sdl_display->format->Gmask, sdl_display->format->Bmask);
+
+#if 0	/* debug */
+printf("@ fullscreen      %d\n",    graph_info.fullscreen    );
+printf("@ width           %d\n",    graph_info.width         );
+printf("@ height          %d\n",    graph_info.height        );
+printf("@ byte_per_pixel  %d\n",    graph_info.byte_per_pixel);
+printf("@ byte_per_line   %d\n",    graph_info.byte_per_line );
+printf("@ buffer          %p\n",    graph_info.buffer        );
+printf("@ nr_color        %d\n",    graph_info.nr_color      );
+printf("@ write_only      %d\n",    graph_info.write_only    );
+printf("@ broken_mouse    %d\n",    graph_info.broken_mouse  );
+printf("@ dont_frameskip  %d\n",    graph_info.dont_frameskip);
 #endif
 
-	/* ウインドウを開く */
-
-  if( use_fullscreen ){				/* フルスクリーン表示の場合 */
-
-    if( verbose_proc ) printf( "  Trying full screen mode ... " );
-
-    if( use_hwsurface ) flags = SDL_HWPALETTE | SDL_HWSURFACE | SDL_FULLSCREEN;
-    else                flags = SDL_HWPALETTE | SDL_SWSURFACE | SDL_FULLSCREEN;
-
-    if( use_doublebuf ) flags |= SDL_DOUBLEBUF;
-
-    display = NULL;
-#if 0
-    if( enable_fullscreen < 0 ) size = screen_size;
-    else                        size = SCREEN_SIZE_FULL;
-#else
-    size = screen_size;
-#endif
-    size = size*2+1;
-    for( ; size>=0; size -- ){
-
-      SCREEN_W  = screen_size_tbl[ size/2 ].w;
-      SCREEN_H  = screen_size_tbl[ size/2 ].h;
-      SCREEN_DX = (size & 1) ? screen_size_tbl[ size/2 ].dw : 0;
-      SCREEN_DY = (size & 1) ? screen_size_tbl[ size/2 ].dh : STATUS_HEIGHT;
-      WIDTH     = SCREEN_W + SCREEN_DX * 2;
-      HEIGHT    = SCREEN_H + SCREEN_DY * 2;
-
-      if( verbose_proc ) printf( "(%dx%d) ... ",WIDTH,HEIGHT );
-
-      display = SDL_SetVideoMode( WIDTH, HEIGHT, DEPTH, flags );
-      if( display ) break;
-    }
-    size = size/2;
-
-    if( verbose_proc ) printf( "%s\n", (display ? "OK" : "FAILED") );
-
-    if( display ){ now_fullscreen = TRUE;   HEIGHT -= STATUS_HEIGHT; }
-    else         { use_fullscreen = FALSE; }
-
-    if( ! display && enable_fullscreen < 0 ) return 0;
-  }
-
-  if( ! use_fullscreen ){			/* ウインドウ表示の場合 */
-
-    if( verbose_proc ) printf( "  Opening window ... " );
-
-    size      = screen_size;
-    SCREEN_W  = screen_size_tbl[ size ].w;
-    SCREEN_H  = screen_size_tbl[ size ].h;
-    SCREEN_DX = screen_bx;
-    SCREEN_DY = screen_by;
-    WIDTH     = SCREEN_W + SCREEN_DX * 2;
-    HEIGHT    = SCREEN_H + SCREEN_DY * 2;
-
-    if( use_hwsurface ) flags = SDL_HWPALETTE | SDL_HWSURFACE;
-    else                flags = SDL_HWPALETTE | SDL_SWSURFACE;
-
-    if( use_doublebuf )
-      flags |= SDL_DOUBLEBUF;
-
-    display = SDL_SetVideoMode( WIDTH,
-				HEIGHT + ((show_status) ? STATUS_HEIGHT : 0),
-				DEPTH, flags );
-
-    if( verbose_proc ) printf( "%s\n", (display ? "OK" : "FAILED") );
-
-    if( display ){ now_fullscreen = FALSE; }
-    else         { return 0;               }
-  }
-
-  now_screen_size = size;
-
-  if( verbose_proc )
-    printf("    VideoMode %dx%d->%dx%dx%d(%d)  %c%c%c%c  R:%x G:%x B:%x\n",
-	   WIDTH, HEIGHT,
-	   display->w, display->h,
-	   display->format->BitsPerPixel, display->format->BytesPerPixel,
-	   (display->flags & SDL_SWSURFACE) ? 'S' : '-',
-	   (display->flags & SDL_HWSURFACE) ? 'H' : 'S',
-	   (display->flags & SDL_DOUBLEBUF) ? 'D' : '-',
-	   (display->flags & SDL_FULLSCREEN) ? 'F' : '-',
-	 display->format->Rmask,display->format->Gmask,display->format->Bmask);
-
-
-  /* ウインドウのタイトルを表示 */
-  SDL_WM_SetCaption( Q_TITLE " ver " Q_VERSION, Q_TITLE " ver " Q_VERSION );
-
-  /* アイコンを設定するならここで。WIN32の場合、32x32 に限る */
-  /* SDL_WM_SetIcon(SDL_Surface *icon, Uint8 *mask); */
-
-
-  /* スクリーンバッファを確保 */
-  if( verbose_proc ) printf( "  Allocating screen buffer ... " );
-
-  offscreen = SDL_CreateRGBSurface( SDL_SWSURFACE,
-				    WIDTH,
-				    HEIGHT + STATUS_HEIGHT,
-				    DEPTH,
-				    0, 0, 0, 0 );
-
-  if( verbose_proc ) printf( "%s\n", (offscreen ? "OK" : "FAILED") );
-
-  if( offscreen ){ screen_buf = (char *)offscreen->pixels; }
-  else           { return 0;                               }
-
-
-  /* スクリーンバッファの、描画開始位置を設定	*/
-  
-  screen_start = &screen_buf[ (WIDTH*SCREEN_DY + SCREEN_DX) * SIZE_OF_DEPTH ];
-
-
-
-  /* ステータス用のバッファなどを算出 */
-  {
-    status_sx[0] = WIDTH / 5;
-    status_sx[1] = WIDTH - status_sx[0]*2;
-    status_sx[2] = WIDTH / 5;
-
-    status_sy[0] = 
-    status_sy[1] = 
-    status_sy[2] = STATUS_HEIGHT - 3;
-
-    status_buf = &screen_buf[ WIDTH * HEIGHT * SIZE_OF_DEPTH ];
-
-    status_start[0] = status_buf + 3*(WIDTH * SIZE_OF_DEPTH);	/* 3ライン下 */
-    status_start[1] = status_start[0] + ( status_sx[0] * SIZE_OF_DEPTH );
-    status_start[2] = status_start[1] + ( status_sx[1] * SIZE_OF_DEPTH );
-  }
-
-
-  /* マウス表示、グラブの設定 (ついでにキーリピートも) */
-  set_mouse_state();
-
-
-  /* ステータス用の色ピクセルを定義 */
-
-  SET_STATUS_COLOR( STATUS_BG,    ((status_bg>>16)&0xff),
-				  ((status_bg>> 8)&0xff),
-				  ((status_bg    )&0xff) );
-  SET_STATUS_COLOR( STATUS_FG,    ((status_fg>>16)&0xff),
-				  ((status_fg>> 8)&0xff),
-				  ((status_fg    )&0xff) );
-  SET_STATUS_COLOR( STATUS_BLACK, 0x00, 0x00, 0x00 );
-  SET_STATUS_COLOR( STATUS_WHITE, 0xff, 0xff, 0xff );
-  SET_STATUS_COLOR( STATUS_RED,   0xff, 0x00, 0x00 );
-  SET_STATUS_COLOR( STATUS_GREEN, 0x00, 0xff, 0x00 );
-
-
-  /* どこかで初期化せねば */
-  if( use_joydevice ){
-    joy_init();
-  }
-
-  /* HALFサイズ時の色補完有無を設定 */
-  set_half_interp();
-
-  now_status = show_status;
-
-  return(1);
+    return &graph_info;
 }
 
 
 
-/************************************************************************/
-/* グラフィックシステムの終了						*/
-/************************************************************************/
-void	graphic_system_term( void )
-{
-  SDL_WM_GrabInput( SDL_GRAB_OFF );
+/*======================================================================*/
+#define	FABS(a)		(((a) >= 0.0) ? (a) : -(a))
 
-  SDL_QuitSubSystem( SDL_INIT_VIDEO );
+static	int	search_mode(int w, int h, double aspect)
+{
+    int i;
+    int fit = -1;
+    int fit_w = 0, fit_h = 0;
+    double fit_a = 0.0;
+
+    for (i=0; sdl_mode[i]; i++) {
+	/* 画面サイズに収まっていること */
+	if (w <= sdl_mode[i]->w &&
+	    h <= sdl_mode[i]->h) {
+
+	    int tmp_w = sdl_mode[i]->w;
+	    int tmp_h = sdl_mode[i]->h;
+	    double tmp_a = FABS(((double)tmp_w / tmp_h) - aspect);
+
+	    /* 最初に見つかったものをまずはチョイス */
+	    if (fit == -1) {
+		fit = i;
+		fit_w = tmp_w;
+		fit_h = tmp_h;
+		fit_a = tmp_a;
+
+	    } else {
+	    /* 次からは、前回のと比べて、よりフィットすればチョイス */
+
+		/* 横長モニター、ないし、アスペクト未指定の場合 */
+		if (aspect >= 1.0 || aspect < 0.01) {
+
+		    /* 縦の差の少ないほう、またはアスペクト比の近いほう */
+		    if (((tmp_h - h) < (fit_h - h)) ||
+			((tmp_h == fit_h) && (tmp_a < fit_a))) {
+			fit = i;
+			fit_w = tmp_w;
+			fit_h = tmp_h;
+			fit_a = tmp_a;
+		    }
+
+		} else {	/* 縦長モニター (なんて一般的なの?) の場合 */
+
+		    /* 横の差の少ないほう、またはアスペクト比の近いほう */
+		    if (((tmp_w - w) < (fit_w - w)) ||
+			((tmp_w == fit_w) && (tmp_a < fit_a))) {
+			fit = i;
+			fit_w = tmp_w;
+			fit_h = tmp_h;
+			fit_a = tmp_a;
+		    }
+		}
+	    }
+	}
+    }
+    /* 該当するのが全くない場合は、 -1 が返る */
+    return fit;
+}
+
+/************************************************************************/
+
+void	graph_exit(void)
+{
+    SDL_WM_GrabInput(SDL_GRAB_OFF);
+
+    SDL_QuitSubSystem(SDL_INIT_VIDEO);
+}
+
+
+/************************************************************************
+ *	色の確保
+ *	色の解放
+ ************************************************************************/
+
+void	graph_add_color(const PC88_PALETTE_T color[],
+			int nr_color, unsigned long pixel[])
+{
+    int i;
+    for (i=0; i<nr_color; i++) {
+	pixel[i] = SDL_MapRGB(sdl_offscreen->format,
+			      color[i].red, color[i].green, color[i].blue);
+    }
+}
+
+/************************************************************************/
+
+void	graph_remove_color(int nr_pixel, unsigned long pixel[])
+{
+    /* 色に関しては何も管理しないので、ここでもなにもしない */
 }
 
 
 
-/************************************************************************/
-/* グラフィックシステムの再初期化					*/
-/*	screen_size, use_fullscreen より、新たなウインドウを生成する。	*/
-/*	再初期化に失敗したときは、どうしようもないので、強制終了する。	*/
-/************************************************************************/
-int	graphic_system_restart( void )
+/************************************************************************
+ *	グラフィックの更新
+ ************************************************************************/
+
+void	graph_update(int nr_rect, T_GRAPH_RECT rect[])
 {
-  if( now_fullscreen && use_fullscreen ){	/* 全画面のままです */
+    SDL_Rect srect[16], drect;
+    int i;
 
-    if( now_screen_size != screen_size
-	/* && enable_fullscreen < 0 */ ){
-
-      SDL_QuitSubSystem( SDL_INIT_VIDEO );
-
-    }else
-    {
-      set_half_interp();
-      return 0;
+    if (nr_rect > 16) {
+	fprintf(stderr, "SDL: Maybe Update Failied...\n");
+	nr_rect = 16;
     }
 
-  }else if( now_fullscreen != use_fullscreen ){	/* 全画面←→ウインドウ切替 */
+    for (i=0; i<nr_rect; i++) {
+	srect[i].x = rect[i].x;
+	srect[i].y = rect[i].y;
+	srect[i].w = rect[i].width;
+	srect[i].h = rect[i].height;
 
-#if 0
-    if( SDL_WM_ToggleFullScreen( display ) ) return;
-#endif
-    SDL_QuitSubSystem( SDL_INIT_VIDEO );		/* 一旦 VIDEO 終了 */
-
-  }else{					/* ウインドウサイズ変更 */
-
-    if( now_screen_size == screen_size ){	/* サイズ同じならこのまま */
-      set_half_interp();
-      return 0;
-    }
-
-    /* VIDEO を終了するとウインドウが破棄→生成されて鬱陶しいのでしない */
-    /* SDL_QuitSubSystem( SDL_INIT_VIDEO ); */
-  }
-
-
-
-  if( ! open_display( FALSE ) ){
-    fprintf(stderr,"Sorry : Graphic System Fatal Error !!!\n");
-
-    quasi88_exit();
-  }
-
-  return 1;
-}
-
-
-
-/************************************************************************/
-/* パレット設定								*/
-/************************************************************************/
-void	trans_palette( SYSTEM_PALETTE_T syspal[] )
-{
-  int     i, j;
-
-	/* パレット値をコピー */
-
-  for( i=0; i<16; i++ ){
-    color_pixel[i] = (((syspal[i].red  >>3)&0x1f) <<11)|
-		     (((syspal[i].green>>3)&0x1f) << 6)|
-		     (((syspal[i].blue >>3)&0x1f));
-  }
-
-
-	/* HALFサイズフィルタリング可能時はフィルタパレット値を計算 */
-
-  if( now_half_interp ){
-    SYSTEM_PALETTE_T hpal[16];
-    for( i=0; i<16; i++ ){
-      hpal[i].red   = syspal[i].red   >> 1;
-      hpal[i].green = syspal[i].green >> 1;
-      hpal[i].blue  = syspal[i].blue  >> 1;
-    }
-
-    for( i=0; i<16; i++ ){
-      color_half_pixel[i][i] = color_pixel[i];
-    }
-    for( i=0; i<16; i++ ){
-      for( j=i+1; j<16; j++ ){
-	color_half_pixel[i][j]=((((hpal[i].red  +hpal[j].red  )>>3)&0x1f)<<11)|
-			       ((((hpal[i].green+hpal[j].green)>>3)&0x1f)<< 6)|
-			       ((((hpal[i].blue +hpal[j].blue )>>3)&0x1f));
-	color_half_pixel[j][i] = color_half_pixel[i][j];
-      }
-    }
-  }
-}
-
-
-
-
-/************************************************************************/
-/* 画面表示								*/
-/************************************************************************/
-/*
- *	ボーダー(枠)、ステータスも含めて全てを表示する
- */
-void	put_image_all( void )
-{
-  SDL_Rect srect, drect;
-  int h;
-
-  if( now_fullscreen ) h = HEIGHT + STATUS_HEIGHT;
-  else                 h = HEIGHT + ((now_status) ? STATUS_HEIGHT : 0);
-
-
-  drect.x = srect.x = 0;	srect.w = WIDTH;
-  drect.y = srect.y = 0;	srect.h = h;
-
-  if( SDL_BlitSurface( offscreen, &srect, display, &drect ) < 0 ){
-    fprintf( stderr, "SDL: Warn: Unsuccessful blitting\n" );
-  }
-  /* SDL_UpdateRect(display, 0,0,0,0); */
-  SDL_Flip(display);
-}
-
-
-/*
- *	VRAMの (x0,y0)-(x1,y1) および 指定されたステータスを表示する
- */
-void	put_image( int x0, int y0, int x1, int y1, int st0, int st1, int st2 )
-{
-  int      i, flag = 0, nr_update = 0;
-  SDL_Rect srect[4], drect,  update[4];
-
-  if( x0 >= 0 ){
-    if      ( now_screen_size == SCREEN_SIZE_FULL ){
-      ;
-    }else if( now_screen_size == SCREEN_SIZE_HALF ){
-      x0 /= 2;  x1 /= 2;  y0 /= 2;  y1 /= 2;
-    }else  /* now_screen_size == SCREEN_SIZE_DOUBLE */ {
-      x0 *= 2;  x1 *= 2;  y0 *= 2;  y1 *= 2;
-    }
-
-    flag |= 1;
-    srect[0].x = SCREEN_DX + x0;	srect[0].w = x1 - x0;
-    srect[0].y = SCREEN_DY + y0;	srect[0].h = y1 - y0;
-  }
-  if( now_status || now_fullscreen ){
-    if( st0 ){
-      flag |= 2;
-      srect[1].x = 0;			srect[1].w = status_sx[0];
-      srect[1].y = HEIGHT;		srect[1].h = STATUS_HEIGHT;
-    }
-    if( st1 ){
-      flag |= 4;
-      srect[2].x = status_sx[0];	srect[2].w = status_sx[1];
-      srect[2].y = HEIGHT;		srect[2].h = STATUS_HEIGHT;
-    }
-    if( st2 ){
-      flag |= 8;
-      srect[3].x = status_sx[0] + status_sx[1];	srect[3].w = status_sx[2];
-      srect[3].y = HEIGHT;			srect[3].h = STATUS_HEIGHT;
-    }
-  }
-
-  for( i=0; i<4; i++ ){
-    if( flag & (1<<i ) ){
-      drect = srect[i];
-
-      if( SDL_BlitSurface( offscreen, &srect[i], display, &drect ) < 0 ){
-	fprintf( stderr, "SDL: Warn: Unsuccessful blitting\n" );
-      }
-
-      update[ nr_update ++ ] = srect[i];
-    }
-  }
-
-  if( display->flags & SDL_DOUBLEBUF ){
-
-    SDL_Flip( display );
-
-    for( i=0; i<4; i++ ){
-      if( flag & (1<<i ) ){
 	drect = srect[i];
-	SDL_BlitSurface( offscreen, &srect[i], display, &drect );
-      }
+
+	if (SDL_BlitSurface(sdl_offscreen, &srect[i], sdl_display, &drect) <0) {
+	    fprintf(stderr, "SDL: Unsuccessful blitting\n");
+	}
     }
 
-  }else{
+    if (sdl_display->flags & SDL_DOUBLEBUF) {
 
-    SDL_UpdateRects( display, nr_update, update );
-  }
-}
+	SDL_Flip(sdl_display);
 
+	for (i=0; i<nr_rect; i++) {
+	    drect = srect[i];
+	    SDL_BlitSurface(sdl_offscreen, &srect[i], sdl_display, &drect);
+	}
 
+    } else {
 
-
-
-/************************************************************************/
-/* ステータスを表示・非表示切り替え					*/
-/*	show_status に基づいて切り替える				*/
-/*		ウインドウ時は、ウインドウサイズを変更する		*/
-/*		全画面時は、処理なしのはず・・・			*/
-/*	状態不変なら 0 を、再描画不要なら 1 を、再描画必要なら 2 を返す	*/
-/************************************************************************/
-int	set_status_window( void )
-{
-  if( now_status == show_status ){		/* ステータスそのまま	*/
-    return 0;
-  }
-
-
-  if( now_fullscreen == FALSE ){
-
-    /* show_status に応じて、画面サイズを変える */
-
-    if( ! open_display( FALSE ) ){
-      fprintf(stderr,"Sorry : Graphic System Fatal Error !!!\n");
-
-      quasi88_exit();
+	SDL_UpdateRects(sdl_display, nr_rect, srect);
     }
-    return 2;
-
-  }else{
-
-    /* フルスクリーン時は、ステータス表示有無に関わらず、画面サイズは同じ */
-    now_status = show_status;
-    return 1;
-  }
 }
 
 
+/************************************************************************
+ *	タイトルの設定
+ *	属性の設定
+ ************************************************************************/
 
-/************************************************************************/
-/* HALFサイズ時の色補完の有効・無効を設定				*/
-/************************************************************************/
-int	set_half_interp( void )
+void	graph_set_window_title(const char *title)
 {
-  if( now_screen_size == SCREEN_SIZE_HALF &&
-      use_half_interp ){
-
-    now_half_interp = TRUE;
-
-  }else{
-    now_half_interp = FALSE;
-  }
-
-  return now_half_interp;
+    SDL_WM_SetCaption(title, title);
 }
 
-
-
 /************************************************************************/
-/* ウインドウのバーに表示するタイトルを設定				*/
-/************************************************************************/
-void	set_window_title( const char *title )
+
+void	graph_set_attribute(int mouse_show, int grab, int keyrepeat_on)
 {
-  SDL_WM_SetCaption( title, title );
+    if (mouse_show) SDL_ShowCursor(SDL_ENABLE);
+    else            SDL_ShowCursor(SDL_DISABLE);
+
+    if (grab) SDL_WM_GrabInput(SDL_GRAB_ON);
+    else      SDL_WM_GrabInput(SDL_GRAB_OFF);
+
+    if (keyrepeat_on) SDL_EnableKeyRepeat(SDL_DEFAULT_REPEAT_DELAY,
+					  SDL_DEFAULT_REPEAT_INTERVAL);
+    else              SDL_EnableKeyRepeat(0, 0);
+
+    sdl_mouse_rel_move = (mouse_show == FALSE && grab) ? TRUE : FALSE;
+
+    /* SDL は、グラブ中かつマウスオフなら、ウインドウの端にマウスが
+       ひっかかっても、マウス移動の相対量を検知できる。
+
+       なので、この条件を sdl_mouse_rel_move にセットしておき、
+       真なら、マウス移動は相対量、偽なら絶対位置とする (event.c)
+
+       メニューでは、かならずグラブなし (マウスはあり or なし) なので、
+       この条件にはかからず、常にウインドウの端でマウスは停止する。
+    */
 }
 
-
-
-/************************************************************************/
-/* マウスのグラブ・表示を設定する関数					*/
-/*	グローバル変数 grab_mouse 、 hide_mouse に基づき、設定する	*/
-/*									*/
-/*	ついでなんで、キーリピートなども設定してしまおう。		*/
-/************************************************************************/
-int	set_mouse_state( void )
-{
-  int	repeat;		/* オートリピートの有無	*/
-  int	mouse;		/* マウス表示の有無	*/
-  int	grab;		/* グラブの有無		*/
-
-  if( get_emu_mode() == EXEC ){
-
-    repeat = FALSE;
-    if( now_fullscreen || grab_mouse ){
-      mouse  = FALSE;
-      grab   = TRUE;
-    }else{
-      mouse  = (hide_mouse) ? FALSE : TRUE;
-      grab   = FALSE;
-    }
-
-  }else{
-
-    repeat = TRUE;
-    mouse  = (now_fullscreen && use_swcursor) ? FALSE : TRUE;
-    grab   = (now_fullscreen) ? TRUE : FALSE;
-  }
-
-
-  if( repeat )
-    SDL_EnableKeyRepeat(SDL_DEFAULT_REPEAT_DELAY, SDL_DEFAULT_REPEAT_INTERVAL);
-  else
-    SDL_EnableKeyRepeat( 0, 0 );
-
-  if( mouse ) SDL_ShowCursor( SDL_ENABLE );
-  else        SDL_ShowCursor( SDL_DISABLE );
-
-  if( grab ) SDL_WM_GrabInput( SDL_GRAB_ON );
-  else       SDL_WM_GrabInput( SDL_GRAB_OFF );
-
-  mouse_rel_move = (!mouse && grab) ? TRUE : FALSE;
-
-
-/*printf( "K=%d M=%d G=%d\n",repeat,mouse,grab);*/
-
-  return mouse;
-}
 /*
-  フルスクリーンの問題点 (Winにて発生)
-  ダブルバッファの場合、マウスが正常に表示されない？
-  シングルバッファでハードウェアサーフェスの場合、
-  マウスをONにした瞬間、マウスの表示すべき位置にゴミが残る？
+  -videodrv directx について
 
-  ↓
-  メニュー画面遷移だけの問題なので、ソフトウェアカーソルでごまかそう
+  グラブあり、マウスありの場合、グラブされない・・・
+
+  全画面で、グラブなし、マウスなしにすると、
+  マウスが画面の端で停止してしまう。あたりまえだが…
+  全画面の場合、グラブなしは意味があるのか？ マルチディスプレイで検証
+
+
+
+  -videodrv dga について
+
+  ウインドウでも全画面でも、全画面フラグが立っている。
+  デフォルトで -hwsurface になっている。 -swsurface の指定は可能。
+  -doublebuf を指定すると、 -hwsurface もセットで有効になる。
+
+  全画面←→ウインドウを繰り返すとコアを吐く。
+
+  -hwsurface では、マウスの表示に時々残骸が残る。
+  -swsurface は問題さなげ。
+
+  -doublebuf を指定すると、マウスは表示されなくなる。
 */

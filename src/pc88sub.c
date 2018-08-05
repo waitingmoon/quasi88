@@ -232,11 +232,14 @@ void	sub_INT_update( void )
 	/* なので、この「サブCPUでもキースキャン」処理を行なう	*/
 	/* 頻度を変更できるようにしておこう。			*/
 
+	/* D.C.コネクションとか… */
+
   if( sub_load_rate && cpu_timing < 2 ){
     sub_total_state += z80sub_cpu.state0;
     if( sub_total_state/sub_load_rate >= state_of_vsync ){
-      event_handle();
-      draw_screen();
+
+      CPU_BREAKOFF();
+      quasi88_event_flags |= (EVENT_FRAME_UPDATE | EVENT_AUDIO_UPDATE);
       sub_total_state = 0;
     }
   }
@@ -246,7 +249,9 @@ void	sub_INT_update( void )
 
 	/* メニューへの遷移などは、ここで確認 */
 
-  if( next_emu_mode() != EXEC ) CPU_BREAKOFF();
+  if (quasi88_event_flags & EVENT_MODE_CHANGED) {
+    CPU_BREAKOFF();
+  }
 }
 
 
@@ -291,7 +296,7 @@ void	pc88sub_init( int init )
   z80sub_cpu.break_if_halt = TRUE;
   z80sub_cpu.PC_prev   = z80sub_cpu.PC;		/* dummy for monitor */
 
-#if	defined( SUB_DISP ) || defined( SUB_FILE )
+#ifdef	DEBUGLOG
   z80sub_cpu.log	= TRUE;
 #else
   z80sub_cpu.log	= FALSE;
@@ -336,13 +341,13 @@ INLINE	void	check_break_point( int type, word addr, char *str )
 {
   int	i;
 
-  if ( get_emu_mode() == MONITOR ) return; /* モニターモード時はスルー */
+  if (quasi88_is_monitor()) return; /* モニターモード時はスルー */
   for( i=0; i<NR_BP; i++ ){
     if( break_point[BP_SUB][i].type == type &&
         break_point[BP_SUB][i].addr == addr ){
       printf( "*** Break at %04x *** ( SUB[#%d] : %s %04x )\n",
 	      z80sub_cpu.PC.W, i+1, str, addr );
-      set_emu_mode( MONITOR );
+      quasi88_debug();
       break;
     }
   }

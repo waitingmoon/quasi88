@@ -16,9 +16,6 @@
 /*----------------------------------------------------------------------*/
 
 /*
-#ifndef	NR_LANG
-#define	NR_LANG		2
-#endif
 #ifndef	NR_DRIVE
 #define	NR_DRIVE	2
 #endif
@@ -30,18 +27,19 @@
 
 /* このファイルが EUC-japan か Shift-JIS かをチェックする・・・ */
 
-const	char	*menu_kanji_code = "漢字";
-const	char	menu_kanji_code_euc[]  = { 0xb4, 0xc1, 0xbb, 0xfa, 0x00 };
-const	char	menu_kanji_code_sjis[] = { 0x8a, 0xbf, 0x8e, 0x9a, 0x00 };
+const char *menu_kanji_code = "漢字";
+const char menu_kanji_code_euc[]  = { 0xb4, 0xc1, 0xbb, 0xfa, 0x00 };
+const char menu_kanji_code_sjis[] = { 0x8a, 0xbf, 0x8e, 0x9a, 0x00 };
+const char menu_kanji_code_utf8[] = { 0xe6, 0xbc, 0xa2, 0xe5, 0xad, 0x97, 0x00 };
 
 
-typedef struct{
-  char	*str[2];	/* [0]…ANK文字列  [1]…日本語文字列	*/
-  int	val;		/* int値 汎用				*/
+typedef struct {
+    char	*str[2];	/* [0]…ANK文字列  [1]…日本語文字列	*/
+    int		val;		/* int値 汎用				*/
 } t_menudata;
 
-typedef struct{
-  char	*str[2];	/* [0]…ANK文字列  [1]…日本語文字列	*/
+typedef struct {
+    char	*str[2];	/* [0]…ANK文字列  [1]…日本語文字列	*/
 } t_menulabel;
 
 
@@ -52,48 +50,56 @@ typedef struct{
  ****************************************************************/
 
 /*--------------------------------------------------------------
- *	メニューの '*' タブにて表示される情報 (サウンド関連のみ定義)
+ *	メニューの '*' タブにて表示される情報
  *--------------------------------------------------------------*/
 
 static const char *data_about_en[] =
 {
 #ifdef	USE_SOUND
-
-  "SOUND OUTPUT ... Available",
-  "   SOUND OUTPUT ported from xmame-0.71.1",
-  "   (c) Nicola Salmoria, The MAME Team and xmame project",
+    "MAME Sound Driver ... Available",
+    "   " Q_MAME_COPYRIGHT,
+    "@MAMEVER",
 #ifdef	USE_FMGEN
-  "",
-  "FM Sound Generator ... Available",
-  "   fmgen008-current (c) cisc",
+    "",
+    "FM Sound Generator ... Available",
+    "   " Q_FMGEN_COPYRIGHT,
+    "@FMGENVER",
+#endif
+#else
+    "SOUND OUTPUT ... Not available",
+#endif  
+    "",
+#ifdef	USE_MONITOR
+    "Monitor mode ... Supported",
+    "",
 #endif
 
-#else
-  "SOUND OUTPUT ... Not available",
-#endif  
-
-  NULL,	/* 終端 */
+    NULL,	/* 終端 */
 };
 
 
 static const char *data_about_jp[] =
 {
 #ifdef	USE_SOUND
-
-  "サウンド出力が組み込まれています",
-  "   サウンド出力は、xmame-0.71.1 から移植されました",
-  "   (c) Nicola Salmoria, The MAME Team and xmame project",
+    "MAME サウンドドライバ が組み込まれています",
+    "   " Q_MAME_COPYRIGHT,
+    "@MAMEVER",
 #ifdef	USE_FMGEN
-  "",
-  "FM Sound Generator が組み込まれています",
-  "   fmgen008-current (c) cisc",
+    "",
+    "FM Sound Generator が組み込まれています",
+    "   " Q_FMGEN_COPYRIGHT,
+    "@FMGENVER",
 #endif
-
 #else
-  "サウンド出力 は組み込まれていません",
+    "サウンド出力 は組み込まれていません",
+#endif
+    "",
+#ifdef	USE_MONITOR
+    "モニターモードが使用できます",
+    "",
 #endif
 
-  NULL,	/* 終端 */
+    NULL,	/* 終端 */
 };
 
 
@@ -130,22 +136,57 @@ static const t_menudata data_top[] =
 };
 
 
+enum {
+    DATA_TOP_STATUS_PAD,
+    DATA_TOP_STATUS_CHK,
+    DATA_TOP_STATUS_KEY
+};
 static const t_menulabel data_top_status[] =
 {
-  { { "Status(F11)",     "ステータス(F11)" } },
+  { { "              ",  "              " } },
+  { { "Status",          "ステータス"     } },
+  { { "        (F11) ",  "         (F11)" } },
 };
 
 
 enum {
-  DATA_TOP_MONITOR,
+    DATA_TOP_MONITOR_PAD,
+    DATA_TOP_MONITOR_BTN
+};
+static const t_menulabel data_top_monitor[] =
+{
+  { { "            ",  "            ", } },
+  { { " MONITOR  ",    " モニター ",   } },
+};
+
+
+enum {
+  DATA_TOP_SAVECFG,
   DATA_TOP_QUIT,
   DATA_TOP_EXIT
 };
 static const t_menudata data_top_button[] =
 {
-  { { " MONITOR ",     " モニター ",      }, DATA_TOP_MONITOR },
+  { { " Save Cfg.",    " 設定保存 ",      }, DATA_TOP_SAVECFG },
   { { " QUIT(F12) ",   " 終了(F12) ",     }, DATA_TOP_QUIT    },
   { { " EXIT(ESC) ",   " 戻る(ESC) ",     }, DATA_TOP_EXIT    },
+};
+
+
+enum {
+  DATA_TOP_SAVECFG_TITLE,
+  DATA_TOP_SAVECFG_INFO,
+  DATA_TOP_SAVECFG_AUTO,
+  DATA_TOP_SAVECFG_OK,
+  DATA_TOP_SAVECFG_CANCEL
+};
+static const t_menulabel data_top_savecfg[] =
+{
+  { { "Save settings in following file. ", "現在の設定を、以下の環境設定ファイルに保存します" } },
+  { { "(Some settings are not saved)    ", "（一部の設定は、保存されません）                " } },
+  { { "Save when QUASI88 exit. ",          "終了時に、自動で保存する"                         } },
+  { { "   OK   ",                          " 保存 "                                           } },
+  { { " CANCEL ",                          " 取消 "                                           } },
 };
 
 
@@ -195,10 +236,10 @@ enum {
 };
 static const t_menulabel data_graph[] =
 {
-  { { " <<< FRAME RATE >>> ", " フレームレート "           } },
-  { { " <<< RESIZE >>> ",     " 画面サイズ "               } },
-  { { " <<< PCG-8100 >>>",    " PCG-8100 "                 } },
-  { { " <<< FONT >>> ",       " フォント (PCG無効時のみ) " } },
+  { { " <<< FRAME RATE >>> ", " フレームレート " } },
+  { { " <<< RESIZE >>> ",     " 画面サイズ "     } },
+  { { " <<< PCG-8100 >>>",    " PCG-8100 "       } },
+  { { " <<< FONT >>> ",       " フォント "       } },
 };
 
 static const t_menudata data_graph_frate[] =
@@ -233,18 +274,16 @@ static const t_menudata data_graph_resize[] =
 
 static const t_menulabel data_graph_fullscreen[] =
 {
-  { { "Toggle Full Screen (-fullscreen)", "フルスクリーン表示する (-fullscreen)", } },
+  { { "Full Screen (-fullscreen)", "フルスクリーン (-fullscreen) ", } },
 };
 
 enum {
-  DATA_GRAPH_MISC_HIDE_MOUSE,
   DATA_GRAPH_MISC_15K,
   DATA_GRAPH_MISC_DIGITAL,
   DATA_GRAPH_MISC_NOINTERP
 };
 static const t_menudata data_graph_misc[] =
 {
-  { { "Hide Mouse-cursor       (-hide_mouse)",  "マウスを表示しない           (-hide_mouse)" }, DATA_GRAPH_MISC_HIDE_MOUSE },
   { { "Monitor Freq. 15k       (-15k)",         "モニタ周波数を15kに設定      (-15k)"        }, DATA_GRAPH_MISC_15K        },
   { { "Digital Monitor         (-digital)",     "デジタルモニタに設定         (-digital)"    }, DATA_GRAPH_MISC_DIGITAL    },
   { { "No reduce interpolation (-nointerp)",    "半分サイズ時に縮小補間しない (-nointerp)"   }, DATA_GRAPH_MISC_NOINTERP   },
@@ -252,15 +291,15 @@ static const t_menudata data_graph_misc[] =
 
 static const t_menudata data_graph_misc2[] =
 {
-  { { "Fill-Line Display       (-noskipline)",  "ラインの隙間を埋める         (-noskipline)" },  0 },
-  { { "Skip-Line Display       (-skipline)",    "1ラインおきに表示する        (-skipline)"   }, -1 },
-  { { "Interlace Display       (-interlace)",   "インターレース表示する       (-interlace)"  },  1 },
+  { { "Fill-Line Display       (-noskipline)",  "ラインの隙間を埋める         (-noskipline)" }, SCREEN_INTERLACE_NO   },
+  { { "Skip-Line Display       (-skipline)",    "1ラインおきに表示する        (-skipline)"   }, SCREEN_INTERLACE_SKIP },
+  { { "Interlace Display       (-interlace)",   "インターレース表示する       (-interlace)"  }, SCREEN_INTERLACE_YES  },
 };
 
 static const t_menudata data_graph_pcg[] =
 {
-  { { " Noexist ", " なし " }, FALSE },
-  { { " Exist ",   " あり " }, TRUE  },
+  { { " Noexist ", " なし "  }, FALSE },
+  { { " Exist ",   " あり  " }, TRUE  },
 };
 
 #if 0
@@ -398,6 +437,7 @@ enum {
   DATA_CPU_MISC_BLANK2,
   DATA_CPU_MISC_MEMWAIT,
   DATA_CPU_MISC_MEMWAIT_X,
+  DATA_CPU_MISC_CMDSING,
 };
 static const t_menudata data_cpu_misc[] =
 {
@@ -406,11 +446,13 @@ static const t_menudata data_cpu_misc[] =
   { { "",                   "",                       }, -1                    },
   { { "HighSpeed BASIC ON", "高速BASIC処理 有効 ",    }, DATA_CPU_MISC_HSBASIC },
   { { "(-hsbasic)",         "(-hsbasic)",             }, -1                    },
-
-#if 1
   { { "",                   "",                       }, -1                    },
   { { "Memory Wait(dummy)", "偽メモリウェイト",       }, DATA_CPU_MISC_MEMWAIT },
   { { "(-mem_wait)",        "(-mem_wait)",            }, -1                    },
+
+#if 0
+  { { "",                   "",                       }, -1                    },
+  { { "CMD SING",           "CMD SING",               }, DATA_CPU_MISC_CMDSING },
 #endif
 };
 
@@ -426,12 +468,15 @@ enum {
   DATA_RESET_VERSION,
   DATA_RESET_DIPSW,
   DATA_RESET_DIPSW_BTN,
-  DATA_RESET_MISC,
-  DATA_RESET_SNDDRV,
+  DATA_RESET_SOUND,
+  DATA_RESET_EXTRAM,
+  DATA_RESET_JISHO,
   DATA_RESET_NOTICE,
   DATA_RESET_DIPSW_SET,
   DATA_RESET_DIPSW_QUIT,
-  DATA_RESET_NOW
+  DATA_RESET_BOOT,
+  DATA_RESET_NOW,
+  DATA_RESET_INFO
 };
 static const t_menulabel data_reset[] =
 {
@@ -441,13 +486,17 @@ static const t_menulabel data_reset[] =
   { { " ROM VERSION ",            " ROM バージョン "               } },
   { { " DIP-Switch ",             " ディップスイッチ "             } },
   { { " Setting ",                " 設定 "                         } },
-  { { " Misc",                    " その他 "                       } },
-  { { " SoundDriver",             " サウンドドライバ "             } },
+  { { " Sound Board",             " サウンドボード "               } },
+  { { " ExtRAM",                  " 拡張RAM "                      } },
+  { { " Dict.ROM",                " 辞書ROM "                      } },
   { { "(*) When checked, Real CPU clock depend on the 'CPU'-TAB setting. ",
       "(＊) チェックが入っている場合、実際のクロックは『CPU』タブ設定のままとなります" } },
   { { " <<< DIP-SW Setting >>> ", " <<< ディップスイッチ設定 >>> " } },
   { { " EXIT ",                   " 戻る "                         } },
+  { { " BOOT ",                   " 起動 "                         } },
   { { " RESET now ! ",            " この設定でリセットする "       } },
+  { { " (Without a reset, the setting is not applied.) ",
+      " （リセットをしないと、設定は反映されません）"              } },
 };
 
 static const t_menudata data_reset_basic[] =
@@ -471,28 +520,48 @@ static const t_menulabel data_reset_clock_async[] =
 
 static const t_menudata data_reset_version[] =
 {
-  { { "0", "0" }, '0' },
-  { { "1", "1" }, '1' },
-  { { "2", "2" }, '2' },
-  { { "3", "3" }, '3' },
-  { { "4", "4" }, '4' },
-  { { "5", "5" }, '5' },
-  { { "6", "6" }, '6' },
-  { { "7", "7" }, '7' },
-  { { "8", "8" }, '8' },
-  { { "9", "9" }, '9' },
+  { { "Default",  " 既定値" }, 0   },
+  { { "  1.0",    "  1.0"   }, '0' },
+  { { "  1.1",    "  1.1"   }, '1' },
+  { { "  1.2",    "  1.2"   }, '2' },
+  { { "  1.3",    "  1.3"   }, '3' },
+  { { "  1.4",    "  1.4"   }, '4' },
+  { { "  1.5",    "  1.5"   }, '5' },
+  { { "  1.6",    "  1.6"   }, '6' },
+  { { "  1.7",    "  1.7"   }, '7' },
+  { { "  1.8",    "  1.8"   }, '8' },
+  { { "  1.9*",   "  1.9*"  }, '9' },
 };
 
 static const t_menulabel data_reset_boot[] =
 {
-  { { " Boot from DISK ", " ディスクから起動 " } },
-  { { " Boot from ROM  ", " ＲＯＭ  から起動 " } },
+  { { " Boot from DISK  ", "  ディスク " } },
+  { { " Boot from ROM   ", "  ＲＯＭ   " } },
 };
 
-static const t_menudata data_reset_misc_sb[] =
+static const t_menudata data_reset_sound[] =
 {
   { { " Sound board    (OPN)  ", " サウンドボード   (OPN)  ", }, SOUND_I  },
   { { " Sound board II (OPNA) ", " サウンドボードII (OPNA) ", }, SOUND_II },
+};
+
+static const t_menudata data_reset_extram[] =
+{
+  { { " Nothing ",   " なし    "  },  0 },
+  { { "    128KB",   "    128KB"  },  1 },
+  { { "    256KB",   "    256KB"  },  2 },
+  { { "    384KB",   "    384KB"  },  3 },
+  { { "    512KB",   "    512KB"  },  4 },
+  { { "      1MB",   "      1MB"  },  8 },
+  { { " 1M+128KB",   " 1M+128KB"  },  9 },
+  { { " 1M+256KB",   " 1M+256KB"  }, 10 },
+  { { "      2MB",   "      2MB"  }, 16 },
+};
+
+static const t_menudata data_reset_jisho[] =
+{
+  { { " no-jisho ",  " なし ", }, 0 },
+  { { " has jisho ", " あり ", }, 1 },
 };
 
 static const t_menulabel data_reset_current[] =
@@ -501,10 +570,10 @@ static const t_menulabel data_reset_current[] =
   { { "DictROM", "辞書ROM" } },
 };
 
-static const t_menudata data_reset_snddrv[] =
+static const t_menulabel data_reset_detail[] =
 {
-  { { " MAME  Sound Driver ", " MAME  Sound Driver ", }, FALSE  },
-  { { " fmgen Sound Driver ", " fmgen Sound Driver ", }, TRUE  },
+  { { " Misc. << ", " その他 << " } },
+  { { " Misc. >> ", " その他 >> " } },
 };
 
 
@@ -515,38 +584,47 @@ static const t_menudata data_reset_snddrv[] =
 enum {
   DATA_VOLUME_TOTAL,
   DATA_VOLUME_LEVEL,
-  DATA_VOLUME_SD2
+  DATA_VOLUME_DEPEND,
+  DATA_VOLUME_AUDIO,
+  DATA_VOLUME_AUDIO_SET,
+  DATA_VOLUME_AUDIO_QUIT,
+  DATA_VOLUME_AUDIO_INFO,
 };
 static const t_menulabel data_volume[] =
 {
   { { " Volume ",             " 音量 "                       } },
   { { " Level ",              " レベル "                     } },
   { { " depend on FM-level ", " 以下はＦＭ音量に依存します " } },
+
+  { { " Setting ",                                               " 詳細設定 "                                        } },
+  { { " <<< Sound-device Setting >>> ",                          " <<< サウンドデバイス詳細設定 >>> "                } },
+  { { " EXIT ",                                                  " 戻る "                                            } },
+  { { " The settings are applied in the return from the menu. ", " 設定は、メニューモードから戻る際に反映されます。" } },
 };
 
 
 
 static const t_menulabel data_volume_no[] =
 {
-  { { " SoundBoard (OPN)     [ Sound Output is not available. ] "," サウンドボード (OPN)                [ サウンド出力は組み込まれていません ] " } },
-  { { " SoundBoard II (OPNA) [ Sound Output is not available. ] "," サウンドボードII (OPNA)             [ サウンド出力は組み込まれていません ] " } },
-  { { " SoundBoard (OPN)               [ Sound Output is OFF. ] "," サウンドボード (OPN)                        [ サウンド出力はオフ状態です ] " } },
-  { { " SoundBoard II (OPNA)           [ Sound Output is OFF. ] "," サウンドボードII (OPNA)                     [ サウンド出力はオフ状態です ] " } },
+  { { " SoundBoard (OPN)                        [ Sound Output is not available. ] "," サウンドボード (OPN)                [ サウンド出力は組み込まれていません ] " } },
+  { { " SoundBoard II (OPNA)                    [ Sound Output is not available. ] "," サウンドボードII (OPNA)             [ サウンド出力は組み込まれていません ] " } },
+  { { " SoundBoard (OPN)                   [ Sound Output is OFF. ] ",               " サウンドボード (OPN)       [ サウンド出力はオフ状態です ] " } },
+  { { " SoundBoard II (OPNA)               [ Sound Output is OFF. ] ",               " サウンドボードII (OPNA)    [ サウンド出力はオフ状態です ] " } },
 };
 
 
 
 static const t_menulabel data_volume_type[] =
 {
-  { { " SoundBoard (OPN)                 [ MAME Sound Driver ] "," サウンドボード (OPN)                                 [ MAME Sound Driver ] " } },
-  { { " SoundBoard II (OPNA)             [ MAME Sound Driver ] "," サウンドボードII (OPNA)                              [ MAME Sound Driver ] " } },
-  { { " SoundBoard (OPN)                [ fmgen Sound Driver ] "," サウンドボード (OPN)                                [ FMGEN Sound Driver ] " } },
-  { { " SoundBoard II (OPNA)            [ fmgen Sound Driver ] "," サウンドボードII (OPNA)                             [ FMGEN Sound Driver ] " } },
+  { { " SoundBoard (OPN)            [ MAME built-in FM Generator ] ",                " サウンドボード (OPN)      [ FM音源ジェネレータ：MAME内蔵 ] " } },
+  { { " SoundBoard II (OPNA)        [ MAME built-in FM-Generator ] ",                " サウンドボードII (OPNA)   [ FM音源ジェネレータ：MAME内蔵 ] " } },
+  { { " SoundBoard (OPN)                    [ fmgen FM-Generator ] ",                " サウンドボード (OPN)         [ FM音源ジェネレータ：fmgen ] " } },
+  { { " SoundBoard II (OPNA)                [ fmgen FM-Generator ] ",                " サウンドボードII (OPNA)      [ FM音源ジェネレータ：fmgen ] " } },
 };
 
 
 
-typedef struct{
+typedef struct {
   char	*str[2];
   int	val;
   int	min;
@@ -564,7 +642,8 @@ enum {
   VOL_BEEP,
   VOL_RHYTHM,
   VOL_ADPCM,
-  VOL_FMPSG
+  VOL_FMGEN,
+  VOL_SAMPLE
 };
 
 static const t_volume data_volume_total[] =
@@ -587,8 +666,50 @@ static const t_volume data_volume_rhythm[] =
 
 static const t_volume data_volume_fmgen[] =
 {
-  { { " FM & PSG   [%] :",  " FM/PSG音量 [％]：" }, VOL_FMPSG, FMVOL_MIN,    FMVOL_MAX,    1,10},
+  { { " FM & PSG   [%] :",  " FM/PSG音量 [％]：" }, VOL_FMGEN, FMGENVOL_MIN, FMGENVOL_MAX, 1,10},
   { { " BEEP sound [%] :",  " ＢＥＥＰ音 [％]：" }, VOL_BEEP,  BEEPVOL_MIN,  BEEPVOL_MAX,  1,10},
+};
+
+static const t_volume data_volume_sample[] =
+{
+  { { " SAMPLE snd [%] :",  " サンプル音 [％]：" }, VOL_SAMPLE,SAMPLEVOL_MIN,SAMPLEVOL_MAX,1,10},
+};
+
+
+enum {
+  DATA_VOLUME_AUDIO_FMGEN,
+  DATA_VOLUME_AUDIO_FREQ,
+  DATA_VOLUME_AUDIO_SAMPLE,
+};
+static const t_menulabel data_volume_audio[] =
+{
+  { { " FM Generator     ",                            " FM音源ジェネレータ       ",                    } },
+  { { " Sample-Frequency ([Hz], Range = 8000-48000) ", " サンプリング周波数 ([Hz],範囲＝8000〜48000) ", } },
+  { { " Sample Data      ",                            " サンプル音の使用有無     ",                    } },
+};
+
+static const t_menudata data_volume_audio_fmgen[] =
+{
+  { { " MAME built-in ", " MAME 内蔵  ", }, FALSE  },
+  { { " fmgen",          " fmgen",       }, TRUE   },
+};
+static const t_menudata data_volume_audio_freq_combo[] =
+{
+  { { "48000", "48000" }, 48000 },
+  { { "44100", "44100" }, 44100 },
+  { { "22050", "22050" }, 22050 },
+  { { "11025", "11025" }, 11025 },
+};
+static const t_menudata data_volume_audio_sample[] =
+{
+  { { " Not Use       ", " 使用しない ", }, FALSE  },
+  { { " Use",            " 使用する ",   }, TRUE   },
+};
+
+
+static const t_menulabel data_volume_audiodevice_stop[] =
+{
+  { { " (The sound device is stopping.)", " （サウンドデバイスは、停止中です）", } },
 };
 
 
@@ -949,7 +1070,7 @@ static const t_menulabel data_disk_blank[] =
 
 enum {
   DATA_DISK_FNAME,
-  DATA_DISK_FNAME_TITEL,
+  DATA_DISK_FNAME_TITLE,
   DATA_DISK_FNAME_LINE,
   DATA_DISK_FNAME_SAME,
   DATA_DISK_FNAME_SEP,
@@ -977,18 +1098,50 @@ static const t_menulabel data_disk_fname[] =
 
 
 
+enum {
+  DATA_DISK_DISPSWAP,
+  DATA_DISK_DISPSWAP_INFO_1,
+  DATA_DISK_DISPSWAP_INFO_2,
+  DATA_DISK_DISPSWAP_OK
+};
+static const t_menulabel data_disk_dispswap[] =
+{
+  { { "Swap Drv-Disp",                                   "表示 左右入換"                                     } },
+  { { "Swap Drive-Display placement",                    "DRIVE [1:] と [2:] の表示位置を、左右入れ換えます" } },
+  { { "This setting effects next time. ",                "この設定は次回のメニューモードより有効となります " } },
+  { { "  OK  ",                                          " 確認 "                                            } },
+};
+
+
+
+enum {
+  DATA_DISK_DISPSTATUS,
+  DATA_DISK_DISPSTATUS_INFO,
+  DATA_DISK_DISPSTATUS_OK
+};
+static const t_menulabel data_disk_dispstatus[] =
+{
+  { { "Show in status",                                  "表示 ステータス"                                   } },
+  { { "Display image name in status area. ",             "ステータス部に、イメージ名を表示します"            } },
+  { { "  OK  ",                                          " 確認 "                                            } },
+};
+
+
+
 /*--------------------------------------------------------------
  *	「その他」 タブ
  *--------------------------------------------------------------*/
 
 enum {
   DATA_MISC_SUSPEND,
-  DATA_MISC_SNAPSHOT
+  DATA_MISC_SNAPSHOT,
+  DATA_MISC_WAVEOUT,
 };
 static const t_menulabel data_misc[] =
 {
-  { { " State save / State load ", " ステートセーブ/ステートロード " } },
-  { { " Screen SnapShot ",         " スクリーンスナップショット "    } },
+  { { "State Save     ",    "ステートセーブ " } },
+  { { "Screen Shot    ",    "画面保存       " } },
+  { { "Sound Record   ",    "サウンド保存   " } },
 };
 
 
@@ -1004,11 +1157,11 @@ enum {
 };
 static const t_menulabel data_misc_suspend[] =
 {
-  { { "Change",                                     " 参照 "                               } },
-  { { " STATE SAVE ",                               " ステートセーブ "                     } },
-  { { " STATE LOAD ",                               " ステートロード "                     } },
-  { { "                   number : ",               "             連番： "                 } },
-  { { " Input (Select) a suspend-image filename. ", " ステートファイル名を入力して下さい " } },
+  { { " Change ",                           " ファイル変更 "                       } },
+  { { " SAVE ",                             " セーブ "                             } },
+  { { " LOAD ",                             " ロード "                             } },
+  { { "                         number : ", "                 連番： "             } },
+  { { " Input (Select) a state filename. ", " ステートファイル名を入力して下さい " } },
 };
 
 
@@ -1045,17 +1198,17 @@ enum {
 };
 static const t_menulabel data_misc_suspend_err[] =
 {
-  { { "State save Finished.",                           "状態を保存しました。"                           } },
-  { { "State load Finished.",                           "状態を復元しました。"                           } },
-  { { "----------------------------------------------", "----------------------------------------------" } },
-  { { "      ( Following image files are set )       ", " ( 以下のイメージファイルが設定されています ) " } },
-  { { " OK ",                                           "確認"                                           } },
-  { { "Error / State save failed.",                     "エラー／状態は保存されませんでした。"           } },
-  { { "Error / State load failed.",                     "エラー／状態の復元に失敗しました。"             } },
-  { { "State-file already exist, Over write ?",         "ファイルはすでに存在します。上書きしますか？"   } },
-  { { " Over Write ",                                   "上書き"                                         } },
-  { { " Cancel ",                                       "取消"                                           } },
-  { { "State-file not exist or broken.",                "ステートファイルが無いか、壊れています。"       } },
+  { { "State save Finished.",                           "状態を保存しました。"                               } },
+  { { "State load Finished.",                           "状態を復元しました。"                               } },
+  { { "----------------------------------------------", "----------------------------------------------"     } },
+  { { "      ( Following image files are set )       ", " ( 以下のイメージファイルが設定されています ) "     } },
+  { { " OK ",                                           "確認"                                               } },
+  { { "Error / State save failed.",                     "エラー／状態は保存されませんでした。"               } },
+  { { "Error / State load failed. Reset done",          "エラー／状態の復元に失敗しました。リセットします。" } },
+  { { "State-file already exist, Over write ?",         "ファイルはすでに存在します。上書きしますか？"       } },
+  { { " Over Write ",                                   "上書き"                                             } },
+  { { " Cancel ",                                       "取消"                                               } },
+  { { "State-file not exist or broken.",                "ステートファイルが無いか、壊れています。"           } },
 };
 
 
@@ -1063,17 +1216,19 @@ static const t_menulabel data_misc_suspend_err[] =
 enum {
   DATA_MISC_SNAPSHOT_FORMAT,
   DATA_MISC_SNAPSHOT_CHANGE,
+  DATA_MISC_SNAPSHOT_PADDING,
   DATA_MISC_SNAPSHOT_BUTTON,
   DATA_MISC_SNAPSHOT_FSEL,
   DATA_MISC_SNAPSHOT_CMD
 };
 static const t_menulabel data_misc_snapshot[] =
 {
-  { { " Format   ",                                 " 画像形式   "                                   } },
-  { { "Change",                                     " 参照 "                                         } },
-  { { " SAVE ",                                     " 保存 "                                         } },
-  { { " Input (Select) a snapshot base-filename. ", " スナップショットのファイル名を入力して下さい " } },
-  { { "Exec following Command ",                    "次のコマンドを実行する "                        } },
+  { { " Format   ",                                        " 画像形式   "                                   } },
+  { { " Change ",                                          " ベース名変更 "                                 } },
+  { { "                    ",                              "            "                                   } },
+  { { " SAVE ",                                            " 保存 "                                         } },
+  { { " Input (Select) a screen-snapshot base-filename. ", " 保存するファイル (ベース名) を入力して下さい " } },
+  { { "Exec following Command",                            "次のコマンドを実行する"                         } },
 };
 
 static const t_menudata data_misc_snapshot_format[] =
@@ -1082,6 +1237,25 @@ static const t_menudata data_misc_snapshot_format[] =
   { { " PPM ", " PPM " }, 1 },
   { { " RAW ", " RAW " }, 2 },
 };
+
+
+
+enum {
+  DATA_MISC_WAVEOUT_CHANGE,
+  DATA_MISC_WAVEOUT_START,
+  DATA_MISC_WAVEOUT_STOP,
+  DATA_MISC_WAVEOUT_PADDING,
+  DATA_MISC_WAVEOUT_FSEL
+};
+static const t_menulabel data_misc_waveout[] =
+{
+  { { " Change ",                                       " ベース名変更 "                                 } },
+  { { " START ",                                        " 開始 "                                         } },
+  { { " STOP ",                                         " 停止 "                                         } },
+  { { "                                            ",   "                                       "        } },
+  { { " Input (Select) a sound-record base-filename. ", " 出力するファイル (ベース名) を入力して下さい " } },
+};
+
 
 
 static const t_menulabel data_misc_sync[] =
@@ -1093,22 +1267,23 @@ static const t_menulabel data_misc_sync[] =
 
 
 
-
 /*--------------------------------------------------------------
  *	「キー」 タブ
  *--------------------------------------------------------------*/
 enum {
   DATA_KEY_FKEY,
   DATA_KEY_CURSOR,
-  DATA_KEY_CFG,
-  DATA_KEY_SKEY
+  DATA_KEY_CURSOR_SPACING,
+  DATA_KEY_SKEY,
+  DATA_KEY_SKEY2
 };
 static const t_menulabel data_key[] =
 {
-  { { " Function key Config ", " ファンクションキー設定 ", } },
-  { { " Curosr Key Config ",   " カーソルキー設定 ",       } }, 
-  { { " Another Key Config ",  " その他のキー設定 ",       } },
-  { { " Software Keyboard ",   "ソフトウェアキーボード",   } },
+  { { " Function key Config ",             " ファンクションキー設定 ",         } },
+  { { " Curosr Key Config ",               " カーソルキー設定 ",               } }, 
+  { { "                                 ", "                                ", } },
+  { { " Software ",                        " ソフトウェア ",                   } },
+  { { "   Keyboard  ",                     "  キーボード  ",                   } },
 };
 
 
@@ -1192,16 +1367,18 @@ static const t_menulabel data_skey_set[] =
 
 static const t_menudata data_key_cursor_mode[] =
 {
-  { { " Default(CursorKey) ",   " 標準(カーソルキー) ", },  0, },
-  { { " Assign to 2,4,6,8 ",    " 2,4,6,8 を割り当て ", },  1, },
-  { { " Assign following \034", " 右のように割り当て ", },  2, },
+  { { " Default(CursorKey)",  " 標準(カーソルキー)",    },  0, },
+  { { " Assign to 2,4,6,8",   " 2,4,6,8 を割り当て",    },  1, },
+  { { " Assign arbitrarily ", " 任意のキーを割り当て ", },  2, },
 };
 static const t_menudata data_key_cursor[] =
 {
-  { { "              \036 ",  "             ↑ ",   },  0, },
-  { { " \035 ",               "← ",                },  2, },
-  { { "               \034 ", "              → ",  },  3, },
-  { { "              \037 ",  "             ↓ ",   },  1, },
+  { { "             ",          "             ",     },   0, },
+  { { "                \036",   "               ↑", },  -1, },
+  { { " ",                      " ",                 },   2, },
+  { { "\035           \034 ",   "←        → ",     },   3, },
+  { { "                \037",   "               ↓", },  -1, },
+  { { "             ",          "             ",     },   1, },
 };
 
 
@@ -1211,73 +1388,167 @@ static const t_menudata data_key_cursor[] =
  *--------------------------------------------------------------*/
 enum {
   DATA_MOUSE_MODE,
-  DATA_MOUSE_MOUSE,
-  DATA_MOUSE_JOYSTICK
+  DATA_MOUSE_SERIAL,
+
+  DATA_MOUSE_SYSTEM,
+
+  DATA_MOUSE_DEVICE_MOUSE,
+  DATA_MOUSE_DEVICE_JOY,
+  DATA_MOUSE_DEVICE_JOY2,
+  DATA_MOUSE_DEVICE_ABOUT,
+
+  DATA_MOUSE_DEVICE_NUM,
+
+  DATA_MOUSE_CONNECTING,
+  DATA_MOUSE_SWAP_MOUSE,
+  DATA_MOUSE_SWAP_JOY,
+  DATA_MOUSE_SWAP_JOY2
 };
 static const t_menulabel data_mouse[] =
 {
-  { { " Mouse(Joystick) port setting ",  " マウス(ジョイスティック)ポート設定 "   } },
-  { { " Mouse input ",                   " マウス入力をキーに割り当て "           } },
-  { { " Joystick input ",                " ジョイスティック入力をキーに割り当て " } },
+  { { " Mouse / Joystick setting ", " マウス／ジョイスティック接続 "  } },
+  { { " Serial-mouse ",             " シリアルマウス "                } },
+
+  { { " [ System Setup  (Some settings are disabled in some systems.)]               ",
+      " 【システム設定  (設定の一部は、システムによっては無効です)】                 ", } },
+
+  { { " Mouse ",                         " マウス入力 ",                         } },
+  { { " Joystick ",                      " ジョイスティック入力 ",               } },
+  { { " Joystick(2) ",                   " ジョイスティック(2)入力 "             } },
+  { { " About ",                         " ※ "                                  } },
+
+  { { " %d Joystick(s) is found.",       "  %d 個のジョイスティックが使用できます。" } },
+
+  { { "  Connecting mouse-port   ",         "  マウスポートに接続中    "         } },
+  { { "Swap mouse buttons",                 "左右ボタンを入れ替える"             } },
+  { { "Swap joystick buttons (-joy_swap)",  "ＡＢボタンを入れ替える (-joyswap)"  } },
+  { { "Swap joystick buttons",              "ＡＢボタンを入れ替える"             } },
 };
 
 
 
-static const t_menulabel data_mouse_mode_msg[] =
-{
-  { { "General-purpose I/O port : ", " 汎用I/Oポートに " } },
-};
 static const t_menudata data_mouse_mode[] =
 {
-  { { "Not Connect               (-nomouse)  ", "なにも装着しない                     (-nomouse)  " }, MOUSE_NONE     },
-  { { "Connect Mouse             (-mouse)    ", "マウスを装着                         (-mouse)    " }, MOUSE_MOUSE    },
-  { { "Connect Mouse as joystick (-joymouse) ", "マウスをジョイスティックモードで装着 (-joymouse) " }, MOUSE_JOYMOUSE },
-  { { "Connect joystick          (-joystick) ", "ジョイスティックを装着               (-joystick) " }, MOUSE_JOYSTICK },
+  { { "Not Connect               (-nomouse) ", "なにも接続しない                     (-nomouse) " }, MOUSE_NONE     },
+  { { "Connect Mouse             (-mouse)   ", "マウスを接続                         (-mouse)   " }, MOUSE_MOUSE    },
+  { { "Connect Mouse as joystick (-joymouse)", "マウスをジョイスティックモードで接続 (-joymouse)" }, MOUSE_JOYMOUSE },
+  { { "Connect joystick          (-joystick)", "ジョイスティックを接続               (-joystick)" }, MOUSE_JOYSTICK },
+};
+
+
+
+static const t_menulabel data_mouse_serial[] =
+{
+  { { "Connect (-serialmouse)", "接続 (-serialmouse)" } },
 };
 
 
 
 static const t_menudata data_mouse_mouse_key_mode[] =
 {
-  { { " Not Assigned ",         " キー割り当てなし   " },  0 },
-  { { " Assign to 2-8,x,z ",    " 2-8,x,z を割り当て " },  1 },
-  { { " Assign following \034", " 右のように割り当て " },  2 },
+  { { " Not Assigned ",          " キー割り当てなし"       },  0 },
+  { { " Assign to 2,4,6,8,x,z ", " 2,4,6,8,x,zを割り当て " },  1 },
+  { { " Assign arbitrarily    ", " 任意のキーを割り当て"   },  2 },
 };
 static const t_menudata data_mouse_mouse[] =
 {
-  { { "              \036 ",  "             ↑ "   },  0 },
-  { { "                L ",   "               左 " },  4 },
-  { { " \035 ",               "← "                },  2 },
-  { { "               \034 ", "              → "  },  3 },
-  { { "              \037 ",  "             ↓ "   },  1 },
-  { { "                R ",   "               右 " },  5 },
+  { { "             ",          "             ",     },   0, },
+  { { "                \036",   "               ↑", },  -1, },
+  { { " ",                      " ",                 },   2, },
+  { { "\035           \034 ",   "←        → ",     },   3, },
+  { { "                \037",   "               ↓", },  -1, },
+  { { "             ",          "             ",     },   1, },
+  { { "",                       "",                  },  -1, },
+  { { " L ",                    " 左 "               },   4, },
+  { { "",                       "",                  },  -1, },
+  { { " R ",                    " 右 "               },   5, },
 };
 
 
 
 static const t_menudata data_mouse_joy_key_mode[] =
 {
-  { { " Not Assigned ",         " キー割り当てなし   " },  0 },
-  { { " Assign to 2-8,x,z ",    " 2-8,x,z を割り当て " },  1 },
-  { { " Assign following \034", " 右のように割り当て " },  2 },
+  { { " Not Assigned ",          " キー割り当てなし"       },  0 },
+  { { " Assign to 2,4,6,8,x,z ", " 2,4,6,8,x,zを割り当て " },  1 },
+  { { " Assign arbitrarily    ", " 任意のキーを割り当て"   },  2 },
 };
 static const t_menudata data_mouse_joy[] =
 {
-  { { "              \036 ",  "             ↑ "   },  0 },
-  { { "                A ",   "                A " },  4 },
-  { { " \035 ",               "← "                },  2 },
-  { { "               \034 ", "              → "  },  3 },
-  { { "              \037 ",  "             ↓ "   },  1 },
-  { { "                B ",   "                B " },  5 },
+  { { "             ",          "             ",     },   0, },
+  { { "                \036",   "               ↑", },  -1, },
+  { { " ",                      " ",                 },   2, },
+  { { "\035           \034 ",   "←        → ",     },   3, },
+  { { "                \037",   "               ↓", },  -1, },
+  { { "             ",          "             ",     },   1, },
+  { { " A ",                    " Ａ "               },   4, },
+  { { " B ",                    " Ｂ "               },   5, },
+  { { " C ",                    " Ｃ "               },   6, },
+  { { " D ",                    " Ｄ "               },   7, },
+  { { " E ",                    " Ｅ "               },   8, },
+  { { " F ",                    " Ｆ "               },   9, },
+  { { " G ",                    " Ｇ "               },  10, },
+  { { " H ",                    " Ｈ "               },  11, },
 };
-
-
-
-static const t_menulabel data_mouse_joystick_swap[] =
+static const t_menudata data_mouse_joy2_key_mode[] =
 {
-  { { "Swap A-button for B-button (-joy_swap)", "AボタンとBボタンを入れ替え (-joyswap)" } },
+  { { " Not Assigned ",          " キー割り当てなし"       },  0 },
+  { { " Assign to 2,4,6,8,x,z ", " 2,4,6,8,x,zを割り当て " },  1 },
+  { { " Assign arbitrarily    ", " 任意のキーを割り当て"   },  2 },
+};
+static const t_menudata data_mouse_joy2[] =
+{
+  { { "             ",          "             ",     },   0, },
+  { { "                \036",   "               ↑", },  -1, },
+  { { " ",                      " ",                 },   2, },
+  { { "\035           \034 ",   "←        → ",     },   3, },
+  { { "                \037",   "               ↓", },  -1, },
+  { { "             ",          "             ",     },   1, },
+  { { " A ",                    " Ａ "               },   4, },
+  { { " B ",                    " Ｂ "               },   5, },
+  { { " C ",                    " Ｃ "               },   6, },
+  { { " D ",                    " Ｄ "               },   7, },
+  { { " E ",                    " Ｅ "               },   8, },
+  { { " F ",                    " Ｆ "               },   9, },
+  { { " G ",                    " Ｇ "               },  10, },
+  { { " H ",                    " Ｈ "               },  11, },
 };
 
+
+
+static const t_volume data_mouse_sensitivity[] =
+{
+  { { " Sensitivity [%] :",  " マウス感度 [％]：" }, -1, 10, 200,  1, 10},
+};
+
+
+
+static const t_menulabel data_mouse_misc_msg[] =
+{
+  { { " Mouse Cursor : ", " マウスカーソルを " } },
+};
+static const t_menudata data_mouse_misc[] =
+{
+  { { "Always show the mouse cursor            (-show_mouse) ", "常に表示する             (-show_mouse) " }, SHOW_MOUSE },
+  { { "Always Hide the mouse cursor            (-hide_mouse) ", "常に隠す                 (-hide_mouse) " }, HIDE_MOUSE },
+  { { "Auto-hide the mouse cutsor              (-auto_mouse) ", "自動的に隠す             (-auto_mouse) " }, AUTO_MOUSE },
+  { { "Confine the mouse cursor on the screend (-grab_mouse) ", "画面に閉じ込める（隠す） (-grab_mouse) " }, -1         },
+  { { "Confine the mouse cursor when mouse clicked           ", "クリックで閉じ込める                   " }, -2         },
+};
+
+
+
+static const t_menudata data_mouse_debug_hide[] =
+{
+  { { " SHOW ", " 表示 ", }, SHOW_MOUSE, },
+  { { " HIDE ", " 隠す ", }, HIDE_MOUSE, },
+  { { " AUTO ", " 自動 ", }, AUTO_MOUSE, },
+};
+static const t_menudata data_mouse_debug_grab[] =
+{
+  { { " UNGRAB ", " 離す ", }, UNGRAB_MOUSE, },
+  { { " GRAB   ", " 掴む ", }, GRAB_MOUSE,   },
+  { { " AUTO   ", " 自動 ", }, AUTO_MOUSE,   },
+};
 
 
 /*--------------------------------------------------------------
@@ -1747,10 +2018,10 @@ static const t_keymap keymap_assign[] =
   { "J     ",    KEY88_j            },
   { "K     ",    KEY88_k            },
   { "L     ",    KEY88_l            },
-  { "M     ",    KEY88_n            },
-  { "N     ",    KEY88_o            },
-  { "O     ",    KEY88_p            },
-  { "P     ",    KEY88_q            },
+  { "M     ",    KEY88_m            },
+  { "N     ",    KEY88_n            },
+  { "O     ",    KEY88_o            },
+  { "P     ",    KEY88_p            },
   { "Q     ",    KEY88_q            },
   { "R     ",    KEY88_r            },
   { "S     ",    KEY88_s            },
@@ -1840,7 +2111,7 @@ static const t_keymap keymap_assign[] =
 
 /* t_menulabel の index 番目の文字列を取得するマクロ -------------------*/
 
-#define		GET_LABEL( l, index )	(l[index].str[menu_lang])
+#define		GET_LABEL(l, index)	(l[index].str[menu_lang])
 
 
 /* フレームを生成する --------------------------------------------------
@@ -1848,49 +2119,49 @@ static const t_keymap keymap_assign[] =
 				label	フレームのラベル
 				widget	!= NULL なら、これを乗せる。
 */
-INLINE	Q8tkWidget *PACK_FRAME( Q8tkWidget *box,
-				const char *label, Q8tkWidget *widget )
+static	Q8tkWidget *PACK_FRAME(Q8tkWidget *box,
+			       const char *label, Q8tkWidget *widget)
 {
-  Q8tkWidget	*frame = q8tk_frame_new( label );
+    Q8tkWidget *frame = q8tk_frame_new(label);
 
-  if( widget )
-    q8tk_container_add( frame, widget );
+    if (widget)
+	q8tk_container_add(frame, widget);
 
-  q8tk_widget_show( frame );
-  if( box )
-    q8tk_box_pack_start( box, frame );
+    q8tk_widget_show(frame);
+    if (box)
+	q8tk_box_pack_start(box, frame);
 
-  return frame;
+    return frame;
 }
 
 
 /* HBOXを生成する ------------------------------------------------------
 				box	!= NULL なら、これに PACK する。
 */
-INLINE	Q8tkWidget *PACK_HBOX( Q8tkWidget *box )
+static	Q8tkWidget *PACK_HBOX(Q8tkWidget *box)
 {
-  Q8tkWidget	*hbox = q8tk_hbox_new();
+    Q8tkWidget *hbox = q8tk_hbox_new();
 
-  q8tk_widget_show( hbox );
-  if( box )
-    q8tk_box_pack_start( box, hbox );
+    q8tk_widget_show(hbox);
+    if (box)
+	q8tk_box_pack_start(box, hbox);
 
-  return hbox;
+    return hbox;
 }
 
 
 /* VBOXを生成する ------------------------------------------------------
 				box	!= NULL なら、これに PACK する。
 */
-INLINE	Q8tkWidget *PACK_VBOX( Q8tkWidget *box )
+static	Q8tkWidget *PACK_VBOX(Q8tkWidget *box)
 {
-  Q8tkWidget	*vbox = q8tk_vbox_new();
+    Q8tkWidget *vbox = q8tk_vbox_new();
 
-  q8tk_widget_show( vbox );
-  if( box )
-    q8tk_box_pack_start( box, vbox );
+    q8tk_widget_show(vbox);
+    if (box)
+	q8tk_box_pack_start(box, vbox);
 
-  return vbox;
+    return vbox;
 }
 
 
@@ -1898,45 +2169,45 @@ INLINE	Q8tkWidget *PACK_VBOX( Q8tkWidget *box )
 				box	!= NULL なら、これに PACK する。
 				label	ラベル
 */
-INLINE	Q8tkWidget *PACK_LABEL( Q8tkWidget *box, const char *label )
+static	Q8tkWidget *PACK_LABEL(Q8tkWidget *box, const char *label)
 {
-  Q8tkWidget	*labelwidget = q8tk_label_new( label );
+    Q8tkWidget *labelwidget = q8tk_label_new(label);
 
-  q8tk_widget_show( labelwidget );
-  if( box )
-    q8tk_box_pack_start( box, labelwidget );
+    q8tk_widget_show(labelwidget);
+    if (box)
+	q8tk_box_pack_start(box, labelwidget);
 
-  return labelwidget;
+    return labelwidget;
 }
 
 
 /* VSEPATATOR を生成する -----------------------------------------------
 				box	!= NULL なら、これに PACK する。
 */
-INLINE	Q8tkWidget *PACK_VSEP( Q8tkWidget *box )
+static	Q8tkWidget *PACK_VSEP(Q8tkWidget *box)
 {
-  Q8tkWidget *vsep = q8tk_vseparator_new();
+    Q8tkWidget *vsep = q8tk_vseparator_new();
 
-  q8tk_widget_show( vsep );
-  if( box )
-    q8tk_box_pack_start( box, vsep );
+    q8tk_widget_show(vsep);
+    if (box)
+	q8tk_box_pack_start(box, vsep);
 
-  return vsep;
+    return vsep;
 }
 
 
 /* HSEPATATOR を生成する -----------------------------------------------
 				box	!= NULL なら、これに PACK する。
 */
-INLINE	Q8tkWidget *PACK_HSEP( Q8tkWidget *box )
+static	Q8tkWidget *PACK_HSEP(Q8tkWidget *box)
 {
-  Q8tkWidget *hsep = q8tk_hseparator_new();
+    Q8tkWidget *hsep = q8tk_hseparator_new();
 
-  q8tk_widget_show( hsep );
-  if( box )
-    q8tk_box_pack_start( box, hsep );
+    q8tk_widget_show(hsep);
+    if (box)
+	q8tk_box_pack_start(box, hsep);
 
-  return hsep;
+    return hsep;
 }
 
 
@@ -1946,18 +2217,18 @@ INLINE	Q8tkWidget *PACK_HSEP( Q8tkWidget *box )
 				callback "clicked" 時のコールバック関数
 				parm	そのパラメータ
 */
-INLINE	Q8tkWidget *PACK_BUTTON( Q8tkWidget *box,
-				 const char *label,
-				 Q8tkSignalFunc callback, void *parm )
+static	Q8tkWidget *PACK_BUTTON(Q8tkWidget *box,
+				const char *label,
+				Q8tkSignalFunc callback, void *parm)
 {
-  Q8tkWidget	*button = q8tk_button_new_with_label( label );
+    Q8tkWidget *button = q8tk_button_new_with_label(label);
 
-  q8tk_signal_connect( button, "clicked", callback, parm );
-  q8tk_widget_show( button );
-  if( box )
-    q8tk_box_pack_start( box, button );
+    q8tk_signal_connect(button, "clicked", callback, parm);
+    q8tk_widget_show(button);
+    if (box)
+	q8tk_box_pack_start(box, button);
 
-  return button;
+    return button;
 }
 
 
@@ -1969,21 +2240,21 @@ INLINE	Q8tkWidget *PACK_BUTTON( Q8tkWidget *box,
 				callback "clicked" 時のコールバック関数
 				parm	そのパラメータ
 */
-INLINE	Q8tkWidget *PACK_CHECK_BUTTON( Q8tkWidget *box,
-				       const char *label, int on,
-				       Q8tkSignalFunc callback, void *parm )
+static	Q8tkWidget *PACK_CHECK_BUTTON(Q8tkWidget *box,
+				      const char *label, int on,
+				      Q8tkSignalFunc callback, void *parm)
 {
-  Q8tkWidget	*button = q8tk_check_button_new_with_label( label );
+    Q8tkWidget *button = q8tk_check_button_new_with_label(label);
 
-  if( on )
-    q8tk_toggle_button_set_state( button, TRUE );
+    if (on)
+	q8tk_toggle_button_set_state(button, TRUE);
 
-  q8tk_signal_connect( button, "toggled", callback, parm );
-  q8tk_widget_show( button );
-  if( box )
-    q8tk_box_pack_start( box, button );
+    q8tk_signal_connect(button, "toggled", callback, parm);
+    q8tk_widget_show(button);
+    if (box)
+	q8tk_box_pack_start(box, button);
 
-  return button;
+    return button;
 }
 
 
@@ -1995,23 +2266,23 @@ INLINE	Q8tkWidget *PACK_CHECK_BUTTON( Q8tkWidget *box,
 				callback "clicked" 時のコールバック関数
 				parm	そのパラメータ
 */
-INLINE	Q8tkWidget *PACK_RADIO_BUTTON( Q8tkWidget *box,
-				       Q8tkWidget *button,
-				       const char *label, int on,
-				       Q8tkSignalFunc callback, void *parm )
+static	Q8tkWidget *PACK_RADIO_BUTTON(Q8tkWidget *box,
+				      Q8tkWidget *button,
+				      const char *label, int on,
+				      Q8tkSignalFunc callback, void *parm)
 {
-  Q8tkWidget	*b = q8tk_radio_button_new_with_label( button, label );
+    Q8tkWidget *b = q8tk_radio_button_new_with_label(button, label);
 
-  q8tk_widget_show( b );
-  q8tk_signal_connect( b, "clicked", callback, parm );
+    q8tk_widget_show(b);
+    q8tk_signal_connect(b, "clicked", callback, parm);
 
-  if( on )
-    q8tk_toggle_button_set_state( b, TRUE );
+    if (on)
+	q8tk_toggle_button_set_state(b, TRUE);
 
-  if( box )
-    q8tk_box_pack_start( box, b );
+    if (box)
+	q8tk_box_pack_start(box, b);
 
-  return b;
+    return b;
 }
 
 
@@ -2026,40 +2297,40 @@ INLINE	Q8tkWidget *PACK_RADIO_BUTTON( Q8tkWidget *box,
 				initstr	上記該当が無い場合の初期文字列
 				width	表示サイズ。0で自動
 				act_callback "activate"時のコールバック関数
-				act_parm	そのパラメータ
+				act_parm     そのパラメータ
 				chg_callback "changed"時のコールバック関数
-				chg_parm	そのパラメータ
+				chg_parm     そのパラメータ
 */
-INLINE	Q8tkWidget *PACK_COMBO( Q8tkWidget *box,
-				const t_menudata *p, int count,
-				int initval, const char *initstr, int width,
-				Q8tkSignalFunc act_callback, void *act_parm,
-				Q8tkSignalFunc chg_callback, void *chg_parm )
+static	Q8tkWidget *PACK_COMBO(Q8tkWidget *box,
+			       const t_menudata *p, int count,
+			       int initval, const char *initstr, int width,
+			       Q8tkSignalFunc act_callback, void *act_parm,
+			       Q8tkSignalFunc chg_callback, void *chg_parm)
 {
-  int i;
-  Q8tkWidget	*combo = q8tk_combo_new();
+    int i;
+    Q8tkWidget *combo = q8tk_combo_new();
 
-  for( i=0; i<count; i++, p++ ){
-    q8tk_combo_append_popdown_strings( combo, p->str[menu_lang], NULL );
+    for (i=0; i<count; i++, p++) {
+	q8tk_combo_append_popdown_strings(combo, p->str[menu_lang], NULL);
 
-    if( initval == p->val ) initstr = p->str[menu_lang];
-  }
+	if (initval == p->val) initstr = p->str[menu_lang];
+    }
 
-  q8tk_combo_set_text( combo, initstr ? initstr : " " );
-  q8tk_signal_connect( combo, "activate", act_callback, act_parm );
-  if( chg_callback ){
-    q8tk_combo_set_editable( combo, TRUE );
-    q8tk_signal_connect( combo, "changed",  chg_callback, chg_parm );
-  }
-  q8tk_widget_show( combo );
+    q8tk_combo_set_text(combo, initstr ? initstr : " ");
+    q8tk_signal_connect(combo, "activate", act_callback, act_parm);
+    if (chg_callback) {
+	q8tk_combo_set_editable(combo, TRUE);
+	q8tk_signal_connect(combo, "changed",  chg_callback, chg_parm);
+    }
+    q8tk_widget_show(combo);
 
-  if( width )
-    q8tk_misc_set_size( combo, width, 0 );
+    if (width)
+	q8tk_misc_set_size(combo, width, 0);
 
-  if( box )
-    q8tk_box_pack_start( box, combo );
+    if (box)
+	q8tk_box_pack_start(box, combo);
 
-  return combo;
+    return combo;
 }
 
 
@@ -2069,35 +2340,37 @@ INLINE	Q8tkWidget *PACK_COMBO( Q8tkWidget *box,
 				width	表示文字列長。0で自動
 				text	初期文字列
 				act_callback "activate"時のコールバック関数
-				act_parm	そのパラメータ
+				act_parm     そのパラメータ
 				chg_callback "changed"時のコールバック関数
-				chg_parm	そのパラメータ
+				chg_parm     そのパラメータ
 */
-INLINE	Q8tkWidget *PACK_ENTRY( Q8tkWidget *box,
-				int length, int width, const char *text,
-				Q8tkSignalFunc act_callback, void *act_parm,
-				Q8tkSignalFunc chg_callback, void *chg_parm )
+static	Q8tkWidget *PACK_ENTRY(Q8tkWidget *box,
+			       int length, int width, const char *text,
+			       Q8tkSignalFunc act_callback, void *act_parm,
+			       Q8tkSignalFunc chg_callback, void *chg_parm)
 {
-  Q8tkWidget	*e;
+    Q8tkWidget *e;
 
-  e = q8tk_entry_new_with_max_length( length );
+    e = q8tk_entry_new_with_max_length(length);
 
-  if( width )
-    q8tk_misc_set_size( e, width, 1 );
+    if (width)
+	q8tk_misc_set_size(e, width, 1);
 
-  if( text )
-    q8tk_entry_set_text( e, text );
+    if (text)
+	q8tk_entry_set_text(e, text);
 
-  if( act_callback ) q8tk_signal_connect( e, "activate", act_callback, act_parm );
-  if( chg_callback ) q8tk_signal_connect( e, "changed",  chg_callback, chg_parm );
+    if (act_callback)
+	q8tk_signal_connect(e, "activate", act_callback, act_parm);
+    if (chg_callback)
+	q8tk_signal_connect(e, "changed",  chg_callback, chg_parm);
 
-  q8tk_misc_set_placement( e, 0, Q8TK_PLACEMENT_Y_CENTER );
-  q8tk_widget_show( e );
+    q8tk_misc_set_placement(e, 0, Q8TK_PLACEMENT_Y_CENTER);
+    q8tk_widget_show(e);
 
-  if( box )
-    q8tk_box_pack_start( box, e );
+    if (box)
+	q8tk_box_pack_start(box, e);
 
-  return e;
+    return e;
 }
 
 
@@ -2114,26 +2387,26 @@ INLINE	Q8tkWidget *PACK_ENTRY( Q8tkWidget *box,
 				callback "toggled"時のコールバック関数
 					 パラメータは (void*)(p[].val)
 */
-INLINE	void	PACK_CHECK_BUTTONS( Q8tkWidget *box,
-				    const t_menudata *p, int count,
-				    int (*f_initval)(int),
-				    Q8tkSignalFunc callback )
+static	void	PACK_CHECK_BUTTONS(Q8tkWidget *box,
+				   const t_menudata *p, int count,
+				   int (*f_initval)(int),
+				   Q8tkSignalFunc callback)
 {
-  int i;
-  Q8tkWidget	*button;
+    int i;
+    Q8tkWidget *button;
 
-  for( i=0; i<count; i++, p++ ){
+    for (i=0; i<count; i++, p++) {
 
-    button = q8tk_check_button_new_with_label( p->str[menu_lang] );
+	button = q8tk_check_button_new_with_label(p->str[menu_lang]);
 
-    if( (*f_initval)( p->val ) )
-      q8tk_toggle_button_set_state( button, TRUE );
+	if ((*f_initval)(p->val))
+	    q8tk_toggle_button_set_state(button, TRUE);
 
-    q8tk_signal_connect( button, "toggled", callback, (void *)(p->val) );
+	q8tk_signal_connect(button, "toggled", callback, (void *)(p->val));
 
-    q8tk_widget_show( button );
-    q8tk_box_pack_start( box, button );
-  }
+	q8tk_widget_show(button);
+	q8tk_box_pack_start(box, button);
+    }
 }
 
 
@@ -2148,25 +2421,26 @@ INLINE	void	PACK_CHECK_BUTTONS( Q8tkWidget *box,
 				callback "clicked"時のコールバック関数
 					 パラメータは (void*)(p[].val)
 */
-INLINE	void	PACK_RADIO_BUTTONS( Q8tkWidget *box,
+static	Q8List	*PACK_RADIO_BUTTONS(Q8tkWidget *box,
 				    const t_menudata *p, int count,
-				    int initval, Q8tkSignalFunc callback )
+				    int initval, Q8tkSignalFunc callback)
 {
-  int i;
-  Q8tkWidget	*button = NULL;
+    int i;
+    Q8tkWidget *button = NULL;
 
-  for( i=0; i<count; i++, p++ ){
+    for (i=0; i<count; i++, p++) {
 
-    button = q8tk_radio_button_new_with_label( button, p->str[menu_lang] );
+	button = q8tk_radio_button_new_with_label(button, p->str[menu_lang]);
 
-    q8tk_widget_show( button );
-    q8tk_box_pack_start( box, button );
-    q8tk_signal_connect( button, "clicked", callback, (void *)(p->val) );
+	q8tk_widget_show(button);
+	q8tk_box_pack_start(box, button);
+	q8tk_signal_connect(button, "clicked", callback, (void *)(p->val));
 
-    if( initval == p->val ){
-      q8tk_toggle_button_set_state( button, TRUE );
+	if (initval == p->val) {
+	    q8tk_toggle_button_set_state(button, TRUE);
+	}
     }
-  }
+    return q8tk_radio_button_get_list(button);
 }
 
 
@@ -2176,127 +2450,160 @@ INLINE	void	PACK_RADIO_BUTTONS( Q8tkWidget *box,
 					この情報をもとにHSCALEを生成。
 				initval 初期値
 				callback "value_changed"時のコールバック関数
-				parm	そのパラメータ
+				parm     そのパラメータ
 */
-INLINE	void	PACK_HSCALE( Q8tkWidget *box,
-			     const t_volume *p,
-			     int initval,
-			     Q8tkSignalFunc callback, void *parm )
+static	Q8tkWidget *PACK_HSCALE(Q8tkWidget *box,
+				const t_volume *p,
+				int initval,
+				Q8tkSignalFunc callback, void *parm)
 {
-  Q8tkWidget	*adj, *scale;
+    Q8tkWidget *adj, *scale;
 
-  adj = q8tk_adjustment_new( initval,
-			     p->min, p->max, p->step, p->page );
+    adj = q8tk_adjustment_new(initval,
+			      p->min, p->max, p->step, p->page);
 
-  q8tk_signal_connect( adj, "value_changed", callback, parm );
+    q8tk_signal_connect(adj, "value_changed", callback, parm);
 
-  scale = q8tk_hscale_new( adj );
-  q8tk_adjustment_set_arrow( scale->stat.scale.adj, TRUE );
-  /*q8tk_adjustment_set_length( scale->stat.scale.adj, 11 );*/
-  q8tk_scale_set_draw_value( scale, TRUE );
-  q8tk_scale_set_value_pos( scale, Q8TK_POS_LEFT );
+    scale = q8tk_hscale_new(adj);
+    q8tk_adjustment_set_arrow(scale->stat.scale.adj, TRUE);
+    /*q8tk_adjustment_set_length(scale->stat.scale.adj, 11);*/
+    q8tk_scale_set_draw_value(scale, TRUE);
+    q8tk_scale_set_value_pos(scale, Q8TK_POS_LEFT);
 
-  q8tk_widget_show( scale );
+    q8tk_widget_show(scale);
 
-  if( box )
-    q8tk_box_pack_start( box, scale );
+    if (box)
+	q8tk_box_pack_start(box, scale);
+
+    return scale;
 }
 
 
 
-/* キーアサイン変更用ウィジットを生成する ------------------------------
-				XXXX
-*/
-INLINE	Q8tkWidget *MAKE_KEY_COMBO( Q8tkWidget *box,
-				    const t_menudata *p,
-				    int (*f_initval)(int),
-				    Q8tkSignalFunc callback )
+/* キーアサイン変更用ウィジットを生成する ------------------------------ */
+static	Q8tkWidget *MAKE_KEY_COMBO(Q8tkWidget *box,
+				   const t_menudata *p,
+				   int (*f_initval)(int),
+				   Q8tkSignalFunc callback)
 {
-  {
-    Q8tkWidget *label = q8tk_label_new( GET_LABEL( p, 0 ) );
-    q8tk_box_pack_start( box, label );
-    q8tk_widget_show( label );
-  }
-  {
-    int i;
-    const t_keymap *k = keymap_assign;
-    const char     *initstr = " ";
-    int             initval = (*f_initval)( p->val );
-
-    Q8tkWidget *combo = q8tk_combo_new();
-
-    for( i=0; i<COUNTOF(keymap_assign); i++, k++ ){
-      q8tk_combo_append_popdown_strings( combo, k->str, NULL );
-
-      if( initval == k->code ) initstr = k->str;
+    {
+	Q8tkWidget *label = q8tk_label_new(GET_LABEL(p, 0));
+	q8tk_box_pack_start(box, label);
+	q8tk_widget_show(label);
     }
+    {
+	int i;
+	const t_keymap *k = keymap_assign;
+	const char     *initstr = " ";
+	int             initval = (*f_initval)(p->val);
 
-    q8tk_combo_set_text( combo, initstr );
-    q8tk_misc_set_size( combo, 6, 0 );
-    q8tk_signal_connect( combo, "activate", callback, (void*)(p->val) );
+	Q8tkWidget *combo = q8tk_combo_new();
 
-    q8tk_box_pack_start( box, combo );
-    q8tk_widget_show( combo );
+	for (i=0; i<COUNTOF(keymap_assign); i++, k++) {
+	    q8tk_combo_append_popdown_strings(combo, k->str, NULL);
 
-    return combo;
-  }
+	    if (initval == k->code) initstr = k->str;
+	}
+
+	q8tk_combo_set_text(combo, initstr);
+	q8tk_misc_set_size(combo, 6, 0);
+	q8tk_signal_connect(combo, "activate", callback, (void*)(p->val));
+
+	q8tk_box_pack_start(box, combo);
+	q8tk_widget_show(combo);
+
+	return combo;
+    }
 }
 
-static	Q8tkWidget *PACK_KEY_ASSIN( Q8tkWidget *box,
+static	Q8tkWidget *PACK_KEY_ASSIGN(Q8tkWidget *box,
 				    const t_menudata *p, int count,
 				    int (*f_initval)(int),
-				    Q8tkSignalFunc callback )
+				    Q8tkSignalFunc callback)
 {
-  Q8tkWidget *vbox, *hbox;
+    int i;
+    Q8tkWidget *vbox, *hbox, *allbox;
 
-  vbox = q8tk_vbox_new();
-  {
-    {						/* - - - - - - - - */
-      hbox = q8tk_hbox_new();
-      {							/* ↑ */
-	MAKE_KEY_COMBO( hbox, p, f_initval, callback );
-	p++;
-
-	if( count > 4 ){				/* A */
-	  MAKE_KEY_COMBO( hbox, p, f_initval, callback );
-	  p++;
+    vbox = q8tk_vbox_new();
+    {
+	{							/* combo */
+	    hbox = q8tk_hbox_new();
+	    {
+		MAKE_KEY_COMBO(hbox, p, f_initval, callback);
+		p++;
+	    }
+	    q8tk_widget_show(hbox);
+	    q8tk_box_pack_start(vbox, hbox);
 	}
-      }
-      q8tk_widget_show( hbox );
-      q8tk_box_pack_start( vbox, hbox );
-    }
-    {						/* - - - - - - - - */
-      hbox = q8tk_hbox_new();
-      {							/* ← */
-	MAKE_KEY_COMBO( hbox, p, f_initval, callback );
-	p++;						/* → */
-	MAKE_KEY_COMBO( hbox, p, f_initval, callback );
-	p++;
-      }
-      q8tk_widget_show( hbox );
-      q8tk_box_pack_start( vbox, hbox );
-    }
-    {						/* - - - - - - - - */
-      hbox = q8tk_hbox_new();
-      {							/* ↓ */
-	MAKE_KEY_COMBO( hbox, p, f_initval, callback );
+
+	PACK_LABEL(vbox, GET_LABEL(p, 0));			/* ↑ */
 	p++;
 
-	if( count > 4 ){				/* B */
-	  MAKE_KEY_COMBO( hbox, p, f_initval, callback );
-	  p++;
+	{						/* combo ← → combo */
+	    hbox = q8tk_hbox_new();
+	    {
+		MAKE_KEY_COMBO(hbox, p, f_initval, callback);
+		p++;
+		MAKE_KEY_COMBO(hbox, p, f_initval, callback);
+		p++;
+	    }
+	    q8tk_widget_show(hbox);
+	    q8tk_box_pack_start(vbox, hbox);
 	}
-      }
-      q8tk_widget_show( hbox );
-      q8tk_box_pack_start( vbox, hbox );
-    }
-  }
-  q8tk_widget_show( vbox );
 
-  if( box )
-    q8tk_box_pack_start( box, vbox );
+	PACK_LABEL(vbox, GET_LABEL(p, 0));			/* ↓ */
+	p++;
+
+	{							/* combo */
+	    hbox = q8tk_hbox_new();
+	    {
+		MAKE_KEY_COMBO(hbox, p, f_initval, callback);
+		p++;
+	    }
+	    q8tk_widget_show(hbox);
+	    q8tk_box_pack_start(vbox, hbox);
+	}
+    }
+    q8tk_widget_show(vbox);
+
+
+    if (count < 6) {		/* 方向キーだけで処理終わり */
+
+	allbox = vbox;
+
+    } else {			/* 他にも処理するキーあり */
+
+	allbox = q8tk_hbox_new();
+	q8tk_box_pack_start(allbox, vbox);
+
+	{
+	    vbox = q8tk_vbox_new();
+	    for (i=6; i<count; i++) {
+		if (p->val < 0) {
+		    PACK_LABEL(vbox, GET_LABEL(p, 0));
+		    p++;
+		} else {
+		    hbox = q8tk_hbox_new();
+		    {
+			MAKE_KEY_COMBO(hbox, p, f_initval, callback);
+			p++;
+		    }
+		    q8tk_widget_show(hbox);
+		    q8tk_box_pack_start(vbox, hbox);
+		}
+	    }
+	    q8tk_widget_show(vbox);
+	    q8tk_box_pack_start(allbox, vbox);
+	}
+
+	q8tk_widget_show(allbox);
+    }
+
+
+    if (box)
+	q8tk_box_pack_start(box, allbox);
     
-  return vbox;
+    return allbox;
 }
 
 
@@ -2319,74 +2626,74 @@ static	Q8tkWidget *PACK_KEY_ASSIN( Q8tkWidget *box,
 					選択情報がここにセット
 */
 static struct{
-  void		(*ok_button)(void);	/* OK押下時の呼び出す関数   */
-  char		*get_filename;		/* 選択したファイル名格納先 */
-  int		sz_get_filename;	/* そのバッファサイズ       */
-  int		*get_ro;		/* RO かどうかのフラグ      */
-  Q8tkWidget	*accel;
+    void	(*ok_button)(void);	/* OK押下時の呼び出す関数   */
+    char	*get_filename;		/* 選択したファイル名格納先 */
+    int		sz_get_filename;	/* そのバッファサイズ       */
+    int		*get_ro;		/* RO かどうかのフラグ      */
+    Q8tkWidget	*accel;
 } FSEL;
-static void cb_fsel_ok( Q8tkWidget *dummy, Q8tkWidget *f );
-static void cb_fsel_cancel( Q8tkWidget *dummy, Q8tkWidget *f );
+static void cb_fsel_ok(UNUSED_WIDGET, Q8tkWidget *f);
+static void cb_fsel_cancel(UNUSED_WIDGET, Q8tkWidget *f);
 
-static void START_FILE_SELECTION( const char *label,	/* タイトル       */
-				  int select_ro,	/* RO選択状態     */
-				  const char *filename,	/* 初期ファイル名 */
+static void START_FILE_SELECTION(const char *label,	/* タイトル       */
+				 int select_ro,		/* RO選択状態     */
+				 const char *filename,	/* 初期ファイル名 */
 
-				  void (*ok_button)( void ),
-				  char *get_filename,
-				  int  sz_get_filename,
-				  int  *get_ro )
+				 void (*ok_button)(void),
+				 char *get_filename,
+				 int  sz_get_filename,
+				 int  *get_ro)
 {
-  Q8tkWidget *f;
+    Q8tkWidget *f;
 
-  f = q8tk_file_selection_new( label, select_ro );
-  q8tk_widget_show( f );
-  q8tk_grab_add( f );
+    f = q8tk_file_selection_new(label, select_ro);
+    q8tk_widget_show(f);
+    q8tk_grab_add(f);
 
-  if( filename )
-    q8tk_file_selection_set_filename( f, filename );
+    if (filename)
+	q8tk_file_selection_set_filename(f, filename);
 
-  q8tk_signal_connect( Q8TK_FILE_SELECTION( f )->ok_button,
-		       "clicked", cb_fsel_ok, f );
-  q8tk_signal_connect( Q8TK_FILE_SELECTION( f )->cancel_button,
-		       "clicked", cb_fsel_cancel, f );
-  q8tk_widget_grab_default( Q8TK_FILE_SELECTION( f )->cancel_button);
+    q8tk_signal_connect(Q8TK_FILE_SELECTION(f)->ok_button,
+			"clicked", cb_fsel_ok, f);
+    q8tk_signal_connect(Q8TK_FILE_SELECTION(f)->cancel_button,
+			"clicked", cb_fsel_cancel, f);
+    q8tk_widget_set_focus(Q8TK_FILE_SELECTION(f)->cancel_button);
 
-  FSEL.ok_button       = ok_button;
-  FSEL.get_filename    = get_filename;
-  FSEL.sz_get_filename = sz_get_filename;
-  FSEL.get_ro          = ( select_ro >= 0 ) ? get_ro : NULL;
+    FSEL.ok_button       = ok_button;
+    FSEL.get_filename    = get_filename;
+    FSEL.sz_get_filename = sz_get_filename;
+    FSEL.get_ro          = (select_ro >= 0) ? get_ro : NULL;
 
-  FSEL.accel = q8tk_accel_group_new();
+    FSEL.accel = q8tk_accel_group_new();
 
-  q8tk_accel_group_attach( FSEL.accel, f );
-  q8tk_accel_group_add( FSEL.accel, Q8TK_KEY_ESC,
-		        Q8TK_FILE_SELECTION( f )->cancel_button, "clicked" );
+    q8tk_accel_group_attach(FSEL.accel, f);
+    q8tk_accel_group_add(FSEL.accel, Q8TK_KEY_ESC,
+			 Q8TK_FILE_SELECTION(f)->cancel_button, "clicked");
 }
 
 
-static void cb_fsel_cancel( Q8tkWidget *dummy, Q8tkWidget *f )
+static void cb_fsel_cancel(UNUSED_WIDGET, Q8tkWidget *f)
 {
-  q8tk_grab_remove( f );
-  q8tk_widget_destroy( f );
-  q8tk_widget_destroy( FSEL.accel );
+    q8tk_grab_remove(f);
+    q8tk_widget_destroy(f);
+    q8tk_widget_destroy(FSEL.accel);
 }
 
-static void cb_fsel_ok( Q8tkWidget *dummy, Q8tkWidget *f )
+static void cb_fsel_ok(UNUSED_WIDGET, Q8tkWidget *f)
 {
-  *FSEL.get_filename = '\0';
-  strncat( FSEL.get_filename, q8tk_file_selection_get_filename( f ), 
-	   FSEL.sz_get_filename - 1 );
+    *FSEL.get_filename = '\0';
+    strncat(FSEL.get_filename, q8tk_file_selection_get_filename(f), 
+	    FSEL.sz_get_filename - 1);
 
-  if( FSEL.get_ro )
-    *FSEL.get_ro = q8tk_file_selection_get_readonly( f );
+    if (FSEL.get_ro)
+	*FSEL.get_ro = q8tk_file_selection_get_readonly(f);
 
-  q8tk_grab_remove( f );
-  q8tk_widget_destroy( f );
-  q8tk_widget_destroy( FSEL.accel );
+    q8tk_grab_remove(f);
+    q8tk_widget_destroy(f);
+    q8tk_widget_destroy(FSEL.accel);
 
-  if( FSEL.ok_button )
-    (*FSEL.ok_button)();
+    if (FSEL.ok_button)
+	(*FSEL.ok_button)();
 }
 
 
@@ -2396,13 +2703,14 @@ static void cb_fsel_ok( Q8tkWidget *dummy, Q8tkWidget *f )
 
 	ダイアログは、以下の構成とする
 	+-----------------------------------+
-	|               見出し 1            |	見出しラベル (1個以上)
-	|                 ：                |
+	|               見出し 1            |	見出しラベル   (1個以上)
 	|                 ：                |
 	|               見出し 2            |
-	| --------------------------------- |	セパレータ(最大1個)
-	| [エントリ] [ボタン] …… [ボタン] |	エントリ  (最大1個)
-	+-----------------------------------+	ボタン    (1個以上)
+	|                 ：                |
+	|          [チェックボタン]         |	チェックボタン (1個以上)
+	| --------------------------------- |	セパレータ     (1個以上)
+	| [エントリ] [ボタン] …… [ボタン] |	エントリ       (最大1個)
+	+-----------------------------------+	ボタン         (1個以上)
 
 	ラベル、セパレータ、ボタン、エントリは全部合わせて最大で、
 	DIA_MAX 個まで。
@@ -2420,135 +2728,154 @@ static	Q8tkWidget	*dialog_accel;
 
 /* ダイアログ作成開始 */
 
-static	void	dialog_create( void )
+static	void	dialog_create(void)
 {
-  int i;
-  Q8tkWidget *d = q8tk_dialog_new();
-  Q8tkWidget *a = q8tk_accel_group_new();
+    int i;
+    Q8tkWidget *d = q8tk_dialog_new();
+    Q8tkWidget *a = q8tk_accel_group_new();
 
-  q8tk_misc_set_placement( Q8TK_DIALOG( d )->action_area,
-			   Q8TK_PLACEMENT_X_CENTER, Q8TK_PLACEMENT_Y_CENTER );
+    q8tk_misc_set_placement(Q8TK_DIALOG(d)->action_area,
+			    Q8TK_PLACEMENT_X_CENTER, Q8TK_PLACEMENT_Y_CENTER);
 
-  q8tk_accel_group_attach( a, d );
+    q8tk_accel_group_attach(a, d);
 
 
-  for( i=0; i<DIA_MAX; i++ ) dialog[ i ] = NULL;
-  dialog_num   = 0;
-  dialog_entry = NULL;
+    for (i=0; i<DIA_MAX; i++) dialog[ i ] = NULL;
+    dialog_num   = 0;
+    dialog_entry = NULL;
 
-  dialog_accel = a;
-  dialog_main  = d;
+    dialog_accel = a;
+    dialog_main  = d;
 }
 
 /* ダイアログにラベル（見出し）を追加。複数個、追加できる */
 
-static	void	dialog_set_title( const char *label )
+static	void	dialog_set_title(const char *label)
 {
-  Q8tkWidget *l = q8tk_label_new( label );
+    Q8tkWidget *l = q8tk_label_new(label);
 
-  if(dialog_num>=DIA_MAX){fprintf( stderr, "%s %d\n", __FILE__, __LINE__ );}
+    if (dialog_num>=DIA_MAX) {fprintf(stderr, "%s %d\n", __FILE__, __LINE__);}
 
-  q8tk_box_pack_start( Q8TK_DIALOG( dialog_main )->vbox, l );
-  q8tk_widget_show( l );
-  q8tk_misc_set_placement( l, Q8TK_PLACEMENT_X_CENTER, Q8TK_PLACEMENT_Y_TOP );
+    q8tk_box_pack_start(Q8TK_DIALOG(dialog_main)->vbox, l);
+    q8tk_widget_show(l);
+    q8tk_misc_set_placement(l, Q8TK_PLACEMENT_X_CENTER, Q8TK_PLACEMENT_Y_TOP);
 
-  dialog[ dialog_num ++ ] = l;
+    dialog[ dialog_num ++ ] = l;
+}
+
+/* ダイアログにチェックボタンを追加 (引数…ボタン名,状態,コールバック関数) */
+
+static	void	dialog_set_check_button(const char *label, int on,
+					Q8tkSignalFunc callback, void *parm)
+{
+    Q8tkWidget *b = q8tk_check_button_new_with_label(label);
+
+    if (dialog_num>=DIA_MAX) {fprintf(stderr, "%s %d\n", __FILE__, __LINE__);}
+
+    if (on)
+	q8tk_toggle_button_set_state(b, TRUE);
+
+    q8tk_box_pack_start(Q8TK_DIALOG(dialog_main)->vbox, b);
+    q8tk_widget_show(b);
+    q8tk_signal_connect(b, "toggled", callback, parm);
+
+    dialog[ dialog_num ++ ] = b;
 }
 
 /* ダイアログにセパレータを追加。 */
 
-static	void	dialog_set_separator( void )
+static	void	dialog_set_separator(void)
 {
-  Q8tkWidget *s = q8tk_hseparator_new();
+    Q8tkWidget *s = q8tk_hseparator_new();
 
-  if(dialog_num>=DIA_MAX){fprintf( stderr, "%s %d\n", __FILE__, __LINE__ );}
+    if (dialog_num>=DIA_MAX) {fprintf(stderr, "%s %d\n", __FILE__, __LINE__);}
 
-  q8tk_box_pack_start( Q8TK_DIALOG( dialog_main )->vbox, s );
-  q8tk_widget_show( s );
+    q8tk_box_pack_start(Q8TK_DIALOG(dialog_main)->vbox, s);
+    q8tk_widget_show(s);
 
-  dialog[ dialog_num ++ ] = s;
+    dialog[ dialog_num ++ ] = s;
 }
 
 /* ダイアログにボタンを追加 (引数…ボタンの名称,コールバック関数) */
 
-static	void	dialog_set_button( const char *label,
-				   Q8tkSignalFunc callback, void *parm )
+static	void	dialog_set_button(const char *label,
+				  Q8tkSignalFunc callback, void *parm)
 {
-  Q8tkWidget *b = q8tk_button_new_with_label( label );
+    Q8tkWidget *b = q8tk_button_new_with_label(label);
 
-  if(dialog_num>=DIA_MAX){fprintf( stderr, "%s %d\n", __FILE__, __LINE__ );}
+    if (dialog_num>=DIA_MAX) {fprintf(stderr, "%s %d\n", __FILE__, __LINE__);}
 
-  q8tk_box_pack_start( Q8TK_DIALOG( dialog_main )->action_area, b );
-  q8tk_widget_show( b );
-  q8tk_signal_connect( b, "clicked", callback, parm );
+    q8tk_box_pack_start(Q8TK_DIALOG(dialog_main)->action_area, b);
+    q8tk_widget_show(b);
+    q8tk_signal_connect(b, "clicked", callback, parm);
 
-  dialog[ dialog_num ++ ] = b;
+    dialog[ dialog_num ++ ] = b;
 }
 
 /* ダイアログにエントリを追加 (引数…初期文字列,最大文字数,コールバック関数) */
 
-static	void	dialog_set_entry( const char *text, int max_length,
-				  Q8tkSignalFunc callback, void *parm )
+static	void	dialog_set_entry(const char *text, int max_length,
+				 Q8tkSignalFunc callback, void *parm)
 {
-  Q8tkWidget *e = q8tk_entry_new_with_max_length( max_length );
+    Q8tkWidget *e = q8tk_entry_new_with_max_length(max_length);
 
-  q8tk_box_pack_start( Q8TK_DIALOG( dialog_main )->action_area, e );
-  q8tk_widget_show( e );
-  q8tk_signal_connect( e, "activate", callback, parm );
-  q8tk_misc_set_size( e, max_length+1, 0 );
-  q8tk_misc_set_placement( e, 0, Q8TK_PLACEMENT_Y_CENTER );
-  q8tk_entry_set_text( e, text );
+    q8tk_box_pack_start(Q8TK_DIALOG(dialog_main)->action_area, e);
+    q8tk_widget_show(e);
+    q8tk_signal_connect(e, "activate", callback, parm);
+    q8tk_misc_set_size(e, max_length+1, 0);
+    q8tk_misc_set_placement(e, 0, Q8TK_PLACEMENT_Y_CENTER);
+    q8tk_entry_set_text(e, text);
 
-  dialog_entry = e;
+    dialog_entry = e;
 
-  dialog[ dialog_num ++ ] = e;
+    dialog[ dialog_num ++ ] = e;
 }
 
 /* ダイアログ内の、エントリの文字列をとり出す */
 
-static	const	char	*dialog_get_entry( void )
+static	const	char	*dialog_get_entry(void)
 {
-  return	q8tk_entry_get_text( dialog_entry );
+    return q8tk_entry_get_text(dialog_entry);
 }
 
 /* 直前に追加したダイアログのボタンに、ショートカットキーを設定 */
 
-static	void	dialog_accel_key( int key )
+static	void	dialog_accel_key(int key)
 {
-  Q8tkWidget *w = dialog[ dialog_num-1 ];
-  q8tk_accel_group_add( dialog_accel, key, w, "clicked" );
+    Q8tkWidget *w = dialog[ dialog_num-1 ];
+    q8tk_accel_group_add(dialog_accel, key, w, "clicked");
 }
 
 /* ダイアログ表示開始 (グラブされる。フォーカスは最後に追加したボタンへ) */
 
-static	void	dialog_start( void )
+static	void	dialog_start(void)
 {
-  q8tk_widget_show( dialog_main );
-  q8tk_grab_add( dialog_main );
+    q8tk_widget_show(dialog_main);
+    q8tk_grab_add(dialog_main);
 
-  if( dialog[ dialog_num -1 ] ){
-    q8tk_widget_grab_default( dialog[ dialog_num -1 ] );
-  }
+    if (dialog[ dialog_num -1 ]) {
+	q8tk_widget_set_focus(dialog[ dialog_num -1 ]);
+    }
 }
 
 /* ダイアログを消去 (ウインドウを消去し、グラブを解除する) */
 
-static	void	dialog_destroy( void )
+static	void	dialog_destroy(void)
 {
-  int	i;
-  for( i=0; i<DIA_MAX; i++ ){
-    if( dialog[i] ){
-      q8tk_widget_destroy( dialog[i] );
-      dialog[i] = NULL;
+    int i;
+    for (i=0; i<DIA_MAX; i++) {
+	if (dialog[i]) {
+	    q8tk_widget_destroy(dialog[i]);
+	    dialog[i] = NULL;
+	}
     }
-  }
 
-  q8tk_grab_remove( dialog_main );
-  q8tk_widget_destroy( dialog_main );
-  q8tk_widget_destroy( dialog_accel );
+    q8tk_grab_remove(dialog_main);
+    q8tk_widget_destroy(dialog_main);
+    q8tk_widget_destroy(dialog_accel);
 
-  dialog_num   = 0;
-  dialog_main  = NULL;
-  dialog_entry = NULL;
-  dialog_accel = NULL;
+    dialog_num   = 0;
+    dialog_main  = NULL;
+    dialog_entry = NULL;
+    dialog_accel = NULL;
 }

@@ -22,6 +22,7 @@
 
 
 int	set_version;	/* 起動時のバージョン強制変更 '0' 〜 '9'	*/
+int	rom_version;	/* (変更前の) BASIC ROMバージョン		*/
 
 int	use_extram	= DEFAULT_EXTRAM;	/* 拡張RAMのカード数	*/
 int	use_jisho_rom	= DEFAULT_JISHO;	/* 辞書ROMを使う	*/
@@ -30,9 +31,13 @@ int	use_pcg = FALSE;			/* PCG-8100サポート	*/
 int	font_type = 0;				/* フォントの種類	*/
 int	font_loaded = 0;			/* ロードしたフォント種	*/
 
+int	memory_wait = FALSE;			/* メモリウェイトの有無	*/
+
 char	*file_compatrom = NULL;			/* P88SR emu のROMを使う*/
 
 int	has_kanji_rom   = FALSE;		/* 漢字ROMの有無	*/
+
+int	linear_ext_ram = TRUE;			/* 拡張RAMを連続させる	*/
 
 
 /*----------------------------------------------------------------------*/
@@ -122,14 +127,14 @@ byte	*dummy_ram;			/* ダミーRAM (32KB)		*/
  *----------------------------------------------------------------------*/
 static	int	mem_alloc_result;
 
-void	mem_alloc_start( const char *msg )	/* メモリ確保開始 */
+static	void	mem_alloc_start( const char *msg )	/* メモリ確保開始 */
 {
   if( verbose_proc ){ printf( "%s", msg ); }
 
   mem_alloc_result = TRUE;
 }
 
-void	*mem_alloc( size_t size )		/* メモリ確保 */
+static	void	*mem_alloc( size_t size )		/* メモリ確保 */
 {
   void	*ptr = malloc( size );
 
@@ -139,7 +144,7 @@ void	*mem_alloc( size_t size )		/* メモリ確保 */
   return ptr;
 }
 
-int	mem_alloc_finish( void )		/* メモリ確保完了(偽で失敗) */
+static	int	mem_alloc_finish( void )		/* メモリ確保完了(偽で失敗) */
 {
   if( verbose_proc ){ 
     if( mem_alloc_result == FALSE ){ printf( "FAILED\n" ); }
@@ -403,7 +408,7 @@ int	memory_allocate( void )
     has_kanji_rom = TRUE;
   }else{
     has_kanji_rom = FALSE;
-    menu_lang = LANG_ENGLISH;
+    menu_lang = MENU_ENGLISH;
   }
 
   load_rom( rom_list[ KNJ2_ROM ], kanji_rom[1][0], 0x20000, DISP_RESULT );
@@ -523,6 +528,9 @@ int	memory_allocate( void )
 
 
 
+		/* ROMのバージョンを保存 */
+  rom_version = ROM_VERSION;
+
 		/* オプショナルなメモリを確保 */
 
   if( memory_allocate_additional()== FALSE ){
@@ -547,6 +555,15 @@ int	memory_allocate_additional( void )
 		/* 拡張メモリを確保 */
 
   if( use_extram ){
+
+    if (use_extram <= 4 ||
+	BETWEEN(8, use_extram, 10) ||
+	use_extram == 16) {
+	;
+    } else {
+	linear_ext_ram = TRUE;
+    }
+
 				/* 確保済みサイズが小さければ、確保しなおし */
     if( ext_ram && alloced_extram < use_extram ){
       free( ext_ram );
@@ -704,6 +721,7 @@ void	memory_free( void )
 #define	SID_PCG		"MEM4"
 #define	SID_ADPCM	"MEMA"
 #define	SID_ERAM	"MEMB"
+#define	SID2		"MEM5"
 
 static	T_SUSPEND_W	suspend_memory_work[]=
 {
@@ -716,11 +734,18 @@ static	T_SUSPEND_W	suspend_memory_work[]=
   { TYPE_END,	0			},
 };
 
+static	T_SUSPEND_W	suspend_memory_work2[]=
+{
+  { TYPE_INT,	&linear_ext_ram,	},
+  { TYPE_END,	0			},
+};
+
 
 int	statesave_memory( void )
 {
-  set_version = ROM_VERSION;
   if( statesave_table( SID, suspend_memory_work ) != STATE_OK ) return FALSE;
+
+  if( statesave_table( SID2, suspend_memory_work2 ) != STATE_OK ) return FALSE;
 
   /* 通常メモリ */
 
@@ -751,7 +776,23 @@ int	statesave_memory( void )
 int	stateload_memory( void )
 {
   if( stateload_table( SID, suspend_memory_work ) != STATE_OK ) return FALSE;
-  ROM_VERSION = set_version;
+
+  /* 〜0.6.3 はステートセーブ保存時に、 ROMバージョン値をバージョン強制変更値
+     として 保存している。(つまり、オプション -server X 指定状態になっている)
+     0.6.4〜 では、そのようなことは行わない。(別途 ROM バージョンを管理)
+     特に互換性に実害はないと思うが…。以下を加えればさらに安全? */
+  /* if (set_version == rom_version) set_version = 0; */
+
+
+  if( stateload_table( SID2, suspend_memory_work2 ) != STATE_OK ) {
+
+    /* 旧バージョンなら、みのがす */
+
+    printf( "stateload : Statefile is old. (ver 0.6.0, 1, 2 or 3?)\n" );
+
+    linear_ext_ram = TRUE;
+  }
+
 
   /* 通常メモリ */
 

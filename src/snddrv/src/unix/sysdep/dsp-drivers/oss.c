@@ -44,6 +44,11 @@ Version 0.1, January 2000
 #define AUDIO_DEVICE   "/dev/dsp"
 #endif
 
+#if 1		/* QUASI88 */
+extern int verbose_proc;
+#define fprintf     if (verbose_proc) fprintf
+#endif		/* QUASI88 */
+
 /* our per instance private data struct */
 struct oss_dsp_priv_data {
    int fd;

@@ -3,36 +3,6 @@
 
 
 
-		/* CRTC側から見たアトリビュート	*/
-
-#define MONO_SECRET	0x01
-#define MONO_BLINK	0x02
-#define MONO_REVERSE	0x04
-#define MONO_UPPER	0x10
-#define MONO_UNDER	0x20
-#define MONO_GRAPH	0x80
-#define COLOR_SWITCH	0x08
-#define COLOR_GRAPH	0x10
-#define COLOR_B		0x20
-#define COLOR_R		0x40
-#define COLOR_G		0x80
-
-		/* 内部表現で使用するアトリビュート */
-
-#define ATTR_REVERSE	0x01			/* 反転			*/
-#define ATTR_SECRET	0x02			/* 表示/非表示		*/
-#define ATTR_UPPER	0x04			/* アッパーライン	*/
-#define ATTR_LOWER	0x08			/* アンダーライン	*/
-#define ATTR_GRAPH	0x10			/* グラフィックモード	*/
-#define ATTR_B		0x20			/* 色 Blue		*/
-#define ATTR_R		0x40			/* 色 Reg		*/
-#define ATTR_G		0x80			/* 色 Green		*/
-
-#define MONO_MASK	0x0f
-#define COLOR_MASK	0xe0
-
-
-
 extern	int	crtc_active;		/* CRTCの状態 0:CRTC作動 1:CRTC停止 */
 extern	int	crtc_intr_mask;		/* CRTCの割込マスク ==3 で表示	    */
 extern	int	crtc_cursor[2];		/* カーソル位置 非表示の時は(-1,-1) */
@@ -76,23 +46,7 @@ extern	int	blink_cycle;		/* 点滅の周期	8/16/24/32	*/
 extern	int	blink_counter;		/* 点滅制御カウンタ		*/
 
 
-/* このマクロは、CRTC,DMAC設定時および、I/O 31H / 53H 出力時に呼ぶ	*/
-
-#define	set_text_display()						\
-	do{								\
-	  if( (dmac_mode & 0x4) && (crtc_active) && crtc_intr_mask==3){	\
-	    if( !(grph_pile & GRPH_PILE_TEXT) ){			\
-	      text_display = TEXT_ENABLE;				\
-	    }else{							\
-	      if( grph_ctrl & GRPH_CTRL_COLOR )				\
-		text_display = TEXT_DISABLE;				\
-	      else							\
-		text_display = TEXT_ATTR_ONLY;				\
-	    }								\
-	  }else{							\
-	    text_display = TEXT_DISABLE;				\
-	  }								\
-	}while(0)
+void	set_text_display(void);
 
 
 
@@ -102,6 +56,21 @@ extern	int	dma_wait_count;		/* DMAで消費するサイクル数	*/
 					crtc_byte_per_line * crtc_sz_lines
 
 #define	RESET_DMA_WAIT_COUNT()	dma_wait_count = 0
+
+
+
+	/* テキスト処理 */
+
+extern	int	text_attr_flipflop;
+extern	Ushort	text_attr_buf[2][2048];
+
+typedef union{
+  bit8          b[12];
+  bit32		l[3];
+} T_GRYPH;
+
+void	get_font_gryph( int attr, T_GRYPH *gryph, int *color );
+void	crtc_make_text_attr( void );
 
 
 

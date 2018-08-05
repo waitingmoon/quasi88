@@ -1450,8 +1450,9 @@ printf("%04x %04x %04x %04x \n",
 	}
 
 	if( verbose_proc ){
-	  if( i== 6 ) printf("(Loading Rhythm file is success[OK])..");
-	  else        printf("(Loading Rhythm file is failure[FAILED])..");
+	  printf("  Loading Rhythm file for fmgen ... ");
+	  if( i== 6 ) printf("OK\n");
+	  else        printf("FAILED\n");
 	}
 #endif	// forQUASI88
 	if (i != 6)

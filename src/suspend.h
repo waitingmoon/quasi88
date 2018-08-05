@@ -4,8 +4,6 @@
 #include <stdio.h>
 #include "file-op.h"
 
-extern	int	set_state_filename( int init );
-
 
 #if 0	/* → file-op.h */
 extern char file_state[QUASI88_MAX_FILENAME];	/* ステートファイル名   */
@@ -74,11 +72,18 @@ int	statesave_system( void );
 
 
 
+void		filename_init_state(int synchronize);
+const char	*filename_get_state(void);
+int		filename_get_state_serial(void);
+void		filename_set_state(const char *filename);
+void		filename_set_state_serial(int serial);
+
+
 void	stateload_init( void );
 int	statesave( void );
 int	stateload( void );
-int	statesave_check( void );
-int	stateload_check( void );
+int	statesave_check_file_exist(void);
+int	stateload_check_file_exist(void);
 
 int	statefile_revision( void );
 

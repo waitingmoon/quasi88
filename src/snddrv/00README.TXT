@@ -1,5 +1,5 @@
 
-※ このディレクトリ以下には、MAME-0.71/XMAME-0.71.1 のソースが含まれています。
+※ このディレクトリ以下には、MAME 0.112/XMAME 0.106 のソースが含まれています。
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
   QUASI88 のコンパイル時にサウンド出力を有効にしておくと、このディレクトリ
@@ -13,123 +13,150 @@
 
 MAME のライセンスについては、このディレクトリにある
 
-	mame.txt
+	license.txt
 
 を参照してください。(XMAMEのライセンスもこれに準拠します)
 
 
 (*) MAME は、Nicola Salmoria 氏 と The MAME Team が著作権を有する、マルチ
     アーケードマシンエミュレータです。
-    XMAME は、xmame project による MAME の UNIX移植版です。
+    XMAME は、XMAME project による MAME の UNIX移植版です。(現在、休止中)
 
-    MAME、XMAME についての、より多くの情報は以下のページを御覧下さい。
+    MAME についての、より多くの情報は以下のウェブサイトを御覧下さい。
 
-	MAME  Home Page ==>> http://www.mame.net/
-	XMAME Home Page ==>> http://x.mame.net/
+	http://www.mamedev.org/
 
 
 -------------------------------------------------------------------------------
-xmame-0.71.1 のサウンドドライバを組み込みにあたり、以下のファイルを
-使用しました。これらのうちいくつかは、QUASI88 向けに改変されています。
 
-なお、左がもともとのファイルのあった場所で、右が QUASI88 配布物における
-ファイルの場所です。
-
-xmame-0.71.1/src/sndintrf.c				snddrv/src/sndintrf.c
-xmame-0.71.1/src/sndintrf.h				snddrv/src/sndintrf.h
-xmame-0.71.1/src/sound/2203intf.c			snddrv/src/sound/2203intf.c
-xmame-0.71.1/src/sound/2203intf.h			snddrv/src/sound/2203intf.h
-xmame-0.71.1/src/sound/2608intf.c			snddrv/src/sound/2608intf.c
-xmame-0.71.1/src/sound/2608intf.h			snddrv/src/sound/2608intf.h
-xmame-0.71.1/src/sound/ay8910.c				snddrv/src/sound/ay8910.c
-xmame-0.71.1/src/sound/ay8910.h				snddrv/src/sound/ay8910.h
-xmame-0.71.1/src/sound/filter.c				snddrv/src/sound/filter.c
-xmame-0.71.1/src/sound/filter.h				snddrv/src/sound/filter.h
-xmame-0.71.1/src/sound/fm.c				snddrv/src/sound/fm.c
-xmame-0.71.1/src/sound/fm.h				snddrv/src/sound/fm.h
-xmame-0.71.1/src/sound/mixer.c				snddrv/src/sound/mixer.c
-xmame-0.71.1/src/sound/mixer.h				snddrv/src/sound/mixer.h
-xmame-0.71.1/src/sound/streams.c			snddrv/src/sound/streams.c
-xmame-0.71.1/src/sound/streams.h			snddrv/src/sound/streams.h
-xmame-0.71.1/src/sound/ymdeltat.c			snddrv/src/sound/ymdeltat.c
-xmame-0.71.1/src/sound/ymdeltat.h			snddrv/src/sound/ymdeltat.h
-xmame-0.71.1/src/unix/sound.c				snddrv/src/unix/sound.c
-xmame-0.71.1/src/unix/sysdep/COPYING.LIB		snddrv/src/unix/sysdep/COPYING.LIB
-xmame-0.71.1/src/unix/sysdep/begin_code.h		snddrv/src/unix/sysdep/begin_code.h
-xmame-0.71.1/src/unix/sysdep/end_code.h			snddrv/src/unix/sysdep/end_code.h
-xmame-0.71.1/src/unix/sysdep/fifo.h			snddrv/src/unix/sysdep/fifo.h
-xmame-0.71.1/src/unix/sysdep/misc.c			snddrv/src/unix/sysdep/misc.c
-xmame-0.71.1/src/unix/sysdep/misc.h			snddrv/src/unix/sysdep/misc.h
-xmame-0.71.1/src/unix/sysdep/plugin_manager.c		snddrv/src/unix/sysdep/plugin_manager.c
-xmame-0.71.1/src/unix/sysdep/plugin_manager.h		snddrv/src/unix/sysdep/plugin_manager.h
-xmame-0.71.1/src/unix/sysdep/plugin_manager_priv.h	snddrv/src/unix/sysdep/plugin_manager_priv.h
-xmame-0.71.1/src/unix/sysdep/rc.c			snddrv/src/unix/sysdep/rc.c
-xmame-0.71.1/src/unix/sysdep/rc.h			snddrv/src/unix/sysdep/rc.h
-xmame-0.71.1/src/unix/sysdep/rc_priv.h			snddrv/src/unix/sysdep/rc_priv.h
-xmame-0.71.1/src/unix/sysdep/sound_stream.c		snddrv/src/unix/sysdep/sound_stream.c
-xmame-0.71.1/src/unix/sysdep/sound_stream.h		snddrv/src/unix/sysdep/sound_stream.h
-xmame-0.71.1/src/unix/sysdep/sound_stream_priv.h	snddrv/src/unix/sysdep/sound_stream_priv.h
-xmame-0.71.1/src/unix/sysdep/sysdep_dsp.c		snddrv/src/unix/sysdep/sysdep_dsp.c
-xmame-0.71.1/src/unix/sysdep/sysdep_dsp.h		snddrv/src/unix/sysdep/sysdep_dsp.h
-xmame-0.71.1/src/unix/sysdep/sysdep_dsp_plugins.h	snddrv/src/unix/sysdep/sysdep_dsp_plugins.h
-xmame-0.71.1/src/unix/sysdep/sysdep_dsp_priv.h		snddrv/src/unix/sysdep/sysdep_dsp_priv.h
-xmame-0.71.1/src/unix/sysdep/sysdep_mixer.c		snddrv/src/unix/sysdep/sysdep_mixer.c
-xmame-0.71.1/src/unix/sysdep/sysdep_mixer.h		snddrv/src/unix/sysdep/sysdep_mixer.h
-xmame-0.71.1/src/unix/sysdep/sysdep_mixer_plugins.h	snddrv/src/unix/sysdep/sysdep_mixer_plugins.h
-xmame-0.71.1/src/unix/sysdep/sysdep_mixer_priv.h	snddrv/src/unix/sysdep/sysdep_mixer_priv.h
-xmame-0.71.1/src/unix/sysdep/dsp-drivers/alsa.c		snddrv/src/unix/sysdep/dsp-drivers/alsa.c
-xmame-0.71.1/src/unix/sysdep/dsp-drivers/arts.c		snddrv/src/unix/sysdep/dsp-drivers/arts.c
-xmame-0.71.1/src/unix/sysdep/dsp-drivers/artssound.c	snddrv/src/unix/sysdep/dsp-drivers/artssound.c
-xmame-0.71.1/src/unix/sysdep/dsp-drivers/coreaudio.c	snddrv/src/unix/sysdep/dsp-drivers/coreaudio.c
-xmame-0.71.1/src/unix/sysdep/dsp-drivers/esound.c	snddrv/src/unix/sysdep/dsp-drivers/esound.c
-xmame-0.71.1/src/unix/sysdep/dsp-drivers/io-audio.c	snddrv/src/unix/sysdep/dsp-drivers/io-audio.c
-xmame-0.71.1/src/unix/sysdep/dsp-drivers/irix.c		snddrv/src/unix/sysdep/dsp-drivers/irix.c
-xmame-0.71.1/src/unix/sysdep/dsp-drivers/irix_al.c	snddrv/src/unix/sysdep/dsp-drivers/irix_al.c
-xmame-0.71.1/src/unix/sysdep/dsp-drivers/netbsd.c	snddrv/src/unix/sysdep/dsp-drivers/netbsd.c
-xmame-0.71.1/src/unix/sysdep/dsp-drivers/oss.c		snddrv/src/unix/sysdep/dsp-drivers/oss.c
-xmame-0.71.1/src/unix/sysdep/dsp-drivers/sdl.c		snddrv/src/unix/sysdep/dsp-drivers/sdl.c, snddrv/quasi88-SDL/sdl.c
-xmame-0.71.1/src/unix/sysdep/dsp-drivers/solaris.c	snddrv/src/unix/sysdep/dsp-drivers/solaris.c
-xmame-0.71.1/src/unix/sysdep/dsp-drivers/soundkit.m	snddrv/src/unix/sysdep/dsp-drivers/soundkit.m
-xmame-0.71.1/src/unix/sysdep/dsp-drivers/waveout.c	snddrv/src/unix/sysdep/dsp-drivers/waveout.c
-xmame-0.71.1/src/unix/sysdep/mixer-drivers/oss.c	snddrv/src/unix/sysdep/mixer-drivers/oss.c
-xmame-0.71.1/src/unix/sysdep/mixer-drivers/solaris.c	snddrv/src/unix/sysdep/mixer-drivers/solaris.c
+●src ディレクトリ および src/sound ディレクトリのソースは、
+  MAME 0.112 のソースを QUASI88 向けに改変したものです。
 
 
+src/cpuintrf.h			ダミー
+src/driver.c			未使用部分をコメントアウト。
+src/driver.h			ダミー
+src/mame.h			ダミー
+src/mamecore.h			ダミー
+src/osdepend.h			ダミー
+src/profiler.h			ダミー
+src/restrack.c			未使用部分をコメントアウト。
+src/restrack.h			ダミー
+src/sndintrf.c			BEEP, fmgen対応部を追加。
+src/sndintrf.h			BEEP, fmgen対応部を追加。
+src/sound.c			プロトタイプ変更など
+src/sound.h			プロトタイプ変更
+src/streams.c			MAME 0.106 相当に変更
+src/streams.h			
+src/timer.h			ダミー
 
-MAME で必要なワークの宣言・定義用に、以下のファイルを作成しました。
+src/sound/2203intf.c		タイマー、音量処理追加
+src/sound/2203intf.h		タイマー、音量処理追加
+src/sound/2608intf.c		タイマー、音量処理追加
+src/sound/2608intf.h		タイマー、音量処理追加
+src/sound/ay8910.c		音量処理追加
+src/sound/ay8910.h		音量処理追加
+src/sound/flt_rc.c		
+src/sound/flt_rc.h		
+src/sound/flt_vol.c		
+src/sound/flt_vol.h		
+src/sound/fm.c			修正
+src/sound/fm.h			define修正
+src/sound/samples.c		ファイル処理変更
+src/sound/samples.h		
+src/sound/wavwrite.c		修正
+src/sound/wavwrite.h		
+src/sound/ymdeltat.c		音量処理追加
+src/sound/ymdeltat.h		
+
+
+●src/unix ディレクトリ以下のソースは、
+  XMAME 0.106 のソースを QUASI88向けに改変したものです。
+
+
+src/unix/sound.c				オプション修正
+src/unix/sysdep/begin_code.h			
+src/unix/sysdep/end_code.h			
+src/unix/sysdep/fifo.h				
+src/unix/sysdep/misc.c				
+src/unix/sysdep/misc.h				
+src/unix/sysdep/plugin_manager.c		
+src/unix/sysdep/plugin_manager.h		
+src/unix/sysdep/plugin_manager_priv.h		
+src/unix/sysdep/rc.c				独自オプション処理追加
+src/unix/sysdep/rc.h				独自オプション処理追加
+src/unix/sysdep/rc_priv.h			
+src/unix/sysdep/sysdep_dsp.c			VERBOSE対応
+src/unix/sysdep/sysdep_dsp.h			
+src/unix/sysdep/sysdep_dsp_plugins.h		
+src/unix/sysdep/sysdep_dsp_priv.h		
+src/unix/sysdep/sysdep_mixer.c			VERBOSE対応
+src/unix/sysdep/sysdep_mixer.h			
+src/unix/sysdep/sysdep_mixer_plugins.h		
+src/unix/sysdep/sysdep_mixer_priv.h		
+src/unix/sysdep/sysdep_sound_stream.c		独自オプション処理追加
+src/unix/sysdep/sysdep_sound_stream.h		
+src/unix/sysdep/sysdep_sound_stream_priv.h	
+src/unix/sysdep/dsp-drivers/alsa.c		
+src/unix/sysdep/dsp-drivers/arts.c		
+src/unix/sysdep/dsp-drivers/artssound.c		
+src/unix/sysdep/dsp-drivers/coreaudio.c		
+src/unix/sysdep/dsp-drivers/esound.c		VERBOSE対応
+src/unix/sysdep/dsp-drivers/io-audio.c		
+src/unix/sysdep/dsp-drivers/irix.c		
+src/unix/sysdep/dsp-drivers/irix_al.c		
+src/unix/sysdep/dsp-drivers/netbsd.c		
+src/unix/sysdep/dsp-drivers/oss.c		VERBOSE対応
+src/unix/sysdep/dsp-drivers/sdl.c		VERBOSE対応
+src/unix/sysdep/dsp-drivers/solaris.c		
+src/unix/sysdep/dsp-drivers/soundkit.m		
+src/unix/sysdep/dsp-drivers/waveout.c		VERBOSE対応
+src/unix/sysdep/mixer-drivers/alsa.c		
+src/unix/sysdep/mixer-drivers/oss.c		
+src/unix/sysdep/mixer-drivers/solaris.c		
+
+
+-------------------------------------------------------------------------------
+●MAME で必要なワークの宣言・定義用に、以下のファイルを作成しました。
 
 	snddrv/quasi88/mame-quasi88.c
 	snddrv/quasi88/mame-quasi88.h
+	snddrv/quasi88/machine.c
 
 
-コンパイル用のダミーファイルとして、以下のファイルを作成ししました。
+●X11版 QUASI88 と MAME/XMAME とのインターフェイス部として、以下のファイルを
+  作成しました。
 
-	snddrv/src/devices.h
-	snddrv/src/osd_cpu.h
-	snddrv/src/state.h
-	snddrv/src/unix/driver.h
-	snddrv/src/unix/xmame.h
+	snddrv/quasi88/X11/audio.c
+	snddrv/quasi88/X11/audio.h
 
 
--------------------------------------------------------------------------------
-X11版 QUASI88 と MAME/XMAME とのインターフェイス部として、以下のファイルを
-作成しました。
+●SDL版 QUASI88 と MAME とのインターフェイス部として、以下のファイルを
+  作成しました。
+  (snddrv/quasi88/SDL/sdl.c は、 src/unix/sysdep/dsp-drivers/sdl.c を
+   ベースに作成しました)
 
-	snddrv/quasi88-X11/snddrv-X11.c
-	snddrv/quasi88-X11/snddrv-X11.h
-
-
-SDL版 QUASI88 と MAME とのインターフェイス部として、以下のファイルを
-作成しました。
-
-	snddrv/quasi88-SDL/snddrv-SDL.c
-	snddrv/quasi88-SDL/snddrv-SDL.h
+	snddrv/quasi88/SDL/audio.c
+	snddrv/quasi88/SDL/audio.h
+	snddrv/quasi88/SDL/sdl.c
 
 
--------------------------------------------------------------------------------
-MAME/XMAME のサウンドドライバで BEEP 音を出力させるために、以下のファイルを
-新規に追加しました。
+●MAME のサウンドドライバで BEEP 音を出力させるために、以下のファイルを
+  新規に追加しました。
 
 	snddrv/quasi88/beepintf.c
+	snddrv/quasi88/beepintf.h
 	snddrv/quasi88/beep.c
 	snddrv/quasi88/beep.h
+
+
+●MAME のサウンドドライバで fmgen のサウンドを出力させるために、以下のファイル
+  を新規に追加しました。
+
+	snddrv/quasi88/2203fmgen.cpp
+	snddrv/quasi88/2203fmgen.h
+	snddrv/quasi88/2608fmgen.cpp
+	snddrv/quasi88/2608fmgen.h
+
+
+-------------------------------------------------------------------------------

@@ -46,10 +46,14 @@ typedef unsigned int   bit32;
 
 #define	COUNTOF(arr)	(int)(sizeof(arr)/sizeof((arr)[0]))
 #define	OFFSETOF(s, m)	((size_t)(&((s *)0)->m))
+#undef  MAX
 #define	MAX(a,b)	(((a)>(b))?(a):(b))
+#undef  MIN
 #define	MIN(a,b)	(((a)<(b))?(a):(b))
-#define	ABS(x)		( ((x) >= 0)? (x) : -(x) )
-#define	SGN( x )	( ((x)>0) ? 1 : ( ((x)<0) ? -1 : 0 ) ) 
+#undef  ABS
+#define	ABS(x)		(((x) >= 0)? (x) : -(x))
+#define	SGN(x)		(((x) > 0) ? 1 : (((x) < 0) ? -1 : 0)) 
+#define	BETWEEN(l,x,h)	((l) <= (x) && (x) <= (h))
 
 
 #ifdef LSB_FIRST			/* リトルエンディアン */
@@ -101,31 +105,74 @@ extern	int	verbose_suspend;	/* サスペンド時の異常を報告	*/
 extern	int	verbose_snd;		/* サウンドのメッセージ		*/
 
 
+enum {
+    EVENT_NONE		= 0x0000,
+    EVENT_FRAME_UPDATE	= 0x0001,
+    EVENT_AUDIO_UPDATE	= 0x0002,
+    EVENT_MODE_CHANGED	= 0x0004,
+    EVENT_DEBUG		= 0x0008,
+    EVENT_QUIT		= 0x0010
+};
+extern	int	quasi88_event_flags;
+extern	int	quasi88_debug_pause;	/* 1ならpause, 0ならmonitor */
+
+enum EmuMode
+{
+    EXEC,
+
+    GO,
+    TRACE,
+    STEP,
+    TRACE_CHANGE,
+
+    MONITOR,
+    MENU,
+    PAUSE,
+
+    QUIT
+};
+
+
 #define	INIT_POWERON	(0)
 #define	INIT_RESET	(1)
 #define	INIT_STATELOAD	(2)
 
-int	quasi88( void );
-void	quasi88_atexit( void (*function)(void) );
-void	quasi88_exit( void );
-void	quasi88_reset( void );
-int	quasi88_stateload( void );
+void	quasi88(void);
 
+void	quasi88_start(void);
+void	quasi88_main(void);
+void	quasi88_stop(int normal_exit);
+enum {
+    QUASI88_LOOP_EXIT,
+    QUASI88_LOOP_ONE,
+    QUASI88_LOOP_BUSY
+};
+int	quasi88_loop(void);
 
+void	quasi88_atexit(void (*function)(void));
+void	quasi88_exit(int status);
 
-char	*alloc_diskname( const char *filename );
-char	*alloc_romname( const char *filename );
-char	*alloc_global_cfgname( void );
-char	*alloc_local_cfgname( const char *imagename );
-char	*alloc_keyboard_cfgname( void );
-char	*alloc_state_filename( int init );
-char	*alloc_snapshot_filename( int init );
+void	quasi88_exec(void);
+void	quasi88_exec_step(void);
+void	quasi88_exec_trace(void);
+void	quasi88_exec_trace_change(void);
+void	quasi88_menu(void);
+void	quasi88_pause(void);
+void	quasi88_monitor(void);
+void	quasi88_debug(void);
+void	quasi88_quit(void);
+int	quasi88_is_exec(void);
+int	quasi88_is_menu(void);
+int	quasi88_is_pause(void);
+int	quasi88_is_monitor(void);
 
 
 
 /*----------------------------------------------------------------------*/
 /* その他	(実体は、 quasi88.c  にて定義してある)			*/
 /*----------------------------------------------------------------------*/
+void	wait_vsync_switch(void);
+
 void	sjis2euc( char *euc_p, const char *sjis_p );
 void	euc2sjis( char *sjis_p, const char *euc_p );
 int	euclen( const char *euc_p );
@@ -137,67 +184,92 @@ char	*my_strtok( char *dst, char *src );
 
 
 /*----------------------------------------------------------------------*/
-/*	デバッグ用に画面やファイルにログを出力 (処理速度が低下します)	*/
+/*									*/
 /*----------------------------------------------------------------------*/
+const char	*filename_get_disk(int drv);
+const char	*filename_get_tape(int mode);
+const char	*filename_get_prn(void);
+const char	*filename_get_sin(void);
+const char	*filename_get_sout(void);
+const char	*filename_get_disk_or_dir(int drv);
+const char	*filename_get_tape_or_dir(int mode);
+const char	*filename_get_disk_name(int drv);
+const char	*filename_get_tape_name(int mode);
 
-/*#define PIO_DISP*/		/* PIO 関係のログを画面に表示     */
-/*#define PIO_FILE*/		/*		   ファイルに出力 */
-
-/*#define FDC_DISP*/		/* FDC 関係のログを画面に表示     */
-/*#define FDC_FILE*/		/*		   ファイルに出力 */
-
-/*#define MAIN_DISP*/		/* メイン Z80 関係のログを画面に表示 */
-/*#define MAIN_FILE*/		/*		   ファイルに出力    */
-
-/*#define SUB_DISP*/		/* サブ Z80 関係のログを画面に表示 */
-/*#define SUB_FILE*/		/*		   ファイルに出力  */
-
-
-#ifndef	USE_MONITOR
-#undef PIO_DISP
-#undef PIO_FILE
-#undef FDC_DISP
-#undef FDC_FILE
-#undef MAIN_DISP
-#undef MAIN_FILE
-#undef SUB_DISP
-#undef SUB_FILE
-#endif
+char	*filename_alloc_diskname(const char *filename);
+char	*filename_alloc_romname(const char *filename);
+char	*filename_alloc_global_cfgname(void);
+char	*filename_alloc_local_cfgname(const char *imagename);
+char	*filename_alloc_keyboard_cfgname(void);
 
 
-/* ログをファイルに取る場合は、ファイルを開く */
-#if defined(PIO_FILE) || defined(FDC_FILE) || defined(MAIN_FILE) || defined(SUB_FILE)
-#include <stdio.h>
-extern	FILE	*LOG;
-#endif
 
-
-/* ログ出力のマクロ							*/
-/*	・可変長引数の関数を呼び出すマクロである。			*/
-/*	・マクロそのものを無効にするには、一般には			*/
-/*		#define  logxxx   (void)				*/
-/*		#define  logxxx   if(1){}else printf			*/
-/*	などを使う。前者ではワーニングが出る時があるので後者を採用した。*/
-
-
-#if	defined( PIO_DISP ) || defined( PIO_FILE )
-void	logpio( const char *format, ... );
+/*----------------------------------------------------------------------*/
+/*	デバッグ用							*/
+/*----------------------------------------------------------------------*/
+#ifdef	DEBUGPRINTF
+void	debugprintf(const char *format, ...);
+#define	XPRINTF	debugprintf
 #else
+#define	XPRINTF	if(1){}else printf
+#endif
+
+extern	int	pio_debug;
+extern	int	fdc_debug;
+extern	int	main_debug;
+extern	int	sub_debug;
+
+#ifdef	DEBUGLOG
+void	debuglog_init(void);
+void	debuglog_sync(void);
+void	debuglog_exit(void);
+
+void	logpio(const char *format, ...);
+void	logfdc(const char *format, ...);
+void	logz80(const char *format, ...);
+void	logz80_target(int debug_flag);
+#else
+
+#define	debuglog_init()
+#define	debuglog_sync()
+#define	debuglog_exit()
 #define	logpio	if(1){}else printf
-#endif
-
-#if	defined( FDC_DISP ) || defined( FDC_FILE )
-void	logfdc( const char *format, ... );
-#else
 #define	logfdc	if(1){}else printf
-#endif
-
-#if	defined( MAIN_DISP ) || defined( MAIN_FILE ) || defined( SUB_DISP ) || defined( SUB_FILE )
-void	logz80( const char *format, ... );
-#else
 #define	logz80	if(1){}else printf
+#define	logz80_target(x)
 #endif
 
 
+extern	int	debug_profiler;
+
+#ifdef	PROFILER
+enum {
+    PROF_LAPSE_RESET,
+    PROF_LAPSE_CPU,
+    PROF_LAPSE_INPUT,
+    PROF_LAPSE_SND,
+    PROF_LAPSE_AUDIO,
+    PROF_LAPSE_CPU2,
+    PROF_LAPSE_BLIT,
+    PROF_LAPSE_VIDEO,
+    PROF_LAPSE_IDLE,
+    PROF_LAPSE_END
+};
+void	profiler_init(void);
+void	profiler_lapse(int type);
+void	profiler_exit(void);
+void	profiler_current_time(void);
+void	profiler_watch_start(void);
+void	profiler_watch_stop(void);
+void	profiler_video_output(int timing, int skip, int drawn);
+#else
+#define	profiler_init()
+#define	profiler_lapse(i)
+#define	profiler_exit()
+#define	profiler_current_time()
+#define	profiler_watch_start()
+#define	profiler_watch_stop()
+#define	profiler_video_output(t,s,d)
+#endif
 
 #endif		/* QUASI88_H_INCLUDED */

@@ -41,15 +41,9 @@ opm.h			未使用につき、削除
 opna.cpp		Windows依存部を修正
 opna.h			-
 psg.cpp			-
-psg.h			出力を16bitに変更 (FM_SAMPLETYPE)
+psg.h			出力を16bitに変更 (PSG_SAMPLETYPE)
 readme.txt		-
 types.h			QUASI88用に修正
 
 -------------------------------------------------------------------------------
-fmgen と QUASI88 とのインターフェイス部として、以下のファイルを
-新規に追加してました。
-
-2203fmgen.cpp
-2203fmgen.h
-2608fmgen.cpp
-2608fmgen.h
+QUASI88 は、 MAME のサウンドエンジンを介して、 fmgen を使用しています。

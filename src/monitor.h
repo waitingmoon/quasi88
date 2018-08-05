@@ -10,7 +10,10 @@ void	set_signal( void );
 
 
 
-void	monitor_main( void );
+#ifdef	USE_MONITOR
+void	monitor_init(void);
+void	monitor_main(void);
+#endif
 
 void print_hankaku(FILE *fp, Uchar *str, char npc);
 

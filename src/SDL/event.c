@@ -4,10 +4,6 @@
  *	詳細は、 event.h 参照
  ************************************************************************/
 
-/* ----------------------------------------------------------------------
- *		ヘッダファイル部
- * ---------------------------------------------------------------------- */
-
 #include <SDL.h>
 
 #include <stdlib.h>
@@ -15,9 +11,8 @@
 #include <ctype.h>
 
 #include "quasi88.h"
+#include "getconf.h"
 #include "keyboard.h"
-
-#include "graph.h"	/* now_screen_size		*/
 
 #include "drive.h"
 
@@ -26,7 +21,12 @@
 #include "screen.h"
 #include "event.h"
 
+#include "intr.h"			/* test */
+#include "screen.h"			/* test */
 
+	int	show_fps;		/* test */
+static	int	display_fps_init(void);	/* test */
+static	void	display_fps(void);	/* test */
 
 int	use_cmdkey = 1;			/* Commandキーでメニューへ遷移     */
 
@@ -39,9 +39,31 @@ int	use_joydevice = TRUE;		/* ジョイスティックデバイスを開く? */
 static	int	now_unicode = FALSE;	/* 正確にキーが拾えるようだが、キー */
 					/* リリースの検知が面倒なので保留   */
 
-static	SDL_Joystick *joy = NULL;	/* NULLならジョイスティック使用不可 */
+#define	JOY_MAX   	KEY88_PAD_MAX		/* ジョイスティック上限(2個) */
+
+#define	BUTTON_MAX	KEY88_PAD_BUTTON_MAX	/* ボタン上限(8個)	     */
+
+#define	AXIS_U		0x01
+#define	AXIS_D		0x02
+#define	AXIS_L		0x04
+#define	AXIS_R		0x08
+
+typedef struct {
+
+    SDL_Joystick *dev;		/* オープンしたジョイスティックの構造体 */
+    int		  num;		/* QUASI88 でのジョイスティック番号 0〜 */
+
+    int		  axis;		/* 方向ボタン押下状態			*/
+    int		  nr_button;	/* 有効なボタンの数			*/
+
+} T_JOY_INFO;
+
+static T_JOY_INFO joy_info[ JOY_MAX ];
+
+static	int	joystick_num;		/* オープンしたジョイスティックの数 */
 
 
+static	const char *debug_sdlkeysym(int code); /* デバッグ用 */
 /*==========================================================================
  * キー配列について
  *
@@ -90,7 +112,11 @@ static	SDL_Joystick *joy = NULL;	/* NULLならジョイスティック使用不可 */
  *	○キーロックに難あり(?)
  *	  NumLockはロックできる。
  *	  windib  だと SHIFT + CapsLock がロック可。
- *	  NumLock だと CapsLock、カタカナひらがな、半角/全角がロック可。
+ *	  directx だと CapsLock、カタカナひらがな、半角/全角がロック可。
+ *	○NumLock中のテンキー入力に難あり(?)
+ *	  windib  だと NumLock中に SHIFT + テンキーで、SHIFTが一時的にオフ
+ *	  NumLockしてなければ問題なし。
+ *	  windib  だと この問題はない。
  *
  *	○メニューモードでは、UNICODE を有効にする。
  *	  こうすれば、「SHIFT」+「1」 を 「!」 と認識できるし、「SHIFT」+「2」
@@ -101,11 +127,34 @@ static	SDL_Joystick *joy = NULL;	/* NULLならジョイスティック使用不可 */
  *	  directx の時のキーコード割り当てが明らかに不自然なのだが。
  *===========================================================================*/
 
+/* ソフトウェアNumLock をオンした際の、キーバインディング変更テーブル */
+
+typedef struct {
+    int		type;		/* KEYCODE_INVALID / SYM / SCAN		*/
+    int		code;		/* キーシンボル、ないし、スキャンコード	*/
+    int		new_key88;	/* NumLock ON 時の QUASI88キーコード	*/
+    int		org_key88;	/* NumLock OFF時の QUASI88キーコード	*/
+} T_BINDING;
+
+
+/* キーバインディングをデフォルト(初期値)から変更する際の、テーブル */
+
+typedef struct {
+    int		type;		/* KEYCODE_INVALID / SYM / SCAN		*/
+    int		code;		/* キーシンボル、ないし、スキャンコード	*/
+    int		key88;		/* 変更する QUASI88キーコード           */
+} T_REMAPPING;
+
+
+
 /*----------------------------------------------------------------------
  * SDL の keysym を QUASI88 の キーコードに変換するテーブル
  *
  *	キーシンボル SDLK_xxx が押されたら、 
  *	keysym2key88[ SDLK_xxx ] が押されたとする。
+ *
+ *	keysym2key88[] には、 KEY88_xxx をセットしておく。
+ *	初期値は keysym2key88_default[] と同じ
  *----------------------------------------------------------------------*/
 static int keysym2key88[ SDLK_LAST ];
 
@@ -116,26 +165,25 @@ static int keysym2key88[ SDLK_LAST ];
  *
  *	スキャンコード code が押されたら、
  *	keycode2key88[ code ] が押されたとする。
- *	(keysym2key88[]に優先する。スキャンコードの値は 0〜配列maxまで)
+ *
+ *	keycode2key88[] には、 KEY88_xxx または -1 をセットしておく。
+ *	これは keysym2key88[] に優先される。(ただし -1 の場合は無効)
+ *	初期値は 全て -1、変換可能なスキャンコードは 0〜255までに制限。
  *----------------------------------------------------------------------*/
 static int scancode2key88[ 256 ];
 
  
 
 /*----------------------------------------------------------------------
- * ソフトウェア NumLock オン/オフ 時のマッピング変更テーブル
+ * ソフトウェア NumLock オン時の キーコード変換情報
  *
- *	binding[].code が押されたら、
- *	binding[].new_key88 が押されたことにする。
- *	(変更できるキーの個数は、配列maxまで)
+ *	binding[].code (SDL の keysym ないし keycode) が押されたら、
+ *	binding[].new_key88 (KEY88_xxx) が押されたことにする。
+ *
+ *	ソフトウェア NumLock オン時は、この情報にしたがって、
+ *	keysym2key88[] 、 keycode2key88[] を書き換える。
+ *	変更できるキーの個数は、64個まで (これだけあればいいだろう)
  *----------------------------------------------------------------------*/
-typedef struct{
-  int type;		/* 0:終端 / 1:keysym / 2:scancode	*/
-  int code;		/* キーシンボル、ないし、スキャンコード	*/
-  int org_key88;	/* NumLock OFF時の QUASI88キーコード	*/
-  int new_key88;	/* NumLock ON 時の QUASI88キーコード	*/
-} T_BINDING;
-
 static T_BINDING binding[ 64 ];
 
 
@@ -346,239 +394,217 @@ static const int keysym2key88_default[ SDLK_LAST ] =
 
 
 /*----------------------------------------------------------------------
- * keysym2key88[] と scancode2key88[] の一部を、変更するテーブル
+ * keysym2key88[]   の初期値は、keysym2key88_default[] と同じ、
+ * scancode2key88[] の初期値は、全て -1 (未使用) であるが、
+ * キーボードの種類に応じて、keysym2key88[] と scancode2key88[] の一部を
+ * 変更することにする。以下は、その変更の情報。
  *----------------------------------------------------------------------*/
 
-typedef struct{
-  int type;		/* 0:終端 / 1:keysym / 2:scancode	*/
-  int code;		/* キーシンボル、ないし、スキャンコード	*/
-  int key88;
-} T_REMAPPING;
-
-
-const T_REMAPPING remapping_x11_106[] =
+static const T_REMAPPING remapping_x11_106[] =
 {
-  {	1,  SDLK_LSUPER,	KEY88_KANA,		},
-  {	1,  SDLK_RALT,		KEY88_ZENKAKU,		},
-/*{	1,  SDLK_RCTRL,		KEY88_UNDERSCORE,	},*/
-  {	1,  SDLK_MENU,		KEY88_SYS_MENU, 	},
-  {	2,  49,			KEY88_ZENKAKU,		},	/* 半角全角 */
-  {	2,  133,		KEY88_YEN,		},	/* \ |      */
-  {	2,  123,		KEY88_UNDERSCORE,	},	/* \ _ ロ   */
-  {	2,  131,		KEY88_KETTEI,		},
-  {	2,  129,		KEY88_HENKAN,		},
-  {	2,  120,		KEY88_KANA,		},	/* カタひら */
-  {	0,  0,			0,			},
+    {	KEYCODE_SYM,  SDLK_LSUPER,	KEY88_KANA,	    },
+    {	KEYCODE_SYM,  SDLK_RALT,	KEY88_ZENKAKU,	    },
+/*  {	KEYCODE_SYM,  SDLK_RCTRL,	KEY88_UNDERSCORE,   },*/
+    {	KEYCODE_SYM,  SDLK_MENU,	KEY88_SYS_MENU,     },
+    {	KEYCODE_SCAN,     49,		KEY88_ZENKAKU,	    },   /* 半角全角 */
+    {	KEYCODE_SCAN,    133,		KEY88_YEN,	    },   /* \ |      */
+    {	KEYCODE_SCAN,    123,		KEY88_UNDERSCORE,   },   /* \ _ ロ   */
+    {	KEYCODE_SCAN,    131,		KEY88_KETTEI,	    },
+    {	KEYCODE_SCAN,    129,		KEY88_HENKAN,	    },
+    {	KEYCODE_SCAN,    120,		KEY88_KANA,	    },   /* カタひら */
+    {	KEYCODE_INVALID, 0,		0,		    },
 };
 
-const T_REMAPPING remapping_x11_101[] =
+static const T_REMAPPING remapping_x11_101[] =
 {
-  {	1,  SDLK_BACKQUOTE,	KEY88_YEN,		},
-  {	1,  SDLK_EQUALS,	KEY88_CARET,		},
-  {	1,  SDLK_BACKSLASH,	KEY88_AT,		},
-  {	1,  SDLK_QUOTE,		KEY88_COLON,		},
-  {	1,  SDLK_LSUPER,	KEY88_KANA,		},
-  {	1,  SDLK_RALT,		KEY88_ZENKAKU,		},
-  {	1,  SDLK_RCTRL,		KEY88_UNDERSCORE,	},
-  {	1,  SDLK_MENU,		KEY88_SYS_MENU, 	},
-  {	0,  0,			0,			},
+    {	KEYCODE_SYM,  SDLK_BACKQUOTE,	KEY88_YEN,	    },
+    {	KEYCODE_SYM,  SDLK_EQUALS,	KEY88_CARET,	    },
+    {	KEYCODE_SYM,  SDLK_BACKSLASH,	KEY88_AT,	    },
+    {	KEYCODE_SYM,  SDLK_QUOTE,	KEY88_COLON,	    },
+    {	KEYCODE_SYM,  SDLK_LSUPER,	KEY88_KANA,	    },
+    {	KEYCODE_SYM,  SDLK_RALT,	KEY88_ZENKAKU,	    },
+    {	KEYCODE_SYM,  SDLK_RCTRL,	KEY88_UNDERSCORE,   },
+    {	KEYCODE_SYM,  SDLK_MENU,	KEY88_SYS_MENU,     },
+    {	KEYCODE_INVALID, 0,		0,		    },
 };
 
-const T_REMAPPING remapping_windib_106[] =
+static const T_REMAPPING remapping_windib_106[] =
 {
-  {	1,  SDLK_BACKQUOTE,	0,			},	/* 半角全角 */
-  {	1,  SDLK_EQUALS,	KEY88_CARET,		},	/* ^        */
-  {	1,  SDLK_LEFTBRACKET,	KEY88_AT,		},	/* @        */
-  {	1,  SDLK_RIGHTBRACKET,	KEY88_BRACKETLEFT,	},	/* [        */
-  {	1,  SDLK_QUOTE,		KEY88_COLON,		},	/* :        */
-  {	1,  SDLK_LSUPER,	KEY88_KANA,		},	/* 左Window */
-  {	1,  SDLK_RALT,		KEY88_ZENKAKU,		},	/* 右Alt    */
-/*{	1,  SDLK_RCTRL,		KEY88_UNDERSCORE,	},*/	/* 右Ctrl   */
-  {	1,  SDLK_MENU,		KEY88_SYS_MENU, 	},	/* Menu     */
-  {	2,  125,		KEY88_YEN,		},	/* \ |      */
-  {	2,   43,		KEY88_BRACKETRIGHT,	},	/* ] }      */
-  {	2,  115,		KEY88_UNDERSCORE,	},	/* \ _ ロ   */
-  {	2,  123,		KEY88_KETTEI,		},	/* 無変換   */
-  {	2,  121,		KEY88_HENKAN,		},	/* 変換     */
-/*{	2,  112,		0,			},*/	/* カタひら */
-  {	0,  0,			0,			},
+    {	KEYCODE_SYM,  SDLK_BACKQUOTE,	0,		    },   /* 半角全角 */
+    {	KEYCODE_SYM,  SDLK_EQUALS,	KEY88_CARET,	    },   /* ^        */
+    {	KEYCODE_SYM,  SDLK_LEFTBRACKET,	KEY88_AT,	    },   /* @        */
+    {	KEYCODE_SYM,  SDLK_RIGHTBRACKET,KEY88_BRACKETLEFT,  },   /* [        */
+    {	KEYCODE_SYM,  SDLK_QUOTE,	KEY88_COLON,	    },   /* :        */
+    {	KEYCODE_SYM,  SDLK_LSUPER,	KEY88_KANA,	    },   /* 左Window */
+    {	KEYCODE_SYM,  SDLK_RALT,	KEY88_ZENKAKU,	    },   /* 右Alt    */
+/*  {	KEYCODE_SYM,  SDLK_RCTRL,	KEY88_UNDERSCORE,   },*/ /* 右Ctrl   */
+    {	KEYCODE_SYM,  SDLK_MENU,	KEY88_SYS_MENU,     },   /* Menu     */
+    {	KEYCODE_SCAN,    125,		KEY88_YEN,	    },   /* \ |      */
+    {	KEYCODE_SCAN,     43,		KEY88_BRACKETRIGHT, },   /* ] }      */
+    {	KEYCODE_SCAN,    115,		KEY88_UNDERSCORE,   },   /* \ _ ロ   */
+    {	KEYCODE_SCAN,    123,		KEY88_KETTEI,	    },   /* 無変換   */
+    {	KEYCODE_SCAN,    121,		KEY88_HENKAN,	    },   /* 変換     */
+/*  {	KEYCODE_SCAN,    112,		0,		    },*/ /* カタひら */
+    {	KEYCODE_INVALID, 0,		0,		    },
 };
 
-const T_REMAPPING remapping_windib_101[] =
+static const T_REMAPPING remapping_windib_101[] =
 {
-  {	1,  SDLK_BACKQUOTE,	KEY88_YEN,		}, 	/* `        */
-  {	1,  SDLK_EQUALS,	KEY88_CARET,		}, 	/* =        */
-  {	1,  SDLK_BACKSLASH,	KEY88_AT,		},	/* \        */
-  {	1,  SDLK_QUOTE,		KEY88_COLON,		}, 	/* '        */
-  {	1,  SDLK_LSUPER,	KEY88_KANA,		},	/* 左Window */
-  {	1,  SDLK_RALT,		KEY88_ZENKAKU,		},	/* 右Alt    */
-  {	1,  SDLK_RCTRL,		KEY88_UNDERSCORE,	},	/* 右Ctrl   */
-  {	1,  SDLK_MENU,		KEY88_SYS_MENU, 	},	/* Menu     */
-  {	0,  0,			0,			},
+    {	KEYCODE_SYM,  SDLK_BACKQUOTE,	KEY88_YEN,	    },   /* `        */
+    {	KEYCODE_SYM,  SDLK_EQUALS,	KEY88_CARET,	    },   /* =        */
+    {	KEYCODE_SYM,  SDLK_BACKSLASH,	KEY88_AT,	    },   /* \        */
+    {	KEYCODE_SYM,  SDLK_QUOTE,	KEY88_COLON,	    },   /* '        */
+    {	KEYCODE_SYM,  SDLK_LSUPER,	KEY88_KANA,	    },   /* 左Window */
+    {	KEYCODE_SYM,  SDLK_RALT,	KEY88_ZENKAKU,	    },   /* 右Alt    */
+    {	KEYCODE_SYM,  SDLK_RCTRL,	KEY88_UNDERSCORE,   },   /* 右Ctrl   */
+    {	KEYCODE_SYM,  SDLK_MENU,	KEY88_SYS_MENU,     },   /* Menu     */
+    {	KEYCODE_INVALID, 0,		0,		    },
 };
 
-const T_REMAPPING remapping_directx_106[] =
+static const T_REMAPPING remapping_directx_106[] =
 {
-  {	1,  SDLK_BACKSLASH,	KEY88_UNDERSCORE,	},	/* \ _ ロ   */
-  {	1,  SDLK_LMETA,		KEY88_KANA,		},	/* 左Window */
-  {	1,  SDLK_RALT,		KEY88_ZENKAKU,		},	/* 右Alt    */
-/*{	1,  SDLK_RCTRL,		KEY88_UNDERSCORE,	},*/	/* 右Ctrl   */
-  {	1,  SDLK_MENU,		KEY88_SYS_MENU, 	},	/* Menu     */
-/*{	2,  148,		0,			},*/	/* 半角全角 */
-  {	2,  144,		KEY88_CARET,		},	/* ^        */
-  {	2,  125,		KEY88_YEN,		},	/* \        */
-  {	2,  145,		KEY88_AT,		},	/* @        */
-  {	2,  146,		KEY88_COLON,		},	/* :        */
-  {	2,  123,		KEY88_KETTEI,		},	/* 無変換   */
-  {	2,  121,		KEY88_HENKAN,		},	/* 変換     */
-  {	2,  112,		KEY88_KANA,		},	/* カタひら */
-  {	0,  0,			0,			},
+    {	KEYCODE_SYM,  SDLK_BACKSLASH,	KEY88_UNDERSCORE,   },   /* \ _ ロ   */
+    {	KEYCODE_SYM,  SDLK_LMETA,	KEY88_KANA,	    },   /* 左Window */
+    {	KEYCODE_SYM,  SDLK_RALT,	KEY88_ZENKAKU,	    },   /* 右Alt    */
+/*  {	KEYCODE_SYM,  SDLK_RCTRL,	KEY88_UNDERSCORE,   },*/ /* 右Ctrl   */
+    {	KEYCODE_SYM,  SDLK_MENU,	KEY88_SYS_MENU,     },   /* Menu     */
+/*  {	KEYCODE_SCAN,    148,		0,		    },*/ /* 半角全角 */
+    {	KEYCODE_SCAN,    144,		KEY88_CARET,	    },   /* ^        */
+    {	KEYCODE_SCAN,    125,		KEY88_YEN,	    },   /* \        */
+    {	KEYCODE_SCAN,    145,		KEY88_AT,	    },   /* @        */
+    {	KEYCODE_SCAN,    146,		KEY88_COLON,	    },   /* :        */
+    {	KEYCODE_SCAN,    123,		KEY88_KETTEI,	    },   /* 無変換   */
+    {	KEYCODE_SCAN,    121,		KEY88_HENKAN,	    },   /* 変換     */
+    {	KEYCODE_SCAN,    112,		KEY88_KANA,	    },   /* カタひら */
+    {	KEYCODE_INVALID, 0,		0,		    },
 };
 
-const T_REMAPPING remapping_directx_101[] =
+static const T_REMAPPING remapping_directx_101[] =
 {
-  {	1,  SDLK_BACKQUOTE,	KEY88_YEN,		}, 	/* `        */
-  {	1,  SDLK_EQUALS,	KEY88_CARET,		}, 	/* =        */
-  {	1,  SDLK_BACKSLASH,	KEY88_AT,		},	/* \        */
-  {	1,  SDLK_QUOTE,		KEY88_COLON,		}, 	/* '        */
-  {	1,  SDLK_LMETA,		KEY88_KANA,		},	/* 左Window */
-  {	1,  SDLK_RALT,		KEY88_ZENKAKU,		},	/* 右Alt    */
-  {	1,  SDLK_RCTRL,		KEY88_UNDERSCORE,	},	/* 右Ctrl   */
-  {	1,  SDLK_MENU,		KEY88_SYS_MENU, 	},	/* Menu     */
-  {	2,  148,		KEY88_YEN,		},
-  {	2,  144,		KEY88_CARET,		},
-  {	2,  145,		KEY88_AT,		},
-  {	2,  146,		KEY88_COLON,		},
-  {	2,  125,		KEY88_YEN,		},
-  {	0,  0,			0,			},
+    {	KEYCODE_SYM,  SDLK_BACKQUOTE,	KEY88_YEN,	    },   /* `        */
+    {	KEYCODE_SYM,  SDLK_EQUALS,	KEY88_CARET,	    },   /* =        */
+    {	KEYCODE_SYM,  SDLK_BACKSLASH,	KEY88_AT,	    },   /* \        */
+    {	KEYCODE_SYM,  SDLK_QUOTE,	KEY88_COLON,	    },   /* '        */
+    {	KEYCODE_SYM,  SDLK_LMETA,	KEY88_KANA,	    },   /* 左Window */
+    {	KEYCODE_SYM,  SDLK_RALT,	KEY88_ZENKAKU,	    },   /* 右Alt    */
+    {	KEYCODE_SYM,  SDLK_RCTRL,	KEY88_UNDERSCORE,   },   /* 右Ctrl   */
+    {	KEYCODE_SYM,  SDLK_MENU,	KEY88_SYS_MENU,     },   /* Menu     */
+    {	KEYCODE_SCAN,    148,		KEY88_YEN,	    },
+    {	KEYCODE_SCAN,    144,		KEY88_CARET,	    },
+    {	KEYCODE_SCAN,    145,		KEY88_AT,	    },
+    {	KEYCODE_SCAN,    146,		KEY88_COLON,	    },
+    {	KEYCODE_SCAN,    125,		KEY88_YEN,	    },
+    {	KEYCODE_INVALID, 0,		0,		    },
 };
 
-const T_REMAPPING remapping_toolbox_106[] =
+static const T_REMAPPING remapping_toolbox_106[] =
 {
-  {	1,  SDLK_LMETA,		KEY88_SYS_MENU,		},
-  {	1,  SDLK_RMETA,		KEY88_SYS_MENU,		},
-  {	2,  95,			KEY88_KP_COMMA,		},
-/*{	2,  102,		0,			},*/	 /* 英数    */
-/*{	2,  104,		0,			},*/	 /* カナ    */
-  {	0,  0,			0,			},
+    {	KEYCODE_SYM,  SDLK_LMETA,	KEY88_SYS_MENU,	    },
+    {	KEYCODE_SYM,  SDLK_RMETA,	KEY88_SYS_MENU,	    },
+    {	KEYCODE_SCAN,    95,		KEY88_KP_COMMA,	    },
+/*  {	KEYCODE_SCAN,    102,		0,		    },*/ /* 英数     */
+/*  {	KEYCODE_SCAN,    104,		0,		    },*/ /* カナ     */
+    {	KEYCODE_INVALID, 0,		0,		    },
 };
 
-const T_REMAPPING remapping_toolbox_101[] =
+static const T_REMAPPING remapping_toolbox_101[] =
 {
-  {	1,  SDLK_LMETA,		KEY88_SYS_MENU,		},
-  {	1,  SDLK_RMETA,		KEY88_SYS_MENU,		},
-  {	1,  SDLK_BACKQUOTE,	KEY88_YEN,		},
-  {	1,  SDLK_EQUALS,	KEY88_CARET,		},
-  {	1,  SDLK_BACKSLASH,	KEY88_AT,		},
-  {	1,  SDLK_QUOTE,		KEY88_COLON,		},
-  {	0,  0,			0,			},
+    {	KEYCODE_SYM,  SDLK_LMETA,	KEY88_SYS_MENU,	    },
+    {	KEYCODE_SYM,  SDLK_RMETA,	KEY88_SYS_MENU,	    },
+    {	KEYCODE_SYM,  SDLK_BACKQUOTE,	KEY88_YEN,	    },
+    {	KEYCODE_SYM,  SDLK_EQUALS,	KEY88_CARET,	    },
+    {	KEYCODE_SYM,  SDLK_BACKSLASH,	KEY88_AT,	    },
+    {	KEYCODE_SYM,  SDLK_QUOTE,	KEY88_COLON,	    },
+    {	KEYCODE_INVALID, 0,		0,		    },
 };
 
-const T_REMAPPING remapping_dummy[] =
+static const T_REMAPPING remapping_dummy[] =
 {
-  {	0,  0,			0,			},
+    {	KEYCODE_INVALID, 0,		0,		    },
 };
 
 
 
 /*----------------------------------------------------------------------
- * ソフトウェア NumLock オン/オフ 時のマッピング変更テーブル
+ * ソフトウェア NumLock オン時の キーコード変換情報 (デフォルト)
  *----------------------------------------------------------------------*/
 
 static const T_BINDING binding_106[] =
 {
-  {	1,	SDLK_5,		0,	KEY88_HOME,		},
-  {	1,	SDLK_6,		0,	KEY88_HELP,		},
-  {	1,	SDLK_7,		0,	KEY88_KP_7,		},
-  {	1,	SDLK_8,		0,	KEY88_KP_8,		},
-  {	1,	SDLK_9,		0,	KEY88_KP_9,		},
-  {	1,	SDLK_0,		0,	KEY88_KP_MULTIPLY,	},
-  {	1,	SDLK_MINUS,	0,	KEY88_KP_SUB,		},
-  {	1,	SDLK_CARET,	0,	KEY88_KP_DIVIDE,	},
-  {	1,	SDLK_u,		0,	KEY88_KP_4,		},
-  {	1,	SDLK_i,		0,	KEY88_KP_5,		},
-  {	1,	SDLK_o,		0,	KEY88_KP_6,		},
-  {	1,	SDLK_p,		0,	KEY88_KP_ADD,		},
-  {	1,	SDLK_j,		0,	KEY88_KP_1,		},
-  {	1,	SDLK_k,		0,	KEY88_KP_2,		},
-  {	1,	SDLK_l,		0,	KEY88_KP_3,		},
-  {	1,	SDLK_SEMICOLON,	0,	KEY88_KP_EQUAL,		},
-  {	1,	SDLK_m,		0,	KEY88_KP_0,		},
-  {	1,	SDLK_COMMA,	0,	KEY88_KP_COMMA,		},
-  {	1,	SDLK_PERIOD,	0,	KEY88_KP_PERIOD,	},
-  {	1,	SDLK_SLASH,	0,	KEY88_RETURNR,		},
-  {	0,	0,		0,	0,			},
+    {	KEYCODE_SYM,	SDLK_5,		KEY88_HOME,		0,	},
+    {	KEYCODE_SYM,	SDLK_6,		KEY88_HELP,		0,	},
+    {	KEYCODE_SYM,	SDLK_7,		KEY88_KP_7,		0,	},
+    {	KEYCODE_SYM,	SDLK_8,		KEY88_KP_8,		0,	},
+    {	KEYCODE_SYM,	SDLK_9,		KEY88_KP_9,		0,	},
+    {	KEYCODE_SYM,	SDLK_0,		KEY88_KP_MULTIPLY,	0,	},
+    {	KEYCODE_SYM,	SDLK_MINUS,	KEY88_KP_SUB,		0,	},
+    {	KEYCODE_SYM,	SDLK_CARET,	KEY88_KP_DIVIDE,	0,	},
+    {	KEYCODE_SYM,	SDLK_u,		KEY88_KP_4,		0,	},
+    {	KEYCODE_SYM,	SDLK_i,		KEY88_KP_5,		0,	},
+    {	KEYCODE_SYM,	SDLK_o,		KEY88_KP_6,		0,	},
+    {	KEYCODE_SYM,	SDLK_p,		KEY88_KP_ADD,		0,	},
+    {	KEYCODE_SYM,	SDLK_j,		KEY88_KP_1,		0,	},
+    {	KEYCODE_SYM,	SDLK_k,		KEY88_KP_2,		0,	},
+    {	KEYCODE_SYM,	SDLK_l,		KEY88_KP_3,		0,	},
+    {	KEYCODE_SYM,	SDLK_SEMICOLON,	KEY88_KP_EQUAL,		0,	},
+    {	KEYCODE_SYM,	SDLK_m,		KEY88_KP_0,		0,	},
+    {	KEYCODE_SYM,	SDLK_COMMA,	KEY88_KP_COMMA,		0,	},
+    {	KEYCODE_SYM,	SDLK_PERIOD,	KEY88_KP_PERIOD,	0,	},
+    {	KEYCODE_SYM,	SDLK_SLASH,	KEY88_RETURNR,		0,	},
+    {	KEYCODE_INVALID,0,		0,			0,	},
 };
 
 static const T_BINDING binding_101[] =
 {
-  {	1,	SDLK_5,		0,	KEY88_HOME,		},
-  {	1,	SDLK_6,		0,	KEY88_HELP,		},
-  {	1,	SDLK_7,		0,	KEY88_KP_7,		},
-  {	1,	SDLK_8,		0,	KEY88_KP_8,		},
-  {	1,	SDLK_9,		0,	KEY88_KP_9,		},
-  {	1,	SDLK_0,		0,	KEY88_KP_MULTIPLY,	},
-  {	1,	SDLK_MINUS,	0,	KEY88_KP_SUB,		},
-  {	1,	SDLK_EQUALS,	0,	KEY88_KP_DIVIDE,	},
-  {	1,	SDLK_u,		0,	KEY88_KP_4,		},
-  {	1,	SDLK_i,		0,	KEY88_KP_5,		},
-  {	1,	SDLK_o,		0,	KEY88_KP_6,		},
-  {	1,	SDLK_p,		0,	KEY88_KP_ADD,		},
-  {	1,	SDLK_j,		0,	KEY88_KP_1,		},
-  {	1,	SDLK_k,		0,	KEY88_KP_2,		},
-  {	1,	SDLK_l,		0,	KEY88_KP_3,		},
-  {	1,	SDLK_SEMICOLON,	0,	KEY88_KP_EQUAL,		},
-  {	1,	SDLK_m,		0,	KEY88_KP_0,		},
-  {	1,	SDLK_COMMA,	0,	KEY88_KP_COMMA,		},
-  {	1,	SDLK_PERIOD,	0,	KEY88_KP_PERIOD,	},
-  {	1,	SDLK_SLASH,	0,	KEY88_RETURNR,		},
-  {	0,	0,		0,	0,			},
+    {	KEYCODE_SYM,	SDLK_5,		KEY88_HOME,		0,	},
+    {	KEYCODE_SYM,	SDLK_6,		KEY88_HELP,		0,	},
+    {	KEYCODE_SYM,	SDLK_7,		KEY88_KP_7,		0,	},
+    {	KEYCODE_SYM,	SDLK_8,		KEY88_KP_8,		0,	},
+    {	KEYCODE_SYM,	SDLK_9,		KEY88_KP_9,		0,	},
+    {	KEYCODE_SYM,	SDLK_0,		KEY88_KP_MULTIPLY,	0,	},
+    {	KEYCODE_SYM,	SDLK_MINUS,	KEY88_KP_SUB,		0,	},
+    {	KEYCODE_SYM,	SDLK_EQUALS,	KEY88_KP_DIVIDE,	0,	},
+    {	KEYCODE_SYM,	SDLK_u,		KEY88_KP_4,		0,	},
+    {	KEYCODE_SYM,	SDLK_i,		KEY88_KP_5,		0,	},
+    {	KEYCODE_SYM,	SDLK_o,		KEY88_KP_6,		0,	},
+    {	KEYCODE_SYM,	SDLK_p,		KEY88_KP_ADD,		0,	},
+    {	KEYCODE_SYM,	SDLK_j,		KEY88_KP_1,		0,	},
+    {	KEYCODE_SYM,	SDLK_k,		KEY88_KP_2,		0,	},
+    {	KEYCODE_SYM,	SDLK_l,		KEY88_KP_3,		0,	},
+    {	KEYCODE_SYM,	SDLK_SEMICOLON,	KEY88_KP_EQUAL,		0,	},
+    {	KEYCODE_SYM,	SDLK_m,		KEY88_KP_0,		0,	},
+    {	KEYCODE_SYM,	SDLK_COMMA,	KEY88_KP_COMMA,		0,	},
+    {	KEYCODE_SYM,	SDLK_PERIOD,	KEY88_KP_PERIOD,	0,	},
+    {	KEYCODE_SYM,	SDLK_SLASH,	KEY88_RETURNR,		0,	},
+    {	KEYCODE_INVALID,0,		0,			0,	},
 };
 
 static const T_BINDING binding_directx[] =
 {
-  {	1,	SDLK_5,		0,	KEY88_HOME,		},
-  {	1,	SDLK_6,		0,	KEY88_HELP,		},
-  {	1,	SDLK_7,		0,	KEY88_KP_7,		},
-  {	1,	SDLK_8,		0,	KEY88_KP_8,		},
-  {	1,	SDLK_9,		0,	KEY88_KP_9,		},
-  {	1,	SDLK_0,		0,	KEY88_KP_MULTIPLY,	},
-  {	1,	SDLK_MINUS,	0,	KEY88_KP_SUB,		},
-  {	1,	SDLK_EQUALS,	0,	KEY88_KP_DIVIDE,	},
-  {	2,	144,		0,	KEY88_KP_DIVIDE,	},
-  {	1,	SDLK_u,		0,	KEY88_KP_4,		},
-  {	1,	SDLK_i,		0,	KEY88_KP_5,		},
-  {	1,	SDLK_o,		0,	KEY88_KP_6,		},
-  {	1,	SDLK_p,		0,	KEY88_KP_ADD,		},
-  {	1,	SDLK_j,		0,	KEY88_KP_1,		},
-  {	1,	SDLK_k,		0,	KEY88_KP_2,		},
-  {	1,	SDLK_l,		0,	KEY88_KP_3,		},
-  {	1,	SDLK_SEMICOLON,	0,	KEY88_KP_EQUAL,		},
-  {	1,	SDLK_m,		0,	KEY88_KP_0,		},
-  {	1,	SDLK_COMMA,	0,	KEY88_KP_COMMA,		},
-  {	1,	SDLK_PERIOD,	0,	KEY88_KP_PERIOD,	},
-  {	1,	SDLK_SLASH,	0,	KEY88_RETURNR,		},
-  {	0,	0,		0,	0,			},
+    {	KEYCODE_SYM,	SDLK_5,		KEY88_HOME,		0,	},
+    {	KEYCODE_SYM,	SDLK_6,		KEY88_HELP,		0,	},
+    {	KEYCODE_SYM,	SDLK_7,		KEY88_KP_7,		0,	},
+    {	KEYCODE_SYM,	SDLK_8,		KEY88_KP_8,		0,	},
+    {	KEYCODE_SYM,	SDLK_9,		KEY88_KP_9,		0,	},
+    {	KEYCODE_SYM,	SDLK_0,		KEY88_KP_MULTIPLY,	0,	},
+    {	KEYCODE_SYM,	SDLK_MINUS,	KEY88_KP_SUB,		0,	},
+    {	KEYCODE_SYM,	SDLK_EQUALS,	KEY88_KP_DIVIDE,	0,	},
+    {	KEYCODE_SCAN,	144,		KEY88_KP_DIVIDE,	0,	},
+    {	KEYCODE_SYM,	SDLK_u,		KEY88_KP_4,		0,	},
+    {	KEYCODE_SYM,	SDLK_i,		KEY88_KP_5,		0,	},
+    {	KEYCODE_SYM,	SDLK_o,		KEY88_KP_6,		0,	},
+    {	KEYCODE_SYM,	SDLK_p,		KEY88_KP_ADD,		0,	},
+    {	KEYCODE_SYM,	SDLK_j,		KEY88_KP_1,		0,	},
+    {	KEYCODE_SYM,	SDLK_k,		KEY88_KP_2,		0,	},
+    {	KEYCODE_SYM,	SDLK_l,		KEY88_KP_3,		0,	},
+    {	KEYCODE_SYM,	SDLK_SEMICOLON,	KEY88_KP_EQUAL,		0,	},
+    {	KEYCODE_SYM,	SDLK_m,		KEY88_KP_0,		0,	},
+    {	KEYCODE_SYM,	SDLK_COMMA,	KEY88_KP_COMMA,		0,	},
+    {	KEYCODE_SYM,	SDLK_PERIOD,	KEY88_KP_PERIOD,	0,	},
+    {	KEYCODE_SYM,	SDLK_SLASH,	KEY88_RETURNR,		0,	},
+    {	KEYCODE_INVALID,0,		0,			0,	},
 };
 
-
-
-/******************************************************************************
- * メニューに入る際のキーの名称を返す
- *	とりあえず、起動時のステータスの表示にて使用。
- *	本当はメニューモードの中でも反映させる必要があるのだが ………
- *		面倒なので、実装は今後の課題にしよう
- *****************************************************************************/
-const	char	*get_keysym_menu( void )
-{
-#if	defined( QUASI88_FMAC )
-  if( use_cmdkey ){
-    return	"Command";
-  }
-#endif
-
-  return	"F12";
-}
 
 
 /******************************************************************************
@@ -586,125 +612,158 @@ const	char	*get_keysym_menu( void )
  *
  *	1/60毎に呼び出される。
  *****************************************************************************/
-static	int	analyze_keyconf_file( const char *video_driver );
+static	int	joystick_init(void);
+static	void	joystick_exit(void);
+static	int	analyze_keyconf_file(void);
+
+static	char	video_driver[32];
 
 /*
  * これは 起動時に1回だけ呼ばれる
  */
-void	event_handle_init( void )
+void	event_init(void)
 {
-  const T_REMAPPING *map;
-  const T_BINDING   *bin;
-  int i;
-  char video_driver[32];
+    const T_REMAPPING *map;
+    const T_BINDING   *bin;
+    int i;
 
+    /* ジョイスティック初期化 */
 
-  if( SDL_VideoDriverName( video_driver, sizeof(video_driver) ) == NULL ){
-    memset( video_driver, 0, sizeof(video_driver) );
-  }
-
-  memset( keysym2key88, 0, sizeof(keysym2key88) );
-  for( i=0; i<COUNTOF(scancode2key88); i++ ){
-    scancode2key88[ i ] = -1;
-  }
-  memset( binding, 0, sizeof(binding) );
-
-  function_f[ 11 ] = FN_STATUS;
-  function_f[ 12 ] = FN_MENU;
-
-
-
-  switch( keyboard_type ){
-
-  case 0:					/* デフォルトキーボード */
-    if( analyze_keyconf_file( video_driver ) ){
-      ;
-    }else{
-      memcpy( keysym2key88, keysym2key88_default,sizeof(keysym2key88_default));
-      memcpy( binding, binding_106, sizeof(binding_106) );
-    }
-    break;
-
-
-  case 1:					/* 106日本語キーボード */
-  case 2:					/* 101英語キーボード ? */
-    memcpy( keysym2key88, keysym2key88_default, sizeof(keysym2key88_default) );
-
-#if	defined( QUASI88_FUNIX )
-
-    if( keyboard_type == 1 ){ map = remapping_x11_106;	bin = binding_106; }
-    else                    { map = remapping_x11_101;	bin = binding_101; }
-
-#elif	defined( QUASI88_FWIN )
-
-    if( strcmp( video_driver, "directx" ) == 0 ){
-      if( keyboard_type == 1 ) map = remapping_directx_106;
-      else                     map = remapping_directx_101;
-      bin = binding_directx;
-    }else{
-      if( keyboard_type == 1 ) map = remapping_windib_106;
-      else                     map = remapping_windib_101;
-      bin = binding_101;
+    if (use_joydevice) {
+	if (verbose_proc) printf("Initializing Joystick System ... ");
+	i = joystick_init();
+	if (verbose_proc) {
+	    if (i) printf("OK (found %d joystick(s))\n", i);
+	    else   printf("FAILED\n");
+	}
     }
 
-#elif	defined( QUASI88_FMAC )
 
-    if( keyboard_type == 1 ){ map = remapping_toolbox_106; bin = binding_106; }
-    else                    { map = remapping_toolbox_101; bin = binding_101; }
+    /* キーマッピング初期化 */
 
-    if( use_cmdkey == FALSE ){
-      map += 2;
+    if (SDL_VideoDriverName(video_driver, sizeof(video_driver)) == NULL) {
+	memset(video_driver, 0, sizeof(video_driver));
     }
+
+    memset(keysym2key88, 0, sizeof(keysym2key88));
+    for (i=0; i<COUNTOF(scancode2key88); i++) {
+	scancode2key88[ i ] = -1;
+    }
+    memset(binding, 0, sizeof(binding));
+
+
+
+    switch (keyboard_type) {
+
+    case 0:					/* デフォルトキーボード */
+	if (analyze_keyconf_file()) {
+	    ;
+	} else {
+	    memcpy(keysym2key88,
+		   keysym2key88_default, sizeof(keysym2key88_default));
+	    memcpy(binding,
+		   binding_106, sizeof(binding_106));
+	}
+	break;
+
+
+    case 1:					/* 106日本語キーボード */
+    case 2:					/* 101英語キーボード ? */
+	memcpy(keysym2key88,
+	       keysym2key88_default, sizeof(keysym2key88_default));
+
+#if	defined(QUASI88_FUNIX)
+
+	if (keyboard_type == 1) {
+	    map = remapping_x11_106;
+	    bin = binding_106;
+	} else {
+	    map = remapping_x11_101;
+	    bin = binding_101;
+	}
+
+#elif	defined(QUASI88_FWIN)
+
+	if (strcmp(video_driver, "directx") == 0) {
+	    if (keyboard_type == 1) map = remapping_directx_106;
+	    else                    map = remapping_directx_101;
+	    bin = binding_directx;
+	} else {
+	    if (keyboard_type == 1) map = remapping_windib_106;
+	    else                    map = remapping_windib_101;
+	    bin = binding_101;
+	}
+
+#elif	defined(QUASI88_FMAC)
+
+	if (keyboard_type == 1) {
+	    map = remapping_toolbox_106;
+	    bin = binding_106;
+	} else {
+	    map = remapping_toolbox_101;
+	    bin = binding_101;
+	}
+
+	if (use_cmdkey == FALSE) {
+	    map += 2;
+	}
 
 #else
-    map = remapping_dummy;
-    bin = binding_106;
+	map = remapping_dummy;
+	bin = binding_106;
 #endif
 
-    for( ;  map->type;  map ++ ){
+	for ( ; map->type; map ++) {
 
-      if      ( map->type == 1 ){
+	    if        (map->type == KEYCODE_SYM) {
 
-	keysym2key88[ map->code ] = map->key88;
+		keysym2key88[ map->code ] = map->key88;
 
-      }else if( map->type == 2 ){
+	    } else if (map->type == KEYCODE_SCAN) {
 
-	scancode2key88[ map->code ] = map->key88;
+		scancode2key88[ map->code ] = map->key88;
 
-      }
+	    }
+	}
+
+	for (i=0; i<COUNTOF(binding); i++) {
+	    if (bin->type == KEYCODE_INVALID) break;
+
+	    binding[ i ].type      = bin->type;
+	    binding[ i ].code      = bin->code;
+	    binding[ i ].org_key88 = bin->org_key88;
+	    binding[ i ].new_key88 = bin->new_key88;
+	    bin ++;
+	}
+	break;
     }
 
-    for( i=0; i<COUNTOF(binding); i++ ){
-      if( bin->type == 0 ) break;
 
-      binding[ i ].type      = bin->type;
-      binding[ i ].code      = bin->code;
-      binding[ i ].org_key88 = bin->org_key88;
-      binding[ i ].new_key88 = bin->new_key88;
-      bin ++;
+
+    /* ソフトウェアNumLock 時のキー差し替えの準備 */
+
+    for (i=0; i<COUNTOF(binding); i++) {
+
+	if        (binding[i].type == KEYCODE_SYM) {
+
+	    binding[i].org_key88 = keysym2key88[ binding[i].code ];
+
+	} else if (binding[i].type == KEYCODE_SCAN) {
+
+	    binding[i].org_key88 = scancode2key88[ binding[i].code ];
+
+	} else {
+	    break;
+	}
     }
-    break;
-  }
 
 
-
-  /* ソフトウェアNumLock 時のキー差し替えの準備 */
-
-  for( i=0; i<COUNTOF(binding); i++ ){
-
-    if      ( binding[i].type == 1 ){
-
-      binding[i].org_key88 = keysym2key88[ binding[i].code ];
-
-    }else if( binding[i].type == 2 ){
-
-      binding[i].org_key88 = scancode2key88[ binding[i].code ];
-
-    }else{
-      break;
+    /* test */
+    if (show_fps) {
+	if (display_fps_init() == FALSE) {
+	    show_fps = FALSE;
+	}
     }
-  }
-
 }
 
 
@@ -712,184 +771,205 @@ void	event_handle_init( void )
 /*
  * 約 1/60 毎に呼ばれる
  */
-void	event_handle( void )
+void	event_update(void)
 {
-  static enum {
-    AXIS_U = 0x01,
-    AXIS_D = 0x02,
-    AXIS_L = 0x04,
-    AXIS_R = 0x08
-  } pad_axis = 0x00;
+    SDL_Event E;
+    SDLKey keysym;
+    int    key88, x, y;
 
 
-  SDL_Event E;
-  SDLKey keysym;
-  int    key88, x, y;
+    SDL_PumpEvents();		/* イベントを汲み上げる */
 
+    while (SDL_PeepEvents(&E, 1, SDL_GETEVENT,
+			  SDL_EVENTMASK(SDL_KEYDOWN)        | 
+			  SDL_EVENTMASK(SDL_KEYUP)          |
+			  SDL_EVENTMASK(SDL_MOUSEMOTION)    |
+			  SDL_EVENTMASK(SDL_MOUSEBUTTONDOWN)|
+			  SDL_EVENTMASK(SDL_MOUSEBUTTONUP)  |
+			  SDL_EVENTMASK(SDL_JOYAXISMOTION)  |
+			  SDL_EVENTMASK(SDL_JOYBUTTONDOWN)  |
+			  SDL_EVENTMASK(SDL_JOYBUTTONUP)    |
+			  SDL_EVENTMASK(SDL_VIDEOEXPOSE)    |
+			  SDL_EVENTMASK(SDL_ACTIVEEVENT)    |
+			  SDL_EVENTMASK(SDL_USEREVENT)      |
+			  SDL_EVENTMASK(SDL_QUIT))) {
 
-  SDL_PumpEvents();		/* イベントを汲み上げる */
+	switch (E.type) {
 
-  while( SDL_PeepEvents(&E, 1, SDL_GETEVENT,
-			SDL_EVENTMASK(SDL_KEYDOWN)        | 
-			SDL_EVENTMASK(SDL_KEYUP)          |
-			SDL_EVENTMASK(SDL_MOUSEMOTION)    |
-			SDL_EVENTMASK(SDL_MOUSEBUTTONDOWN)|
-			SDL_EVENTMASK(SDL_MOUSEBUTTONUP)  |
-			SDL_EVENTMASK(SDL_JOYAXISMOTION)  |
-			SDL_EVENTMASK(SDL_JOYBUTTONDOWN)  |
-			SDL_EVENTMASK(SDL_JOYBUTTONUP)    |
-			SDL_EVENTMASK(SDL_VIDEOEXPOSE)    |
-			SDL_EVENTMASK(SDL_ACTIVEEVENT)    |
-    			SDL_EVENTMASK(SDL_QUIT)) ) {
+	case SDL_KEYDOWN:	/*------------------------------------------*/
+	case SDL_KEYUP:
 
-    switch( E.type ){
+	    keysym  = E.key.keysym.sym;
 
-    case SDL_KEYDOWN:		/*------------------------------------------*/
-    case SDL_KEYUP:
+	    if (now_unicode == FALSE) {	/* キーASCII時 */
 
-      keysym  = E.key.keysym.sym;
+		/* scancode2key88[] が定義済なら、そのキーコードを優先する */
+		if (E.key.keysym.scancode < COUNTOF(scancode2key88) &&
+		    scancode2key88[ E.key.keysym.scancode ] >= 0) {
 
-      if( now_unicode ){		/* キーUNICODE時 (メニューなど) */
+		    key88 = scancode2key88[ E.key.keysym.scancode ];
 
-	if( E.key.keysym.unicode <= 0xff &&
-	    isprint( E.key.keysym.unicode ) ){
-	  keysym = E.key.keysym.unicode;
-	}
-	if( SDLK_SPACE <= keysym && keysym < SDLK_DELETE ) key88 = keysym;
-	else                                 key88 = keysym2key88[ keysym ];
+		} else {
+		    key88 = keysym2key88[ keysym ];
+		}
 
-      }else{				/* キーASCII時 */
+	    } else {			/* キーUNICODE時 (メニューなど) */
 
-	key88 = keysym2key88[ keysym ];
+		if (E.key.keysym.unicode <= 0xff &&
+		    isprint(E.key.keysym.unicode)) {
+		    keysym = E.key.keysym.unicode;
+		}
+		if (SDLK_SPACE <= keysym && keysym < SDLK_DELETE) {
+		    /* ASCIIコードの範囲内では、SDLK_xx と KEY88_xx は等価 */
+		    key88 = keysym;
+		} else {
+		    key88 = keysym2key88[ keysym ];
+		}
+	    }
 
-	if( E.key.keysym.scancode < COUNTOF(scancode2key88) &&
-	    scancode2key88[ E.key.keysym.scancode ] >= 0    ){
+	    /*if (E.type==SDL_KEYDOWN)
+		printf("scan=%3d : %04x=%-16s -> %d\n", E.key.keysym.scancode,
+		       keysym, debug_sdlkeysym(keysym), key88);*/
+	    /*printf("%d %d %d\n",key88,keysym,E.key.keysym.scancode);*/
+	    quasi88_key(key88, (E.type == SDL_KEYDOWN));
 
-	  key88 = scancode2key88[ E.key.keysym.scancode ];
-	}
+	    break;
 
-/*printf("%d %d %d\n",key88,keysym,E.key.keysym.scancode );*/
-      }
-      pc88_key( key88, (E.type==SDL_KEYDOWN) );
-
-      break;
-
-    case SDL_MOUSEMOTION:	/*------------------------------------------*/
-      if( mouse_rel_move ){		/* マウスがウインドウの端に届いても */
+	case SDL_MOUSEMOTION:	/*------------------------------------------*/
+	    if (sdl_mouse_rel_move) {	/* マウスがウインドウの端に届いても */
 					/* 相対的な動きを検出できる場合     */
-	x = E.motion.xrel;
-	y = E.motion.yrel;
-#if 0
-	if( get_emu_mode()==EXEC ){	/* マウスの速度調整が可能だけども */
-	  x /= 10;			/* マウスを表示している場合、     */
-	  y /= 10;			/* 表示位置と座標がずれるので注意 */
+		x = E.motion.xrel;
+		y = E.motion.yrel;
+
+		quasi88_mouse_moved_rel(x, y);
+
+	    } else {
+
+		x = E.motion.x;
+		y = E.motion.y;
+
+		quasi88_mouse_moved_abs(x, y);
+	    }
+	    break;
+
+	case SDL_MOUSEBUTTONDOWN:/*------------------------------------------*/
+	case SDL_MOUSEBUTTONUP:
+	    /* マウス移動イベントも同時に処理する必要があるなら、
+	       quasi88_mouse_moved_abs/rel 関数をここで呼び出しておく */
+
+	    switch (E.button.button) {
+	    case SDL_BUTTON_LEFT:	key88 = KEY88_MOUSE_L;		break;
+	    case SDL_BUTTON_MIDDLE:	key88 = KEY88_MOUSE_M;		break;
+	    case SDL_BUTTON_RIGHT:	key88 = KEY88_MOUSE_R;		break;
+	    case SDL_BUTTON_WHEELUP:	key88 = KEY88_MOUSE_WUP;	break;
+	    case SDL_BUTTON_WHEELDOWN:	key88 = KEY88_MOUSE_WDN;	break;
+	    default:			key88 = 0;			break;
+	    }
+	    if (key88) {
+		quasi88_mouse(key88, (E.type == SDL_MOUSEBUTTONDOWN));
+	    }
+	    break;
+
+	case SDL_JOYAXISMOTION:	/*------------------------------------------*/
+	    /*printf("%d %d %d\n",E.jaxis.which,E.jaxis.axis,E.jaxis.value);*/
+
+	    if (E.jbutton.which < JOY_MAX &&
+		joy_info[E.jbutton.which].dev != NULL) {
+
+		int now, chg;
+		T_JOY_INFO *joy = &joy_info[E.jbutton.which];
+		int offset = (joy->num) * KEY88_PAD_OFFSET;
+
+		if (E.jaxis.axis == 0) {	/* 左右方向 */
+
+		    now = joy->axis & ~(AXIS_L|AXIS_R);
+
+		    if      (E.jaxis.value < -0x4000) now |= AXIS_L;
+		    else if (E.jaxis.value >  0x4000) now |= AXIS_R;
+
+		    chg = joy->axis ^ now;
+		    if (chg & AXIS_L) {
+			quasi88_pad(KEY88_PAD1_LEFT + offset,  (now & AXIS_L));
+		    }
+		    if (chg & AXIS_R) {
+			quasi88_pad(KEY88_PAD1_RIGHT + offset, (now & AXIS_R));
+		    }
+
+		} else {			/* 上下方向 */
+
+		    now = joy->axis & ~(AXIS_U|AXIS_D);
+
+		    if      (E.jaxis.value < -0x4000) now |= AXIS_U;
+		    else if (E.jaxis.value >  0x4000) now |= AXIS_D;
+
+		    chg = joy->axis ^ now;
+		    if (chg & AXIS_U) {
+			quasi88_pad(KEY88_PAD1_UP + offset,   (now & AXIS_U));
+		    }
+		    if (chg & AXIS_D) {
+			quasi88_pad(KEY88_PAD1_DOWN + offset, (now & AXIS_D));
+		    }
+		}
+		joy->axis = now;
+	    }
+	    break;
+
+	case SDL_JOYBUTTONDOWN:	/*------------------------------------------*/
+	case SDL_JOYBUTTONUP:
+	    /*printf("%d %d\n",E.jbutton.which,E.jbutton.button);*/
+
+	    if (E.jbutton.which < JOY_MAX &&
+		joy_info[E.jbutton.which].dev != NULL) {
+
+		T_JOY_INFO *joy = &joy_info[E.jbutton.which];
+		int offset = (joy->num) * KEY88_PAD_OFFSET;
+
+		if (E.jbutton.button < KEY88_PAD_BUTTON_MAX) {
+		    key88 = KEY88_PAD1_A + E.jbutton.button + offset;
+		    quasi88_pad(key88, (E.type == SDL_JOYBUTTONDOWN));
+		}
+	    }
+	    break;
+
+	case SDL_QUIT:		/*------------------------------------------*/
+	    if (verbose_proc) printf("Window Closed !\n");
+	    quasi88_quit();
+	    break;
+
+	case SDL_ACTIVEEVENT:	/*------------------------------------------*/
+	    /* -focus オプションを機能させたいなら、 
+	       quasi88_focus_in / quasi88_focus_out を適宜呼び出す必要がある */
+
+	    if (E.active.state & SDL_APPINPUTFOCUS) {
+		if (E.active.gain) {
+		    quasi88_focus_in();
+		} else {
+		    quasi88_focus_out();
+		}
+	    }
+	    break;
+
+	case SDL_VIDEOEXPOSE:	/*------------------------------------------*/
+	    quasi88_expose();
+	    break;
+
+	case SDL_USEREVENT:	/*------------------------------------------*/
+	    if (E.user.code == 1) {
+		display_fps();		/* test */
+	    }
+	    break;
 	}
-#endif
-	pc88_mouse_moved_rel( x, y );
-      
-
-      }else{
-
-	x = E.motion.x;
-	y = E.motion.y;
-
-	x -= SCREEN_DX;
-	y -= SCREEN_DY;
-	if     ( now_screen_size == SCREEN_SIZE_HALF )  { x *= 2; y *= 2; }
-#ifdef	SUPPORT_DOUBLE
-	else if( now_screen_size == SCREEN_SIZE_DOUBLE ){ x /= 2; y /= 2; }
-#endif
-	pc88_mouse_moved_abs( x, y );
-      }
-      break;
-
-
-    case SDL_MOUSEBUTTONDOWN:	/*------------------------------------------*/
-    case SDL_MOUSEBUTTONUP:
-
-      /* マウス移動イベントも同時に処理する必要があるなら、
-	 pc88_mouse_moved_abs/rel 関数をここで呼び出しておく */
-
-      if     ( E.button.button==SDL_BUTTON_LEFT      ) key88 = KEY88_MOUSE_L;
-      else if( E.button.button==SDL_BUTTON_MIDDLE    ) key88 = KEY88_MOUSE_M;
-      else if( E.button.button==SDL_BUTTON_RIGHT     ) key88 = KEY88_MOUSE_R;
-      else if( E.button.button==SDL_BUTTON_WHEELUP   ) key88 = KEY88_MOUSE_WUP;
-      else if( E.button.button==SDL_BUTTON_WHEELDOWN ) key88 = KEY88_MOUSE_WDN;
-      else break;
-
-      pc88_mouse( key88, (E.type==SDL_MOUSEBUTTONDOWN) );
-      break;
-
-
-    case SDL_JOYAXISMOTION:	/*------------------------------------------*/
-/*printf("%d %d %d\n",E.jaxis.which,E.jaxis.axis,E.jaxis.value);*/
-      if( E.jbutton.which == 0 ){
-	int now, chg;
-
-	if( E.jaxis.axis == 0 ){	/* 左右方向 */
-
-	  now = pad_axis & ~(AXIS_L|AXIS_R);
-
-	  if     ( E.jaxis.value < -0x4000 ) now |= AXIS_L;
-	  else if( E.jaxis.value >  0x4000 ) now |= AXIS_R;
-
-	  chg = pad_axis ^ now;
-	  if( chg & AXIS_L ) pc88_pad( KEY88_PAD_LEFT,  (now & AXIS_L) );
-	  if( chg & AXIS_R ) pc88_pad( KEY88_PAD_RIGHT, (now & AXIS_R) );
-
-	}else{				/* 上下方向 */
-
-	  now = pad_axis & ~(AXIS_U|AXIS_D);
-
-	  if     ( E.jaxis.value < -0x4000 ) now |= AXIS_U;
-	  else if( E.jaxis.value >  0x4000 ) now |= AXIS_D;
-
-	  chg = pad_axis ^ now;
-	  if( chg & AXIS_U ) pc88_pad( KEY88_PAD_UP,    (now & AXIS_U) );
-	  if( chg & AXIS_D ) pc88_pad( KEY88_PAD_DOWN,  (now & AXIS_D) );
-	}
-	pad_axis = now;
-      }
-      break;
-
-
-    case SDL_JOYBUTTONDOWN:	/*------------------------------------------*/
-    case SDL_JOYBUTTONUP:
-/*printf("%d %d\n",E.jbutton.which,E.jbutton.button);*/
-      if( E.jbutton.which == 0 ){
-	if( E.jbutton.button < 8 ){
-	  key88 = KEY88_PAD_A + E.jbutton.button;
-	  pc88_pad( key88, ( E.type==SDL_JOYBUTTONDOWN ) );
-	}
-      }
-      break;
-
-
-    case SDL_QUIT:		/*------------------------------------------*/
-      if( verbose_proc ) printf( "Window Closed.....\n" );
-      pc88_quit();
-      break;
-
-
-    case SDL_ACTIVEEVENT:	/*------------------------------------------*/
-      /* -focus オプションを機能させたいなら、 
-	 pc88_focus_in / pc88_focus_out を適宜呼び出す必要がある。 */
-
-      if( E.active.state & SDL_APPINPUTFOCUS ){
-	if( E.active.gain ){
-	  pc88_focus_in();
-	}else{
-	  pc88_focus_out();
-	}
-      }
-      break;
-
-
-    case SDL_VIDEOEXPOSE:	/*------------------------------------------*/
-      put_image_all();			/* EXPOSE 時は 勝手に再描画しておく */
-      break;
     }
-  }
+}
+
+
+
+/*
+ * これは 終了時に1回だけ呼ばれる
+ */
+void	event_exit(void)
+{
+    joystick_exit();
 }
 
 
@@ -900,22 +980,15 @@ void	event_handle( void )
  *	現在のマウスの絶対座標を *x, *y にセット
  ************************************************************************/
 
-void	init_mouse_position( int *x, int *y )
+void	event_get_mouse_pos(int *x, int *y)
 {
-  int win_x, win_y;
+    int win_x, win_y;
 
-  SDL_PumpEvents();
-  SDL_GetMouseState( &win_x, &win_y );
+    SDL_PumpEvents();
+    SDL_GetMouseState(&win_x, &win_y);
 
-  win_x -= SCREEN_DX;
-  win_y -= SCREEN_DY;
-
-  if     ( now_screen_size == SCREEN_SIZE_HALF )  { win_x *= 2;  win_y *= 2; }
-#ifdef	SUPPORT_DOUBLE
-  else if( now_screen_size == SCREEN_SIZE_DOUBLE ){ win_x /= 2;  win_y /= 2; }
-#endif
-  *x = win_x;
-  *y = win_y;
+    *x = win_x;
+    *y = win_y;
 }
 
 
@@ -926,36 +999,36 @@ void	init_mouse_position( int *x, int *y )
  *
  *****************************************************************************/
 
-INLINE	void	numlock_setup( int enable )
+static	void	numlock_setup(int enable)
 {
-  int i;
+    int i;
 
-  for( i=0; i<COUNTOF(binding); i++ ){
+    for (i=0; i<COUNTOF(binding); i++) {
 
-    if      ( binding[i].type == 1 ){
+	if        (binding[i].type == KEYCODE_SYM) {
 
-      if( enable ){
-	keysym2key88[ binding[i].code ] = binding[i].new_key88;
-      }else{
-	keysym2key88[ binding[i].code ] = binding[i].org_key88;
-      }
+	    if (enable) {
+		keysym2key88[ binding[i].code ] = binding[i].new_key88;
+	    } else {
+		keysym2key88[ binding[i].code ] = binding[i].org_key88;
+	    }
 
-    }else if( binding[i].type == 2 ){
+	} else if (binding[i].type == KEYCODE_SCAN) {
 
-      if( enable ){
-	scancode2key88[ binding[i].code ] = binding[i].new_key88;
-      }else{
-	scancode2key88[ binding[i].code ] = binding[i].org_key88;
-      }
+	    if (enable) {
+		scancode2key88[ binding[i].code ] = binding[i].new_key88;
+	    } else {
+		scancode2key88[ binding[i].code ] = binding[i].org_key88;
+	    }
 
-    }else{
-      break;
+	} else {
+	    break;
+	}
     }
-  }
 }
 
-int	numlock_on ( void ){ numlock_setup( TRUE );  return TRUE; }
-void	numlock_off( void ){ numlock_setup( FALSE ); }
+int	event_numlock_on (void){ numlock_setup(TRUE);  return TRUE; }
+void	event_numlock_off(void){ numlock_setup(FALSE); }
 
 
 
@@ -964,73 +1037,110 @@ void	numlock_off( void ){ numlock_setup( FALSE ); }
  *
  *****************************************************************************/
 
-void	event_init( void )
+void	event_switch(void)
 {
-  /* 既存のイベントをすべて破棄 */
-  /* なんてことは、しない ? */
+    /* 既存のイベントをすべて破棄 */
+    /* なんてことは、しない ? */
 
-  if( get_emu_mode() == EXEC ){
+    if (quasi88_is_exec()) {
 
-    if( use_unicode ){
+	if (use_unicode) {
 
-      /* キー押下を UNICODE に変換可能とする (処理が重いらしいので指定時のみ)*/
-      SDL_EnableUNICODE( 1 );
-      now_unicode = TRUE;
+	    /* キー押下を UNICODE に変換可能とする
+	       (処理が重いらしいので指定時のみ) */
+	    SDL_EnableUNICODE( 1 );
+	    now_unicode = TRUE;
 
-    }else{
+	} else {
 
-      /* キー押下を ASCII コードに変換可能とする */
-      SDL_EnableUNICODE( 0 );
-      now_unicode = FALSE;
+	    /* キー押下を ASCII コードに変換可能とする */
+	    SDL_EnableUNICODE( 0 );
+	    now_unicode = FALSE;
+	}
+
+    } else {
+
+	SDL_EnableUNICODE( 1 );
+	now_unicode = TRUE;
+
     }
-
-  }else{
-
-    SDL_EnableUNICODE( 1 );
-    now_unicode = TRUE;
-
-  }
-
-  /* マウス表示、グラブの設定 (ついでにキーリピートも) */
-  set_mouse_state();
 }
 
 
 
 /******************************************************************************
  * ジョイスティック
- *
- * 一度だけの初期化時点（ウインドウとか？）にて、オープンする。
  *****************************************************************************/
 
-int	joy_init( void )
+static	int	joystick_init(void)
 {
-  joy = NULL;
+    SDL_Joystick *dev;
+    int i, max, nr_button;
 
-  if( ! SDL_WasInit( SDL_INIT_JOYSTICK ) ){
-    if( SDL_InitSubSystem( SDL_INIT_JOYSTICK ) ){
-      return FALSE;
+    /* ワーク初期化 */
+    joystick_num = 0;
+
+    memset(joy_info, 0, sizeof(joy_info));
+    for (i=0; i<JOY_MAX; i++) {
+	joy_info[i].dev = NULL;
     }
-  }
 
-  if( SDL_NumJoysticks() >= 1 ){	/* ジョイスティックがあるかチェック */
+    /* ジョイスティックサブシステム初期化 */
+    if (! SDL_WasInit(SDL_INIT_JOYSTICK)) {
+	if (SDL_InitSubSystem(SDL_INIT_JOYSTICK)) {
+	    return 0;
+	}
+    }
 
-    joy = SDL_JoystickOpen(0);		/* ジョイスティックをオープン */
+    /* ジョイスティックの数を調べて、デバイスオープン */
+    max = SDL_NumJoysticks();
+    max = MIN(max, JOY_MAX);		/* ワークの数だけ、有効 */
 
-    if( joy )
-      SDL_JoystickEventState( SDL_ENABLE );	/* イベント処理を有効にする */
-  }
+    for (i=0; i<max; i++) {
+	dev = SDL_JoystickOpen(i);	/* i番目のジョイスティックをオープン */
 
-  if( joy ) return TRUE;
-  else      return FALSE;
+	if (dev) {
+	    /* ボタンの数を調べる */
+	    nr_button = SDL_JoystickNumButtons(dev);
+	    nr_button = MIN(nr_button, BUTTON_MAX);
+
+	    joy_info[i].dev = dev;
+	    joy_info[i].num = joystick_num ++;
+	    joy_info[i].nr_button = nr_button;
+	}
+    }
+
+    if (joystick_num > 0) {			/* 1個以上オープンできたら  */
+	SDL_JoystickEventState(SDL_ENABLE);	/* イベント処理を有効にする */
+    }
+
+    return joystick_num;			/* ジョイスティックの数を返す */
 }
 
 
 
-int	joystick_available( void )
+static	void	joystick_exit(void)
 {
-  if( joy ) return TRUE;
-  else      return FALSE;
+    int i;
+
+    if (joystick_num > 0) {
+
+	for (i=0; i<JOY_MAX; i++) {
+	    if (joy_info[i].dev) {
+		SDL_JoystickClose(joy_info[i].dev);
+		joy_info[i].dev = NULL;
+	    }
+	}
+
+	joystick_num = 0;
+    }
+}
+
+
+
+int	event_get_joystick_num(void)
+{
+    return joystick_num;
 }
 
 
@@ -1043,187 +1153,10 @@ int	joystick_available( void )
  *	設定ファイルが無ければ偽、あれば処理して真を返す
  *****************************************************************************/
 
-/* キー設定ファイル1行あたりの最大文字数 */
-#define	MAX_KEYFILE_LINE	(256)
+/* SDL の keysym の文字列を int 値に変換するテーブル */
 
-static	int	convert_str2keysym( const char *str );
-static	int	analyze_keyconf_file( const char *video_driver )
+static const T_SYMBOL_TABLE sdlkeysym_list[] =
 {
-  FILE *fp = NULL;
-  int	enable = FALSE;
-  int	initialized = FALSE;
-
-  int  line_cnt = 0;
-  int  binding_cnt = 0;
-  int  code, key88, chg = -1;
-  char   line[ MAX_KEYFILE_LINE ];
-  char buffer[ MAX_KEYFILE_LINE ];
-  char *parm1, *parm2, *parm3, *parm4;
-
-
-	/* キー設定ファイルを開く */
-
-  if( file_keyboard == NULL ){			/* キー設定ファイル名取得 */
-    file_keyboard = alloc_keyboard_cfgname();
-  }
-
-  if( file_keyboard ){
-    fp = fopen( file_keyboard, "r" );		/* キー設定ファイルを開く */
-    if( verbose_proc ){
-      if( fp ){
-	printf( "\"%s\" read and initialize\n", file_keyboard );
-      }else{
-	printf( "can't open keyboard configuration file \"%s\"\n",
-		file_keyboard );
-	printf( "\n" );
-      }
-      fflush(stdout); fflush(stderr);
-    }
-    free( file_keyboard );
-  }
-
-  if( fp == NULL ) return 0;			/* 開けなかったら偽を返す */
-
-
-
-	/* キー設定ファイルを1行づつ解析 */
-
-  while( fgets( line, MAX_KEYFILE_LINE, fp ) ){
-
-    line_cnt ++;
-    parm1 = parm2 = parm3 = parm4 = NULL;
-
-	/* パラメータを parm1〜parm4 にセット */
-
-    { char *str = line;
-      char *b; {             b = &buffer[0];    str = my_strtok( b, str ); }
-      if( str ){ parm1 = b;  b += strlen(b)+1;  str = my_strtok( b, str ); }
-      if( str ){ parm2 = b;  b += strlen(b)+1;  str = my_strtok( b, str ); }
-      if( str ){ parm3 = b;  b += strlen(b)+1;  str = my_strtok( b, str ); }
-      if( str ){ parm4 = b;  }
-    }
-
-
-	/* パラメータがなければ次の行へ、あれば解析処理 */
-
-    if      ( parm1 == NULL ){			/* パラメータなし */
-      ;
-
-    }else if( parm2 == NULL ){			/* パラメータ 1個 */
-
-      if( parm1[0] == '[' ){
-
-	if( my_strcmp( parm1, "[SDL]" ) == 0 &&
-	    initialized == FALSE ){
-
-	  enable      = TRUE;
-	  initialized = TRUE;
-	  if( verbose_proc ) printf( "(read start in line %d)\n", line_cnt );
-
-	}else{
-	  if( enable ){
-	    if(verbose_proc) printf( "(read end   in line %d)\n", line_cnt-1);
-	  }
-	  enable = FALSE;
-	}
-
-      }else if( enable ){
-	fprintf( stderr, "warning: error in line %d (ignored)\n", line_cnt );
-      }
-
-    }else if( parm3 == NULL ||			/* パラメータ 2個 */
-	      parm4 == NULL ){			/* パラメータ 3個 */
-
-      if( parm3 == NULL   &&
-	  parm1[0] == '[' ){
-
-	if( my_strcmp( parm1, "[SDL]" )      == 0 &&
-	    my_strcmp( parm2, video_driver ) == 0 ){
-
-	  enable      = TRUE;
-	  initialized = TRUE;
-	  if( verbose_proc ) printf( "(read start in line %d)\n", line_cnt );
-
-	}else{
-	  if( enable ){
-	    if(verbose_proc) printf( "(read end   in line %d)\n", line_cnt-1);
-	  }
-	  enable = FALSE;
-	}
-
-      }else if( enable ){
-
-	code  = convert_str2keysym( parm1 );
-	key88 = convert_str2key88( parm2 );
-
-	if( parm3 ) chg = convert_str2key88( parm3 );
-
-
-	if( code  < 0 ||
-	    key88 < 0 ||
-	    (parm3 && chg < 0) ){
-	  fprintf( stderr, "warning: error in line %d (ignored)\n", line_cnt );
-
-	}else{
-
-	  if( parm1[0] == '<' ){
-	    scancode2key88[ code ] = key88;
-	  }else{
-	    keysym2key88[ code ]   = key88;
-	  }
-
-	  if( parm3 ){
-	    if( binding_cnt >= COUNTOF(binding) ){
-	      fprintf( stderr,
-		"warning: too many NumLock-code in %d (ignored)\n", line_cnt );
-
-	    }else{
-	      binding[ binding_cnt ].type      = ( parm1[0] == '<' ) ? 2 : 1;
-	      binding[ binding_cnt ].code      = code;
-	      binding[ binding_cnt ].new_key88 = chg;
-	      binding_cnt ++;
-	    }
-	  }
-	}
-      }
-
-    }else{					/* パラメータ いっぱい */
-
-      if( enable ){
-	fprintf( stderr, "warning: too many argument in line %d\n", line_cnt );
-      }
-
-    }
-
-  }
-  fclose(fp);
-
-
-  if( enable ){
-    if(verbose_proc) printf( "(read end   in line %d)\n", line_cnt-1);
-  }
-
-  if( initialized == FALSE ){
-    fprintf( stderr, "warning: not configured (use initial config)\n" );
-  }
-
-  if( verbose_proc ){
-    printf( "\n" );
-  }
-  fflush(stdout); fflush(stderr);
-
-  return (initialized) ? 1 : 0;
-}
-
-
-/*---------------------------------------------------------------------------
- *---------------------------------------------------------------------------*/
-static	int	convert_str2keysym( const char *str )
-{
-  const struct{
-    char *name;    int val;
-  }
-  list[] = {
     {	"SDLK_BACKSPACE",	SDLK_BACKSPACE		}, /*	= 8,	*/
     {	"SDLK_TAB",		SDLK_TAB		}, /*	= 9,	*/
     {	"SDLK_CLEAR",		SDLK_CLEAR		}, /*	= 12,	*/
@@ -1455,28 +1388,151 @@ static	int	convert_str2keysym( const char *str )
     {	"SDLK_POWER",		SDLK_POWER		}, /*	= 320,	*/
     {	"SDLK_EURO",		SDLK_EURO		}, /*	= 321,	*/
     {	"SDLK_UNDO",		SDLK_UNDO		}, /*	= 322,	*/
-  };
-
-  char *conv_end;
-  unsigned long i;
-
-  if(  str==NULL ) return -1;
-  if( *str=='\0' ) return -1;
-
-  if( str[0] == '<' ){				/* <数字> の場合 */
-    i = strtoul( &str[1], &conv_end, 0 );
-    if( *conv_end == '>' &&
-	i < COUNTOF(scancode2key88) ){
-      return i;
+};
+/* デバッグ用 */
+static	const char *debug_sdlkeysym(int code)
+{
+    int i;
+    for (i=0; i<COUNTOF(sdlkeysym_list); i++) {
+	if (code == sdlkeysym_list[i].val)
+	    return sdlkeysym_list[i].name;
     }
-    return -1;
-  }
-					/* 定義文字列に合致するのを探す */
-  for( i=0; i<COUNTOF(list); i++ ){
-    if( strcmp( list[i].name, str ) == 0 ){
-      return list[i].val;
-    }
-  }
+    return "invalid";
+}
 
-  return -1;
+/* キー設定ファイルの、識別タグをチェックするコールバック関数 */
+
+static const char *identify_callback(const char *parm1,
+				     const char *parm2,
+				     const char *parm3)
+{
+    if (my_strcmp(parm1, "[SDL]") == 0) {
+	if (parm2 == NULL ||
+	    my_strcmp(parm2, video_driver) == 0) {
+	    return NULL;				/* 有効 */
+	}
+    }
+
+    return "";						/* 無効 */
+}
+
+/* キー設定ファイルの、設定を処理するコールバック関数 */
+
+static const char *setting_callback(int type,
+				    int code,
+				    int key88,
+				    int numlock_key88)
+{
+    static int binding_cnt = 0;
+
+    if (type == KEYCODE_SCAN) {
+	if (code >= COUNTOF(scancode2key88)) {
+	    return "scancode too large";	/* 無効 */
+	}
+	scancode2key88[ code ] = key88;
+    } else {
+	keysym2key88[ code ]   = key88;
+    }
+
+    if (numlock_key88 >= 0) {
+	if (binding_cnt >= COUNTOF(binding)) {
+	    return "too many NumLock-code";	/* 無効 */
+	}
+	binding[ binding_cnt ].type      = type;
+	binding[ binding_cnt ].code      = code;
+	binding[ binding_cnt ].new_key88 = numlock_key88;
+	binding_cnt ++;
+    }
+
+    return NULL;				/* 有効 */
+}
+
+/* キー設定ファイルの処理関数 */
+
+static	int	analyze_keyconf_file(void)
+{
+    return
+	config_read_keyconf_file(file_keyboard,		  /* キー設定ファイル*/
+				 identify_callback,	  /* 識別タグ行 関数 */
+				 sdlkeysym_list,	  /* 変換テーブル    */
+				 COUNTOF(sdlkeysym_list), /* テーブルサイズ  */
+				 TRUE,			  /* 大小文字無視    */
+				 setting_callback);	  /* 設定行 関数     */
+}
+
+
+
+/******************************************************************************
+ * FPS
+ *****************************************************************************/
+
+/* test */
+
+#define	FPS_INTRVAL		(1000)		/* 1000ms毎に表示する */
+static	Uint32	display_fps_callback(Uint32 interval, void *dummy);
+
+static	int	display_fps_init(void)
+{
+    if (show_fps == FALSE) return TRUE;
+
+    if (! SDL_WasInit(SDL_INIT_TIMER)) {
+	if (SDL_InitSubSystem(SDL_INIT_TIMER)) {
+	    return FALSE;
+	}
+    }
+
+    SDL_AddTimer(FPS_INTRVAL, display_fps_callback, NULL);
+    return TRUE;
+}
+
+static	Uint32	display_fps_callback(Uint32 interval, void *dummy)
+{
+#if 0
+
+    /* コールバック関数の内部からウインドウタイトルを変更するのは危険か ?
+       「コールバック関数内ではどんな関数も呼び出すべきでない」となっている */
+
+    display_fps();
+
+#else
+
+    /* SDL_PushEvent だけは呼び出しても安全となっているので、
+       ユーザイベントで処理してみよう */
+
+    SDL_Event user_event;
+
+    user_event.type = SDL_USEREVENT;
+    user_event.user.code  = 1;
+    user_event.user.data1 = NULL;
+    user_event.user.data2 = NULL;
+    SDL_PushEvent(&user_event);		/* エラーは無視 */
+#endif
+
+    return FPS_INTRVAL;
+}
+
+static	void	display_fps(void)
+{
+    static int prev_drawn_count;
+    static int prev_vsync_count;
+    int now_drawn_count;
+    int now_vsync_count;
+
+    if (show_fps == FALSE) return;
+
+    now_drawn_count = quasi88_info_draw_count();
+    now_vsync_count = quasi88_info_vsync_count();
+
+    if (quasi88_is_exec()) {
+	char buf[32];
+
+	sprintf(buf, "FPS: %3d (VSYNC %3d)",
+		now_drawn_count - prev_drawn_count,
+		now_vsync_count - prev_vsync_count);
+
+	SDL_WM_SetCaption(buf, buf);
+    }
+
+    prev_drawn_count = now_drawn_count;
+    prev_vsync_count = now_vsync_count;
 }

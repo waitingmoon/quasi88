@@ -18,6 +18,9 @@ extern	double	vsync_freq_hz;		/* VSYNC 割り込みの周期	    [Hz]  */
 extern	int	state_of_cpu;			/*メインCPUが処理した命令数 */
 extern	int	state_of_vsync;			/* VSYNC周期のステート数   */
 
+extern	int	wait_rate;			/* ウエイト調整 比率    [%]  */
+extern	int	wait_by_sleep;			/* ウエイト調整時 sleep する */
+
 extern	int	no_wait;			/* ウエイトなし		*/
 
 extern	int	boost;				/* ブースト		*/
@@ -57,5 +60,6 @@ void	main_INT_init( void );
 void	main_INT_update( void );
 int	main_INT_chk( void );
 
+int	quasi88_info_vsync_count(void);
 
 #endif	/* INTR_H_INCLUDED */

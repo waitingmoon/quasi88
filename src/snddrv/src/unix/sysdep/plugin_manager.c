@@ -27,6 +27,11 @@ Version 0.1, January 2000
 #include "plugin_manager_priv.h"
 #include "misc.h"
 
+#if 1		/* QUASI88 */
+extern int verbose_proc;
+#define fprintf     if (verbose_proc) fprintf
+#endif		/* QUASI88 */
+
 /* private methods */
 static int plugin_manager_add(struct plugin_manager_struct *manager,
    struct plugin_manager_data *data)
@@ -174,6 +179,8 @@ void plugin_manager_unload(struct plugin_manager_struct *manager,
          plugin_manager_remove(manager, i);
       }
    }
+   free(manager->data);
+   manager->data = NULL;
 }
 
 static void *plugin_manager_init_and_or_create(

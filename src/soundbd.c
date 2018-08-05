@@ -11,6 +11,7 @@
 #include "soundbd.h"
 
 #include "pc88cpu.h"
+#include "pc88main.h"
 #include "intr.h"
 
 #include "snddrv.h"
@@ -109,10 +110,15 @@ static	int	sound2_counter_old = 0;
 
 static	int	sound2_delay = 0;	/* フラグの遅れ			*/
 
+
+/* BEEP関連。手頃な定義場所がない… */
+
+int	use_cmdsing = TRUE;		/* 真で、CMD SING有効		*/
+
 /********************************************************/
 /* SOUND 初期化						*/
 /********************************************************/
-void	sound_init( void )
+void	sound_board_init( void )
 {
   int	i;
   for( i=0; i<0x100; i++ ) sound_reg [ i ] = 0x00;
@@ -174,7 +180,7 @@ void	sound_out_reg( byte data )
 {
   sound_reg_select = data & 0xff;
 
-  xmame_sound_out_reg( data );
+  xmame_dev_sound_out_reg( data );
 }
 
 /********************************************************/
@@ -187,7 +193,7 @@ void	sound_out_data( byte data )
 
   sound_reg[ sound_reg_select ] = data;
 
-  xmame_sound_out_data( data );
+  xmame_dev_sound_out_data( data );
 
 
   switch( sound_reg_select ){
@@ -248,7 +254,7 @@ void	sound_out_data( byte data )
 /********************************************************/
 byte	sound_in_status( void )
 {
-  xmame_sound_in_status();
+  xmame_dev_sound_in_status();
 
   return ( sound_FLAG_B << 1 ) | sound_FLAG_A;	/* 常に ready */
 
@@ -261,7 +267,7 @@ byte	sound_in_status( void )
 /********************************************************/
 byte	sound_in_data( int always_sound_II )
 {
-  xmame_sound_in_data();
+  xmame_dev_sound_in_data();
 
   if      ( sound_reg_select < 0x10 ){		/* 0x00〜0x0f はリード可 */
 
@@ -298,7 +304,7 @@ void	sound2_out_reg( byte data )
 {
   sound2_reg_select = data & 0xff;
 
-  xmame_sound2_out_reg( data );
+  xmame_dev_sound2_out_reg( data );
 }
 
 /********************************************************/
@@ -310,7 +316,7 @@ void	sound2_out_data( byte data )
 
   sound2_reg[ sound2_reg_select ] = data;
 
-  xmame_sound2_out_data( data );
+  xmame_dev_sound2_out_data( data );
 
 /*
 if( sound2_reg_select==0x08 )
@@ -397,6 +403,7 @@ printf("%02x %02x\n",(int)sound2_reg_select,(int)data);
     sound2_start_addr  = ((int)sound2_reg[ 0x03 ] << 8) | sound2_reg[ 0x02 ];
     sound2_start_addr  = (sound2_start_addr << sound2_mem_size);
     sound2_start_addr &= 0x3ffff;
+    sound2_data_addr = sound2_start_addr;
     break;
 
   case 0x04:					/* ストップアドレス */
@@ -478,7 +485,7 @@ printf("%02x %02x\n",(int)sound2_reg_select,(int)data);
 /********************************************************/
 byte	sound2_in_status( void )
 {
-  xmame_sound2_in_status();
+  xmame_dev_sound2_in_status();
 
   if( sound2_delay & 0x08 ){
     sound2_delay &= ~0x08;
@@ -503,7 +510,7 @@ byte	sound2_in_data( void )
 {
   byte data = 0x00;
 
-  xmame_sound2_in_data();
+  xmame_dev_sound2_in_data();
 
   if( sound2_reg_select==0x08 ){		/* データ読み出し */
 
@@ -544,6 +551,7 @@ byte	sound2_in_data( void )
 
 #define	SID	"SND "
 #define	SID2	"SND2"
+#define	SID3	"SND3"
 
 static	T_SUSPEND_W	suspend_sound_work[] =
 {
@@ -606,10 +614,15 @@ static	T_SUSPEND_W	suspend_sound_work[] =
   { TYPE_END,	0			},
 };
 
-
 static	T_SUSPEND_W	suspend_sound_work2[] =
 {
   { TYPE_INT,	&sound_prescaler_sel,	},
+  { TYPE_END,	0			},
+};
+
+static	T_SUSPEND_W	suspend_sound_work3[] =
+{
+  { TYPE_INT,	&use_cmdsing,		},
   { TYPE_END,	0			},
 };
 
@@ -620,6 +633,8 @@ int	statesave_sound( void )
   if( statesave_table( SID, suspend_sound_work ) != STATE_OK ) return FALSE;
 
   if( statesave_table( SID2, suspend_sound_work2 ) != STATE_OK ) return FALSE;
+
+  if( statesave_table( SID3, suspend_sound_work3 ) != STATE_OK ) return FALSE;
 
   return TRUE;
 }
@@ -637,8 +652,13 @@ int	stateload_sound( void )
     if      ( sound_prescaler == 6 ) sound_prescaler_sel = 2;
     else if ( sound_prescaler == 3 ) sound_prescaler_sel = 3;
     else                      /* 2*/ sound_prescaler_sel = 0;	/* or 1 */
+  }
 
-    return TRUE;
+  if( stateload_table( SID3, suspend_sound_work3 ) != STATE_OK ){
+
+    /* 旧バージョンなら、みのがす */
+
+    printf( "stateload : Statefile is old. (ver 0.6.0, 1, 2 or 3?)\n" );
   }
 
   return TRUE;
@@ -722,22 +742,22 @@ void	sound_output_after_stateload( void )
     { 0xb4, 0xb6 },
   };
 
-  if( use_sound ){
+  if( xmame_has_sound() ){
     int	i, j;
 
 #if 0
     {
-      int  vol = xmame_get_sound_volume();
-      int pvol = xmame_get_mixer_volume( XMAME_MIXER_PSG );
-      int fvol = xmame_get_mixer_volume( XMAME_MIXER_FM );
-      int bvol = xmame_get_mixer_volume( XMAME_MIXER_BEEP );
+      int  vol = xmame_cfg_get_mastervolume();
+      int pvol = xmame_cfg_get_mixer_volume( XMAME_MIXER_PSG );
+      int fvol = xmame_cfg_get_mixer_volume( XMAME_MIXER_FM );
+      int bvol = xmame_cfg_get_mixer_volume( XMAME_MIXER_BEEP );
 
 	/* ミュート */
 
-      xmame_set_sound_volume( 0 );
-      xmame_set_mixer_volume( XMAME_MIXER_PSG,  0 );
-      xmame_set_mixer_volume( XMAME_MIXER_FM,   0 );
-      xmame_set_mixer_volume( XMAME_MIXER_BEEP, 0 );
+      xmame_cfg_set_mastervolume( 0 );
+      xmame_cfg_set_mixer_volume( XMAME_MIXER_PSG,  0 );
+      xmame_cfg_set_mixer_volume( XMAME_MIXER_FM,   0 );
+      xmame_cfg_set_mixer_volume( XMAME_MIXER_BEEP, 0 );
     }
 #endif
 
@@ -745,14 +765,14 @@ void	sound_output_after_stateload( void )
 
     switch( sound_prescaler_sel ){
     case 0:
-      xmame_sound_out_reg( 0x2f );      xmame_sound_out_data( 0 );
+      xmame_dev_sound_out_reg( 0x2f );      xmame_dev_sound_out_data( 0 );
       break;
     case 1:
-      xmame_sound_out_reg( 0x2f );      xmame_sound_out_data( 0 );
-      xmame_sound_out_reg( 0x2e );      xmame_sound_out_data( 0 );
+      xmame_dev_sound_out_reg( 0x2f );      xmame_dev_sound_out_data( 0 );
+      xmame_dev_sound_out_reg( 0x2e );      xmame_dev_sound_out_data( 0 );
       break;
     case 3:
-      xmame_sound_out_reg( 0x2e );      xmame_sound_out_data( 0 );
+      xmame_dev_sound_out_reg( 0x2e );      xmame_dev_sound_out_data( 0 );
       break;
     default:
       break;
@@ -766,8 +786,8 @@ void	sound_output_after_stateload( void )
 
       for( j=0; j<size; j++ ){
 	if( addr[j][0] <= i  &&  i <= addr[j][1] ){
-	  xmame_sound_out_reg( i );
-	  xmame_sound_out_data( sound_reg[ i ] );
+	  xmame_dev_sound_out_reg( i );
+	  xmame_dev_sound_out_data( sound_reg[ i ] );
 	  break;
 	}
       }
@@ -782,8 +802,8 @@ void	sound_output_after_stateload( void )
 
 	for( j=0; j<size; j++ ){
 	  if( addr[j][0] <= i  &&  i <= addr[j][1] ){
-	    xmame_sound2_out_reg( i );
-	    xmame_sound2_out_data( sound2_reg[ i ] );
+	    xmame_dev_sound2_out_reg( i );
+	    xmame_dev_sound2_out_data( sound2_reg[ i ] );
 	    break;
 	  }
 	}
@@ -792,19 +812,25 @@ void	sound_output_after_stateload( void )
 
       i = sound2_reg[ 0 ];
       i &= ~0x80;
-      xmame_sound2_out_reg( 0 );
-      xmame_sound2_out_data( i );
+      xmame_dev_sound2_out_reg( 0 );
+      xmame_dev_sound2_out_data( i );
     }
 
 #if 0
 	/* 音量復帰 */
     {
-      xmame_set_sound_volume( vol );
-      xmame_set_mixer_volume( XMAME_MIXER_PSG,  pvol );
-      xmame_set_mixer_volume( XMAME_MIXER_FM,   fvol );
-      xmame_set_mixer_volume( XMAME_MIXER_BEEP, bvol );
+      xmame_cfg_set_mastervolume( vol );
+      xmame_cfg_set_mixer_volume( XMAME_MIXER_PSG,  pvol );
+      xmame_cfg_set_mixer_volume( XMAME_MIXER_FM,   fvol );
+      xmame_cfg_set_mixer_volume( XMAME_MIXER_BEEP, bvol );
     }
 #endif
+
+    xmame_dev_beep_cmd_sing(use_cmdsing);
+
+    if( ctrl_signal & (0x80|0x20) ){
+      xmame_dev_beep_out_data( ctrl_signal );
+    }
 
   }
 

@@ -20,6 +20,8 @@
 #include "file-op.h"
 #include "suspend.h"
 #include "status.h"
+#include "event.h"
+#include "snddrv.h"
 
 
 
@@ -37,6 +39,13 @@ int	fdc_wait = 0;			/* FDC の ウエイト 0無 1有	*/
 
 int	fdc_ignore_readonly = FALSE;	/* 読込専用時、ライトを無視する	*/
 
+
+/* FDCのシーク音処理のワーク
+   連続でシークした場合、一定間隔で音を出すようにする。
+   本来はドライブ毎のワークなのだが、かまわんだろう。
+   このワークは、ステートセーブしない */
+static	int	fdc_sound_counter;
+static	int	fdc_sound_skipper = 1;	/* SEEK 4回毎に音を出す */
 
 #define	MAX_DRIVE	(4)		/* FDCで扱えるドライブ数	*/
 					/* 処理は NR_DRIVE(==2)だけ対応	*/
@@ -193,7 +202,7 @@ static	struct{
 #define	STATUS_NR	(0x60)		/* Not Ready			*/
 #define	STATUS_NW	(0x70)		/* Not Writable			*/
 #define	STATUS_UNDEF	(0x80)		/* Another Error		*/
-#define	STATUS_TIMEOUT	(0x90)		/* Time out			*/
+#define	STATUS_TMOUT	(0x90)		/* Time out			*/
 #define	STATUS_DE	(0xa0)		/* Data Error (ID)		*/
 #define	STATUS_DE_DD	(0xb0)		/* Data Error (DATA)		*/
 #define	STATUS_ND	(0xc0)		/* No Data			*/
@@ -381,7 +390,7 @@ void print_fdc_status(int nStatus, int nDrive, int nTrack, int nSector)
 		    case BP_WRITE: printf("( Write )\n"); break;
 		    case BP_DIAG:  printf("( Diag )\n"); break;
 	 	    }
-		    set_emu_mode( MONITOR );
+		    quasi88_debug();
 		    break;
 		}
 	    }
@@ -486,7 +495,7 @@ int	drive_check_empty( int drv )
 
 #define		DISK_ERROR( s, drv )					\
   do {									\
-    if( get_emu_mode() != MENU ){					\
+    if (quasi88_is_menu() == FALSE) {					\
       printf( "\n" );				 			\
       printf( "[[[ %-26s ]]]\n", s );				  	\
       printf( "[[[   Eject Disk from drive %d: ]]]\n" "\n", drv+1 ); 	\
@@ -508,7 +517,7 @@ int	drive_check_empty( int drv )
 
 int	disk_insert( int drv, const char *filename, int img, int readonly )
 {
-  int	i, exit_flag;
+  int	exit_flag;
   Uchar c[32];
   long	offset;
   int	num;
@@ -907,7 +916,7 @@ static	int	disk_now_sec( int drv )
 
   if( error ){					/* SEEK / READ Error */
     printf_system_error( error );
-    status_message( 1, 60*10, "DiskI/O Read Error" );
+    status_message( 1, STATUS_WARN_TIME, "DiskI/O Read Error" );
   }
 
 
@@ -990,6 +999,7 @@ static	void	fdc_init( void )
     fdc.ncn[ i ]  = 0;
     fdc.pcn[ i ]  = 0;
   }
+  fdc.intr_unit = 4;
 }
 
 
@@ -1139,7 +1149,7 @@ static	int	fdc_check_unit( void )
       fdc.st1 = ST1_NW;
       fdc.st2 = 0;
       fdc.carry = 0;
-      status_message( 1, 60*10, "Disk Write Protected" );
+      status_message( 1, STATUS_WARN_TIME, "Disk Write Protected" );
       return 1;
     }
   }
@@ -1149,6 +1159,10 @@ static	int	fdc_check_unit( void )
 #ifdef	WAIT_FOR_HEADLOAD
   if( fdc.hl_stat[drv] == FALSE ){
     /* ロード音 ? */
+    if ((cpu_timing > 0) && (fdc_wait)) {
+      /*logfdc("### Head Down ###\n");*/
+      xmame_dev_sample_headdown();
+    }
     fdc.hl_stat[drv] = TRUE;
     fdc.wait += fdc.hlt_clk;
   }
@@ -1452,7 +1466,7 @@ static	int	fdc_read_data( void )
     } else error = 2;
     if( error ){			/* OSレベルのエラー発生 */
       printf_system_error( error );		/* DATA CRC err にする*/
-      status_message( 1, 60*10, "DiskI/O Read Error" );
+      status_message( 1, STATUS_WARN_TIME, "DiskI/O Read Error" );
       fdc.st0 |= ST0_IC_AT;
       fdc.st1 |= ST1_DE;
       fdc.st2 |= ST2_DD;
@@ -1579,7 +1593,7 @@ static	int	fdc_write_data( void )
 	printf("FDC %s : Drive %d Write Skipped (write protected)\n",
 	       cmd_name[fdc.command],drv+1);
       }
-      status_message( 1, 60*10, "Disk Write Skipped" );
+      status_message( 1, STATUS_WARN_TIME, "Disk Write Skipped" );
 
     }else{
 
@@ -1591,7 +1605,7 @@ static	int	fdc_write_data( void )
 	  printf("FDC %s : Drive %d Write Failed (file changed ?)\n",
 		 cmd_name[fdc.command],drv+1);
       }
-      status_message( 1, 60*10, "Disk Write Failed" );
+      status_message( 1, STATUS_WARN_TIME, "Disk Write Failed" );
     }
     return 1;
   }
@@ -1708,7 +1722,7 @@ static	int	fdc_write_data( void )
     fdc.st0 = ST0_IC_AT | (fdc.hd<<2) | fdc.us | ST0_NR;
     fdc.st1 = 0;
     fdc.st2 = 0;
-    status_message( 1, 60*10, "DiskI/O Write Error" );
+    status_message( 1, STATUS_WARN_TIME, "DiskI/O Write Error" );
   }else{
     fdc.st0 = ST0_IC_NT | (fdc.hd<<2) | fdc.us;
     fdc.st1 = 0;
@@ -1768,7 +1782,7 @@ static	int	fdc_write_id( void )
 	printf("FDC %s : Drive %d Write Skipped (write protected)\n",
 	       cmd_name[fdc.command],drv+1);
       }
-      status_message( 1, 60*10, "Disk Write Skipped" );
+      status_message( 1, STATUS_WARN_TIME, "Disk Write Skipped" );
 
     }else{
 
@@ -1783,7 +1797,7 @@ static	int	fdc_write_id( void )
 	  printf("FDC %s : Drive %d Format Failed (file changed ?)\n",
 		 cmd_name[fdc.command],drv+1);
       }
-      status_message( 1, 60*10, "Disk Write Failed" );
+      status_message( 1, STATUS_WARN_TIME, "Disk Write Failed" );
     }
     return 1;
   }
@@ -1901,7 +1915,7 @@ static	int	fdc_write_id( void )
     fdc.st0 = ST0_IC_AT | (fdc.hd<<2) | fdc.us | ST0_NR;
     fdc.st1 = 0;
     fdc.st2 = 0;
-    status_message( 1, 60*10, "DiskI/O Write Error" );
+    status_message( 1, STATUS_WARN_TIME, "DiskI/O Write Error" );
   }else{
     fdc.st0 = ST0_IC_NT | (fdc.hd<<2) | fdc.us;
     fdc.st1 = 0;
@@ -2190,16 +2204,18 @@ static	void	r_phase( void )
 
     case SENSE_INT_STATUS:			/* SENSE INT STATUS          */
       i = fdc.intr_unit;				/* シーク完(割込発生)*/
+      fdc.intr_unit = 4;
       if( i < MAX_DRIVE ){				/* のドライブあり    */
 	if( i<NR_DRIVE ) fdc.r0 = ST0_IC_NT | ST0_SE | i;
 	else             fdc.r0 = ST0_IC_AT | ST0_SE | ST0_NR | i;
 	fdc.r1 = fdc.pcn[ i ];
+	logfdc("\t\t\t\t\t\t<st0:%02x pcn:%02x>\n",
+	       fdc.r0,fdc.r1);
       }else{						/* 見つからない時は  */
 	fdc.command = INVALID;				/* INVALID扱いとする */
 	fdc.r0 = ST0_IC_IC;
+	logfdc("\t\t\t\t\t\tinvalid\n");
       }
-      logfdc("\t\t\t\t\t\t<st0:%02x pcn:%02x>\n",
-	     fdc.r0,fdc.r1);
       break;
 
     case SENSE_DEVICE_STATUS:			/* SENSE DEVICE STATUS    */
@@ -2311,7 +2327,14 @@ static	void	e_phase_seek( void )
 #ifdef	WAIT_FOR_SEEK
     }else{
       /* シーク音 ? */
+      if ((cpu_timing > 0) && (fdc_wait)) {
+	fdc_sound_counter = 0;
+	/*logfdc("### Seek ###\n");*/
+	xmame_dev_sample_seek();
+      }
       fdc.seek_stat[ fdc.us ] = SEEK_STAT_MOVE;
+      if( fdc.pcn[ fdc.us ] < fdc.ncn[ fdc.us ] ) fdc.pcn[ fdc.us ] ++;
+      else                                        fdc.pcn[ fdc.us ] --;
       fdc.seek_wait[ fdc.us ] = fdc.srt_clk;
       ICOUNT( -1 );
       REPEAT();
@@ -2892,6 +2915,14 @@ int	fdc_ctrl( int interval )
 	  fdc.seek_wait[i] = 0;
 	}else{							/* まだまだ */
 	  /* シーク音 ? */
+	  if ((cpu_timing > 0) && (fdc_wait)) {
+	    fdc_sound_counter ++;
+	    if (fdc_sound_counter >= fdc_sound_skipper) {
+	      fdc_sound_counter = 0;
+	      /*logfdc("### Seek ###\n");*/
+	      xmame_dev_sample_seek();
+	    }
+	  }
 	  if( fdc.pcn[i] < fdc.ncn[i] ) fdc.pcn[i] ++;
 	  else                          fdc.pcn[i] --;
 	  fdc.seek_wait[i] = fdc.srt_clk;
@@ -2910,6 +2941,10 @@ int	fdc_ctrl( int interval )
 	if( fdc.hl_wait[i] >= fdc.hut_clk ){
 	  fdc.hl_stat[i] = FALSE;
 	  /* アンロード音 ? */
+	  if ((cpu_timing > 0) && (fdc_wait)) {
+	    /*logfdc("### Head Up ###\n");*/
+	    xmame_dev_sample_headup();
+	  }
 	}
       }
     }

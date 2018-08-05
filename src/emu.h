@@ -11,35 +11,6 @@ extern	int	cpu_slice_us;			/* -cpu 2 処理時分割(us)*/
 extern	int	trace_counter;			/* TRACE 時のカウンタ	*/
 
 
-enum EmuMode
-{
-  EXEC,
-
-  GO,
-  TRACE,
-  STEP,
-  TRACE_CHANGE,
-
-  MONITOR,
-  MENU,
-  PAUSE,
-
-  QUIT
-};
-
-
-/* エミュレータのモードを設定する。	引数は、以下のいずれかとする         */
-void	set_emu_mode( int mode );	/*  GO, TRACE, STEP, TRADE_CHANGE,   */
-					/*  MONITOR, MENU, PAUSE, QUIT       */
-
-/* エミュレータの現在モードを取得する。	戻値は、以下のいずれかになる         */
-int	get_emu_mode( void );		/*  EXEC, MONITOR, MENU, PAUSE       */
-
-/* エミュレータの次のモードを取得する。	戻値は、以下のいずれかになる         */
-int	next_emu_mode( void );		/*  EXEC, MONITOR, MENU, PAUSE, QUIT */
-
-
-
 typedef struct{					/* ブレークポイント制御 */
   short	type;
   word	addr;
@@ -71,8 +42,12 @@ extern  break_drive_t break_point_fdc[NR_BP];
 
 	/**** 関数 ****/
 
-void	emu( void );
+void	emu_breakpoint_init( void );
 void	emu_reset( void );
+void	set_emu_exec_mode( int mode );
+
+void	emu_init(void);
+void	emu_main(void);
 
 
 #endif	/* EMU_H_INCLUDED */

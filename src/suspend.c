@@ -9,6 +9,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <ctype.h>
 
 #include "quasi88.h"
 #include "suspend.h"
@@ -165,7 +166,7 @@ INLINE	int	statesave_double( OSD_FILE *fp, double *val )
   unsigned char c[4];
   int	wk;
 
-  wk = (*val) * 1000000.0;
+  wk = (int) ((*val) * 1000000.0);
   c[0] = ( wk       ) & 0xff;
   c[1] = ( wk >>  8 ) & 0xff;
   c[2] = ( wk >> 16 ) & 0xff;
@@ -505,16 +506,155 @@ int	statefile_revision( void )
  *
  ************************************************************************/
 
-int	statesave_check( void )
-{
-  OSD_FILE *fp;
+/*
+  statesave() / stateload() でセーブ/ロードされるファイル名は、
+  自動的に設定されるので、セーブ/ロード時に指定する必要はない。
+  (ディスクイメージの名前などに基づき、設定される)
 
-  if( file_state[0] &&
-      (fp = osd_fopen( FTYPE_STATE_LOAD, file_state, "rb" )) ){
-    osd_fclose(fp);
-    return TRUE;
-  }
-  return FALSE;
+  でも、これだと1種類しかロード/セーブできずに不便なので、
+  filename_set_state_serial(int serial) で連番を指定できる。
+	
+			ステートファイル名
+	引数 '5'	/my/state/dir/file-5.sta
+	引数 'z'	/my/state/dir/file-z.sta
+	引数 0		/my/state/dir/file.sta
+
+  よって、連番指定でステートセーブする場合は、
+	  filename_set_state_serial('1');
+	  statesave();
+  のように呼び出す。
+
+  ----------------------------------------------------------------------
+  ファイル名を変更したい場合は、以下の関数を使う。
+
+  ファイル名の取得 … filename_get_state()
+	現在設定されているステートファイル名が取得できる。
+	/my/state/dir/file-a.sta のような文字列が返る。
+
+  ファイル連番の取得 … filename_get_state_serial()
+	現在設定されているステートファイル名の連番が取得できる。
+	/my/state/dir/file-Z.sta ならば、 'Z' が返る。
+	/my/state/dir/file.sta ならば、   0 が返る。
+	拡張子が .sta でないなら、        -1 が返る。
+
+  ファイル名の設定 … filename_set_state(name)
+	ステートファイル名を name に設定する。
+	連番つきのファイル名でも、連番なしでもよい。
+	なお、NULL を指定すると、初期値がセットされる。
+
+  ファイル連番の設定 … filename_set_state_serial(num)
+	連番を num に設定する。  ファイル名の拡張子が .sta でないなら付加する。
+	num が 0 なら、連番無し。ファイル名の拡張子が .sta でないなら付加する。
+	num が負 なら、連番無し。ファイル名の拡張子はそのままとする。
+*/
+
+
+
+
+const char	*filename_get_state(void)
+{
+    return file_state;
+}
+
+int		filename_get_state_serial(void)
+{
+    const char  *str_sfx = STATE_SUFFIX;		/* ".sta" */
+    const size_t len_sfx = strlen(STATE_SUFFIX);	/* 4      */
+    size_t len = strlen(file_state);
+
+    if (len > len_sfx &&
+	my_strcmp(&file_state[ len - len_sfx ], str_sfx) == 0) {
+
+	if (len > len_sfx + 2 &&	/* ファイル名が xxx-N.sta */
+	    '-' ==  file_state[ len - len_sfx -2 ]   &&
+	    isalnum(file_state[ len - len_sfx -1 ])) {
+						/* '0'-'9','a'-'z' を返す */
+	    return file_state[ len - len_sfx -1 ];    
+
+	} else {			/* ファイル名が xxx.sta */
+	    return 0;
+	}
+    } else {				/* ファイル名が その他 */
+	return -1;
+    }
+}
+
+void		filename_set_state(const char *filename)
+{
+    if (filename) {
+	strncpy(file_state, filename, QUASI88_MAX_FILENAME - 1);
+	file_state[ QUASI88_MAX_FILENAME - 1 ] = '\0';
+    } else {
+	filename_init_state(FALSE);
+    }
+}
+
+void		filename_set_state_serial(int serial)
+{
+    const char  *str_sfx = STATE_SUFFIX;		/* ".sta"   */
+    const size_t len_sfx = strlen(STATE_SUFFIX);	/* 4        */
+    char         add_sfx[] = "-N" STATE_SUFFIX;		/* "-N.sta" */
+    size_t len;
+    int now_serial;
+
+    add_sfx[1] = serial;
+
+    len = strlen(file_state);
+
+    now_serial = filename_get_state_serial();
+
+    if (now_serial > 0) {		/* 元のファイル名が xxx-N.sta */
+
+	file_state[ len - len_sfx -2 ] = '\0';	/* -N.sta を削除 */
+
+	if (serial <= 0) {			/* xxx → xxx.sta */
+	    strcat(file_state, str_sfx);
+	} else {				/* xxx → xxx-M.sta */
+	    strcat(file_state, add_sfx);
+	}
+
+    } else if (now_serial == 0) {	/* 元のファイル名が xxx.sta */
+
+	if (serial <= 0) {			/* xxx.sta のまま */
+	    ;
+	} else {
+	    if (len + 2 < QUASI88_MAX_FILENAME) {
+		file_state[ len - len_sfx ] = '\0';  /* .sta を削除 */
+		strcat(file_state, add_sfx);	/* xxx → xxx-M.sta */
+	    }
+	}
+
+    } else {				/* 元のファイル名が その他 xxx */
+
+	if (serial < 0) {			/* xxx のまま */
+	    ;
+	} else if (serial == 0) {		/* xxx → xxx.sta */
+	    if (len + len_sfx < QUASI88_MAX_FILENAME) {
+		strcat(file_state, str_sfx);
+	    }
+	} else {				/* xxx → xxx-M.sta */
+	    if (len + len_sfx + 2 < QUASI88_MAX_FILENAME) {
+		strcat(file_state, add_sfx);
+	    }
+	}
+    }
+}
+
+
+
+
+
+
+int	statesave_check_file_exist(void)
+{
+    OSD_FILE *fp;
+
+    if (file_state[0] &&
+	(fp = osd_fopen(FTYPE_STATE_LOAD, file_state, "rb"))) {
+	osd_fclose(fp);
+	return TRUE;
+    }
+    return FALSE;
 }
 
 
@@ -562,23 +702,23 @@ int	statesave( void )
 
 
 
-int	stateload_check( void )
+int	stateload_check_file_exist(void)
 {
-  int success = FALSE;
+    int success = FALSE;
 
-  if( file_state[0] &&
-      (stateload_fp = osd_fopen( FTYPE_STATE_LOAD, file_state, "rb" )) ){
+    if (file_state[0] &&
+	(stateload_fp = osd_fopen(FTYPE_STATE_LOAD, file_state, "rb"))) {
 
-    if( stateload_header() == STATE_OK ){	/* ヘッダだけチェック */
-      success = TRUE;
+	if (stateload_header() == STATE_OK) {	/* ヘッダだけチェック */
+	    success = TRUE;
+	}
+	osd_fclose(stateload_fp);
     }
-    osd_fclose( stateload_fp );
-  }
 
-  if( verbose_suspend ){
-    printf( "stateload: file check ... %s\n", (success)?"OK":"FAILED" );
-  }
-  return success;
+    if (verbose_suspend) {
+	printf("stateload: file check ... %s\n", (success) ? "OK" : "FAILED");
+    }
+    return success;
 }
 
 
@@ -629,23 +769,12 @@ int	stateload( void )
 /***********************************************************************
  * ステートファイル名を初期化
  ************************************************************************/
-void	stateload_init( void )
+void	stateload_init(void)
 {
-  /* ステートファイル名が設定されていない、
-     または、ステートロード指示あり(ファイル名指定なし) の場合は、
-
-     ステートファイル名をデフォルトに設定しておく */
-
-  if( file_state[0] == '\0' ||
-      ( resume_flag && resume_file == FALSE ) ){
-
-    if( set_state_filename( TRUE ) == FALSE ){
-
-      /* ファイル名を設定しそこねたら、ステートロードもしない */
-
-      printf( "stateload: Intarnal err...\n" );
-      resume_flag = FALSE;
+    if (file_state[0] == '\0') {
+	filename_init_state(FALSE);
     }
-  }
-}
 
+    /* 起動時のオプションでステートロードが指示されている場合、
+       なんらかのファイル名がすでにセットされているはず */
+}
