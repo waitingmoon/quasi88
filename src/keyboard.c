@@ -31,65 +31,65 @@
  *****************************************************************************/
 
 /*
- *	�������� (���ơ��ȥ���������?)
+ *	内部状態 (ステートセーブ不要?)
  */
 
-int		mouse_x;		/* ���ߤ� �ޥ��� x��ɸ		*/
-int		mouse_y;		/* ���ߤ� �ޥ��� y��ɸ		*/
+int		mouse_x;		/* 現在の マウス x座標		*/
+int		mouse_y;		/* 現在の マウス y座標		*/
 
-static	int	mouse_dx;		/* �ޥ��� x������ư��		*/
-static	int	mouse_dy;		/* �ޥ��� y������ư��		*/
+static	int	mouse_dx;		/* マウス x方向移動量		*/
+static	int	mouse_dy;		/* マウス y方向移動量		*/
 
-static	int	mouse_sx;		/* ���ꥢ��ޥ��� x������ư��	*/
-static	int	mouse_sy;		/* ���ꥢ��ޥ��� y������ư��	*/
-static	int	mouse_sb;		/* ���ꥢ��ޥ��� �ܥ���	*/
+static	int	mouse_sx;		/* シリアルマウス x方向移動量	*/
+static	int	mouse_sy;		/* シリアルマウス y方向移動量	*/
+static	int	mouse_sb;		/* シリアルマウス ボタン	*/
 
 
-unsigned char	key_scan[ 0x10 ];	/* IN(00h)��(0Eh) �����������	*/
-					/* key_scan[0]��[14] ����	*/
-					/* I/O�ݡ��� 00H��0EH ��������	*/
-					/* key_scan[15] �ϡ����祤	*/
-					/* ���ƥ��å��ΰ������˻��� */
+unsigned char	key_scan[ 0x10 ];	/* IN(00h)〜(0Eh) キースキャン	*/
+					/* key_scan[0]〜[14] が、	*/
+					/* I/Oポート 00H〜0EH と等価。	*/
+					/* key_scan[15] は、ジョイ	*/
+					/* スティックの一時ワークに使用 */
 
-static	int	key_func[ KEY88_END ];	/* ���������إ�����,��ǽ����	*/
+static	int	key_func[ KEY88_END ];	/* キーの代替コード,機能割当	*/
 
 
 /*
- *	PC88���� / ��������
+ *	PC88状態 / 内部状態
  */
 
-static	int	jop1_step;	/* ����I/O�ݡ��ȤΥ꡼�ɥ��ƥå�	*/
-static	int	jop1_dx;	/* ����I/O�ݡ��Ȥ��� (�ޥ��� x�����Ѱ�)	*/
-static	int	jop1_dy;	/* ����I/O�ݡ��Ȥ��� (�ޥ��� y�����Ѱ�)	*/
-static	int	jop1_time;	/* ����I/O�ݡ��ȤΥ��ȥ����ֽ���������	*/
+static	int	jop1_step;	/* 汎用I/Oポートのリードステップ	*/
+static	int	jop1_dx;	/* 汎用I/Oポートの値 (マウス x方向変位)	*/
+static	int	jop1_dy;	/* 汎用I/Oポートの値 (マウス y方向変位)	*/
+static	int	jop1_time;	/* 汎用I/Oポートのストローブ処理した時	*/
 
-	int	romaji_input_mode = FALSE;	/* ��:�����޻�������	*/
+	int	romaji_input_mode = FALSE;	/* 真:ローマ字入力中	*/
 
 
 
 /*
-  mouse_x, mouse_dx, jop1_dx �δط�
-	�ޥ�������ư������
-		mouse_x �ˤ������к�ɸ�򥻥åȤ��롣
-		�����ɸ�Ȥ��Ѱ� mouse_dx �˥��åȤ��롣
-	����I/O�ݡ��Ȥ���ޥ�����ɸ��꡼�ɤ�������
-		mouse_dx �򥯥�åԥ󥰤����ͤ� jop1_dx �˥��åȤ��롣
+  mouse_x, mouse_dx, jop1_dx の関係
+	マウスが移動した時
+		mouse_x にその絶対座標をセットする。
+		前回座標との変位 mouse_dx にセットする。
+	汎用I/Oポートからマウス座標をリードした時、
+		mouse_dx をクリッピングした値を、 jop1_dx にセットする。
 */
 
 
 
 /*
- *	����
+ *	設定
  */
 
-int	mouse_mode	= 0;		/* �ޥ��������祤���ƥå�����	*/
+int	mouse_mode	= 0;		/* マウス・ジョイステック処理	*/
 
-int	mouse_sensitivity = 100;	/* �ޥ�������			*/
-int	mouse_swap_button = FALSE;	/* �ޥ����ܥ���������ؤ���  	*/
+int	mouse_sensitivity = 100;	/* マウス感度			*/
+int	mouse_swap_button = FALSE;	/* マウスボタンを入れ替える  	*/
 
 
-int	mouse_key_mode	= 0;		/* �ޥ������Ϥ򥭡���ȿ��	*/
-int	mouse_key_assign[6];		/*     0:�ʤ� 1:�ƥ󥭡� 2:Ǥ�� */
+int	mouse_key_mode	= 0;		/* マウス入力をキーに反映	*/
+int	mouse_key_assign[6];		/*     0:なし 1:テンキー 2:任意 */
 static const int mouse_key_assign_tenkey[6] =
 {
   KEY88_KP_8, KEY88_KP_2, KEY88_KP_4, KEY88_KP_6,
@@ -97,45 +97,45 @@ static const int mouse_key_assign_tenkey[6] =
 };
 
 
-int	joy_key_mode	= 0;		/* ���祤���Ϥ򥭡���ȿ��	*/
-int	joy_key_assign[12];		/*     0:�ʤ� 1:�ƥ󥭡� 2:Ǥ�� */
+int	joy_key_mode	= 0;		/* ジョイ入力をキーに反映	*/
+int	joy_key_assign[12];		/*     0:なし 1:テンキー 2:任意 */
 static const int joy_key_assign_tenkey[12] =
 {
   KEY88_KP_8, KEY88_KP_2, KEY88_KP_4, KEY88_KP_6,
   KEY88_x,    KEY88_z,    0, 0, 0, 0, 0, 0,
 };
-int	joy_swap_button   = FALSE;	/* �ܥ����AB�������ؤ���  	*/
+int	joy_swap_button   = FALSE;	/* ボタンのABを入れ替える  	*/
 
 
-int	joy2_key_mode   = 0;		/* ���祤�����Ϥ򥭡���ȿ��	*/
-int	joy2_key_assign[12];		/*     0:�ʤ� 1:�ƥ󥭡� 2:Ǥ�� */
-int	joy2_swap_button   = FALSE;	/* �ܥ����AB�������ؤ���  	*/
+int	joy2_key_mode   = 0;		/* ジョイ２入力をキーに反映	*/
+int	joy2_key_assign[12];		/*     0:なし 1:テンキー 2:任意 */
+int	joy2_swap_button   = FALSE;	/* ボタンのABを入れ替える  	*/
 
 
 
-int	cursor_key_mode = 0;		/* �������륭�����̥�����ȿ��	*/
-int	cursor_key_assign[4];		/*     0:�ʤ� 1:�ƥ󥭡� 2:Ǥ�� */
+int	cursor_key_mode = 0;		/* カーソルキーを別キーに反映	*/
+int	cursor_key_assign[4];		/*     0:なし 1:テンキー 2:任意 */
 static const int cursor_key_assign_tenkey[4] =
 {
   KEY88_KP_8, KEY88_KP_2, KEY88_KP_4, KEY88_KP_6,
 };		/* Cursor KEY -> 10 KEY , original by funa. (thanks!) */
-		/* Cursor Key -> Ǥ�դΥ��� , original by floi. (thanks!) */
+		/* Cursor Key -> 任意のキー , original by floi. (thanks!) */
 
 
 
-int	tenkey_emu      = FALSE;	/* ��:����������ƥ󥭡���	*/
-int	numlock_emu     = FALSE;	/* ��:���եȥ�����NumLock��Ԥ�	*/
+int	tenkey_emu      = FALSE;	/* 真:数字キーをテンキーに	*/
+int	numlock_emu     = FALSE;	/* 真:ソフトウェアNumLockを行う	*/
 
 
 
 
-int	function_f[ 1 + 20 ] =		/* �ե��󥯥���󥭡��ε�ǽ     */
+int	function_f[ 1 + 20 ] =		/* ファンクションキーの機能     */
 {
-  FN_FUNC,    /* [0] �ϥ��ߡ� */
-  FN_FUNC,    FN_FUNC,    FN_FUNC,    FN_FUNC,    FN_FUNC,	/* f1 ��f5  */
-  FN_FUNC,    FN_FUNC,    FN_FUNC,    FN_FUNC,    FN_FUNC,	/* f6 ��f10 */
-  FN_STATUS,  FN_MENU,    FN_FUNC,    FN_FUNC,    FN_FUNC,	/* f11��f15 */
-  FN_FUNC,    FN_FUNC,    FN_FUNC,    FN_FUNC,    FN_FUNC,	/* f16��f20 */
+  FN_FUNC,    /* [0] はダミー */
+  FN_FUNC,    FN_FUNC,    FN_FUNC,    FN_FUNC,    FN_FUNC,	/* f1 〜f5  */
+  FN_FUNC,    FN_FUNC,    FN_FUNC,    FN_FUNC,    FN_FUNC,	/* f6 〜f10 */
+  FN_STATUS,  FN_MENU,    FN_FUNC,    FN_FUNC,    FN_FUNC,	/* f11〜f15 */
+  FN_FUNC,    FN_FUNC,    FN_FUNC,    FN_FUNC,    FN_FUNC,	/* f16〜f20 */
 };
 
 
@@ -144,29 +144,29 @@ double	fn_max_clock = CONST_4MHZ_CLOCK*16;
 int	fn_max_boost = 16;
 
 
-int	romaji_type = 0;		/* �����޻��Ѵ��Υ�����		*/
+int	romaji_type = 0;		/* ローマ字変換のタイプ		*/
 
 
 
 
 
 /*
- *	������� ��Ͽ������
+ *	キー操作 記録・再生
  */
 
-char	*file_rec	= NULL;		/* �������ϵ�Ͽ�Υե�����̾ */
-char	*file_pb	= NULL;		/* �������Ϻ����Υե�����̾ */
+char	*file_rec	= NULL;		/* キー入力記録のファイル名 */
+char	*file_pb	= NULL;		/* キー入力再生のファイル名 */
 
 static	OSD_FILE *fp_rec;
 static	OSD_FILE *fp_pb;
 
-static struct {				/* �������ϵ�Ͽ��¤��		*/
-  Uchar	key[16];			/*	I/O 00H��0FH 		*/
-   char	dx_h;				/*	�ޥ��� dx ���		*/
-  Uchar	dx_l;				/*	�ޥ��� dx ����		*/
-   char	dy_h;				/*	�ޥ��� dy ���		*/
-  Uchar	dy_l;				/*	�ޥ��� dy ����		*/
-   char	image[2];			/*	���᡼��No -1��,0Ʊ,1��	*/
+static struct {				/* キー入力記録構造体		*/
+  Uchar	key[16];			/*	I/O 00H〜0FH 		*/
+   char	dx_h;				/*	マウス dx 上位		*/
+  Uchar	dx_l;				/*	マウス dx 下位		*/
+   char	dy_h;				/*	マウス dy 上位		*/
+  Uchar	dy_l;				/*	マウス dy 下位		*/
+   char	image[2];			/*	イメージNo -1空,0同,1〜	*/
    char resv[2];
 } key_record;				/* 24 bytes			*/
 
@@ -175,7 +175,7 @@ static struct {				/* �������ϵ�Ͽ��¤��		*/
 
 
 /*---------------------------------------------------------------------------
- *	���������� �� I/O �ݡ��Ȥ��б�
+ *	キーコード と I/O ポートの対応
  *---------------------------------------------------------------------------*/
 
 #define	Port0	0x00
@@ -214,7 +214,7 @@ static struct {				/* �������ϵ�Ͽ��¤��		*/
 
 
 enum {
-  /* �������������̾��� */
+  /* 後期型キーの別名定義 */
 
   KEY88_EXT_F6		= KEY88_END + 0,
   KEY88_EXT_F7		= KEY88_END + 1,
@@ -516,14 +516,14 @@ static const T_KEYPORT keyport[ KEY88_EXT_END ] =
 
 
 /*---------------------------------------------------------------------------
- * �����ΥХ���ǥ����ѹ� (���������ɡ���ǽ)
+ * キーのバインディング変更 (キーコード、機能)
  *---------------------------------------------------------------------------*/
 static	void	clr_key_function(void)
 {
     int i;
     for (i=0; i<COUNTOF(key_func); i++) { key_func[i] = 0; }
 
-    /* ����2�ĤΥ����ϡ���ǽ���� */
+    /* この2個のキーは、機能固定 */
     key_func[ KEY88_SYS_STATUS ] = FN_STATUS;
     key_func[ KEY88_SYS_MENU   ] = FN_MENU;
 }
@@ -533,7 +533,7 @@ static	void	set_key_function(int keycode, int func_no)
 {
     key_func[ keycode ] = func_no;
 
-    /* ����2�ĤΥ����ϡ���ǽ���� */
+    /* この2個のキーは、機能固定 */
     key_func[ KEY88_SYS_STATUS ] = FN_STATUS;
     key_func[ KEY88_SYS_MENU   ] = FN_MENU;
 }
@@ -548,7 +548,7 @@ static	void	swap_key_function(int keycode1, int keycode2)
 
 
 /*---------------------------------------------------------------------------
- * �ޥ����κ�ɸ�򡢲��̥������˹�碌����������
+ * マウスの座標を、画面サイズに合わせて補正する
  *---------------------------------------------------------------------------*/
 static void mouse_movement_adjust(int *x, int *y)
 {
@@ -566,23 +566,23 @@ static void mouse_movement_adjust(int *x, int *y)
 
 
 /****************************************************************************
- * �����ΥХ���ǥ����ѹ�
- *	���ץ����䡢��˥塼�Ǥ�����˴�Ť��������Х���ɤ��ѹ�����/�᤹��
+ * キーのバインディング変更
+ *	オプションや、メニューでの設定に基づき、キーバインドを変更する/戻す。
  *****************************************************************************/
 void	keyboard_switch(void)
 {
     int swap;
     const int *p;
 
-    if (quasi88_is_exec()) {	/* ���ߥ���ϡ������Х���ǥ����ѹ� */
+    if (quasi88_is_exec()) {	/* エミュ中は、キーバインディング変更 */
 
 	clr_key_function();
 
 	if (numlock_emu) {
-	    event_numlock_on();		/* Num lock ��ͭ���� (�����ƥ��¸) */
+	    event_numlock_on();		/* Num lock を有効に (システム依存) */
 	}
 
-	if (tenkey_emu) {		/* ����������ƥ󥭡������� */
+	if (tenkey_emu) {		/* 数字キーをテンキーに設定 */
 	    set_key_function( KEY88_1, KEY88_KP_1 );
 	    set_key_function( KEY88_2, KEY88_KP_2 );
 	    set_key_function( KEY88_3, KEY88_KP_3 );
@@ -595,7 +595,7 @@ void	keyboard_switch(void)
 	    set_key_function( KEY88_0, KEY88_KP_0 );
 	}
 
-	if (cursor_key_mode) {		/* ������������ϳ�������ѹ� */
+	if (cursor_key_mode) {		/* カーソルの入力割り当て変更 */
 	    if (cursor_key_mode == 1) p = cursor_key_assign_tenkey;
 	    else                      p = cursor_key_assign;
 
@@ -606,24 +606,24 @@ void	keyboard_switch(void)
 	}
 
 	/*
-	  �����ƥफ��Υޥ������ϡ�����ӥ��祤���ƥ��å����Ϥ���
-	  QUASI88 �Υݡ��ȤˤɤΤ褦��ȿ�Ǥ���뤫�ΰ�����
+	  システムからのマウス入力、およびジョイスティック入力が、
+	  QUASI88 のポートにどのように反映されるかの一覧。
 
-			 |  �ޥ�����ư    �ޥ����ܥ��� | ���祤���ƥ��å�
+			 |  マウス移動    マウスボタン | ジョイスティック
 	  ---------------+--------------+--------------+-----------------
-	  MOUSE_NONE	 | �ʤ�         | �ʤ�         | �ʤ�
+	  MOUSE_NONE	 | なし         | なし         | なし
 	  ---------------+--------------+--------------+-----------------
-	  MOUSE_JOYMOUSE | ������ȿ��   | ������ȿ��   | �ʤ�
+	  MOUSE_JOYMOUSE | 方向を反映   | 押下を反映   | なし
 	  ---------------+--------------+--------------+-----------------
-	  MOUSE_MOUSE	 | ��ư�̤�ȿ�� | ������ȿ��   | �ʤ�
+	  MOUSE_MOUSE	 | 移動量を反映 | 押下を反映   | なし
 	  ---------------+--------------+--------------+-----------------
-	  MOUSE_JOYSTICK | �ʤ�         | �ʤ�         | ������ȿ��
+	  MOUSE_JOYSTICK | なし         | なし         | 押下を反映
 
-	  �֤ʤ��פ���ϡ�QUASI88�ˤ�ȿ�Ǥ���ʤ��Τǡ���ͳ�˥���������Ʋ�ǽ��
+	  「なし」の欄は、QUASI88には反映されないので、自由にキー割り当て可能。
 	*/
 	swap = FALSE;
 
-	switch (mouse_mode) {		/* �ޥ��������ϳ�������ѹ� */
+	switch (mouse_mode) {		/* マウスの入力割り当て変更 */
 	case MOUSE_NONE:
 	case MOUSE_JOYSTICK:
 	    if (mouse_key_mode) {
@@ -665,7 +665,7 @@ void	keyboard_switch(void)
 
 	swap = FALSE;
 
-	switch (mouse_mode) {		/* ���祤���ƥ��å����ϳ�������ѹ� */
+	switch (mouse_mode) {		/* ジョイスティック入力割り当て変更 */
 	case MOUSE_NONE:
 	case MOUSE_MOUSE:
 	case MOUSE_JOYMOUSE:
@@ -692,7 +692,7 @@ void	keyboard_switch(void)
 	    break;
 
 	case MOUSE_JOYSTICK:
-	    /* KEY88_PAD1_C �� KEY88_PAD1_H �ϳ�����Ƥʤ� */
+	    /* KEY88_PAD1_C 〜 KEY88_PAD1_H は割り当てなし */
 	    swap = joy_swap_button;
 	    break;
 	}
@@ -701,7 +701,7 @@ void	keyboard_switch(void)
 	}
 
 
-	if (joy2_key_mode) {	      /* ���祤���ƥ��å������ϳ�������ѹ� */
+	if (joy2_key_mode) {	      /* ジョイスティック２入力割り当て変更 */
 	    if (joy2_key_mode == 1) p = joy_key_assign_tenkey;
 	    else                    p = joy2_key_assign;
 
@@ -726,7 +726,7 @@ void	keyboard_switch(void)
 	}
 
 
-					/* �ե��󥯥���󥭡��ε�ǽ������� */
+					/* ファンクションキーの機能割り当て */
 	set_key_function( KEY88_F1,  function_f[  1 ] );
 	set_key_function( KEY88_F2,  function_f[  2 ] );
 	set_key_function( KEY88_F3,  function_f[  3 ] );
@@ -749,15 +749,15 @@ void	keyboard_switch(void)
 	set_key_function( KEY88_F20, function_f[ 20 ] );
 
 
-    } else {			/* ��˥塼��ʤɤϡ������Х���ǥ����᤹ */
+    } else {			/* メニュー中などは、キーバインディング戻す */
 
-	romaji_clear();			/* �����޻��Ѵ���������� */
+	romaji_clear();			/* ローマ字変換ワークを初期化 */
 
-	event_numlock_off();		/* Num lock ��̵���� (�����ƥ��¸) */
+	event_numlock_off();		/* Num lock を無効に (システム依存) */
     }
 
 
-				/* �ޥ������Ϥ������ơ��ޥ������֤������ */
+				/* マウス入力に備えて、マウス位置を再設定 */
     event_get_mouse_pos(&mouse_x, &mouse_y);
     mouse_movement_adjust(&mouse_x, &mouse_y);
 
@@ -772,7 +772,7 @@ void	keyboard_switch(void)
 
 
 /****************************************************************************
- * �������ϤΥ��(�ݡ���)�����
+ * キー入力のワーク(ポート)初期化
  *****************************************************************************/
 void	keyboard_reset(void)
 {
@@ -785,7 +785,7 @@ void	keyboard_reset(void)
 
 
 /****************************************************************************
- * �������Ϥ���(�ݡ���)��ȿ��		���ߥ�⡼�ɤΤ�
+ * キー入力をワーク(ポート)に反映		エミュモードのみ
  *****************************************************************************/
 static	void	record_playback(void);
 
@@ -793,43 +793,43 @@ void	keyboard_update(void)
 {
     int status;
 
-	/* �����޻����ϥ⡼�ɻ��ϡ������޻��Ѵ���Υ��ʤ� key_scan[] ��ȿ�� */
+	/* ローマ字入力モード時は、ローマ字変換後のカナを key_scan[] に反映 */
 
     if (romaji_input_mode) romaji_output();
 
 
-	/* �ޥ������Ϥ� key_scan[] ��ȿ�� */
+	/* マウス入力を key_scan[] に反映 */
 
     switch (mouse_mode) {
 
     case MOUSE_NONE:
     case MOUSE_JOYSTICK:
-	if (mouse_key_mode == 0) {	/* �ޥ��������������̵���ʤ� */
-	    mouse_dx = 0;		/* �ޥ�����ư�̤�����         */
+	if (mouse_key_mode == 0) {	/* マウスキー割り当て無しなら */
+	    mouse_dx = 0;		/* マウス移動量は不要         */
 	    mouse_dy = 0;
 	    break;
 	}
-	/* FALLTHROUGH */		/* �ޥ��������������ͭ�꤫�� */
-					/* ���祤���ƥ��å��⡼�ɤʤ� */
-    case MOUSE_JOYMOUSE:		/* �ޥ�����ư�̤�ݡ��Ȥ�ȿ�� */
+	/* FALLTHROUGH */		/* マウスキー割り当て有りか、 */
+					/* ジョイスティックモードなら */
+    case MOUSE_JOYMOUSE:		/* マウス移動量をポートに反映 */
 	if (mouse_dx == 0) {
 	    if      (mouse_dy == 0) status = 0;		/* ---- */
-	    else if (mouse_dy >  0) status = (PadD);	/* ��   */
-	    else                    status = (PadU);	/* ��   */
+	    else if (mouse_dy >  0) status = (PadD);	/* ↓   */
+	    else                    status = (PadU);	/* ↑   */
 	} else if (mouse_dx > 0) {
 	    int a = mouse_dy * 100 / mouse_dx;
-	    if      (a >  241) status = (PadD);		/* ��   */
-	    else if (a >   41) status = (PadD | PadR);	/* ���� */
-	    else if (a >  -41) status = (       PadR);	/*   �� */
-	    else if (a > -241) status = (PadU | PadR);	/* ���� */
-	    else               status = (PadU);		/* ��   */
+	    if      (a >  241) status = (PadD);		/* ↓   */
+	    else if (a >   41) status = (PadD | PadR);	/* ↓→ */
+	    else if (a >  -41) status = (       PadR);	/*   → */
+	    else if (a > -241) status = (PadU | PadR);	/* ↑→ */
+	    else               status = (PadU);		/* ↑   */
 	} else {
 	    int a = -mouse_dy * 100 / mouse_dx;
-	    if      (a >  241) status = (PadD);		/* ��   */
-	    else if (a >   41) status = (PadD | PadL);	/* ���� */
-	    else if (a >  -41) status = (       PadL);	/*   �� */
-	    else if (a > -241) status = (PadU | PadL);	/* ���� */
-	    else               status = (PadU);		/* ��   */
+	    if      (a >  241) status = (PadD);		/* ↓   */
+	    else if (a >   41) status = (PadD | PadL);	/* ↓← */
+	    else if (a >  -41) status = (       PadL);	/*   ← */
+	    else if (a > -241) status = (PadU | PadL);	/* ↑← */
+	    else               status = (PadU);		/* ↑   */
 	}
 
 	quasi88_mouse( KEY88_MOUSE_UP,    (status & PadU) );
@@ -837,21 +837,21 @@ void	keyboard_update(void)
 	quasi88_mouse( KEY88_MOUSE_LEFT,  (status & PadL) );
 	quasi88_mouse( KEY88_MOUSE_RIGHT, (status & PadR) );
 
-	mouse_dx = 0;		/* �ݡ���ȿ�Ǹ�ϰ�ư�̥��ꥢ */
+	mouse_dx = 0;		/* ポート反映後は移動量クリア */
 	mouse_dy = 0;
 	break;
 
-    case MOUSE_MOUSE:		/* �ޥ���������ʤ顢         */
-	break;			/* �ޥ�����ư�̤��ݻ����Ƥ��� */
+    case MOUSE_MOUSE:		/* マウス装着時なら、         */
+	break;			/* マウス移動量は保持しておく */
     }
 
 
-	/* �������(scan_key[], mouse_dx, mouse_dy) ��Ͽ������ */
+	/* キー操作(scan_key[], mouse_dx, mouse_dy) を記録／再生 */
 
     record_playback();
 
 
-	/* key_scan[0x0f] (���祤���ƥ��å�) �򥵥�����������ϥݡ��Ȥ�ȿ�� */
+	/* key_scan[0x0f] (ジョイスティック) をサウンド汎用入力ポートに反映 */
 
     switch (mouse_mode) {
     case MOUSE_NONE:
@@ -876,22 +876,22 @@ void	keyboard_update(void)
 
 
 /****************************************************************************
- * ���ꥢ��ޥ�������Υ��ꥢ�������ͼ���
+ * シリアルマウスからのシリアル入力値取得
  *
- *	���ȥåץӥå� 1���ǡ���Ĺ 7bit���ѥ�ƥ��ʤ����ܡ��졼�� 1200bps��
+ *	ストップビット 1、データ長 7bit、パリティなし、ボーレート 1200bps？
  *			+--+--+--+--+--+--+--+--+
- *	1�Х�����	|��|��|��|��|Y7|Y6|X7|X6|
- *			+--+--+--+--+--+--+--+--+
- *			+--+--+--+--+--+--+--+--+
- *	2�Х�����	|��|��|X5|X4|X3|X2|X1|X0|
+ *	1バイト目	|０|１|Ｌ|Ｒ|Y7|Y6|X7|X6|
  *			+--+--+--+--+--+--+--+--+
  *			+--+--+--+--+--+--+--+--+
- *	3�Х�����	|��|��|Y5|Y4|Y3|Y2|Y1|Y0|
+ *	2バイト目	|０|０|X5|X4|X3|X2|X1|X0|
+ *			+--+--+--+--+--+--+--+--+
+ *			+--+--+--+--+--+--+--+--+
+ *	3バイト目	|０|０|Y5|Y4|Y3|Y2|Y1|Y0|
  *			+--+--+--+--+--+--+--+--+
  *
- *	�� ��            �� ���ܥ��󡢱��ܥ��� (��������1)
- *	X7X6X5X4X3X2X1X0 �� X������ư�� (����դ�)
- *	Y7Y6Y5Y4Y3Y2Y1Y0 �� X������ư�� (����դ�)
+ *	Ｌ Ｒ            … 左ボタン、右ボタン (押下時、1)
+ *	X7X6X5X4X3X2X1X0 … X方向移動量 (符合付き)
+ *	Y7Y6Y5Y4Y3Y2Y1Y0 … X方向移動量 (符合付き)
  *
  *****************************************************************************/
 static int serial_mouse_x;
@@ -943,7 +943,7 @@ int	get_serial_mouse_data(void)
 
 
 /****************************************************************************
- * �������� ��Ͽ������
+ * キー入力 記録・再生
  *****************************************************************************/
 void	key_record_playback_init(void)
 {
@@ -961,7 +961,7 @@ void	key_record_playback_init(void)
   fp_pb  = NULL;
   fp_rec = NULL;
 
-  if( file_pb && file_pb[0] ){			/* �����ѥե�����򥪡��ץ� */
+  if( file_pb && file_pb[0] ){			/* 再生用ファイルをオープン */
 
     fp_pb = osd_fopen( FTYPE_KEY_PB, file_pb, "rb" );
 
@@ -973,7 +973,7 @@ void	key_record_playback_init(void)
     }
   }
 
-  if( file_rec && file_rec[0] ){		/* ��Ͽ�ѥե�����򥪡��ץ� */
+  if( file_rec && file_rec[0] ){		/* 記録用ファイルをオープン */
 
     fp_rec = osd_fopen( FTYPE_KEY_REC, file_rec, "wb" );
 
@@ -1003,7 +1003,7 @@ void	key_record_playback_exit(void)
 
 
 /*----------------------------------------------------------------------
- * �������� ��Ͽ����������
+ * キー入力 記録・再生処理
  *----------------------------------------------------------------------*/
 static	void	record_playback(void)
 {
@@ -1072,28 +1072,28 @@ static	void	record_playback(void)
     }
   }
 
-  /* ���ꥢ��ޥ����ϡ�ȿ�ǥ����ߥ󥰤� VSYNC �Ȥϰۤʤ�Τǡ�Ŭ�Ѥ��ʤ� */
+  /* シリアルマウスは、反映タイミングが VSYNC とは異なるので、適用しない */
 }
 
 
 
 /****************************************************************************
- * ���� I/O �ݡ��ȤΥ�������
+ * 汎用 I/O ポートのワーク初期化
  *****************************************************************************/
-/* ���� I/O �ݡ��Ȥ������Ϣ����� ���ڤ��ؤ�ä����ν��� */
+/* 汎用 I/O ポートが、出力→入力 に切り替わった時の処理 */
 void	keyboard_jop1_reset(void)
 {
-#if 0	/* - - - - - - - - - - - - - - - - - �ޥ�����Ϣ�Υ������������  */
+#if 0	/* - - - - - - - - - - - - - - - - - マウス関連のワークを初期化する  */
 
-#if 0						/* �ޥ�����ɸ�����������ۤ�*/
-  event_get_mouse_pos(&mouse_x, &mouse_y);	/* ���������⤷��ʤ����ɡ�  */
-  mouse_movement_adjust(&mouse_x, &mouse_y);	/* �����ޤǤ��ʤ��Ƥ⤤�ä�  */
+#if 0						/* マウス座標も初期化したほう*/
+  event_get_mouse_pos(&mouse_x, &mouse_y);	/* がいいかもしれないけど、  */
+  mouse_movement_adjust(&mouse_x, &mouse_y);	/* そこまでしなくてもいっか  */
 #endif
   mouse_dx = 0;
   mouse_dy = 0;
 
-#endif	/* - - - - - - - - �Ǥ⡢�ºݤˤϤ���򤷤ʤ��Ƥ�³��ϤǤʤ��Ȼפ���*/
-	/*			�³������ä��Τǡ�ver 0.6.2 �ʹߤǤϺ��     */
+#endif	/* - - - - - - - - でも、実際にはこれをしなくても実害はでないと思う。*/
+	/*			実害があったので、ver 0.6.2 以降では削除     */
 
     jop1_step = 0;
     jop1_dx = 0;
@@ -1103,17 +1103,17 @@ void	keyboard_jop1_reset(void)
 
 
 /****************************************************************************
- * ���� I/O �ݡ��� ���ȥ����� ON/OFF
+ * 汎用 I/O ポート ストローブ ON/OFF
  *****************************************************************************/
 
-/* ���ȥ����ֽ����� 720state ����˴�λ�����롣   (��1.25�ϥޡ�����)	*/
-/*  (8MHz�ξ��� 1440state �ʤ�����ɤޤ����ä�)			*/
+/* ストローブ処理は 720state 以内に完了させる。   (×1.25はマージン)	*/
+/*  (8MHzの場合は 1440state なんだけどまあいっか)			*/
 #define	JOP1_STROBE_LIMIT		((int)(720 * 1.25))
 
 void	keyboard_jop1_strobe(void)
 {
-  if( mouse_mode==MOUSE_MOUSE       &&		/* �ޥ��� ͭ�� */
-      (sound_reg[ 0x07 ] & 0x80)==0 ){		/* ����I/O ��������� */
+  if( mouse_mode==MOUSE_MOUSE       &&		/* マウス 有効 */
+      (sound_reg[ 0x07 ] & 0x80)==0 ){		/* 汎用I/O 入力設定時 */
 
     {
       int now = state_of_cpu + z80main_cpu.state0;
@@ -1133,30 +1133,30 @@ void	keyboard_jop1_strobe(void)
 
     switch( jop1_step ){
 
-    case 0:		/* �ǽ�Υ��ȥ�����(ON)�ǡ��ޥ�����ư�̤��ͤ���ꤷ  */
-			/* 2���ܰʹߤΥ��ȥ����֤ǡ����γ��ꤷ���ͤ�ž������ */
+    case 0:		/* 最初のストローブ(ON)で、マウス移動量の値を確定し  */
+			/* 2回目以降のストローブで、この確定した値を転送する */
 		{
-		  int dx = mouse_dx;			/* x ���� �Ѱ� */
-		  int dy = mouse_dy;			/* y ���� �Ѱ� */
+		  int dx = mouse_dx;			/* x 方向 変位 */
+		  int dy = mouse_dy;			/* y 方向 変位 */
 
-#if 1			/* �Ѱ̤��127���ϰ���˥���åԥ󥰤��� */
+#if 1			/* 変位を±127の範囲内にクリッピングする */
 		  int f = 0;
 
-			/* x��y�Τ��� �Ѱ̤� ��127��Ķ���Ƥ�������õ����     */
-		  	/* �Ȥ��Ķ���Ƥ��顢�Ѱ̤��礭���ۤ���Ķ�����Ȥ��롣*/
+			/* x、yのうち 変位が ±127を超えている方を探す。     */
+		  	/* ともに超えてたら、変位の大きいほうが超えたとする。*/
 		  if( dx < -127 || 127 < dx ) f |= 0x01;
 		  if( dy < -127 || 127 < dy ) f |= 0x02;
 		  if( f==0x03 ){
 		    if( ABS(dx) > ABS(dy) ) f = 0x01;
 		    else                    f = 0x02;
 		  }
-		  if( f==0x01 ){		/* x�Ѱ̤� ��127��Ķ������� */
-		    				/* x�Ѱ̤�max�ͤˤ���y������ */
+		  if( f==0x01 ){		/* x変位が ±127を超えた場合 */
+		    				/* x変位をmax値にしてyを補正 */
 		    dy = 127 * SGN(dx) * dy / dx;
 		    dx = 127 * SGN(dx);
 		  }
-		  else if( f==0x02 ){		/* y�Ѱ̤� ��127��Ķ������� */
-						/* y�Ѱ̤�max�ͤˤ���x������ */
+		  else if( f==0x02 ){		/* y変位が ±127を超えた場合 */
+						/* y変位をmax値にしてxを補正 */
 		    dx = 127 * SGN(dy) * dx / dy;
 		    dy = 127 * SGN(dy);
 		  }
@@ -1184,8 +1184,8 @@ void	keyboard_jop1_strobe(void)
 
 
 /***********************************************************************
- * ���եȥ�����NumLock
- * ���ʡʥ����޻��˥������å�
+ * ソフトウェアNumLock
+ * カナ（ローマ字）キーロック
  ************************************************************************/
 void	quasi88_cfg_key_numlock(int on)
 {
@@ -1224,10 +1224,10 @@ void	quasi88_cfg_key_romaji(int on)
 
 
 /****************************************************************************
- * �ڵ����¸����ꡢ�����������˸ƤӽФ�����
+ * 【機種依存部より、キー押下時に呼び出される】
  *
- *	code �ϡ����������ɤǡ� KEY88_SPACE <= code <= KEY88_SHIFTR
- *	on   �ϡ����������ʤ鿿�����������ʤ鵶
+ *	code は、キーコードで、 KEY88_SPACE <= code <= KEY88_SHIFTR
+ *	on   は、キー押下なら真、キー開放なら偽
  *****************************************************************************/
 static	void	do_lattertype(int code, int on);
 static	int	do_func(int func, int on);
@@ -1236,21 +1236,21 @@ void	quasi88_key(int code, int on)
 {
     if (quasi88_is_exec()) {		/*===================================*/
 
-	if (key_func[ code ]) {			/* �ü����������ƺѤξ�� */
-	    code = do_func(key_func[ code ], on);   /*	�ü쵡ǽ������¹�  */
-	    if (code == 0) return;		    /*	���ͤ� ������������ */
+	if (key_func[ code ]) {			/* 特殊処理割り当て済の場合 */
+	    code = do_func(key_func[ code ], on);   /*	特殊機能処理を実行  */
+	    if (code == 0) return;		    /*	戻値は 新キーコード */
 	}
 
-	if (romaji_input_mode && on) {		/* �����޻����ϥ⡼�ɤξ�� */
-	    if (romaji_input(code) == 0) {	/*	�Ѵ�������¹�      */
+	if (romaji_input_mode && on) {		/* ローマ字入力モードの場合 */
+	    if (romaji_input(code) == 0) {	/*	変換処理を実行      */
 		return;
 	    }
 	}
 
-	if (IS_KEY88_LATTERTYPE(code)) {	/* ����������ܡ��ɤν���   */
+	if (IS_KEY88_LATTERTYPE(code)) {	/* 後期型キーボードの処理   */
 	    do_lattertype(code, on);
 	}
-						/* ����������IO�ݡ��Ȥ�ȿ�� */
+						/* キー押下をIOポートに反映 */
 	if (on) KEY88_PRESS(code);
 	else    KEY88_RELEASE(code);
 
@@ -1264,7 +1264,7 @@ void	quasi88_key(int code, int on)
     } else
     if (quasi88_is_menu()) {		/*===================================*/
 	/*printf("%d\n",code);*/
-						/* ��˥塼�Ѥ��ɤ��ؤ��� */
+						/* メニュー用の読み替え… */
 	switch (code) {
 	case KEY88_KP_0:	code = KEY88_0;		break;
 	case KEY88_KP_1:	code = KEY88_1;		break;
@@ -1285,7 +1285,7 @@ void	quasi88_key(int code, int on)
 	case KEY88_KP_DIVIDE:	code = KEY88_SLASH;	break;
 
 	case KEY88_INS_DEL:	code = KEY88_BS;	break;
-      /*case KEY88_DEL:		code = KEY88_BS;	break;	DEL�Τޤ� */
+      /*case KEY88_DEL:		code = KEY88_BS;	break;	DELのまま */
 	case KEY88_KETTEI:	code = KEY88_SPACE;	break;
 	case KEY88_HENKAN:	code = KEY88_SPACE;	break;
 	case KEY88_RETURNL:	code = KEY88_RETURN;	break;
@@ -1326,12 +1326,12 @@ void	quasi88_key(int code, int on)
 
 
 /*----------------------------------------------------------------------
- * ����������ܡ��ɤΥ�������/�������ν���
- *		���եȥ����䡢Ʊ�쵡ǽ�����Υݡ��Ȥ�Ʊ����������
+ * 後期型キーボードのキー押下/開放時の処理
+ *		シフトキーや、同一機能キーのポートを同時処理する
  *----------------------------------------------------------------------*/
 static	void	do_lattertype(int code, int on)
 {
-				  /* KEY88_XXX �� KEY88_EXT_XXX ���Ѵ� */
+				  /* KEY88_XXX を KEY88_EXT_XXX に変換 */
     int code2 = code - KEY88_F6 + KEY88_END;
 
     switch (code) {
@@ -1340,7 +1340,7 @@ static	void	do_lattertype(int code, int on)
     case KEY88_F8:
     case KEY88_F9:
     case KEY88_F10:
-    case KEY88_INS:		/* KEY88_SHIFTR, KEY88_SHIFTL �� ? */
+    case KEY88_INS:		/* KEY88_SHIFTR, KEY88_SHIFTL は ? */
 	if (on) { KEY88_PRESS  (KEY88_SHIFT);  KEY88_PRESS  (code2); }
 	else    { KEY88_RELEASE(KEY88_SHIFT);  KEY88_RELEASE(code2); }
 	break;
@@ -1351,10 +1351,10 @@ static	void	do_lattertype(int code, int on)
     case KEY88_KETTEI:
     case KEY88_ZENKAKU:
     case KEY88_PC:
-    case KEY88_RETURNR:		/* KEY88_RETURNL �� ? */
-    case KEY88_RETURNL:		/* KEY88_RETURNR �� ? */
-    case KEY88_SHIFTR:		/* KEY88_SHIFTL  �� ? */
-    case KEY88_SHIFTL:		/* KEY88_SHIFTR  �� ? */
+    case KEY88_RETURNR:		/* KEY88_RETURNL は ? */
+    case KEY88_RETURNL:		/* KEY88_RETURNR は ? */
+    case KEY88_SHIFTR:		/* KEY88_SHIFTL  は ? */
+    case KEY88_SHIFTL:		/* KEY88_SHIFTR  は ? */
 	if (on) { KEY88_PRESS  (code2); }
 	else    { KEY88_RELEASE(code2); }
 	break;
@@ -1365,8 +1365,8 @@ static	void	do_lattertype(int code, int on)
 }
 
 /*----------------------------------------------------------------------
- * �ե��󥯥���󥭡��˳�����Ƥ���ǽ�ν���
- *		����ͤϡ������ʥ��������� (0�ʤ饭�������ʤ�����)
+ * ファンクションキーに割り当てた機能の処理
+ *		戻り値は、新たなキーコード (0ならキー押下なし扱い)
  *----------------------------------------------------------------------*/
 static void change_framerate(int sign);
 static void change_volume(int sign);
@@ -1378,34 +1378,34 @@ static void change_max_boost(int new_boost);
 static	int	do_func(int func, int on)
 {
     switch (func) {
-    case FN_FUNC:				/* ��ǽ�ʤ� */
+    case FN_FUNC:				/* 機能なし */
 	return 0;
 
-    case FN_FRATE_UP:				/* �ե졼�� */
+    case FN_FRATE_UP:				/* フレーム */
 	if (on) change_framerate(+1);
 	return 0;
-    case FN_FRATE_DOWN:				/* �ե졼�� */
+    case FN_FRATE_DOWN:				/* フレーム */
 	if (on) change_framerate(-1);
 	return 0;
 
-    case FN_VOLUME_UP:				/* ���� */
+    case FN_VOLUME_UP:				/* 音量 */
 	if (on) change_volume(-1);
 	return 0;
-    case FN_VOLUME_DOWN:			/* ���� */
+    case FN_VOLUME_DOWN:			/* 音量 */
 	if (on) change_volume(+1);
 	return 0;
 
-    case FN_PAUSE:				/* ������ */
+    case FN_PAUSE:				/* 一時停止 */
 	if (on) quasi88_pause();
 	return 0;
 
-    case FN_RESIZE:				/* �ꥵ���� */
+    case FN_RESIZE:				/* リサイズ */
 	if (on) {
 	    quasi88_cfg_set_size_large();
 	}
 	return 0;
 
-    case FN_NOWAIT:				/* �������� */
+    case FN_NOWAIT:				/* ウエイト */
 	if (on) change_wait(0);
 	return 0;
     case FN_SPEED_UP:
@@ -1415,7 +1415,7 @@ static	int	do_func(int func, int on)
 	if (on) change_wait(-1);
 	return 0;
 
-    case FN_FULLSCREEN:				/* �������ڤ��ؤ� */
+    case FN_FULLSCREEN:				/* 全画面切り替え */
 	if (on) {
 	    if (quasi88_cfg_can_fullscreen()) {
 		int now  = quasi88_cfg_now_fullscreen();
@@ -1425,7 +1425,7 @@ static	int	do_func(int func, int on)
 	}
 	return 0;
 
-    case FN_IMAGE_NEXT1:			/* DRIVE1: ���᡼���ѹ� */
+    case FN_IMAGE_NEXT1:			/* DRIVE1: イメージ変更 */
 	if (on) quasi88_disk_image_empty(DRIVE_1);
 	else    quasi88_disk_image_next(DRIVE_1);
 	return 0;
@@ -1433,7 +1433,7 @@ static	int	do_func(int func, int on)
 	if (on) quasi88_disk_image_empty(DRIVE_1);
 	else    quasi88_disk_image_prev(DRIVE_1);
 	return 0;
-    case FN_IMAGE_NEXT2:			/* DRIVE2: ���᡼���ѹ� */
+    case FN_IMAGE_NEXT2:			/* DRIVE2: イメージ変更 */
 	if (on) quasi88_disk_image_empty(DRIVE_2);
 	else    quasi88_disk_image_next(DRIVE_2);
 	return 0;
@@ -1450,18 +1450,18 @@ static	int	do_func(int func, int on)
 	}
 	return 0;
 
-    case FN_RESET:				/* �ꥻ�å� */
+    case FN_RESET:				/* リセット */
 	if (on) quasi88_reset(NULL);
 	return 0;
 
-    case FN_KANA:				/* ���� */
+    case FN_KANA:				/* カナ */
 	if (on) {
 	    KEY88_TOGGLE(KEY88_KANA);
 	    romaji_input_mode = FALSE;
 	}
 	return 0;
 
-    case FN_ROMAJI:				/* ����(�����޻�) */
+    case FN_ROMAJI:				/* カナ(ローマ字) */
 	if (on) {
 	    KEY88_TOGGLE(KEY88_KANA);
 	    if (IS_KEY88_PRESS(KEY88_KANA)) {
@@ -1479,7 +1479,7 @@ static	int	do_func(int func, int on)
 	}
 	return 0;
 
-    case FN_SNAPSHOT:				/* �����꡼�󥹥ʥåץ���å�*/
+    case FN_SNAPSHOT:				/* スクリーンスナップショット*/
 	if (on) quasi88_screen_snapshot();
 	return 0;
 
@@ -1493,7 +1493,7 @@ static	int	do_func(int func, int on)
 	if (on) change_max_boost(fn_max_boost);
 	return 0;
 
-    case FN_STATUS:				/* FDD���ơ�����ɽ�� */
+    case FN_STATUS:				/* FDDステータス表示 */
 	if (on) {
 	    if (quasi88_cfg_can_showstatus()) {
 		int now  = quasi88_cfg_now_showstatus();
@@ -1502,7 +1502,7 @@ static	int	do_func(int func, int on)
 	    }
 	}
 	return 0;
-    case FN_MENU:				/* ��˥塼�⡼�� */
+    case FN_MENU:				/* メニューモード */
 	if (on) quasi88_menu();
 	return 0;
 
@@ -1513,14 +1513,14 @@ static	int	do_func(int func, int on)
 
 
 /*
- * �ե졼�ॹ���å׿��ѹ� : -frameskip ���ͤ��ѹ����롣
+ * フレームスキップ数変更 : -frameskip の値を、変更する。
  */
 static void change_framerate(int sign)
 {
     int	i, rate;
-				/*     framerate up ��                  */
+				/*     framerate up ←                  */
     static const int list[] = { 1, 2, 3, 4, 5, 6, 10, 12, 15, 20, 30, 60, };
-				/*                  �� framerate down   */
+				/*                  → framerate down   */
 
     rate = quasi88_cfg_now_frameskip_rate();
 
@@ -1545,7 +1545,7 @@ static void change_framerate(int sign)
 
 
 /*
- * �ܥ�塼���ѹ� : -vol ���ͤ��ѹ����롣
+ * ボリューム変更 : -vol の値を、変更する。
  */
 static void change_volume(int sign)
 {
@@ -1565,7 +1565,7 @@ static void change_volume(int sign)
     
 	    sprintf(str, "VOLUME  %3d[db]", xmame_cfg_get_mastervolume());
 	    status_message(1, STATUS_INFO_TIME, str);
-	    /* �ѹ�������ϡ����Ф餯���̤˲��̤�ɽ�������� */
+	    /* 変更した後は、しばらく画面に音量を表示させる */
 	}
     }
 #endif
@@ -1574,19 +1574,19 @@ static void change_volume(int sign)
 
 
 /*
- * �����������ѹ� : -nowait, -speed ���ͤ��ѹ����롣
+ * ウェイト量変更 : -nowait, -speed の値を、変更する。
  */
 static void change_wait(int sign)
 {
     int w;
 
-    if (sign == 0) {		/* ��������̵ͭ���ѹ� */
+    if (sign == 0) {		/* ウェイト有無の変更 */
 
 	w = quasi88_cfg_now_no_wait();
 	w ^= 1;
 	quasi88_cfg_set_no_wait(w);
 
-    } else {			/* ����������Ψ������ */
+    } else {			/* ウェイト比率の増減 */
 
 	w = quasi88_cfg_now_wait_rate();
 
@@ -1604,7 +1604,7 @@ static void change_wait(int sign)
 
 
 /*
- * ®���ѹ� (speed/clock/boost)
+ * 速度変更 (speed/clock/boost)
  */
 static void change_max_speed(int new_speed)
 {
@@ -1668,10 +1668,10 @@ static void change_max_boost(int new_boost)
 
 
 /******************************************************************************
- * �ڵ����¸����ꡢ�ޥ����Υܥ��󲡲����˸ƤӽФ�����
+ * 【機種依存部より、マウスのボタン押下時に呼び出される】
  *
- *	code �ϡ����������ɤǡ� KEY88_MOUSE_L <= code <= KEY88_MOUSE_DOWN
- *	on   �ϡ����������ʤ鿿�����������ʤ鵶
+ *	code は、キーコードで、 KEY88_MOUSE_L <= code <= KEY88_MOUSE_DOWN
+ *	on   は、キー押下なら真、キー開放なら偽
  *****************************************************************************/
 void	quasi88_mouse(int code, int on)
 {
@@ -1681,16 +1681,16 @@ void	quasi88_mouse(int code, int on)
 	  else    printf("-%d\n",code);
 	*/
 
-	if (key_func[ code ]) {			/* ���������ɤ��ɤ��ؤ�      */
-	    code = do_func(key_func[ code ], on);   /* �ü쵡ǽ������С�    */
-	    if (code == 0) return;		    /* ���������Τ�����    */
-	}					    /* �����޻����Ϥ䡢      */
-						    /* ����������Ͻ������ʤ�*/
+	if (key_func[ code ]) {			/* キーコードの読み替え      */
+	    code = do_func(key_func[ code ], on);   /* 特殊機能があれば、    */
+	    if (code == 0) return;		    /* 処理されるので注意    */
+	}					    /* ローマ字入力や、      */
+						    /* 後期型キーは処理しない*/
 
-	if (on) KEY88_PRESS(code);		/* I/O�ݡ��Ȥ�ȿ��           */
+	if (on) KEY88_PRESS(code);		/* I/Oポートへ反映           */
 	else    KEY88_RELEASE(code);
 
-	/* ���ꥢ��ޥ����ѤΥ�����å� */
+	/* シリアルマウス用のワークセット */
 	if (code == KEY88_MOUSE_L) {
 	    if (on) mouse_sb |=  0x20;
 	    else    mouse_sb &= ~0x20;
@@ -1707,29 +1707,29 @@ void	quasi88_mouse(int code, int on)
 	else    q8tk_event_mouse_off(code);
     }
 
-    if (on) screen_attr_mouse_click();	/* �ޥ�����ư����֡Ĥ����ǥ���� */
+    if (on) screen_attr_mouse_click();	/* マウス自動グラブ…ここでグラブ */
 }
 
 
 
 
 /******************************************************************************
- * �ڵ����¸����ꡢ���祤���ƥ��å����ϻ��˸ƤӽФ�����
+ * 【機種依存部より、ジョイスティック入力時に呼び出される】
  *
- *	code �ϡ����������ɤǡ� KEY88_PAD1_UP <= code <= KEY88_PAD1_H
- *	on   �ϡ����������ʤ鿿�����������ʤ鵶
+ *	code は、キーコードで、 KEY88_PAD1_UP <= code <= KEY88_PAD1_H
+ *	on   は、キー押下なら真、キー開放なら偽
  *****************************************************************************/
 void	quasi88_pad(int code, int on)
 {
     if (quasi88_is_exec()) {		/*===================================*/
 
-	if (key_func[ code ]) {			/* ���������ɤ��ɤ��ؤ�      */
-	    code = do_func(key_func[ code ], on);   /* �ü쵡ǽ������С�    */
-	    if (code == 0) return;		    /* ���������Τ�����    */
-	}					    /* �����޻����Ϥ䡢      */
-						    /* ����������Ͻ������ʤ�*/
+	if (key_func[ code ]) {			/* キーコードの読み替え      */
+	    code = do_func(key_func[ code ], on);   /* 特殊機能があれば、    */
+	    if (code == 0) return;		    /* 処理されるので注意    */
+	}					    /* ローマ字入力や、      */
+						    /* 後期型キーは処理しない*/
 
-	if (on) KEY88_PRESS(code);		/* I/O�ݡ��Ȥ�ȿ��           */
+	if (on) KEY88_PRESS(code);		/* I/Oポートへ反映           */
 	else    KEY88_RELEASE(code);
 
     }
@@ -1741,21 +1741,21 @@ void	quasi88_pad(int code, int on)
 
 
 /****************************************************************************
- * �ڵ����¸����ꡢ�ޥ�����ư���˸ƤӽФ���롣��
+ * 【機種依存部より、マウス移動時に呼び出される。】
  *
- *	abs_coord �������ʤ顢x,y �ϥޥ����ΰ�ư��κ�ɸ�򼨤���
- *		��ɸ�ϡ�graph_setup() ������ͤˤƱ������� ���̥�����
- *		width �� height ���Ф����ͤ򥻥åȤ��뤳�ȡ�
- *		(�ʤ����ϰϳ����ͤǤ�ĤȤ���)
+ *	abs_coord が、真なら、x,y はマウスの移動先の座標を示す。
+ *		座標は、graph_setup() の戻り値にて応答した 画面サイズ
+ *		width × height に対する値をセットすること。
+ *		(なお、範囲外の値でも可とする)
  *
- *	abs_coord �� ���ʤ顢x,y �ϥޥ����ΰ�ư�̤򼨤���
+ *	abs_coord が 偽なら、x,y はマウスの移動量を示す。
  *****************************************************************************/
 void	quasi88_mouse_move(int x, int y, int abs_coord)
 {
     if (abs_coord) {
 	mouse_movement_adjust(&x, &y);
     } else {
-	/* �������ˤ�������ϡ� */
+	/* サイズによる補正は？ */
     }
 
 
@@ -1768,7 +1768,7 @@ void	quasi88_mouse_move(int x, int y, int abs_coord)
 
 	} else {
 
-	    /* �ޥ�����®��Ĵ�� */
+	    /* マウスの速度調整 */
 	    x = x * mouse_sensitivity / 100;
 	    y = y * mouse_sensitivity / 100;
 
@@ -1798,16 +1798,16 @@ void	quasi88_mouse_move(int x, int y, int abs_coord)
 	q8tk_event_mouse_moved(mouse_x, mouse_y);
     }
 
-    screen_attr_mouse_move();	/* �ޥ�����ư�Ǳ����Ĥ����ǲ�� */
+    screen_attr_mouse_move();	/* マウス自動で隠す…ここで解除 */
 }
 
 
 
 /****************************************************************************
- * ��˥塼�⡼�ɤΥ��եȥ����������ܡ��ɽ��� (����Ȥ��� scan_key �����)
+ * メニューモードのソフトウェアキーボード処理 (ワークとして scan_key を使用)
  *****************************************************************************/
 
-/* ���եȥ����������ܡ��ɤ������줿���֤ʤ鿿���֤� */
+/* ソフトウェアキーボードが押された状態なら真を返す */
 int	softkey_is_pressed(int code)
 {
     if (IS_KEY88_LATTERTYPE(code)) {
@@ -1816,7 +1816,7 @@ int	softkey_is_pressed(int code)
     return ((key_scan[ keyport[(code)].port ] & keyport[(code)].mask) == 0);
 }
 
-/* ���եȥ����������ܡ��ɤ򲡤� */
+/* ソフトウェアキーボードを押す */
 void	softkey_press(int code)
 {
     if (IS_KEY88_LATTERTYPE(code)) {
@@ -1825,7 +1825,7 @@ void	softkey_press(int code)
     KEY88_PRESS(code);
 }
 
-/* ���եȥ����������ܡ��ɤ�Υ�� */
+/* ソフトウェアキーボードを離す */
 void	softkey_release(int code)
 {
     if (IS_KEY88_LATTERTYPE(code)) {
@@ -1834,23 +1834,23 @@ void	softkey_release(int code)
     KEY88_RELEASE(code);
 }
 
-/* ���եȥ����������ܡ��ɤ�����Υ�� */
+/* ソフトウェアキーボードを全て離す */
 void	softkey_release_all(void)
 {
     size_t i;
     for (i=0; i<sizeof(key_scan); i++) key_scan[i] = 0xff;
 }
 
-/* ���եȥ����������ܡ��ɤΡ������ܡ��ɥХ���Ƹ� */
+/* ソフトウェアキーボードの、キーボードバグを再現 */
 void	softkey_bug(void)
 {
     int  my_port, your_port;
     byte my_val,  your_val,  save_val;
 
-    save_val = key_scan[8] & 0xf0;	/* port 8 �� ��� 4bit ���оݳ� */
+    save_val = key_scan[8] & 0xf0;	/* port 8 の 上位 4bit は対象外 */
     key_scan[8] |= 0xf0;
 
-    /* port 0��11(����������ܡ��ɤ��ϰ�) �Τߡ��������� */
+    /* port 0〜11(初期型キーボードの範囲) のみ、処理する */
     for (my_port=0; my_port<12; my_port++) {
 	for (your_port=0; your_port<12; your_port++) {
 
@@ -1878,12 +1878,12 @@ void	softkey_bug(void)
 
 
 /***********************************************************************
- * ���ơ��ȥ����ɡ����ơ��ȥ�����
+ * ステートロード／ステートセーブ
  ************************************************************************/
-/* ver 0.6.2 ������ ver 0.6.3 �ʹߤǥե��󥯥���󥭡��ε�ǽ���Ѥ�ä��Τǡ�
-   ���ơ��ȥ����ɡ����ơ��ȥ����֤κݤ��Ѵ����롣*/
+/* ver 0.6.2 以前と ver 0.6.3 以降でファンクションキーの機能が変わったので、
+   ステートロード／ステートセーブの際に変換する。*/
 
-enum {			/* ver 0.6.2�����Ρ��ե��󥯥���󥭡��ε�ǽ	*/
+enum {			/* ver 0.6.2以前の、ファンクションキーの機能	*/
   OLD_FN_FUNC,
   OLD_FN_FRATE_UP,
   OLD_FN_FRATE_DOWN,
@@ -1916,7 +1916,7 @@ enum {			/* ver 0.6.2�����Ρ��ե��󥯥���󥭡��ε�ǽ	*/
   OLD_FN_MENU,
   OLD_FN_end
 };
-static struct{		/* ver 0.6.3�ʹߤȤΡ���ǽ���б�ɽ */
+static struct{		/* ver 0.6.3以降との、機能の対応表 */
 	int	old;		int	now;
 } func_f_convert[] =
 {
@@ -2136,7 +2136,7 @@ int	stateload_keyboard( void )
 
   if( stateload_table( SID2,suspend_keyboard_work2) != STATE_OK ){
 
-    /* ��С������ʤ顢�ߤΤ��� */
+    /* 旧バージョンなら、みのがす */
 
     printf( "stateload : Statefile is old. (ver 0.6.0 or 1?)\n" );
 
@@ -2145,7 +2145,7 @@ int	stateload_keyboard( void )
 
   if( stateload_table( SID3,suspend_keyboard_work3) != STATE_OK ){
 
-    /* ��С������ʤ顢�ߤΤ��� */
+    /* 旧バージョンなら、みのがす */
 
     printf( "stateload : Statefile is old. (ver 0.6.0, 1 or 2?)\n" );
 
@@ -2154,7 +2154,7 @@ int	stateload_keyboard( void )
 
   if( stateload_table( SID4,suspend_keyboard_work4) != STATE_OK ){
 
-    /* ��С������ʤ顢�ߤΤ��� */
+    /* 旧バージョンなら、みのがす */
 
     printf( "stateload : Statefile is old. (ver 0.6.0, 1, 2 or 3?)\n" );
   }
@@ -2164,14 +2164,14 @@ int	stateload_keyboard( void )
 
 
  NOT_HAVE_SID2:
-  /* ���δؿ��θƤӽФ������ˡ� stateload_pc88main �� stateload_intr ��
-     �ƤӽФ���Ƥ��ʤ���С��ʲ��ν�����ϰ�̣���ʤ� */
+  /* この関数の呼び出し以前に、 stateload_pc88main と stateload_intr が
+     呼び出されていなければ、以下の初期化は意味がない */
 
   jop1_time = state_of_cpu + z80main_cpu.state0;
 
 
  NOT_HAVE_SID3:
-  /* function_f[] �򺹤��ؤ��� */
+  /* function_f[] を差し替える */
   function_old2new();
 
 
@@ -2189,11 +2189,11 @@ int	stateload_keyboard( void )
 
 /****************************************************************************
  *
- *	�桼�ƥ���ƥ�
+ *	ユーティリティ
  *
  *****************************************************************************/
 
-/* QUASI88 ���������ɤ�ʸ����� int �ͤ��Ѵ�����ơ��֥� */
+/* QUASI88 キーコードの文字列を int 値に変換するテーブル */
 
 static const T_SYMBOL_TABLE key88sym_list[] =
 {
@@ -2367,28 +2367,28 @@ static const T_SYMBOL_TABLE key88sym_list[] =
 
 
 /***********************************************************************
- * Ϳ����줿ʸ�����QUASI88 ���������ɤ��Ѵ�����
- *	��������ե�����β��Ϥʤɤ˻Ȥ���
+ * 与えられた文字列を、QUASI88 キーコードに変換する
+ *	キー定義ファイルの解析などに使おう
  *
- *   ��)
- *	"KEY88_SPACE" -> KEY88_SPACE	������Τޤޤ�ʸ����ϡ�ľ���Ѵ�
- *	"key88_SPACE" -> KEY88_SPACE	��ʸ�����ߤǤ�褤
- *	"KEY88_Z"     -> KEY88_Z	����⡢������Τޤޤ���
- *	"KEY88_z"     -> KEY88_z	����⡢������Τޤޤ���
- *	"key88_z"     -> KEY88_Z	��ʸ�����ߤξ�����ʸ���ˤʤ��
- *	"0x20"        -> KEY88_SPACE	0x20��0xf7 ��ľ�˥��������ɤ��Ѵ�
- *	"0x01"        -> KEY88_INVALID	�嵭���ϰϳ��ʤ�̵��(0)���֤�
- *	"32"          -> KEY88_SPACE	10�ʿ���8�ʿ��Ǥ�Ʊ��
- *	"KP1"         -> KEY88_KP_1	KP �� 1ʸ�� �ǡ��ƥ󥭡��Ȥ���
- *	"KP+"         -> KEY88_KP_ADD	����Ǥ�褤
- *	"Kp9"         -> KEY88_KP_9	��ʸ�����ߤǤ�褤
- *	"Err"         -> -1		�ɤ�ˤ���פ��ʤ��ä��顢����֤�
+ *   例)
+ *	"KEY88_SPACE" -> KEY88_SPACE	定義そのままの文字列は、直に変換
+ *	"key88_SPACE" -> KEY88_SPACE	小文字混在でもよい
+ *	"KEY88_Z"     -> KEY88_Z	これも、定義そのままの例
+ *	"KEY88_z"     -> KEY88_z	これも、定義そのままの例
+ *	"key88_z"     -> KEY88_Z	小文字混在の場合は大文字になるよ
+ *	"0x20"        -> KEY88_SPACE	0x20〜0xf7 は直にキーコードに変換
+ *	"0x01"        -> KEY88_INVALID	上記の範囲外なら無効(0)を返す
+ *	"32"          -> KEY88_SPACE	10進数や8進数でも同様
+ *	"KP1"         -> KEY88_KP_1	KP と 1文字 で、テンキーとする
+ *	"KP+"         -> KEY88_KP_ADD	記号でもよい
+ *	"Kp9"         -> KEY88_KP_9	小文字混在でもよい
+ *	"Err"         -> -1		どれにも合致しなかったら、負を返す
  ************************************************************************/
 
 int	keyboard_str2key88(const char *str)
 {
   static const T_SYMBOL_TABLE tenkey_list[] =
-  {				/* �ƥ󥭡��˸¤ꡢ�㳰Ū��ɽ������ǽ */
+  {				/* テンキーに限り、例外的な表記が可能 */
     { "KP0"			,	KEY88_KP_0              },
     { "KP1"			,	KEY88_KP_1              },
     { "KP2"			,	KEY88_KP_2              },
@@ -2417,9 +2417,9 @@ int	keyboard_str2key88(const char *str)
     if (len == 0) return -1;
 
 
-					/* 0��9 �ǻϤޤ�С��������Ѵ� */
+					/* 0〜9 で始まれば、数字に変換 */
     if ('0'<=str[0] && str[0]<='9') {
-	l = strtoul(str, &conv_end, 0);		/* 10��,16��,8�ʿ�����ǽ */
+	l = strtoul(str, &conv_end, 0);		/* 10進,16進,8進数が可能 */
 	if (*conv_end == '\0') {
 	    if (32 <= l && l <= 247) {
 		return l;
@@ -2429,7 +2429,7 @@ int	keyboard_str2key88(const char *str)
 	}
 	return -1;
     }
-					/* 3ʸ���ʤ顢�ƥ󥭡����� */
+					/* 3文字なら、テンキーかも */
     if (len == 3) {
 	for (i=0; i<COUNTOF(tenkey_list); i++) {
 	    if (strcmp(tenkey_list[i].name, str) == 0) {
@@ -2442,7 +2442,7 @@ int	keyboard_str2key88(const char *str)
 	    }
 	}
     }
-					/* ���ʸ����˹��פ���Τ�õ�� */
+					/* 定義文字列に合致するのを探す */
     for (i=0; i<COUNTOF(key88sym_list); i++) {
 	if (strcmp(key88sym_list[i].name, str) == 0) {
 	    return key88sym_list[i].val;
@@ -2475,75 +2475,75 @@ const char	*keyboard_key882str(int key88)
 
 
 /****************************************************************************
- * ��������ե�������ɤ߹���ǡ������Ԥ���
+ * キー設定ファイルを読み込んで、設定を行う。
  *
- *	����Ū�ˤϡ���������ե�����򣱹��ɤि�Ӥˡ�������Хå��ؿ���Ƥ֡�
- *	���ιԤ����Ƥ������ȿ�Ǥ��뤫�ɤ����ϡ�������Хå��ؿ����衣
+ *	内部的には、キー設定ファイルを１行読むたびに、コールバック関数を呼ぶ。
+ *	この行の内容を設定に反映するかどうかは、コールバック関数次第。
  *
  * --------------------------------------------------------------------------
- * ��������ե�����ν񼰤ϡ�����ʴ���
- * (��ԤˤĤ� ����3�ĤΥȡ�������¤٤��롣 # ��������ޤǤϥ����ȤȤ���)
+ * キー設定ファイルの書式は、こんな感じ
+ * (一行につき 最大3個のトークンを並べられる。 # から行末まではコメントとする)
  *
  *	[SDL]			dga
  *	SDLK_ESCAPE		KEY88_ESC		KEY88_KP_4
  *	<49>			KEY88_ZENKAKU
  *
- * 1���ܤΤ褦�ˡ�[��] �ǻϤޤ�Ԥϡ��ּ��̥����ԡפȤ��롣
- * 1���ܤΥȡ������ [��] �η����ǡ�2���ܡ�3���ܤΥȡ������Ǥ�� (̵���Ƥ�褤)
- * �ּ��̥����ԡפ��ɤि�Ӥˡ��ʲ��Υ�����Хå��ؿ����ƤӽФ���롣
+ * 1行目のように、[〜] で始まる行は、「識別タグ行」とする。
+ * 1番目のトークンは [〜] の形式で、2番目、3番目のトークンは任意 (無くてもよい)
+ * 「識別タグ行」を読むたびに、以下のコールバック関数が呼び出される。
  *
  *	identify_callback(const char *param1, const char *param2,
  *			  const char *param3)
  *
- *	�����ξ�硢�����ϰʲ������åȤ����
- *		param1 �� "[SDL]"
- *		param2 �� "dga"
- *		param3 �� NULL (3���ܤΥȡ����󤬤ʤ����Ȥ��̣����)
+ *	上の例の場合、引数は以下がセットされる
+ *		param1 … "[SDL]"
+ *		param2 … "dga"
+ *		param3 … NULL (3番目のトークンがないことを意味する)
  *
- * ���Υ�����Хå��ؿ��ϡ����Ρּ��̥����ԡפ�ͭ���Ǥ���С� NULL ���֤��Τǡ�
- * ���μ��ιԤ��顢���Ρּ��̥����ԡ� ([��] �ǻϤޤ��) �ޤǤ򡢽������롣
- * �֤��ͤ� NULL �Ǥʤ����ϡ����Ρּ��̥����ԡפޤǥ����åפ��롣
- * �ʤ����֤��ͤ���ʸ���� "" �Ǥʤ���С���˥󥰤Ȥ��Ƥ����ɽ�����롣
+ * このコールバック関数は、この「識別タグ行」が有効であれば、 NULL を返すので、
+ * この次の行から、次の「識別タグ行」 ([〜] で始まる行) までを、処理する。
+ * 返り値が NULL でない場合は、次の「識別タグ行」までスキップする。
+ * なお、返り値が空文字列 "" でなければ、ワーニングとしてそれを表示する。
  *
- * 2���ܤϡ������Ρ�����ԡפȤ��롣
- * 1���ܡ�2���ܤΥȡ������ɬ�ܤǡ�3���ܤΥȡ������Ǥ�� (̵���Ƥ�褤)
- * ������ԡפΤ��Ӥˡ��ʲ��Υ�����Хå��ؿ����ƤӽФ���롣
+ * 2行目は、キーの「設定行」とする。
+ * 1番目、2番目のトークンは必須で、3番目のトークンは任意 (無くてもよい)
+ * 「設定行」のたびに、以下のコールバック関数が呼び出される。
  *
  *	setting_callback(int type, int code, int key88, int numlock_key88);
  *
- *	�����ξ�硢�����ϰʲ������åȤ���롣
- *		type          �� 1
- *		code          �� "SDLK_ESCAPE" �� int ���Ѵ�������� (��� ��1)
- *		key88         �� KEY88_ESC �� enum��
- *		numlock_key88 �� KEY88_KP_4 �� enum��
+ *	上の例の場合、引数は以下がセットされる。
+ *		type          … 1
+ *		code          … "SDLK_ESCAPE" を int に変換したもの (後述 ※1)
+ *		key88         … KEY88_ESC の enum値
+ *		numlock_key88 … KEY88_KP_4 の enum値
  *
- * 3���ܤ⡢�����Ρ�����ԡפ������񼰤��㴳�ۤʤäƤ��롣
- * ���ξ��⡢Ʊ�ͤ˥�����Хå��ؿ����ƤӽФ���롣
+ * 3行目も、キーの「設定行」だが、書式が若干異なっている。
+ * この場合も、同様にコールバック関数が呼び出される。
  *
  *	callback(int type, int code, int key88, int numlock_key88);
  *
- *	�����ξ�硢�����ϰʲ������åȤ���롣
- *		type          �� 2
- *		code          �� 49
- *		key88         �� KEY88_ZENKAKU �� enum��
- *		numlock_key88 �� -1 (3���ܤΥȡ����󤬤ʤ����Ȥ��̣����)
+ *	上の例の場合、引数は以下がセットされる。
+ *		type          … 2
+ *		code          … 49
+ *		key88         … KEY88_ZENKAKU の enum値
+ *		numlock_key88 … -1 (3番目のトークンがないことを意味する)
  *
- * �Ĥޤꡢ2���ܤη����ξ��ϡ�1���ܤΥȡ������ int ���Ѵ������ͤ� code ��
- * ���åȤ���뤬��3���ܤη����ξ��ϡ� <��> ����ο��ͤ����åȤ���롣
+ * つまり、2行目の形式の場合は、1番目のトークンを int に変換した値が code に
+ * セットされるが、3行目の形式の場合は、 <〜> の中の数値がセットされる。
  *
- * ���Υ�����Хå��ؿ��ϡ����꤬ͭ���Ǥ���� NULL ���֤����֤��ͤ� NULL ��
- * �ʤ�����ʸ���� "" �Ǥ�ʤ����ϥ�˥󥰤Ȥ��Ƥ����ɽ�����롣
+ * このコールバック関数は、設定が有効であれば NULL を返す。返り値が NULL で
+ * なく、空文字列 "" でもない場合はワーニングとしてそれを表示する。
  *
  *
- * ���ơ���1 �Τ褦�ʡ� SDLK_ESCAPE �� int ���Ѵ�������ˡ�ϡ��ʲ�������ˤ�롣
+ * さて、※1 のような、 SDLK_ESCAPE を int に変換する方法は、以下の配列による。
  *
- *	T_SYMBOL_TABLE	table_symbol2int[]; (����Υ������ϡ� table_size)
+ *	T_SYMBOL_TABLE	table_symbol2int[]; (配列のサイズは、 table_size)
  *
- * �����������Ƭ��������å����ơ� table_symbol2int[].name ��1���ܤΥȡ�����
- * �����פ������ˡ�table_symbol2int[].val ���ͤ��֤���
+ * この配列を先頭からチェックして、 table_symbol2int[].name と1番目のトークン
+ * が一致した場合に、table_symbol2int[].val の値を返す。
  *
- * table_ignore_case �����ξ�硢��ʸ����ʸ����̵�뤷�ƥ����å�����Τǡ�
- * �����ξ��� "SDLK_ESCAPE" "sdlk_escape" �ɤ���Ǥ���פȤߤʤ���
+ * table_ignore_case が真の場合、大文字小文字は無視してチェックするので、
+ * 上の例の場合は "SDLK_ESCAPE" "sdlk_escape" どちらでも一致とみなす。
  *
  *
  *
@@ -2556,7 +2556,7 @@ static	int	symbol2int(const char *str,
 			   int                  table_size,
 			   int                  table_ignore_case);
 
-/* ��������ե�����1�Ԥ�����κ���ʸ���� */
+/* キー設定ファイル1行あたりの最大文字数 */
 #define	MAX_KEYFILE_LINE	(256)
 
 int	config_read_keyconf_file(
@@ -2587,10 +2587,10 @@ int	config_read_keyconf_file(
     const char *err_mes;
 
 
-	/* ��������ե�����򳫤� */
+	/* キー設定ファイルを開く */
 
-    if (keyconf_filename == NULL) {		   /* �ե�����̤̾����ʤ�� */
-	filename = filename_alloc_keyboard_cfgname();  /* �ǥե����̾����� */
+    if (keyconf_filename == NULL) {		   /* ファイル名未指定ならば */
+	filename = filename_alloc_keyboard_cfgname();  /* デフォルト名を取得 */
     } else {
 	filename = keyconf_filename;
     }
@@ -2606,23 +2606,23 @@ int	config_read_keyconf_file(
 		printf("\n");
 	    }
 	}
-	if (keyconf_filename == NULL) {			/* �ǥե���Ȥʤ�� */
-	    free((void*)filename);			/* ����������Ȥ� */
+	if (keyconf_filename == NULL) {			/* デフォルトならば */
+	    free((void*)filename);			/* メモリ解放しとく */
 	}
     }
 
-    if (fp == NULL) return FALSE;		/* �����ʤ��ä��鵶���֤� */
+    if (fp == NULL) return FALSE;		/* 開けなかったら偽を返す */
 
 
 
-	/* ��������ե������1�ԤŤĲ��� */
+	/* キー設定ファイルを1行づつ解析 */
 
     while (osd_fgets(line, MAX_KEYFILE_LINE, fp)) {
 
 	line_cnt ++;
 	parm1 = parm2 = parm3 = parm4 = NULL;
 
-	/* �Ԥ����Ƥ�ȡ������ʬ�򡣳ƥȡ�����ϡ�parm1 �� parm4 �˥��å� */
+	/* 行の内容をトークンに分解。各トークンは、parm1 〜 parm4 にセット */
 
 	{ char *str = line;
 	char *b; {             b = &buffer[0];      str = my_strtok(b, str); }
@@ -2633,10 +2633,10 @@ int	config_read_keyconf_file(
 	}
 
 
-	/* �ȡ����󤬤ʤ���м��ιԤ� */
+	/* トークンがなければ次の行へ */
 	if (parm1 == NULL) continue;
 
-	/* �ȡ����󤬻͸İʾ夢��С����ιԤϥ��顼�ʤΤǼ��ιԤ� */
+	/* トークンが四個以上あれば、その行はエラーなので次の行へ */
 	if (parm4 != NULL) {
 	    if (working) {
 		fprintf(stderr,
@@ -2645,25 +2645,25 @@ int	config_read_keyconf_file(
 	    continue;
 	}
 
-	/* �ȡ����󤬰�ġ����Ĥʤ���� */
-	if (parm1[0] == '[') {			/* �ּ��̥����ԡפ���� */
+	/* トークンが一個〜三個なら解析 */
+	if (parm1[0] == '[') {			/* 「識別タグ行」を処理 */
 
-	    /* ������Хå��ؿ���ƤӽФ��ơ�ͭ���ʼ��̥�������Ƚ�� */
+	    /* コールバック関数を呼び出して、有効な識別タグかを判定 */
 	    err_mes = (identify_callback)(parm1, parm2, parm3);
 
-	    if (err_mes == NULL) {		/* ͭ���ʼ��̥������ä� */
+	    if (err_mes == NULL) {		/* 有効な識別タグだった */
 		working   = TRUE;
 		effective = TRUE;
 
 		if (verbose_proc)
 		    printf("(read start in line %d)\n", line_cnt);
 
-	    } else {				/* ̵���ʼ��̥������ä� */
+	    } else {				/* 無効な識別タグだった */
 
-		if (working) {				/* ������ʤ齪λ */
+		if (working) {				/* 処理中なら終了 */
 		    if (verbose_proc)
 			printf("(read stop  in line %d)\n", line_cnt - 1);
-		}					/* �Ǥʤ����̵�� */
+		}					/* でなければ無視 */
 
 		if (err_mes[0] != '\0') {
 		    fprintf(stderr,
@@ -2674,11 +2674,11 @@ int	config_read_keyconf_file(
 		working = FALSE;
 	    }
 
-	} else {				/* ������ԡפ���� */
+	} else {				/* 「設定行」を処理 */
 
 	    if (working) {
 
-		/* ������ԡפǡ��ȡ������Ĥ����ϡ����顼�����ιԤ� */
+		/* 「設定行」で、トークン一個だけは、エラー。次の行へ */
 		if (parm2 == NULL) {
 		    fprintf(stderr,
 			    "warning: error in line %d (ignored)\n", line_cnt);
@@ -2704,9 +2704,9 @@ int	config_read_keyconf_file(
 			err_mes = (setting_callback)(type, code,
 						     key88, numlock_key88);
 
-			if (err_mes == NULL) {	/* ͭ����������ä� */
+			if (err_mes == NULL) {	/* 有効な設定だった */
 			    /* OK */ ;
-			} else {		/* ̵����������ä� */
+			} else {		/* 無効な設定だった */
 			    /* NG */
 			    if (err_mes[0] != '\0') {
 				fprintf(stderr,
@@ -2750,14 +2750,14 @@ static	int	symbol2int(const char *str,
     if ( str == NULL) return -1;
     if (*str == '\0') return -1;
 
-    if (str[0] == '<') {		/* <����> �ξ�� */
+    if (str[0] == '<') {		/* <数字> の場合 */
 	l = strtoul(&str[1], &conv_end, 0);
 	if (*conv_end == '>') {
 	    return l;
 	}
 	return -1;
     }
-					/* ���ʸ����˹��פ���Τ�õ�� */
+					/* 定義文字列に合致するのを探す */
     for (i=0; i<table_size; i++) {
 	if (strcmp(table_symbol2int[i].name, str) == 0) {
 	    return table_symbol2int[i].val;

@@ -1,5 +1,5 @@
 /***********************************************************************
- * ¥°¥é¥Õ¥£¥Ã¥¯½èÍı (X11 Window & DGA 1.0)
+ * ã‚°ãƒ©ãƒ•ã‚£ãƒƒã‚¯å‡¦ç† (X11 Window & DGA 1.0)
  *
  *
  ************************************************************************/
@@ -20,8 +20,8 @@
 
 static	int	xv_port = -1;
 static	int	xv_format;
-static	int	xv_width;		/* ¸½ºß¤Î¥¦¥¤¥ó¥É¥¦¤ÎÉı */
-static	int	xv_height;		/* ¸½ºß¤Î¥¦¥¤¥ó¥É¥¦¤Î¹â */
+static	int	xv_width;		/* ç¾åœ¨ã®ã‚¦ã‚¤ãƒ³ãƒ‰ã‚¦ã®å¹… */
+static	int	xv_height;		/* ç¾åœ¨ã®ã‚¦ã‚¤ãƒ³ãƒ‰ã‚¦ã®é«˜ */
 
 static	GC	xv_gc;
 static	enum {
@@ -32,8 +32,8 @@ static	enum {
 
 
 /************************************************************************
- *	XV¤Î½é´ü²½
- *	XV¤Î½ªÎ»
+ *	XVã®åˆæœŸåŒ–
+ *	XVã®çµ‚äº†
  ************************************************************************/
 
 enum {
@@ -92,12 +92,12 @@ static	void	xv_exit(void)
 
 
 /************************************************************************
- *	¥°¥é¥Õ¥£¥Ã¥¯½èÍı¤Î½é´ü²½
- *	¥°¥é¥Õ¥£¥Ã¥¯½èÍı¤ÎÆ°ºî
- *	¥°¥é¥Õ¥£¥Ã¥¯½èÍı¤Î½ªÎ»
+ *	ã‚°ãƒ©ãƒ•ã‚£ãƒƒã‚¯å‡¦ç†ã®åˆæœŸåŒ–
+ *	ã‚°ãƒ©ãƒ•ã‚£ãƒƒã‚¯å‡¦ç†ã®å‹•ä½œ
+ *	ã‚°ãƒ©ãƒ•ã‚£ãƒƒã‚¯å‡¦ç†ã®çµ‚äº†
  ************************************************************************/
 
-/* ÃÎ¤Ã¤Æ¤ë¥Õ¥©¡¼¥Ş¥Ã¥È¤òÃµ¤¹¡£¸«¤Ä¤±¤¿¤é¤½¤ì¤ò¥í¥Ã¥¯ */
+/* çŸ¥ã£ã¦ã‚‹ãƒ•ã‚©ãƒ¼ãƒãƒƒãƒˆã‚’æ¢ã™ã€‚è¦‹ã¤ã‘ãŸã‚‰ãã‚Œã‚’ãƒ­ãƒƒã‚¯ */
 static	int	xv_search_format_and_grab(void);
 
 static	const T_GRAPH_SPEC	*xv_graph_init(void)
@@ -110,13 +110,13 @@ static	const T_GRAPH_SPEC	*xv_graph_init(void)
     xv_gc = XCreateGC(x11_display, DefaultRootWindow(x11_display), 0, &xgcv);
 
 
-    /* ÃÎ¤Ã¤Æ¤ë¥Õ¥©¡¼¥Ş¥Ã¥È¤òÃµ¤¹¡£¸«¤Ä¤±¤¿¤é¤½¤ì¤ò¥í¥Ã¥¯ */
+    /* çŸ¥ã£ã¦ã‚‹ãƒ•ã‚©ãƒ¼ãƒãƒƒãƒˆã‚’æ¢ã™ã€‚è¦‹ã¤ã‘ãŸã‚‰ãã‚Œã‚’ãƒ­ãƒƒã‚¯ */
     if (xv_search_format_and_grab() == FALSE) {
 	return NULL;
     }
 
 
-    /* ÍøÍÑ²ÄÇ½¤Ê¥¦¥¤¥ó¥É¥¦¤Î¥µ¥¤¥º¤òÄ´¤Ù¤Æ¤ª¤¯ */
+    /* åˆ©ç”¨å¯èƒ½ãªã‚¦ã‚¤ãƒ³ãƒ‰ã‚¦ã®ã‚µã‚¤ã‚ºã‚’èª¿ã¹ã¦ãŠã */
 
     win_w = x11_screen->width;
     win_h = x11_screen->height;
@@ -142,8 +142,8 @@ static	const T_GRAPH_SPEC	*xv_graph_init(void)
 
 /*======================================================================*/
 
-/* XV¤Î¥Õ¥©¡¼¥Ş¥Ã¥È¤Ç¡¢ÃÎ¤Ã¤Æ¤¤¤ë¤Î¤¬¤¢¤ë¤«¤ò¥Á¥§¥Ã¥¯
-	(x11_depth ¤È x11_byte_per_pixel ¤ò¤³¤³¤Ç¥»¥Ã¥È¤¹¤ë) */
+/* XVã®ãƒ•ã‚©ãƒ¼ãƒãƒƒãƒˆã§ã€çŸ¥ã£ã¦ã„ã‚‹ã®ãŒã‚ã‚‹ã‹ã‚’ãƒã‚§ãƒƒã‚¯
+	(x11_depth ã¨ x11_byte_per_pixel ã‚’ã“ã“ã§ã‚»ãƒƒãƒˆã™ã‚‹) */
 
 #define FOURCC_YUY2 0x32595559
 static	int	xv_search_format_and_grab(void)
@@ -162,10 +162,10 @@ static	int	xv_search_format_and_grab(void)
 	return FALSE;
     }
 
-    for (n = 0; n < 2; n++) {	/* n==0 ¤Ê¤é RGB¥Õ¥©¡¼¥Ş¥Ã¥È¤ò
-				   n==1 ¤Ê¤é YUY2¥Õ¥©¡¼¥Ş¥Ã¥È¤òÃµ¤¹ */
+    for (n = 0; n < 2; n++) {	/* n==0 ãªã‚‰ RGBãƒ•ã‚©ãƒ¼ãƒãƒƒãƒˆã‚’
+				   n==1 ãªã‚‰ YUY2ãƒ•ã‚©ãƒ¼ãƒãƒƒãƒˆã‚’æ¢ã™ */
 
-	if (n == 1) break;	/* YUY2 ¤ÏÌ¤¼ÂÁõ¡Ä */
+	if (n == 1) break;	/* YUY2 ã¯æœªå®Ÿè£…â€¦ */
 
 	for (i = 0; i < num_adaptor; i++) {
 
@@ -176,12 +176,12 @@ static	int	xv_search_format_and_grab(void)
 
 		for (j = 0; j < num_format; j++) {
 
-		    if (n == 0) {	/* RGB¥Õ¥©¡¼¥Ş¥Ã¥È¤òÃµ¤¹ */
+		    if (n == 0) {	/* RGBãƒ•ã‚©ãƒ¼ãƒãƒƒãƒˆã‚’æ¢ã™ */
 
 			if ((f[j].type   == XvRGB) &&
 			    (f[j].format == XvPacked)) {
 
-			    /* ÃÎ¤Ã¤Æ¤¤¤ë·Á¼°¤«¤Ê¡© */
+			    /* çŸ¥ã£ã¦ã„ã‚‹å½¢å¼ã‹ãªï¼Ÿ */
 			    x11_byte_per_pixel = 0;
 #ifdef	SUPPORT_16BPP
 			    if (/*f[j].depth <= 16 &&*/
@@ -221,7 +221,7 @@ static	int	xv_search_format_and_grab(void)
 #endif
 			    if (x11_byte_per_pixel == 0) continue;
 
-			    /* ¤è¤·¡¢ÃÎ¤Ã¤Æ¤¤¤ë·Á¼°¤À */
+			    /* ã‚ˆã—ã€çŸ¥ã£ã¦ã„ã‚‹å½¢å¼ã  */
 			    if (XvGrabPort(x11_display, p, CurrentTime)
 								  == Success) {
 				xv_port   = p;
@@ -239,7 +239,7 @@ static	int	xv_search_format_and_grab(void)
 			    }
 			}
 
-		    } else {		/* YUY2¥Õ¥©¡¼¥Ş¥Ã¥È¤òÃµ¤¹ */
+		    } else {		/* YUY2ãƒ•ã‚©ãƒ¼ãƒãƒƒãƒˆã‚’æ¢ã™ */
 
 			if (f[j].id == FOURCC_YUY2) {
 
@@ -268,7 +268,7 @@ static	int	xv_search_format_and_grab(void)
     XFree(f);
     XvFreeAdaptorInfo(adaptor);
 
-    /* ¤³¤ì¤Ï²¿¡© */
+    /* ã“ã‚Œã¯ä½•ï¼Ÿ */
     attr = XvQueryPortAttributes(x11_display, xv_port, &n);
     for (j = 0; j < n; j++) {
 	if (strcmp(attr[j].name, "XV_AUTOPAINT_COLORKEY") == 0) {
@@ -283,8 +283,8 @@ static	int	xv_search_format_and_grab(void)
 
 /************************************************************************/
 
-/* ¥¦¥¤¥ó¥É¥¦¤ÎÀ¸À®»ş¡¿¥ê¥µ¥¤¥º»ş¡¿ÇË´ş»ş ¤ª¤è¤Ó¡¢
-   Á´²èÌÌ¥â¡¼¥É³«»Ï»ş¡¿²òÁüÅÙÀÚÂØ»ş¡¿½ªÎ»»ş ¤Î¡¢ ¼Âºİ¤Î½èÍı¤ò¤¹¤ë´Ø¿ô */
+/* ã‚¦ã‚¤ãƒ³ãƒ‰ã‚¦ã®ç”Ÿæˆæ™‚ï¼ãƒªã‚µã‚¤ã‚ºæ™‚ï¼ç ´æ£„æ™‚ ãŠã‚ˆã³ã€
+   å…¨ç”»é¢ãƒ¢ãƒ¼ãƒ‰é–‹å§‹æ™‚ï¼è§£åƒåº¦åˆ‡æ›¿æ™‚ï¼çµ‚äº†æ™‚ ã®ã€ å®Ÿéš›ã®å‡¦ç†ã‚’ã™ã‚‹é–¢æ•° */
 
 static	int	create_XV(int *width, int *height,
 			  void **ret_buffer, int fullscreen, double aspect);
@@ -300,18 +300,18 @@ static	const T_GRAPH_INFO	*xv_graph_setup(int width, int height,
     void *buf = NULL;
     int success;
 
-    /* Á´²èÌÌÉÔ²Ä¤Ê¤é¡¢Á´²èÌÌÍ×µá¤ÏÌµ»ë */
+    /* å…¨ç”»é¢ä¸å¯ãªã‚‰ã€å…¨ç”»é¢è¦æ±‚ã¯ç„¡è¦– */
     if ((x11_enable_fullscreen == FALSE) && (fullscreen)) {
 	fullscreen = FALSE;
     }
 
 
-    /* Á´²èÌÌ ¢ª ¥¦¥¤¥ó¥É¥¦ ¤Î¾ì¹ç */
+    /* å…¨ç”»é¢ â†’ ã‚¦ã‚¤ãƒ³ãƒ‰ã‚¦ ã®å ´åˆ */
 
-    /* ¥¦¥¤¥ó¥É¥¦ ¢ª Á´²èÌÌ ÀÚ¤êÂØ¤¨¤Î¾ì¹ç¡¢
-       °ìÃ¶¥¦¥¤¥ó¥É¥¦¤òÇË´ş¤·¤Ê¤¤¤È¡¢Á´²èÌÌ¥¦¥¤¥ó¥É¥¦¤¬¸¶ÅÀ¤Ë°ÜÆ°¤·¤Ê¤¤
-       Á´²èÌÌ ¢ª ¥¦¥¤¥ó¥É¥¦ ÀÚ¤êÂØ¤¨¤Î¤Ğ¤¢¤¤¡¢
-       °ìÃ¶¥¦¥¤¥ó¥É¥¦¤òÇË´ş¤·¤Ê¤¤¤È¡¢¥¦¥¤¥ó¥É¥¦ÏÈ¤¬¾Ã¤¨¤¿¤Ş¤Ş */
+    /* ã‚¦ã‚¤ãƒ³ãƒ‰ã‚¦ â†’ å…¨ç”»é¢ åˆ‡ã‚Šæ›¿ãˆã®å ´åˆã€
+       ä¸€æ—¦ã‚¦ã‚¤ãƒ³ãƒ‰ã‚¦ã‚’ç ´æ£„ã—ãªã„ã¨ã€å…¨ç”»é¢ã‚¦ã‚¤ãƒ³ãƒ‰ã‚¦ãŒåŸç‚¹ã«ç§»å‹•ã—ãªã„
+       å…¨ç”»é¢ â†’ ã‚¦ã‚¤ãƒ³ãƒ‰ã‚¦ åˆ‡ã‚Šæ›¿ãˆã®ã°ã‚ã„ã€
+       ä¸€æ—¦ã‚¦ã‚¤ãƒ³ãƒ‰ã‚¦ã‚’ç ´æ£„ã—ãªã„ã¨ã€ã‚¦ã‚¤ãƒ³ãƒ‰ã‚¦æ ãŒæ¶ˆãˆãŸã¾ã¾ */
 
     if (graph_exist) {
 	if (((graph_info.fullscreen == FALSE) && (fullscreen))         ||
@@ -322,7 +322,7 @@ static	const T_GRAPH_INFO	*xv_graph_setup(int width, int height,
     }
 
 
-    /* ¢¢ ¢ª ¥¦¥¤¥ó¥É¥¦ ¤Î¾ì¹ç */
+    /* â–¡ â†’ ã‚¦ã‚¤ãƒ³ãƒ‰ã‚¦ ã®å ´åˆ */
     if (graph_exist == 0) {
 	success = create_XV(&width, &height, &buf, fullscreen, aspect);
     } else {
@@ -356,7 +356,7 @@ static	const T_GRAPH_INFO	*xv_graph_setup(int width, int height,
     graph_info.dont_frameskip	= FALSE;
 
     if (fullscreen == FALSE) {
-	/* ¥¦¥¤¥ó¥É¥¦¤Î¥¿¥¤¥È¥ë¥Ğ¡¼¤òÉü¸µ */
+	/* ã‚¦ã‚¤ãƒ³ãƒ‰ã‚¦ã®ã‚¿ã‚¤ãƒˆãƒ«ãƒãƒ¼ã‚’å¾©å…ƒ */
 	graph_set_window_title(NULL);
     }
 
@@ -396,33 +396,33 @@ static	void	xv_graph_exit(void)
 
 /*======================================================================*/
 
-/* ¥¦¥¤¥ó¥É¥¦¤ÎÀ¸À®»ş¡¦¥ê¥µ¥¤¥º»ş¡¦ÇË´ş»ş¤Ë¤Ï¡¢¥¤¥á¡¼¥¸¤Î³ÎÊİ¡¦²òÊü¤¬É¬Í× */
+/* ã‚¦ã‚¤ãƒ³ãƒ‰ã‚¦ã®ç”Ÿæˆæ™‚ãƒ»ãƒªã‚µã‚¤ã‚ºæ™‚ãƒ»ç ´æ£„æ™‚ã«ã¯ã€ã‚¤ãƒ¡ãƒ¼ã‚¸ã®ç¢ºä¿ãƒ»è§£æ”¾ãŒå¿…è¦ */
 static	void	*create_XVimage(int width, int height);
 static	void	destroy_XVimage(void *buf);
 
-/* fulscreen ¤È aspect ¤Ë¤è¤ê¡¢*width, *height ¤ò·×»»¤·¤Ê¤ª¤·ºÆÀßÄê¤¹¤ë */
+/* fulscreen ã¨ aspect ã«ã‚ˆã‚Šã€*width, *height ã‚’è¨ˆç®—ã—ãªãŠã—å†è¨­å®šã™ã‚‹ */
 static	void	calc_size(int *width, int *height,
 			  int fullscreen, double aspect)
 {
     if (fullscreen) {
 
-	/* ¥¢¥¹¥Ú¥¯¥ÈÈæ¤¬Ì¤»ØÄê¤Î¾ì¹ç¡¢¥¹¥¯¥ê¡¼¥ó¤Î½Ä²£Èæ¤ÇÂåÍÑ */
+	/* ã‚¢ã‚¹ãƒšã‚¯ãƒˆæ¯”ãŒæœªæŒ‡å®šã®å ´åˆã€ã‚¹ã‚¯ãƒªãƒ¼ãƒ³ã®ç¸¦æ¨ªæ¯”ã§ä»£ç”¨ */
 
 	if (aspect < 0.01) {
 	    aspect = (double) x11_screen->width / x11_screen->height;
 	}
 
-	/* ¥¢¥¹¥Ú¥¯¥ÈÈæ¤Ë±ş¤¸¤Æ¡¢½Ä²£¥µ¥¤¥º¤ò·×»»¤·Ä¾¤¹ */
-	/* (²£¤Ï 16¤ÎÇÜ¿ô¡¢½Ä¤Ï 2¤ÎÇÜ¿ô¤Ë¤·¤Æ¤ª¤¯¤³¤È)  */
+	/* ã‚¢ã‚¹ãƒšã‚¯ãƒˆæ¯”ã«å¿œã˜ã¦ã€ç¸¦æ¨ªã‚µã‚¤ã‚ºã‚’è¨ˆç®—ã—ç›´ã™ */
+	/* (æ¨ªã¯ 16ã®å€æ•°ã€ç¸¦ã¯ 2ã®å€æ•°ã«ã—ã¦ãŠãã“ã¨)  */
 
 	if (aspect <= ((double)(*width) / (*height))) {
-	    /* ¥â¥Ë¥¿¡¼¤Î¤Û¤¦¤¬½ÄÄ¹ */
-	    /* *width ¤Ï¤½¤Î¤Ş¤Ş */
+	    /* ãƒ¢ãƒ‹ã‚¿ãƒ¼ã®ã»ã†ãŒç¸¦é•· */
+	    /* *width ã¯ãã®ã¾ã¾ */
 	    *height = ((int)((*width) / aspect) + 1) & ~1;
 	} else {
-	    /* ¥â¥Ë¥¿¡¼¤Î¤Û¤¦¤¬²£Ä¹ */
+	    /* ãƒ¢ãƒ‹ã‚¿ãƒ¼ã®ã»ã†ãŒæ¨ªé•· */
 	    *width = ((int)((*height) * aspect) + 15) & ~15;
-	    /* *height ¤Ï¤½¤Î¤Ş¤Ş */
+	    /* *height ã¯ãã®ã¾ã¾ */
 	}
 
 	xv_width  = x11_screen->width;
@@ -457,7 +457,7 @@ static	void	calc_size(int *width, int *height,
 static	int	create_XV(int *width, int *height,
 			  void **ret_buffer, int fullscreen, double aspect)
 {
-    /* fulscreen ¤È aspect ¤Ë¤è¤ê¡¢*width, *height ¤ò·×»»¤·¤Ê¤ª¤·ºÆÀßÄê¤¹¤ë */
+    /* fulscreen ã¨ aspect ã«ã‚ˆã‚Šã€*width, *height ã‚’è¨ˆç®—ã—ãªãŠã—å†è¨­å®šã™ã‚‹ */
     calc_size(width, height, fullscreen, aspect);
 
 
@@ -476,16 +476,16 @@ static	int	create_XV(int *width, int *height,
 	return FALSE; 
     }
 
-    /* ¥¦¥¤¥ó¥É¥¦¥Ş¥Í¡¼¥¸¥ã¡¼¤ØÆÃÀ­(¥µ¥¤¥ºÊÑ¹¹ÉÔ²Ä)¤ò»Ø¼¨¤¹¤ë */
+    /* ã‚¦ã‚¤ãƒ³ãƒ‰ã‚¦ãƒãƒãƒ¼ã‚¸ãƒ£ãƒ¼ã¸ç‰¹æ€§(ã‚µã‚¤ã‚ºå¤‰æ›´ä¸å¯)ã‚’æŒ‡ç¤ºã™ã‚‹ */
     set_wm_hints(xv_width, xv_height, fullscreen);
 
-    /* ¥¤¥Ù¥ó¥È¤ÎÀßÄê */
+    /* ã‚¤ãƒ™ãƒ³ãƒˆã®è¨­å®š */
     XSelectInput(x11_display, x11_window,
 		 FocusChangeMask | ExposureMask |
 		 KeyPressMask | KeyReleaseMask |
 		 ButtonPressMask | ButtonReleaseMask | PointerMotionMask);
 
-    /* ¥ê¥µ¥¤¥º»ş (¥¹¥Æ¡¼¥¿¥¹ ON/OFFÀÚÂØ»ş) ¤Ë¡¢²èÌÌ¤«¾Ã¤¨¤Ê¤¤¤è¤¦¤Ë¤¹¤ë(?) */
+    /* ãƒªã‚µã‚¤ã‚ºæ™‚ (ã‚¹ãƒ†ãƒ¼ã‚¿ã‚¹ ON/OFFåˆ‡æ›¿æ™‚) ã«ã€ç”»é¢ã‹æ¶ˆãˆãªã„ã‚ˆã†ã«ã™ã‚‹(?) */
     {
 	XSetWindowAttributes attributes;
 	attributes.bit_gravity = NorthWestGravity;
@@ -493,15 +493,15 @@ static	int	create_XV(int *width, int *height,
 				CWBitGravity, &attributes);
     }
 
-    /* ¶¯À©½ªÎ»¡¢ÃæÃÇ¤ËÈ÷¤¨¤Æ¡¢¥¢¥È¥à¤òÀßÄê */
+    /* å¼·åˆ¶çµ‚äº†ã€ä¸­æ–­ã«å‚™ãˆã¦ã€ã‚¢ãƒˆãƒ ã‚’è¨­å®š */
     x11_atom_kill_type = XInternAtom(x11_display, "WM_PROTOCOLS", False);
     x11_atom_kill_data = XInternAtom(x11_display, "WM_DELETE_WINDOW", False);
     XSetWMProtocols(x11_display, x11_window, &x11_atom_kill_data, 1);
 
-    /* ¥¹¥¯¥ê¡¼¥ó¥Ğ¥Ã¥Õ¥¡ ¤È image ¤ò³ÎÊİ */
+    /* ã‚¹ã‚¯ãƒªãƒ¼ãƒ³ãƒãƒƒãƒ•ã‚¡ ã¨ image ã‚’ç¢ºä¿ */
     (*ret_buffer) = create_XVimage(*width, *height);
 
-    /* Drag & Drop ¼õ¤±ÉÕ¤±³«»Ï */
+    /* Drag & Drop å—ã‘ä»˜ã‘é–‹å§‹ */
     xdnd_start();
 
     return (*ret_buffer) ? TRUE : FALSE;
@@ -514,23 +514,23 @@ static	int	resize_XV(int *width, int *height, void *old_buffer,
     Window child;
     int x, y;
 
-    /* fulscreen ¤È aspect ¤Ë¤è¤ê¡¢*width, *height ¤ò·×»»¤·¤Ê¤ª¤·ºÆÀßÄê¤¹¤ë */
+    /* fulscreen ã¨ aspect ã«ã‚ˆã‚Šã€*width, *height ã‚’è¨ˆç®—ã—ãªãŠã—å†è¨­å®šã™ã‚‹ */
     calc_size(width, height, fullscreen, aspect);
 
 
     if (verbose_proc) printf("  Resizing window ... ");
 
-    /* ¥¦¥¤¥ó¥É¥¦¥Ş¥Í¡¼¥¸¥ã¡¼¤Ø¿·¤¿¤Ê¥µ¥¤¥º¤ò»Ø¼¨¤¹¤ë */
+    /* ã‚¦ã‚¤ãƒ³ãƒ‰ã‚¦ãƒãƒãƒ¼ã‚¸ãƒ£ãƒ¼ã¸æ–°ãŸãªã‚µã‚¤ã‚ºã‚’æŒ‡ç¤ºã™ã‚‹ */
     set_wm_hints(xv_width, xv_height, fullscreen);
 
-    /* ¥ê¥µ¥¤¥º¤·¤Æ¥¦¥¤¥ó¥É¥¦¤¬²èÌÌ³°¤Ë½Ğ¤Æ¤·¤Ş¤Ã¤¿¤é¥¤¥ä¤Ê¤Î¤Ç¡¢¤½¤Î¾ì¹ç¤Ï
-       ¥¦¥¤¥ó¥É¥¦¤ò²èÌÌÆâ¤Ë°ÜÆ°¤µ¤»¤è¤¦¤È»×¤¦¡£¤¬´Ä¶­¤Ë¤è¤Ã¤Æ¤Ï XGetGeometry()
-       ¤ò»È¤Ã¤Æ¤â¤Á¤ã¤ó¤ÈºÂÉ¸¤¬¼èÆÀ¤Ç¤­¤Ê¤¤¤·¡¢ XMoveWindow() ¤ò»È¤Ã¤Æ¤â¡¢
-       ¥¦¥¤¥ó¥É¥¦¤ÎÏÈ¤È¤«¤ò¹ÍÎ¸¤»¤º¤Ë°ÜÆ°¤¹¤ë¾ì¹ç¤¬¤¢¤ë¡£¥¦¥¤¥ó¥É¥¦¥Ş¥Í¡¼¥¸¥ã¡¼
-       ¤¬´Ø¤ï¤Ã¤Æ¤¤¤ë¤«¤é¤À¤È»×¤¦¤Î¤À¤¬¡¢¤É¤¦¤¹¤ë¤Î¤¬Àµ¤·¤¤¤ó¤Ç¤·¤ç¤¦ ? */
+    /* ãƒªã‚µã‚¤ã‚ºã—ã¦ã‚¦ã‚¤ãƒ³ãƒ‰ã‚¦ãŒç”»é¢å¤–ã«å‡ºã¦ã—ã¾ã£ãŸã‚‰ã‚¤ãƒ¤ãªã®ã§ã€ãã®å ´åˆã¯
+       ã‚¦ã‚¤ãƒ³ãƒ‰ã‚¦ã‚’ç”»é¢å†…ã«ç§»å‹•ã•ã›ã‚ˆã†ã¨æ€ã†ã€‚ãŒç’°å¢ƒã«ã‚ˆã£ã¦ã¯ XGetGeometry()
+       ã‚’ä½¿ã£ã¦ã‚‚ã¡ã‚ƒã‚“ã¨åº§æ¨™ãŒå–å¾—ã§ããªã„ã—ã€ XMoveWindow() ã‚’ä½¿ã£ã¦ã‚‚ã€
+       ã‚¦ã‚¤ãƒ³ãƒ‰ã‚¦ã®æ ã¨ã‹ã‚’è€ƒæ…®ã›ãšã«ç§»å‹•ã™ã‚‹å ´åˆãŒã‚ã‚‹ã€‚ã‚¦ã‚¤ãƒ³ãƒ‰ã‚¦ãƒãƒãƒ¼ã‚¸ãƒ£ãƒ¼
+       ãŒé–¢ã‚ã£ã¦ã„ã‚‹ã‹ã‚‰ã ã¨æ€ã†ã®ã ãŒã€ã©ã†ã™ã‚‹ã®ãŒæ­£ã—ã„ã‚“ã§ã—ã‚‡ã† ? */
 #if 1
-    /* ¤È¤ê¤¢¤¨¤º¥ë¡¼¥È¥¦¥¤¥ó¥É¥¦¤«¤é¤ÎÁêÂĞ°ÌÃÖ¤òµá¤á¤Æ¡¢¸¶ÅÀ¤¬¾å¤«º¸¤Î²èÌÌ³°
-       ¤À¤Ã¤¿¤é°ÜÆ°¤µ¤»¤ë¡£²¾ÁÛ¥¦¥¤¥ó¥É¥¦¥Ş¥Í¡¼¥¸¥ã¡¼¤Ç¤âÂç¾æÉ×¤À¤í¤¦ */
+    /* ã¨ã‚Šã‚ãˆãšãƒ«ãƒ¼ãƒˆã‚¦ã‚¤ãƒ³ãƒ‰ã‚¦ã‹ã‚‰ã®ç›¸å¯¾ä½ç½®ã‚’æ±‚ã‚ã¦ã€åŸç‚¹ãŒä¸Šã‹å·¦ã®ç”»é¢å¤–
+       ã ã£ãŸã‚‰ç§»å‹•ã•ã›ã‚‹ã€‚ä»®æƒ³ã‚¦ã‚¤ãƒ³ãƒ‰ã‚¦ãƒãƒãƒ¼ã‚¸ãƒ£ãƒ¼ã§ã‚‚å¤§ä¸ˆå¤«ã ã‚ã† */
 
     XTranslateCoordinates(x11_display, x11_window,
 			  DefaultRootWindow(x11_display), 0, 0,
@@ -548,12 +548,12 @@ static	int	resize_XV(int *width, int *height, void *old_buffer,
     if (verbose_proc)
 	printf("%s (%dx%d => %dx%d)\n", (x11_window ? "OK" : "FAILED"), *width, *height, xv_width, xv_height);
 
-    /* image ¤òÇË´ş¤¹¤ë */
+    /* image ã‚’ç ´æ£„ã™ã‚‹ */
     if (old_buffer) {
 	destroy_XVimage(old_buffer);
     }
 
-    /* ¥¹¥¯¥ê¡¼¥ó¥Ğ¥Ã¥Õ¥¡ ¤È image ¤ò³ÎÊİ */
+    /* ã‚¹ã‚¯ãƒªãƒ¼ãƒ³ãƒãƒƒãƒ•ã‚¡ ã¨ image ã‚’ç¢ºä¿ */
     (*ret_buffer) = create_XVimage(*width, *height);
 
     return (*ret_buffer) ? TRUE : FALSE;
@@ -564,12 +564,12 @@ static	void	destroy_XV(void *old_buffer)
 {
     if (verbose_proc) printf("  Closing Window\n");
 
-    /* ¥¤¥á¡¼¥¸ÇË´ş */
+    /* ã‚¤ãƒ¡ãƒ¼ã‚¸ç ´æ£„ */
     if (old_buffer) {
 	destroy_XVimage(old_buffer);
     }
 
-    /* ¥¦¥¤¥ó¥É¥¦ÇË´ş */
+    /* ã‚¦ã‚¤ãƒ³ãƒ‰ã‚¦ç ´æ£„ */
     XDestroyWindow(x11_display, x11_window);
 
     if (x11_grab) {
@@ -577,7 +577,7 @@ static	void	destroy_XV(void *old_buffer)
 	x11_grab = FALSE;
     }
 
-    XSync(x11_display, True);		/* Á´¥¤¥Ù¥ó¥ÈÇË´ş */
+    XSync(x11_display, True);		/* å…¨ã‚¤ãƒ™ãƒ³ãƒˆç ´æ£„ */
 }
 
 /*======================================================================*/
@@ -588,7 +588,7 @@ static	void	*create_XVimage(int width, int height)
 {
     void *buf = NULL;
 
-    use_SHM = TRUE;				/* SHM ¤¬É¬¿Ü */
+    use_SHM = TRUE;				/* SHM ãŒå¿…é ˆ */
 
     {
 	if (verbose_proc) printf("  Using shared memory (MIT-SHM):\n"
@@ -612,8 +612,8 @@ static	void	*create_XVimage(int width, int height)
 		use_SHM = FALSE;
 	    }
 
-	    XSetErrorHandler(private_handler);	/* ¥¨¥é¡¼¥Ï¥ó¥É¥é¤ò²£¼è¤ê */
-						/* (XShmAttach()°Û¾ï¸¡½Ğ) */
+	    XSetErrorHandler(private_handler);	/* ã‚¨ãƒ©ãƒ¼ãƒãƒ³ãƒ‰ãƒ©ã‚’æ¨ªå–ã‚Š */
+						/* (XShmAttach()ç•°å¸¸æ¤œå‡º) */
 	    if (use_SHM) {
 
 		if (verbose_proc) printf("Allocate ... ");
@@ -639,17 +639,17 @@ static	void	*create_XVimage(int width, int height)
 	    if (SHMInfo.shmid >= 0) shmctl(SHMInfo.shmid, IPC_RMID, 0);
 
 
-	    if (use_SHM) {				/* ¤¹¤Ù¤ÆÀ®¸ù */
+	    if (use_SHM) {				/* ã™ã¹ã¦æˆåŠŸ */
 		buf = xvimage->data;
 		if (verbose_proc) printf("OK\n");
-	    } else {					/* ¤É¤Ã¤«¤Ç¼ºÇÔ */
+	    } else {					/* ã©ã£ã‹ã§å¤±æ•— */
 		if (verbose_proc) printf("FAILED(can't use shared memory)\n");
 		if (SHMInfo.shmaddr) shmdt(SHMInfo.shmaddr);
 		XFree(xvimage);
 		xvimage = NULL;
 	    }
 
-	    XSetErrorHandler(None);		/* ¥¨¥é¡¼¥Ï¥ó¥É¥é¤òÌá¤¹ */
+	    XSetErrorHandler(None);		/* ã‚¨ãƒ©ãƒ¼ãƒãƒ³ãƒ‰ãƒ©ã‚’æˆ»ã™ */
 
 	} else {
 	    if (verbose_proc) printf("FAILED(can't use shared memory)\n");
@@ -677,8 +677,8 @@ static	void	destroy_XVimage(void *buf)
 
 
 /************************************************************************
- *	¿§¤Î³ÎÊİ
- *	¿§¤Î²òÊü
+ *	è‰²ã®ç¢ºä¿
+ *	è‰²ã®è§£æ”¾
  ************************************************************************/
 
 static	void	xv_graph_add_color(const PC88_PALETTE_T color[],
@@ -718,12 +718,12 @@ static	void	xv_graph_add_color(const PC88_PALETTE_T color[],
 
 static	void	xv_graph_remove_color(int nr_pixel, unsigned long pixel[])
 {
-    /* ¿§¤Ë´Ø¤·¤Æ¤Ï²¿¤â´ÉÍı¤·¤Ê¤¤¤Î¤Ç¡¢¤³¤³¤Ç¤â¤Ê¤Ë¤â¤·¤Ê¤¤ */
+    /* è‰²ã«é–¢ã—ã¦ã¯ä½•ã‚‚ç®¡ç†ã—ãªã„ã®ã§ã€ã“ã“ã§ã‚‚ãªã«ã‚‚ã—ãªã„ */
 }
 
 
 /************************************************************************
- *	¥°¥é¥Õ¥£¥Ã¥¯¤Î¹¹¿·
+ *	ã‚°ãƒ©ãƒ•ã‚£ãƒƒã‚¯ã®æ›´æ–°
  ************************************************************************/
 
 static	void	xv_graph_update(int nr_rect, T_GRAPH_RECT rect[])

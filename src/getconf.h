@@ -7,87 +7,87 @@
 
 typedef struct T_CONFIG_TABLE {
 
-    int		group;	/* ʬ�� (��¾Ū�ʥ��ץ����ˤ�Ʊ���ͤ��꿶��)  */
-	 		/* QUASI88���̥��ץ����ϡ�    1��299 ����Ѥ��� */
-	 		/* �����ƥ��¸���ץ����ϡ� 300��349 ����Ѥ��� */
-	 		/* ������ɷϤΥ��ץ����ϡ� 350��399 ����Ѥ��� */
+    int		group;	/* 分類 (排他的なオプションには同じ値を割り振る)  */
+	 		/* QUASI88共通オプションは、    1〜299 を使用する */
+	 		/* システム依存オプションは、 300〜349 を使用する */
+	 		/* サウンド系のオプションは、 350〜399 を使用する */
 
-    char	*name;	/* ���ץ�����̾�� (�ϥ��ե�ʤ�)                */
+    char	*name;	/* オプションの名前 (ハイフンなし)                */
 
-    enum {		/* ���ץ����μ���				  */
-			/* �����顼���ϡ��ѿ��ؤΥ��åȤϹԤ��ʤ�	  */
+    enum {		/* オプションの種類				  */
+			/* ・エラー時は、変数へのセットは行われない	  */
 
-	X_FIX,		/* �ѿ� var �� int������� var1 �򥻥å�	  */
-			/* �����ץ����������Բ�			  */
-			/* ��var2 �ϻ��Ѥ��ʤ�				  */
+	X_FIX,		/* 変数 var に int型の定数 var1 をセット	  */
+			/* ・オプション引数は不可			  */
+			/* ・var2 は使用しない				  */
 			/*	*(int*)*var = (int)val1;		  */
 
-	X_INT,		/* �ѿ� var �� int���Υ��ץ��������򥻥å�	  */
-			/* �����ץ���������ͭ���ϰ� var1 �� �� �� var2  */
-			/* ���ϰϳ������ץ�������̤������ϥ��顼	  */
+	X_INT,		/* 変数 var に int型のオプション引数をセット	  */
+			/* ・オプション引数の有効範囲 var1 ≦ 値 ≦ var2  */
+			/* ・範囲外／オプション引数未指定時はエラー	  */
 			/*	*((int*)var) = ARGV;			  */
 
-	X_DBL,		/* �ѿ� var �� double���Υ��ץ��������򥻥å�	  */
-			/* �����ץ���������ͭ���ϰ� var1 �� �� �� var2  */
-			/* ���ϰϳ������ץ�������̤������ϥ��顼	  */
+	X_DBL,		/* 変数 var に double型のオプション引数をセット	  */
+			/* ・オプション引数の有効範囲 var1 ≦ 値 ≦ var2  */
+			/* ・範囲外／オプション引数未指定時はエラー	  */
 			/*	*((double)var) = ARGV;			  */
 
-	X_STR,		/* �ѿ� var �� ���ץ���������ʸ����򥻥å�	  */
-			/* ���ºݤ� malloc ���줿�ΰ�ˡ����ץ�������   */
-			/*   ��ʸ����򥳥ԡ��������Υݥ��󥿤򥻥å�	  */
-			/* �����ץ�������̤������ϥ��顼		  */
-			/* ��var �� NULL �ξ��Ͻ�������������Ȥߤʤ�	  */
-			/* ��var1, var2 �ϻ��Ѥ��ʤ�			  */
+	X_STR,		/* 変数 var に オプション引数の文字列をセット	  */
+			/* ・実際は malloc された領域に、オプション引数   */
+			/*   の文字列をコピーし、そのポインタをセット	  */
+			/* ・オプション引数未指定時はエラー		  */
+			/* ・var が NULL の場合は処理せずに正常とみなす	  */
+			/* ・var1, var2 は使用しない			  */
 			/*	wk = malloc(); strcpy(wk, argv);	  */
 			/*	*(char **)var = wk;                	  */
 
-	X_NOP,		/* �ʤˤ�������ʤ�				  */
-			/* ���ѿ� var �� NULL �ʤ顢���ץ��������Բ�	  */
-			/* ��NULL �Ǥʤ����ϡ����ץ���������ɬ�ܤ�    */
-			/*   ̤������ϥ��顼				  */
-			/* �����顼���ʤ���С�����Ȥ���		  */
-			/* ��var1, var2 �ϻ��Ѥ��ʤ�			  */
+	X_NOP,		/* なにも処理しない				  */
+			/* ・変数 var が NULL なら、オプション引数不可	  */
+			/* ・NULL でない場合は、オプション引数が必須で    */
+			/*   未指定時はエラー				  */
+			/* ・エラーがなければ、正常とする		  */
+			/* ・var1, var2 は使用しない			  */
 
-	X_INV		/* �ʤˤ�������ʤ�				  */
-			/* ���ѿ� var �� NULL �ʤ顢���ץ��������Բ�	  */
-			/* ��NULL �Ǥʤ����ϡ����ץ���������ɬ�ܤ�    */
-			/*   ̤������ϥ��顼				  */
-			/* ����˥��顼�Ȥ���				  */
-			/* ��var1, var2 �ϻ��Ѥ��ʤ�			  */
+	X_INV		/* なにも処理しない				  */
+			/* ・変数 var が NULL なら、オプション引数不可	  */
+			/* ・NULL でない場合は、オプション引数が必須で    */
+			/*   未指定時はエラー				  */
+			/* ・常にエラーとする				  */
+			/* ・var1, var2 は使用しない			  */
     }	type;
 
-    void	*var;	/* �����Ǽ����ѿ����ͤ򥻥åȤ���                 */
-    double	val1;	/* �����ǽ�ʺǾ��� �ޤ��� ���åȤ������         */
-    double	val2;	/* �����ǽ�ʺ�����                               */
+    void	*var;	/* ここで示す変数に値をセットする                 */
+    double	val1;	/* 指定可能な最小値 または セットする定数         */
+    double	val2;	/* 指定可能な最大値                               */
 
-    int	(*func)(char *argv);	/* ���ץ����ν���������Ǥ���С�
-				 * ������ˤ��δؿ����ƤӽФ���롣
-				 * argv �ˤ� �ѥ�᡼�������åȤ���롣
-				 * (ex. -opt 12 �ʤ顢"12")
+    int	(*func)(char *argv);	/* オプションの処理が正常であれば、
+				 * 処理後にこの関数が呼び出される。
+				 * argv には パラメータがセットされる。
+				 * (ex. -opt 12 なら、"12")
 				 * 
-				 * ���δؿ��ϡ��۾ｪλ���� 0 �Ǥʤ��ͤ�
-				 * �֤������ξ��ϥ��顼��ɽ������ */
+				 * この関数は、異常終了時は 0 でない値を
+				 * 返し、その場合はエラーを表示する */
 
     int (*save_func)(const struct T_CONFIG_TABLE *op, char opt_arg[255]);
 
-				/* ������¸���ˡ��ƤӽФ����ؿ���
-				     NULL �ξ�硢���Υ��ץ����˳�������
-				   �������¸����ʤ���
-				     OPT_SAVE �ξ�硢�ǥե���Ȥν����ˤ��
-				   ���꤬��¸����롣
-					X_FIX �ϡ��ѿ�����������פ������
-					���Υ��ץ�������ꤵ��롣
-					X_INT �� X_DBL �� X_STR �ϡ��ѿ����ͤ�
-					�����Ȥ��ơ����ץ�������ꤵ���)
-				     ����ʳ��ξ��ϡ����ꤷ���ؿ����ƤӽФ�
-				   ��롣�����ϡ����ץ����ơ��֥�Υݥ���
-				   �ȡ�0��ᤵ�줿 opt_arg �ؤΥݥ��󥿡�
-				   ���δؿ��ϡ����ץ������������¸������
-				   �ϡ������֤������λ� opt_arg �ˤϥ��ץ����
-				   �����򥻥åȤ��롣���ץ������������פ�
-				   ���ϡ�0��ᤵ�줿�ޤޤˤ��Ƥ��� */
+				/* 設定保存時に、呼び出される関数。
+				     NULL の場合、そのオプションに該当する
+				   設定は保存されない。
+				     OPT_SAVE の場合、デフォルトの処理により
+				   設定が保存される。
+					X_FIX は、変数と定数が一致する場合に
+					そのオプションが設定される。
+					X_INT と X_DBL と X_STR は、変数の値を
+					引数として、オプションが設定される)
+				     それ以外の場合は、指定した関数が呼び出さ
+				   れる。引数は、オプションテーブルのポインタ
+				   と、0埋めされた opt_arg へのポインタ。
+				   この関数は、オプションを設定に保存する場合
+				   は、真を返す。この時 opt_arg にはオプション
+				   引数をセットする。オプション引数が不要の
+				   場合は、0埋めされたままにしておく */
 
-	/* �ơ��֥�ν�ü�ϡ����٤� 0 / NULL �򥻥åȤ��� */
+	/* テーブルの終端は、すべて 0 / NULL をセットする */
 
 } T_CONFIG_TABLE;
 
@@ -99,23 +99,23 @@ typedef struct T_CONFIG_TABLE {
 
 typedef struct {
 
-    char	*d[NR_DRIVE];		/* �ǥ��������᡼���ե�����̾ */
-    int		n[NR_DRIVE];		/* ���᡼���ֹ� */
-    int		ro[NR_DRIVE];		/* ReadOnly�ե饰 */
+    char	*d[NR_DRIVE];		/* ディスクイメージファイル名 */
+    int		n[NR_DRIVE];		/* イメージ番号 */
+    int		ro[NR_DRIVE];		/* ReadOnlyフラグ */
 
-    char	*t[NR_TAPE];		/* �ơ��ץ��᡼���ե�����̾ */
-    char	*prn;			/* �ץ�󥿽��ϥե�����̾ */
-    char	*sin;			/* ���ꥢ�����ϥե�����̾ */
-    char	*sout;			/* ���ꥢ����ϥե�����̾ */
+    char	*t[NR_TAPE];		/* テープイメージファイル名 */
+    char	*prn;			/* プリンタ出力ファイル名 */
+    char	*sin;			/* シリアル入力ファイル名 */
+    char	*sout;			/* シリアル出力ファイル名 */
 
 } T_CONFIG_IMAGE;
 
-extern	T_CONFIG_IMAGE	config_image;	/* �����ǻ��ꤵ�줿���᡼���ե����� */
+extern	T_CONFIG_IMAGE	config_image;	/* 引数で指定されたイメージファイル */
 
 /*------------------------------------------------------------------------*/
 
-extern	int	file_coding;	/* �ե�����̾�δ��������� 0:EUC/1:SJIS/2:UTF8*/
-extern	int	save_config;	/* ���ǡ���λ����������¸����		*/
+extern	int	file_coding;	/* ファイル名の漢字コード 0:EUC/1:SJIS/2:UTF8*/
+extern	int	save_config;	/* 真で、終了時に設定保存する		*/
 
 int	config_init(int argc,
 		    char *argv[],

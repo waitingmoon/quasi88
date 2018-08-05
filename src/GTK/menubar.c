@@ -1,15 +1,15 @@
 /***********************************************************************
- * ¥á¥Ë¥å¡¼¥Ğ¡¼½èÍı
+ * ãƒ¡ãƒ‹ãƒ¥ãƒ¼ãƒãƒ¼å‡¦ç†
  ************************************************************************/
 
-/* QUASI88 ¤Î½èÍı¤Ï¡¢ INIT / MAIN / WAIT ¤Î3¥Õ¥§¡¼¥º¤¢¤ë¡£
- * 	INIT ¤Ï¡¢¥¨¥ß¥å¡¿¥á¥Ë¥å¡¼¤Ê¤É¤ÎÀÚÂØ»ş¤Î¤ß¼Â¹Ô¤µ¤ì¡¢
- *	ÄÌ¾ï¤Ï¡¢ MAIN ¢ª WAIT ¢ª MAIN ¢ª WAIT ¡Ä ¤È¼Â¹Ô¤µ¤ì¤ë¡£
+/* QUASI88 ã®å‡¦ç†ã¯ã€ INIT / MAIN / WAIT ã®3ãƒ•ã‚§ãƒ¼ã‚ºã‚ã‚‹ã€‚
+ * 	INIT ã¯ã€ã‚¨ãƒŸãƒ¥ï¼ãƒ¡ãƒ‹ãƒ¥ãƒ¼ãªã©ã®åˆ‡æ›¿æ™‚ã®ã¿å®Ÿè¡Œã•ã‚Œã€
+ *	é€šå¸¸ã¯ã€ MAIN â†’ WAIT â†’ MAIN â†’ WAIT â€¦ ã¨å®Ÿè¡Œã•ã‚Œã‚‹ã€‚
  *
- *	MAIN ¤Ï¡¢¥¨¥ß¥å ¢ª ²»À¼½ĞÎÏ ¢ª ¥¤¥Ù¥ó¥È½èÍı ¢ª ²èÁü½ĞÎÏ ¤ò¹Ô¤Ê¤¤¡¢
- *	WAIT ¤Ï¡¢¼Â»ş´Ö¤È¤ÎÆ±´ü (»ş´ÖÄÙ¤·) ¤Î¤ß¤ò¹Ô¤Ê¤¦¡£
+ *	MAIN ã¯ã€ã‚¨ãƒŸãƒ¥ â†’ éŸ³å£°å‡ºåŠ› â†’ ã‚¤ãƒ™ãƒ³ãƒˆå‡¦ç† â†’ ç”»åƒå‡ºåŠ› ã‚’è¡Œãªã„ã€
+ *	WAIT ã¯ã€å®Ÿæ™‚é–“ã¨ã®åŒæœŸ (æ™‚é–“æ½°ã—) ã®ã¿ã‚’è¡Œãªã†ã€‚
  *
- * ¤µ¤Æ¡¢GTK ¤Î¥á¥Ë¥å¡¼¥Ğ¡¼¤Î½èÍı¤À¤¬¡¢°ìÂÎ¤É¤³¤Ç¹Ô¤Ê¤ï¤ì¤ë¤Î¤À¤í¤¦¡Ä
+ * ã•ã¦ã€GTK ã®ãƒ¡ãƒ‹ãƒ¥ãƒ¼ãƒãƒ¼ã®å‡¦ç†ã ãŒã€ä¸€ä½“ã©ã“ã§è¡Œãªã‚ã‚Œã‚‹ã®ã ã‚ã†â€¦
  */
 
 
@@ -39,7 +39,7 @@ extern	int	sdl_buffersize;
 static void menubar_item_setup(void);
 static void menubar_item_sensitive(int sensitive);
 
-/* ¥Õ¥¡¥¤¥ëÁªÂò»ş¤Î·ë²Ì¤¬³ÊÇ¼¤µ¤ì¤ë¥°¥í¡¼¥Ğ¥ëÊÑ¿ô  ¤Ê¤Ë¡¢¤³¤Î¼ÂÁõ (;_;) */
+/* ãƒ•ã‚¡ã‚¤ãƒ«é¸æŠæ™‚ã®çµæœãŒæ ¼ç´ã•ã‚Œã‚‹ã‚°ãƒ­ãƒ¼ãƒãƒ«å¤‰æ•°  ãªã«ã€ã“ã®å®Ÿè£… (;_;) */
 static	char	menubar_filename[QUASI88_MAX_FILENAME];
 
 static	int	menubar_active;
@@ -55,10 +55,10 @@ static	T_RESET_CFG	menubar_reset_cfg;
 
 
 
-/* ¥¢¥¤¥Æ¥à¥Õ¥¡¥¯¥È¥ê¤Î¤¬³Ú¤Ê¤Î¤À¤¬¡¢ºÙ¤«¤ÊÀ©¸æ¤¬¤ï¤«¤é¤Ê¤¤¤Î¤Ç¼«ÎÏ¤Ç½èÍı */
+/* ã‚¢ã‚¤ãƒ†ãƒ ãƒ•ã‚¡ã‚¯ãƒˆãƒªã®ãŒæ¥½ãªã®ã ãŒã€ç´°ã‹ãªåˆ¶å¾¡ãŒã‚ã‹ã‚‰ãªã„ã®ã§è‡ªåŠ›ã§å‡¦ç† */
 
 /*
- * ¥á¥Ë¥å¡¼¤Î¹àÌÜ°ìÍ÷		¥á¥Ë¥å¡¼¹àÌÜ¤´¤È¤Ë¡¢ÈÖ¹æ¤ò³ä¤ê¿¶¤ë
+ * ãƒ¡ãƒ‹ãƒ¥ãƒ¼ã®é …ç›®ä¸€è¦§		ãƒ¡ãƒ‹ãƒ¥ãƒ¼é …ç›®ã”ã¨ã«ã€ç•ªå·ã‚’å‰²ã‚ŠæŒ¯ã‚‹
  */
 enum {
     M_TOP,
@@ -241,7 +241,7 @@ enum {
 
     M_END
 };
-enum {				/* ¥é¥¸¥ª¥¢¥¤¥Æ¥à¤Î¥°¥ë¡¼¥×°ìÍ÷ */
+enum {				/* ãƒ©ã‚¸ã‚ªã‚¢ã‚¤ãƒ†ãƒ ã®ã‚°ãƒ«ãƒ¼ãƒ—ä¸€è¦§ */
     GRP_BASIC,
     GRP_CLOCK,
     GRP_SB,
@@ -262,16 +262,16 @@ enum {				/* ¥é¥¸¥ª¥¢¥¤¥Æ¥à¤Î¥°¥ë¡¼¥×°ìÍ÷ */
     GRP_END
 };
 
-static struct {			/* ¥¦¥£¥¸¥Ã¥È¤Ê¤É¤Î¾ğÊó¤òÊİÂ¸¤¹¤ë */
+static struct {			/* ã‚¦ã‚£ã‚¸ãƒƒãƒˆãªã©ã®æƒ…å ±ã‚’ä¿å­˜ã™ã‚‹ */
     GtkWidget	*widget;
     GtkWidget	*label;
     GtkWidget	*submenu;
 } mwidget[M_END];
 
-static GSList *mlist[GRP_END];	/* ¥é¥¸¥ª¥¢¥¤¥Æ¥à¤Î¥ê¥¹¥È¤òÊİÂ¸¤¹¤ë */
+static GSList *mlist[GRP_END];	/* ãƒ©ã‚¸ã‚ªã‚¢ã‚¤ãƒ†ãƒ ã®ãƒªã‚¹ãƒˆã‚’ä¿å­˜ã™ã‚‹ */
 
 /*
- * ¥³¡¼¥ë¥Ğ¥Ã¥¯´Ø¿ô
+ * ã‚³ãƒ¼ãƒ«ãƒãƒƒã‚¯é–¢æ•°
  */
 
 static	void	f_sys_reset	(GtkMenuItem *widget, gpointer data);
@@ -313,7 +313,7 @@ static	void	f_misc_status	(GtkCheckMenuItem *widget, gpointer data);
 static	void	f_help_about	(GtkMenuItem *widget, gpointer data);
 
 /*
- * ¥á¥Ë¥å¡¼¤Î¹àÌÜÆâÍÆ		¿Æ»Ò´Ø·¸¤Î¤¢¤ë¤â¤Î¤Ï¡¢¿Æ¤«¤é½ç¤Ë
+ * ãƒ¡ãƒ‹ãƒ¥ãƒ¼ã®é …ç›®å†…å®¹		è¦ªå­é–¢ä¿‚ã®ã‚ã‚‹ã‚‚ã®ã¯ã€è¦ªã‹ã‚‰é †ã«
  */
 
 typedef struct {
@@ -542,7 +542,7 @@ static T_MENUTABLE menutable[] =
 
 
 /***********************************************************************
- * ¥á¥Ë¥å¡¼¥Ğ¡¼À¸À®
+ * ãƒ¡ãƒ‹ãƒ¥ãƒ¼ãƒãƒ¼ç”Ÿæˆ
  ************************************************************************/
 void	create_menubar(GtkWidget *target_window,
 		       GtkWidget **created_menubar)
@@ -640,31 +640,31 @@ void	create_menubar(GtkWidget *target_window,
 	}
     }
 
-    /* ¥¢¥¯¥»¥é¥ì¡¼¥¿¥­¡¼¤òÀßÄê¤¹¤ë¾ì¹ç¤Ï¡¢ target_window ¤ËÂĞ¤·¤ÆÅĞÏ¿¤¹¤ë */
+    /* ã‚¢ã‚¯ã‚»ãƒ©ãƒ¬ãƒ¼ã‚¿ã‚­ãƒ¼ã‚’è¨­å®šã™ã‚‹å ´åˆã¯ã€ target_window ã«å¯¾ã—ã¦ç™»éŒ²ã™ã‚‹ */
 
     *created_menubar = menubar;
 }
 
 
 /****************************************************************************
- * ¥â¡¼¥ÉÀÚ¤êÂØ¤¨»ş¤Î¡¢¥á¥Ë¥å¡¼¥Ğ¡¼¤Î½èÍıºÆÀßÄê
- *	¥¨¥ß¥å¥â¡¼¥É¤È¥á¥Ë¥å¡¼¥â¡¼¥É¤Ç¡¢¥á¥Ë¥å¡¼¥Ğ¡¼¤ÎÆâÍÆ¤òÊÑ¹¹¤¹¤ë
+ * ãƒ¢ãƒ¼ãƒ‰åˆ‡ã‚Šæ›¿ãˆæ™‚ã®ã€ãƒ¡ãƒ‹ãƒ¥ãƒ¼ãƒãƒ¼ã®å‡¦ç†å†è¨­å®š
+ *	ã‚¨ãƒŸãƒ¥ãƒ¢ãƒ¼ãƒ‰ã¨ãƒ¡ãƒ‹ãƒ¥ãƒ¼ãƒ¢ãƒ¼ãƒ‰ã§ã€ãƒ¡ãƒ‹ãƒ¥ãƒ¼ãƒãƒ¼ã®å†…å®¹ã‚’å¤‰æ›´ã™ã‚‹
  *****************************************************************************/
 void	menubar_setup(int active)
 {
     if (active) {
 
-	/*  ¥á¥Ë¥å¡¼¥Ğ¡¼¤ÎÆâÍÆ¤òÀßÄê */
+	/*  ãƒ¡ãƒ‹ãƒ¥ãƒ¼ãƒãƒ¼ã®å†…å®¹ã‚’è¨­å®š */
 	menubar_item_setup();
 
-	/* »È¤¨¤Ê¤¯¤·¤¿¹àÌÜ¤ò»È¤¨¤ë¤è¤¦¤Ë¤¹¤ë (¥¨¥ß¥å¥â¡¼¥É³«»Ï»ş) */
+	/* ä½¿ãˆãªãã—ãŸé …ç›®ã‚’ä½¿ãˆã‚‹ã‚ˆã†ã«ã™ã‚‹ (ã‚¨ãƒŸãƒ¥ãƒ¢ãƒ¼ãƒ‰é–‹å§‹æ™‚) */
 	menubar_item_sensitive(TRUE);
 
 	menubar_active = TRUE;
 
     } else {
 
-	/* ¤Û¤È¤ó¤É¤Î¹àÌÜ¤ò»È¤¨¤Ê¤¯¤¹¤ë (¥á¥Ë¥å¡¼¥â¡¼¥É³«»Ï»ş) */
+	/* ã»ã¨ã‚“ã©ã®é …ç›®ã‚’ä½¿ãˆãªãã™ã‚‹ (ãƒ¡ãƒ‹ãƒ¥ãƒ¼ãƒ¢ãƒ¼ãƒ‰é–‹å§‹æ™‚) */
 	menubar_item_sensitive(FALSE);
 
 	menubar_active = FALSE;
@@ -676,30 +676,30 @@ void	menubar_setup(int active)
 
 
 
-/* ¥Õ¥¡¥¤¥ëÁªÂò¥À¥¤¥¢¥í¥°¤òÉ½¼¨¤·¡¢ÁªÂò¸å¤Ë¥³¡¼¥ë¥Ğ¥Ã¥¯´Ø¿ô¤ò¸Æ¤Ö */
-static char  *select_file_fullname;		/* ¥Õ¥¡¥¤¥ëÌ¾¤Ï¤³¤³¤Ë³ÊÇ¼ */
-static int    select_file_n_fullname;		/* ¤½¤Î¥Ğ¥Ã¥Õ¥¡¤Î¥µ¥¤¥º   */
-static void (*select_file_callback)(int result);/* ½ªÎ»»ş¤Ë¸Æ¤Ó½Ğ¤¹´Ø¿ô   */
+/* ãƒ•ã‚¡ã‚¤ãƒ«é¸æŠãƒ€ã‚¤ã‚¢ãƒ­ã‚°ã‚’è¡¨ç¤ºã—ã€é¸æŠå¾Œã«ã‚³ãƒ¼ãƒ«ãƒãƒƒã‚¯é–¢æ•°ã‚’å‘¼ã¶ */
+static char  *select_file_fullname;		/* ãƒ•ã‚¡ã‚¤ãƒ«åã¯ã“ã“ã«æ ¼ç´ */
+static int    select_file_n_fullname;		/* ãã®ãƒãƒƒãƒ•ã‚¡ã®ã‚µã‚¤ã‚º   */
+static void (*select_file_callback)(int result);/* çµ‚äº†æ™‚ã«å‘¼ã³å‡ºã™é–¢æ•°   */
 static void cb_select_file_ok(GtkWidget *widget, gpointer data)
 {
     my_strncpy(select_file_fullname,
 	       gtk_file_selection_get_filename(GTK_FILE_SELECTION(data)),
 	       select_file_n_fullname);
 
-    (select_file_callback)(1);			/* ¥Õ¥¡¥¤¥ëÁªÂò¤¢¤ê  */
+    (select_file_callback)(1);			/* ãƒ•ã‚¡ã‚¤ãƒ«é¸æŠã‚ã‚Š  */
 
     gtk_widget_destroy(GTK_WIDGET(data));
 
 }
 static void cb_select_file_cancel(GtkWidget *widget, gpointer data)
 {
-    (select_file_callback)(0);			/* ¥Õ¥¡¥¤¥ëÁªÂò¤»¤º  */
+    (select_file_callback)(0);			/* ãƒ•ã‚¡ã‚¤ãƒ«é¸æŠã›ãš  */
 
     gtk_widget_destroy(GTK_WIDGET(data));
 }
 static void cb_select_file_destroy(GtkWidget *widget, gpointer data)
 {
-    (select_file_callback)(0);			/* ¥Õ¥¡¥¤¥ëÁªÂò¤»¤º  */
+    (select_file_callback)(0);			/* ãƒ•ã‚¡ã‚¤ãƒ«é¸æŠã›ãš  */
 
     gtk_grab_remove(GTK_WIDGET(widget));
 }
@@ -742,7 +742,7 @@ static int select_file(const char *title,
 
 
 
-/* Reset ¥á¥Ë¥å¡¼¥¢¥¤¥Æ¥à¤Î¥é¥Ù¥ë¤ò¹¹¿·¤¹¤ë */
+/* Reset ãƒ¡ãƒ‹ãƒ¥ãƒ¼ã‚¢ã‚¤ãƒ†ãƒ ã®ãƒ©ãƒ™ãƒ«ã‚’æ›´æ–°ã™ã‚‹ */
 static void update_sys_reset(void)
 {
     char buf[32];
@@ -774,7 +774,7 @@ static void update_sys_reset(void)
 
 
 
-/* Drive ¥á¥Ë¥å¡¼¥¢¥¤¥Æ¥à¤òÉ½¼¨¤¹¤ë¡¦±£¤¹ */
+/* Drive ãƒ¡ãƒ‹ãƒ¥ãƒ¼ã‚¢ã‚¤ãƒ†ãƒ ã‚’è¡¨ç¤ºã™ã‚‹ãƒ»éš ã™ */
 static void update_drive(void)
 {
     int uItem;
@@ -792,8 +792,8 @@ static void update_drive(void)
 
 	if (disk_image_exist(drv)) {
 
-	    /* ¥¤¥á¡¼¥¸¤Î¿ô¤ÎÊ¬¡¢¥á¥Ë¥å¡¼¥¢¥¤¥Æ¥à¤òÉ½¼¨¤¹¤ë¡£
-	       ¥é¥Ù¥ë¤Ï¡¢¥¤¥á¡¼¥¸Ì¾¤Ë¥»¥Ã¥È¤·Ä¾¤¹¡£           */
+	    /* ã‚¤ãƒ¡ãƒ¼ã‚¸ã®æ•°ã®åˆ†ã€ãƒ¡ãƒ‹ãƒ¥ãƒ¼ã‚¢ã‚¤ãƒ†ãƒ ã‚’è¡¨ç¤ºã™ã‚‹ã€‚
+	       ãƒ©ãƒ™ãƒ«ã¯ã€ã‚¤ãƒ¡ãƒ¼ã‚¸åã«ã‚»ãƒƒãƒˆã—ç›´ã™ã€‚           */
 	    for (i = 0; i < MIN(disk_image_num(drv), 9); i++) {
 		uItem = i + base;
 
@@ -811,33 +811,33 @@ static void update_drive(void)
 
 	} else {
 
-	    /* ¥Ç¥£¥¹¥¯¤¬¤Ê¤¤¾ì¹ç¡¢¥á¥Ë¥å¡¼¥¢¥¤¥Æ¥à¤ò±£¤¹ */
+	    /* ãƒ‡ã‚£ã‚¹ã‚¯ãŒãªã„å ´åˆã€ãƒ¡ãƒ‹ãƒ¥ãƒ¼ã‚¢ã‚¤ãƒ†ãƒ ã‚’éš ã™ */
 	    for (i=0; i<9; i++) {
 		uItem = i + base;
 		gtk_widget_hide(mwidget[uItem].widget);
 	    }
 	}
 
-	/* ÁªÂòÃæ¥¤¥á¡¼¥¸¤Î¡¢¥é¥¸¥ª¥á¥Ë¥å¡¼¤ò¥¢¥¯¥Æ¥£¥Ö¤Ë¤¹¤ë */
+	/* é¸æŠä¸­ã‚¤ãƒ¡ãƒ¼ã‚¸ã®ã€ãƒ©ã‚¸ã‚ªãƒ¡ãƒ‹ãƒ¥ãƒ¼ã‚’ã‚¢ã‚¯ãƒ†ã‚£ãƒ–ã«ã™ã‚‹ */
 
-	if (disk_image_exist(drv) == FALSE ||	/* ¥Õ¥¡¥¤¥ë¤Ê¤· or */
-	    drive_check_empty(drv)) {		/* ¶õ¤òÁªÂò        */
+	if (disk_image_exist(drv) == FALSE ||	/* ãƒ•ã‚¡ã‚¤ãƒ«ãªã— or */
+	    drive_check_empty(drv)) {		/* ç©ºã‚’é¸æŠ        */
 
-	    uItem = tag;				/*    ¢ª NO Disk */
+	    uItem = tag;				/*    â†’ NO Disk */
 
 	} else {
 	    i = disk_image_selected(drv);
-	    if (0 <= i && i <= 9) {			/* 1¡Á9ÈÖÌÜÁªÂò */
-		uItem = i + base;			/*    ¢ª ¤½¤ì¤À */
-	    } else {					/* 10ÈÖÌÜ¡Á     */
-		uItem = none;				/*    ¢ª ¤Ê¤·   */
+	    if (0 <= i && i <= 9) {			/* 1ã€œ9ç•ªç›®é¸æŠ */
+		uItem = i + base;			/*    â†’ ãã‚Œã  */
+	    } else {					/* 10ç•ªç›®ã€œ     */
+		uItem = none;				/*    â†’ ãªã—   */
 	    }
 	}
 	gtk_check_menu_item_set_active(
 			GTK_CHECK_MENU_ITEM(mwidget[uItem].widget), TRUE);
     }
 
-    /* ¥á¥Ë¥å¡¼¤ÎÌ¾Á°¤òÊÑ¤¨¤¿¤ê¡¢Ìµ¸ú¤Ë¤·¤¿¤ê */
+    /* ãƒ¡ãƒ‹ãƒ¥ãƒ¼ã®åå‰ã‚’å¤‰ãˆãŸã‚Šã€ç„¡åŠ¹ã«ã—ãŸã‚Š */
 
     for (drv = 0; drv < NR_DRIVE; drv ++) {
 	const char *s;
@@ -861,7 +861,7 @@ static void update_drive(void)
     UNLOCK_MENUBAR()
 }
 
-/* Tape Load ¥á¥Ë¥å¡¼¥¢¥¤¥Æ¥à¤Î¥é¥Ù¥ë¤òÊÑ¤¨¤¿¤ê»ÈÍÑÉÔ²Ä¤Ë¤·¤¿¤ê */
+/* Tape Load ãƒ¡ãƒ‹ãƒ¥ãƒ¼ã‚¢ã‚¤ãƒ†ãƒ ã®ãƒ©ãƒ™ãƒ«ã‚’å¤‰ãˆãŸã‚Šä½¿ç”¨ä¸å¯ã«ã—ãŸã‚Š */
 static void update_misc_cload(void)
 {
     int uItem;
@@ -872,7 +872,7 @@ static void update_misc_cload(void)
 
     s = filename_get_tape_name(CLOAD);
 
-    /* ¥Æ¡¼¥×¤¢¤ê¤Ê¤é¥Õ¥¡¥¤¥ëÌ¾¤ò¡¢¤Ê¤·¤Ê¤é¥Ç¥Õ¥©¥ë¥È¤Î¥é¥Ù¥ë¤òÉ½¼¨ */
+    /* ãƒ†ãƒ¼ãƒ—ã‚ã‚Šãªã‚‰ãƒ•ã‚¡ã‚¤ãƒ«åã‚’ã€ãªã—ãªã‚‰ãƒ‡ãƒ•ã‚©ãƒ«ãƒˆã®ãƒ©ãƒ™ãƒ«ã‚’è¡¨ç¤º */
     uItem = M_MISC_CLOAD_S;
     {
 	if (s) { my_strncpy(buf, s, sizeof(buf)); }
@@ -880,20 +880,20 @@ static void update_misc_cload(void)
 	gtk_label_set(GTK_LABEL(mwidget[uItem].label), buf);
     }
 
-    /* ¥Æ¡¼¥×¤¢¤ê¤Ê¤é¡¢¥é¥¸¥ª¥á¥Ë¥å¡¼¤ò¥¢¥¯¥Æ¥£¥Ö¤Ë */
+    /* ãƒ†ãƒ¼ãƒ—ã‚ã‚Šãªã‚‰ã€ãƒ©ã‚¸ã‚ªãƒ¡ãƒ‹ãƒ¥ãƒ¼ã‚’ã‚¢ã‚¯ãƒ†ã‚£ãƒ–ã« */
     if (s) uItem = M_MISC_CLOAD_S;
     else   uItem = M_MISC_CLOAD_S_DUMMY;
     gtk_check_menu_item_set_active(
 			GTK_CHECK_MENU_ITEM(mwidget[uItem].widget), TRUE);
 
-    /* ¥Æ¡¼¥×¤¢¤ê¤Ê¤é unset ¤òÉ½¼¨¡¢¤Ê¤·¤Ê¤é±£¤¹ */
+    /* ãƒ†ãƒ¼ãƒ—ã‚ã‚Šãªã‚‰ unset ã‚’è¡¨ç¤ºã€ãªã—ãªã‚‰éš ã™ */
     uItem = M_MISC_CLOAD_U;
     gtk_widget_set_sensitive(mwidget[uItem].widget, (s) ? TRUE : FALSE);
 
     UNLOCK_MENUBAR()
 }
 
-/* Tape Save ¥á¥Ë¥å¡¼¥¢¥¤¥Æ¥à¤Î¥é¥Ù¥ë¤òÊÑ¤¨¤¿¤ê»ÈÍÑÉÔ²Ä¤Ë¤·¤¿¤ê */
+/* Tape Save ãƒ¡ãƒ‹ãƒ¥ãƒ¼ã‚¢ã‚¤ãƒ†ãƒ ã®ãƒ©ãƒ™ãƒ«ã‚’å¤‰ãˆãŸã‚Šä½¿ç”¨ä¸å¯ã«ã—ãŸã‚Š */
 static void update_misc_csave(void)
 {
     int uItem;
@@ -904,7 +904,7 @@ static void update_misc_csave(void)
 
     s = filename_get_tape_name(CSAVE);
 
-    /* ¥Æ¡¼¥×¤¢¤ê¤Ê¤é¥Õ¥¡¥¤¥ëÌ¾¤ò¡¢¤Ê¤·¤Ê¤é¥Ç¥Õ¥©¥ë¥È¤Î¥é¥Ù¥ë¤òÉ½¼¨ */
+    /* ãƒ†ãƒ¼ãƒ—ã‚ã‚Šãªã‚‰ãƒ•ã‚¡ã‚¤ãƒ«åã‚’ã€ãªã—ãªã‚‰ãƒ‡ãƒ•ã‚©ãƒ«ãƒˆã®ãƒ©ãƒ™ãƒ«ã‚’è¡¨ç¤º */
     uItem = M_MISC_CSAVE_S;
     {
 	if (s) { my_strncpy(buf, s, sizeof(buf)); }
@@ -912,20 +912,20 @@ static void update_misc_csave(void)
 	gtk_label_set(GTK_LABEL(mwidget[uItem].label), buf);
     }
 
-    /* ¥Æ¡¼¥×¤¢¤ê¤Ê¤é¡¢¥é¥¸¥ª¥á¥Ë¥å¡¼¤ò¥¢¥¯¥Æ¥£¥Ö¤Ë */
+    /* ãƒ†ãƒ¼ãƒ—ã‚ã‚Šãªã‚‰ã€ãƒ©ã‚¸ã‚ªãƒ¡ãƒ‹ãƒ¥ãƒ¼ã‚’ã‚¢ã‚¯ãƒ†ã‚£ãƒ–ã« */
     if (s) uItem = M_MISC_CSAVE_S;
     else   uItem = M_MISC_CSAVE_S_DUMMY;
     gtk_check_menu_item_set_active(
 			GTK_CHECK_MENU_ITEM(mwidget[uItem].widget), TRUE);
 
-    /* ¥Æ¡¼¥×¤¢¤ê¤Ê¤é unset ¤òÉ½¼¨¡¢¤Ê¤·¤Ê¤é±£¤¹ */
+    /* ãƒ†ãƒ¼ãƒ—ã‚ã‚Šãªã‚‰ unset ã‚’è¡¨ç¤ºã€ãªã—ãªã‚‰éš ã™ */
     uItem = M_MISC_CSAVE_U;
     gtk_widget_set_sensitive(mwidget[uItem].widget, (s) ? TRUE : FALSE);
 
     UNLOCK_MENUBAR()
 }
 
-/* Sound Record ¥á¥Ë¥å¡¼¥¢¥¤¥Æ¥à¤Î¥Á¥§¥Ã¥¯¤òÊÑ¹¹¤¹¤ë */
+/* Sound Record ãƒ¡ãƒ‹ãƒ¥ãƒ¼ã‚¢ã‚¤ãƒ†ãƒ ã®ãƒã‚§ãƒƒã‚¯ã‚’å¤‰æ›´ã™ã‚‹ */
 static void update_misc_record(void)
 {
     int uItem;
@@ -945,7 +945,7 @@ static void update_misc_record(void)
 
 
 /*======================================================================
- * ¥á¥Ë¥å¡¼¥Ğ¡¼¤ÎÆâÍÆ¤òºÆ½é´ü²½
+ * ãƒ¡ãƒ‹ãƒ¥ãƒ¼ãƒãƒ¼ã®å†…å®¹ã‚’å†åˆæœŸåŒ–
  *======================================================================*/
 static void menubar_item_setup(void)
 {
@@ -986,7 +986,7 @@ static void menubar_item_setup(void)
 
     /* Setting ----------------------------------------------------------*/
 
-    i = quasi88_cfg_now_wait_rate();				/* ¡ö¡ö¡ö¡ö */
+    i = quasi88_cfg_now_wait_rate();				/* ï¼Šï¼Šï¼Šï¼Š */
     switch (i) {
     case 25:		uItem = M_SET_SPD_25;		break;
     case 50:		uItem = M_SET_SPD_50;		break;
@@ -998,12 +998,12 @@ static void menubar_item_setup(void)
     gtk_check_menu_item_set_active(
 			GTK_CHECK_MENU_ITEM(mwidget[uItem].widget), TRUE);
 
-    i = quasi88_cfg_now_no_wait();				/* ¡ö¡ö¡ö¡ö */
+    i = quasi88_cfg_now_no_wait();				/* ï¼Šï¼Šï¼Šï¼Š */
     uItem = M_SET_SPD_MAX;
     gtk_check_menu_item_set_active(
 			GTK_CHECK_MENU_ITEM(mwidget[uItem].widget), i);
 
-    i = cpu_timing;						/* ¡ö¡ö¡ö¡ö */
+    i = cpu_timing;						/* ï¼Šï¼Šï¼Šï¼Š */
     switch (i) {
     case 0:		uItem = M_SET_SUB_SOME;		break;
     case 1:		uItem = M_SET_SUB_OFT;		break;
@@ -1013,12 +1013,12 @@ static void menubar_item_setup(void)
     gtk_check_menu_item_set_active(
 			GTK_CHECK_MENU_ITEM(mwidget[uItem].widget), TRUE);
 
-    i = fdc_wait;						/* ¡ö¡ö¡ö¡ö */
+    i = fdc_wait;						/* ï¼Šï¼Šï¼Šï¼Š */
     uItem = M_SET_FDCWAIT;
     gtk_check_menu_item_set_active(
 			GTK_CHECK_MENU_ITEM(mwidget[uItem].widget), i);
 
-    i = quasi88_cfg_now_frameskip_rate();			/* ¡ö¡ö¡ö¡ö */
+    i = quasi88_cfg_now_frameskip_rate();			/* ï¼Šï¼Šï¼Šï¼Š */
     switch (i) {
     case 1:		uItem = M_SET_REF_60;		break;
     case 2:		uItem = M_SET_REF_30;		break;
@@ -1029,7 +1029,7 @@ static void menubar_item_setup(void)
     gtk_check_menu_item_set_active(
 			GTK_CHECK_MENU_ITEM(mwidget[uItem].widget), TRUE);
 
-    i = quasi88_cfg_now_interlace();				/* ¡ö¡ö¡ö¡ö */
+    i = quasi88_cfg_now_interlace();				/* ï¼Šï¼Šï¼Šï¼Š */
     switch (i) {
     case SCREEN_INTERLACE_NO:	uItem = M_SET_INT_NO;	break;
     case SCREEN_INTERLACE_SKIP:	uItem = M_SET_INT_SKIP;	break;
@@ -1039,7 +1039,7 @@ static void menubar_item_setup(void)
     gtk_check_menu_item_set_active(
 			GTK_CHECK_MENU_ITEM(mwidget[uItem].widget), TRUE);
 
-    i = quasi88_cfg_now_size();					/* ¡ö¡ö¡ö¡ö */
+    i = quasi88_cfg_now_size();					/* ï¼Šï¼Šï¼Šï¼Š */
     switch (i) {
     case SCREEN_SIZE_FULL:	uItem = M_SET_SIZ_FULL;	break;
     case SCREEN_SIZE_HALF:	uItem = M_SET_SIZ_HALF;	break;
@@ -1048,12 +1048,12 @@ static void menubar_item_setup(void)
     gtk_check_menu_item_set_active(
 			GTK_CHECK_MENU_ITEM(mwidget[uItem].widget), TRUE);
 
-    i = use_pcg;						/* ¡ö¡ö¡ö¡ö */
+    i = use_pcg;						/* ï¼Šï¼Šï¼Šï¼Š */
     uItem = M_SET_PCG;
     gtk_check_menu_item_set_active(
 			GTK_CHECK_MENU_ITEM(mwidget[uItem].widget), i);
 
-    i = mouse_mode;						/* ¡ö¡ö¡ö¡ö */
+    i = mouse_mode;						/* ï¼Šï¼Šï¼Šï¼Š */
     switch (i) {
     case MOUSE_NONE:		uItem = M_SET_MO_NO;	break;
     case MOUSE_MOUSE:		uItem = M_SET_MO_MOUSE;	break;
@@ -1064,7 +1064,7 @@ static void menubar_item_setup(void)
     gtk_check_menu_item_set_active(
 			GTK_CHECK_MENU_ITEM(mwidget[uItem].widget), TRUE);
 
-    i = cursor_key_mode;					/* ¡ö¡ö¡ö¡ö */
+    i = cursor_key_mode;					/* ï¼Šï¼Šï¼Šï¼Š */
     switch (i) {
     case 0:		uItem = M_SET_CUR_DEF;		break;
     case 1:		uItem = M_SET_CUR_TEN;		break;
@@ -1073,12 +1073,12 @@ static void menubar_item_setup(void)
     gtk_check_menu_item_set_active(
 			GTK_CHECK_MENU_ITEM(mwidget[uItem].widget), TRUE);
 
-    i = numlock_emu;						/* ¡ö¡ö¡ö¡ö */
+    i = numlock_emu;						/* ï¼Šï¼Šï¼Šï¼Š */
     uItem = M_SET_NUMLOCK;
     gtk_check_menu_item_set_active(
 			GTK_CHECK_MENU_ITEM(mwidget[uItem].widget), i);
 
-    i = romaji_input_mode;					/* ¡ö¡ö¡ö¡ö */
+    i = romaji_input_mode;					/* ï¼Šï¼Šï¼Šï¼Š */
     uItem = M_SET_ROMAJI;
     gtk_check_menu_item_set_active(
 			GTK_CHECK_MENU_ITEM(mwidget[uItem].widget), i);
@@ -1086,7 +1086,7 @@ static void menubar_item_setup(void)
 #ifdef	USE_SOUND
     if (xmame_has_sound()) {
 #ifdef	USE_FMGEN
-	i = xmame_cfg_get_use_fmgen();				/* ¡ö¡ö¡ö¡ö */
+	i = xmame_cfg_get_use_fmgen();				/* ï¼Šï¼Šï¼Šï¼Š */
 	switch (i) {
 	case 0:		uItem = M_SET_FM_MAME;		break;
 	case 1:		uItem = M_SET_FM_FMGEN;		break;
@@ -1096,7 +1096,7 @@ static void menubar_item_setup(void)
 			GTK_CHECK_MENU_ITEM(mwidget[uItem].widget), TRUE);
 #endif
 
-	i = xmame_cfg_get_sample_freq();			/* ¡ö¡ö¡ö¡ö */
+	i = xmame_cfg_get_sample_freq();			/* ï¼Šï¼Šï¼Šï¼Š */
 	switch (i) {
 	case 48000:	uItem = M_SET_FRQ_48;		break;
 	case 44100:	uItem = M_SET_FRQ_44;		break;
@@ -1107,7 +1107,7 @@ static void menubar_item_setup(void)
 	gtk_check_menu_item_set_active(
 			GTK_CHECK_MENU_ITEM(mwidget[uItem].widget), TRUE);
 
-	i = sdl_buffersize;					/* ¡ö¡ö¡ö¡ö */
+	i = sdl_buffersize;					/* ï¼Šï¼Šï¼Šï¼Š */
 	switch (i) {
 	case 8192:	uItem = M_SET_BUF_800;		break;
 	case 4096:	uItem = M_SET_BUF_400;		break;
@@ -1152,7 +1152,7 @@ static void menubar_item_setup(void)
 }
 
 /*======================================================================
- * ¥á¥Ë¥å¡¼¥Ğ¡¼»ÈÍÑ²ÄÇ½¹àÌÜ¤òÀßÄê
+ * ãƒ¡ãƒ‹ãƒ¥ãƒ¼ãƒãƒ¼ä½¿ç”¨å¯èƒ½é …ç›®ã‚’è¨­å®š
  *======================================================================*/
 static void menubar_item_sensitive(int sensitive)
 {
@@ -1171,11 +1171,11 @@ static void menubar_item_sensitive(int sensitive)
 
 
 /*======================================================================
- * ¥á¥Ë¥å¡¼¥Ğ¡¼¥³¡¼¥ë¥Ğ¥Ã¥¯´Ø¿ô
+ * ãƒ¡ãƒ‹ãƒ¥ãƒ¼ãƒãƒ¼ã‚³ãƒ¼ãƒ«ãƒãƒƒã‚¯é–¢æ•°
  *======================================================================*/
 
 /*----------------------------------------------------------------------
- * System ¥á¥Ë¥å¡¼
+ * System ãƒ¡ãƒ‹ãƒ¥ãƒ¼
  *----------------------------------------------------------------------*/
 
 static	void	f_sys_reset(GtkMenuItem *widget, gpointer data)
@@ -1266,7 +1266,7 @@ static	void	f_sys_exit(GtkMenuItem *widget, gpointer data)
 }
 
 /*----------------------------------------------------------------------
- * Setting ¥á¥Ë¥å¡¼
+ * Setting ãƒ¡ãƒ‹ãƒ¥ãƒ¼
  *----------------------------------------------------------------------*/
 
 static	void	f_set_speed(GtkRadioMenuItem *widget, gpointer data)
@@ -1299,7 +1299,7 @@ static	void	f_set_subcpu(GtkRadioMenuItem *widget, gpointer data)
 	if (cpu_timing != (int)data) {
 	    cpu_timing = (int)data;
 	    emu_reset();
-	    /* Â¾¤ËºÆ½é´ü²½¤¹¤Ù¤­¤â¤Î¤Ï¤Ê¤¤¤Î¤«¡© */
+	    /* ä»–ã«å†åˆæœŸåŒ–ã™ã¹ãã‚‚ã®ã¯ãªã„ã®ã‹ï¼Ÿ */
 	}
     }
 }
@@ -1412,7 +1412,7 @@ static	void	f_set_fm(GtkRadioMenuItem *widget, gpointer data)
 #ifdef	USE_FMGEN
     if (GTK_CHECK_MENU_ITEM(widget)->active)
     {
-	/* ¤ä¤Ã¤«¤¤ */
+	/* ã‚„ã£ã‹ã„ */
 	if (((xmame_cfg_get_use_fmgen())          && ((int)data == FALSE)) ||
 	    ((xmame_cfg_get_use_fmgen() == FALSE) && ((int)data))) {
 
@@ -1431,7 +1431,7 @@ static	void	f_set_frq(GtkRadioMenuItem *widget, gpointer data)
 
     if (GTK_CHECK_MENU_ITEM(widget)->active)
     {
-	/* ¤ä¤Ã¤«¤¤ */
+	/* ã‚„ã£ã‹ã„ */
 	if (xmame_cfg_get_sample_freq() != (int)data) {
 	    if (8000 <= (int)data && (int)data <= 48000) {
 		xmame_cfg_set_sample_freq((int)data);
@@ -1449,7 +1449,7 @@ static	void	f_set_buf(GtkRadioMenuItem *widget, gpointer data)
 
     if (GTK_CHECK_MENU_ITEM(widget)->active)
     {
-	/* ¤ä¤Ã¤«¤¤ */
+	/* ã‚„ã£ã‹ã„ */
 	if (sdl_buffersize != (int)data) {
 	    if (32 <= (int)data && (int)data <= 65536) {
 		sdl_buffersize = (int)data;
@@ -1463,7 +1463,7 @@ static	void	f_set_buf(GtkRadioMenuItem *widget, gpointer data)
 #endif
 
 /*----------------------------------------------------------------------
- * Drive ¥á¥Ë¥å¡¼
+ * Drive ãƒ¡ãƒ‹ãƒ¥ãƒ¼
  *----------------------------------------------------------------------*/
 
 static	int	data_drv_chg;
@@ -1487,7 +1487,7 @@ static	void	f_drv_chg(GtkMenuItem *widget, gpointer data)
 		menubar_filename,
 		sizeof(menubar_filename));
 
-    /* ¤³¤Î·ë²Ì¤Ï¡¢¥³¡¼¥ë¥Ğ¥Ã¥¯´Ø¿ô¤Ë¤Æ */
+    /* ã“ã®çµæœã¯ã€ã‚³ãƒ¼ãƒ«ãƒãƒƒã‚¯é–¢æ•°ã«ã¦ */
 }
 static	void	cb_drv_chg(int result)
 {
@@ -1505,7 +1505,7 @@ static	void	cb_drv_chg(int result)
 
 	}
 
-	/* ¤¹¤Ç¤Ë¥Õ¥¡¥¤¥ë¤òÊÄ¤¸¤Æ¤¤¤ë¤Î¤Ç¡¢¼ºÇÔ¤·¤Æ¤â¥á¥Ë¥å¡¼¥Ğ¡¼¹¹¿· */
+	/* ã™ã§ã«ãƒ•ã‚¡ã‚¤ãƒ«ã‚’é–‰ã˜ã¦ã„ã‚‹ã®ã§ã€å¤±æ•—ã—ã¦ã‚‚ãƒ¡ãƒ‹ãƒ¥ãƒ¼ãƒãƒ¼æ›´æ–° */
 	update_drive();
     }
 }
@@ -1548,7 +1548,7 @@ static	void	f_drv_unset(GtkMenuItem *widget, gpointer data)
 }
 
 /*----------------------------------------------------------------------
- * Misc ¥á¥Ë¥å¡¼
+ * Misc ãƒ¡ãƒ‹ãƒ¥ãƒ¼
  *----------------------------------------------------------------------*/
 
 static	void	f_misc_capture(GtkMenuItem *widget, gpointer data)
@@ -1567,7 +1567,7 @@ static	void	f_misc_record(GtkCheckMenuItem *widget, gpointer data)
 
     LOCK_MENUBAR()
 
-    active = xmame_wavout_opened() ? FALSE : TRUE; 	/* µÕ¤Ë¤¹¤ë */
+    active = xmame_wavout_opened() ? FALSE : TRUE; 	/* é€†ã«ã™ã‚‹ */
 
     if (active == FALSE) {
 	if (xmame_wavout_opened()) {
@@ -1593,14 +1593,14 @@ static	void	f_misc_cload_s(GtkMenuItem *widget, gpointer data)
 {
     if (menubar_active == FALSE) { return; }
 
-    if (filename_get_tape(CLOAD)) { return; }	/* ¥Æ¡¼¥×¤¢¤ê¤Ê¤éÌá¤ë */
+    if (filename_get_tape(CLOAD)) { return; }	/* ãƒ†ãƒ¼ãƒ—ã‚ã‚Šãªã‚‰æˆ»ã‚‹ */
 
     select_file("Open Tape-Image-File for LOAD",
 		cb_misc_cload_s,
 		menubar_filename,
 		sizeof(menubar_filename));
 
-    /* ¤³¤Î·ë²Ì¤Ï¡¢¥³¡¼¥ë¥Ğ¥Ã¥¯´Ø¿ô¤Ë¤Æ */
+    /* ã“ã®çµæœã¯ã€ã‚³ãƒ¼ãƒ«ãƒãƒƒã‚¯é–¢æ•°ã«ã¦ */
 }
 static	void	cb_misc_cload_s(int result)
 {
@@ -1608,7 +1608,7 @@ static	void	cb_misc_cload_s(int result)
 
 	int ok = quasi88_load_tape_insert(menubar_filename);
 
-	/* ¤¹¤Ç¤Ë¥Õ¥¡¥¤¥ë¤òÊÄ¤¸¤Æ¤¤¤ë¤Î¤Ç¡¢¼ºÇÔ¤·¤Æ¤â¥á¥Ë¥å¡¼¥Ğ¡¼¹¹¿· */
+	/* ã™ã§ã«ãƒ•ã‚¡ã‚¤ãƒ«ã‚’é–‰ã˜ã¦ã„ã‚‹ã®ã§ã€å¤±æ•—ã—ã¦ã‚‚ãƒ¡ãƒ‹ãƒ¥ãƒ¼ãƒãƒ¼æ›´æ–° */
 	update_misc_cload();
     }
 }
@@ -1627,14 +1627,14 @@ static	void	f_misc_csave_s(GtkMenuItem *widget, gpointer data)
 {
     if (menubar_active == FALSE) { return; }
 
-    if (filename_get_tape(CSAVE)) { return; }	/* ¥Æ¡¼¥×¤¢¤ê¤Ê¤éÌá¤ë */
+    if (filename_get_tape(CSAVE)) { return; }	/* ãƒ†ãƒ¼ãƒ—ã‚ã‚Šãªã‚‰æˆ»ã‚‹ */
 
     select_file("Open Tape-Image-File for SAVE (append)",
 		cb_misc_csave_s,
 		menubar_filename,
 		sizeof(menubar_filename));
 
-    /* ¤³¤Î·ë²Ì¤Ï¡¢¥³¡¼¥ë¥Ğ¥Ã¥¯´Ø¿ô¤Ë¤Æ */
+    /* ã“ã®çµæœã¯ã€ã‚³ãƒ¼ãƒ«ãƒãƒƒã‚¯é–¢æ•°ã«ã¦ */
 }
 static	void	cb_misc_csave_s(int result)
 {
@@ -1642,7 +1642,7 @@ static	void	cb_misc_csave_s(int result)
 
 	int ok = quasi88_save_tape_insert(menubar_filename);
 
-	/* ¤¹¤Ç¤Ë¥Õ¥¡¥¤¥ë¤òÊÄ¤¸¤Æ¤¤¤ë¤Î¤Ç¡¢¼ºÇÔ¤·¤Æ¤â¥á¥Ë¥å¡¼¥Ğ¡¼¹¹¿· */
+	/* ã™ã§ã«ãƒ•ã‚¡ã‚¤ãƒ«ã‚’é–‰ã˜ã¦ã„ã‚‹ã®ã§ã€å¤±æ•—ã—ã¦ã‚‚ãƒ¡ãƒ‹ãƒ¥ãƒ¼ãƒãƒ¼æ›´æ–° */
 	update_misc_csave();
     }
 }
@@ -1662,7 +1662,7 @@ static	void	f_misc_sload(GtkMenuItem *widget, gpointer data)
 
     quasi88_stateload((int) data);
 
-    /* ÀßÄê¤ä¥Õ¥¡¥¤¥ëÌ¾¤¬ÊÑ¹¹¤µ¤ì¤¿¤Ï¤º¤Ê¤Î¤Ç¡¢¥á¥Ë¥å¡¼¥Ğ¡¼¤òÁ´¤Æ¹¹¿· */
+    /* è¨­å®šã‚„ãƒ•ã‚¡ã‚¤ãƒ«åãŒå¤‰æ›´ã•ã‚ŒãŸã¯ãšãªã®ã§ã€ãƒ¡ãƒ‹ãƒ¥ãƒ¼ãƒãƒ¼ã‚’å…¨ã¦æ›´æ–° */
     menubar_setup(TRUE);
 }
 
@@ -1685,7 +1685,7 @@ static	void	f_misc_status(GtkCheckMenuItem *widget, gpointer data)
 }
 
 /*----------------------------------------------------------------------
- * Help ¥á¥Ë¥å¡¼
+ * Help ãƒ¡ãƒ‹ãƒ¥ãƒ¼
  *----------------------------------------------------------------------*/
 
 static	void	cb_help_about_destroy(GtkWidget *widget, gpointer data)

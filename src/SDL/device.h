@@ -6,22 +6,22 @@
 
 
 /*
- *	src/SDL/ °Ê²¼¤Ç¤Î¥°¥í¡¼¥Ğ¥ëÊÑ¿ô
+ *	src/SDL/ ä»¥ä¸‹ã§ã®ã‚°ãƒ­ãƒ¼ãƒãƒ«å¤‰æ•°
  */
-extern	int	sdl_mouse_rel_move;	/* ¥Ş¥¦¥¹ÁêÂĞ°ÜÆ°ÎÌ¸¡ÃÎ²ÄÇ½¤«	*/
+extern	int	sdl_mouse_rel_move;	/* ãƒã‚¦ã‚¹ç›¸å¯¾ç§»å‹•é‡æ¤œçŸ¥å¯èƒ½ã‹	*/
 
 
 
 /*
- *	src/SDL/ °Ê²¼¤Ç¤Î¥°¥í¡¼¥Ğ¥ëÊÑ¿ô (¥ª¥×¥·¥ç¥óÀßÄê²ÄÇ½¤ÊÊÑ¿ô)
+ *	src/SDL/ ä»¥ä¸‹ã§ã®ã‚°ãƒ­ãƒ¼ãƒãƒ«å¤‰æ•° (ã‚ªãƒ—ã‚·ãƒ§ãƒ³è¨­å®šå¯èƒ½ãªå¤‰æ•°)
  */
-extern	int	use_hwsurface;		/* HW SURFACE ¤ò»È¤¦¤«¤É¤¦¤«	*/
-extern	int	use_doublebuf;		/* ¥À¥Ö¥ë¥Ğ¥Ã¥Õ¥¡¤ò»È¤¦¤«¤É¤¦¤«	*/
+extern	int	use_hwsurface;		/* HW SURFACE ã‚’ä½¿ã†ã‹ã©ã†ã‹	*/
+extern	int	use_doublebuf;		/* ãƒ€ãƒ–ãƒ«ãƒãƒƒãƒ•ã‚¡ã‚’ä½¿ã†ã‹ã©ã†ã‹	*/
 
-extern	int	use_cmdkey;		/* Command¥­¡¼¤Ç¥á¥Ë¥å¡¼¤ØÁ«°Ü     */
-extern	int	keyboard_type;		/* ¥­¡¼¥Ü¡¼¥É¤Î¼ïÎà                */
-extern	char	*file_keyboard;		/* ¥­¡¼ÀßÄê¥Õ¥¡¥¤¥ëÌ¾		   */
-extern	int	use_joydevice;		/* ¥¸¥ç¥¤¥¹¥Æ¥£¥Ã¥¯¥Ç¥Ğ¥¤¥¹¤ò³«¤¯? */
+extern	int	use_cmdkey;		/* Commandã‚­ãƒ¼ã§ãƒ¡ãƒ‹ãƒ¥ãƒ¼ã¸é·ç§»     */
+extern	int	keyboard_type;		/* ã‚­ãƒ¼ãƒœãƒ¼ãƒ‰ã®ç¨®é¡                */
+extern	char	*file_keyboard;		/* ã‚­ãƒ¼è¨­å®šãƒ•ã‚¡ã‚¤ãƒ«å		   */
+extern	int	use_joydevice;		/* ã‚¸ãƒ§ã‚¤ã‚¹ãƒ†ã‚£ãƒƒã‚¯ãƒ‡ãƒã‚¤ã‚¹ã‚’é–‹ã? */
 extern	int	show_fps;		/* test */
 
 

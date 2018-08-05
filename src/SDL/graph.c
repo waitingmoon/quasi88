@@ -1,7 +1,7 @@
 /***********************************************************************
- * ����ե��å����� (�����ƥ��¸)
+ * グラフィック処理 (システム依存)
  *
- *	�ܺ٤ϡ� graph.h ����
+ *	詳細は、 graph.h 参照
  ************************************************************************/
 
 #include <stdio.h>
@@ -17,29 +17,29 @@
 /*#define	DEBUG_PRINTF*/
 
 
-/* �ʲ��� static ���ѿ������ץ������ѹ��Ǥ���Τǥ������Х�ˤ��Ƥ��� */
+/* 以下は static な変数。オプションで変更できるのでグローバルにしてある */
 
-    int	use_hwsurface	= TRUE;		/* HW SURFACE ��Ȥ����ɤ���	*/
-    int	use_doublebuf	= FALSE;	/* ���֥�Хåե���Ȥ����ɤ���	*/
+    int	use_hwsurface	= TRUE;		/* HW SURFACE を使うかどうか	*/
+    int	use_doublebuf	= FALSE;	/* ダブルバッファを使うかどうか	*/
 
 
-/* �ʲ��ϡ� event.c �ʤɤǻ��Ѥ��롢 OSD �ʥ������Х��ѿ� */
+/* 以下は、 event.c などで使用する、 OSD なグローバル変数 */
 
-    int	sdl_mouse_rel_move;		/* �ޥ������а�ư�̸��β�ǽ��	*/
+    int	sdl_mouse_rel_move;		/* マウス相対移動量検知可能か	*/
 
 
 
 /************************************************************************/
 
-static	T_GRAPH_SPEC	graph_spec;		/* ���ܾ���		*/
+static	T_GRAPH_SPEC	graph_spec;		/* 基本情報		*/
 
-static	int		graph_exist;		/* ���ǡ����������Ѥ�	*/
-static	T_GRAPH_INFO	graph_info;		/* ���λ��Ρ����̾���	*/
+static	int		graph_exist;		/* 真で、画面生成済み	*/
+static	T_GRAPH_INFO	graph_info;		/* その時の、画面情報	*/
 
 
 /************************************************************************
- *	SDL�ν����
- *	SDL�ν�λ
+ *	SDLの初期化
+ *	SDLの終了
  ************************************************************************/
 
 int	sdl_init(void)
@@ -75,9 +75,9 @@ void	sdl_exit(void)
 
 
 /************************************************************************
- *	����ե��å������ν����
- *	����ե��å�������ư��
- *	����ե��å������ν�λ
+ *	グラフィック処理の初期化
+ *	グラフィック処理の動作
+ *	グラフィック処理の終了
  ************************************************************************/
 
 static	char	sdl_vname[16];
@@ -103,7 +103,7 @@ const T_GRAPH_SPEC	*graph_init(void)
 	printf("Initializing Graphic System (SDL:%s) ... \n", sdl_vname);
     }
 
-    /* �����٤ȡ��ԥ����뤢����ΥХ��ȿ�������å� */
+    /* 色深度と、ピクセルあたりのバイト数をチェック */
 
     sdl_depth          = vi->vfmt->BitsPerPixel;
     sdl_byte_per_pixel = vi->vfmt->BytesPerPixel;
@@ -158,31 +158,31 @@ const T_GRAPH_SPEC	*graph_init(void)
     printf("\n");
 #endif
 
-    /* ���Ѳ�ǽ�ʥ�����ɥ��Υ�������Ĵ�٤Ƥ��� */
+    /* 利用可能なウインドウのサイズを調べておく */
     for (i = 0; i < 2; i++) {
 	Uint32 flags = 0;
 	int w, h;
 
-	if (i == 0) flags = 0;			/* 1���ܤϥ�����ɥ���     */
-	else        flags = SDL_FULLSCREEN;	/* 2���ܤ������̤�����å� */
+	if (i == 0) flags = 0;			/* 1回目はウインドウ、     */
+	else        flags = SDL_FULLSCREEN;	/* 2回目は全画面をチェック */
 
 	if (use_hwsurface) flags |= SDL_HWPALETTE | SDL_HWSURFACE;
 	else               flags |= SDL_HWPALETTE | SDL_SWSURFACE;
 
 	if (use_doublebuf) flags |= SDL_DOUBLEBUF;
 
-	/* ���Ѳ�ǽ�ʺ��祵��������� */
+	/* 利用可能な最大サイズを取得 */
 	sdl_mode = SDL_ListModes(NULL, flags);
 
-	if        (sdl_mode == (SDL_Rect**) 0) {	/* ���⡼���Բ� */
+	if        (sdl_mode == (SDL_Rect**) 0) {	/* 全モード不可 */
 	    w = 0;
 	    h = 0;
-	} else if (sdl_mode == (SDL_Rect**)-1) {	/* ���⡼�ɲ� */
+	} else if (sdl_mode == (SDL_Rect**)-1) {	/* 全モード可 */
 	    w = 10000;
 	    h = 10000;
-	} else {					/* �⡼�ɤ�����å� */
-	    w = sdl_mode[0]->w;					/* �ǽ餬   */
-	    h = sdl_mode[0]->h;					/*   ������ */
+	} else {					/* モードをチェック */
+	    w = sdl_mode[0]->w;					/* 最初が   */
+	    h = sdl_mode[0]->h;					/*   最大値 */
 
 #ifdef	DEBUG_PRINTF
 	    {
@@ -200,8 +200,8 @@ const T_GRAPH_SPEC	*graph_init(void)
 
 	sdl_mode_flags = flags;
     }
-    /* ���λ����ǡ� sdl_mode �ˤϡ������̻��Υ⡼�ɰ��������åȤ���Ƥ��롣
-       sdl_mode_flags �ˤϡ������̻��Υ⡼�ɤΥե饰�����åȤ���Ƥ��롣*/
+    /* この時点で、 sdl_mode には、全画面時のモード一覧がセットされている。
+       sdl_mode_flags には、全画面時のモードのフラグがセットされている。*/
 
     graph_spec.window_max_width      = win_w;
     graph_spec.window_max_height     = win_h;
@@ -230,9 +230,9 @@ const T_GRAPH_INFO	*graph_setup(int width, int height,
 {
     Uint32 flags;
 
-    /* �������ѹ��䡢������ɥ������������ؤκݤϡ����� SDL_SetVideoMode() ��
-       �Ƥ֤����������˰�ö�ӥǥ����֥����ƥ��λ������ɬ�פ�����餷��(?)��
-       (�ӥǥ��ɥ饤�а�¸���� x11, windib, directx �ϡ���λ������) */
+    /* サイズ変更や、ウインドウ⇔全画面切替の際は、再度 SDL_SetVideoMode() を
+       呼ぶが、その前に一旦ビデオサブシステムを終了させる必要があるらしい(?)。
+       (ビデオドライバ依存か？ x11, windib, directx は、終了は不要) */
 
     if (graph_exist) {
 	if (verbose_proc) printf("Re-Initializing Graphic System (SDL:%s) ...",
@@ -241,7 +241,7 @@ const T_GRAPH_INFO	*graph_setup(int width, int height,
 	if ((graph_info.fullscreen == FALSE && fullscreen == FALSE) &&
 	    (! (sdl_display->flags & SDL_FULLSCREEN))) {
 
-	    /* ������ɥ��Υ������ѹ����ϡ���λ��ɬ�פϤʤ����������ġ� */
+	    /* ウインドウのサイズ変更時は、終了の必要はなさそうだが…… */
 	    if (verbose_proc) printf("\n");
 
 	} else {
@@ -251,22 +251,22 @@ const T_GRAPH_INFO	*graph_setup(int width, int height,
     }
 
 
-    /* VIDEO���ö��λ�����ʤ顢VIDEO�κƽ���� */
+    /* VIDEOを一旦終了したなら、VIDEOの再初期化 */
     if (! SDL_WasInit(SDL_INIT_VIDEO)) {
 	if (SDL_InitSubSystem(SDL_INIT_VIDEO) != 0) {
 	    if (verbose_proc) printf(" FAILED\n");
 	    return NULL;
 	}
-	/* VIDEO���ö��λ����ȡ� sdl_mode ��̵���ˤʤ롣(�ǥХ����ˤ�롩) */
+	/* VIDEOを一旦終了すると、 sdl_mode が無効になる。(デバイスによる？) */
 	sdl_mode = SDL_ListModes(NULL, sdl_mode_flags);
 
-		/* sdl_mode �����Ƥ����������Ѥ�äƤ��ޤä���ɤ����褦�� */
+		/* sdl_mode の内容が、以前と変わってしまったらどうしよう？ */
 
 	if (verbose_proc) printf(" OK\n");
     }
 
 
-    /* �����̥⡼�ɤξ�硢Ŭ�ڤʥ⡼�ɤ����� */
+    /* 全画面モードの場合、適切なモードを選択 */
     if (fullscreen) {
 	int fit = search_mode(width, height, aspect);
 	if (fit < 0) {
@@ -277,7 +277,7 @@ const T_GRAPH_INFO	*graph_setup(int width, int height,
 	}
     }
 
-    /* ������ɥ��������̡ˤ򳫤� */
+    /* ウインドウ（全画面）を開く */
     if (verbose_proc) {
 	if (fullscreen) printf("  Trying full screen mode ... ");
 	else            printf("  Opening window ... ");
@@ -299,7 +299,7 @@ const T_GRAPH_INFO	*graph_setup(int width, int height,
     if (sdl_display == NULL) return NULL;
 
 
-    /* �����꡼��Хåե������ */
+    /* スクリーンバッファを確保 */
 
     if (verbose_proc) printf("  Allocating screen buffer ... ");
 
@@ -312,7 +312,7 @@ const T_GRAPH_INFO	*graph_setup(int width, int height,
 
 
 
-    /* ���̾���򥻥åȤ��ơ��֤� */
+    /* 画面情報をセットして、返す */
 
     graph_info.fullscreen	= fullscreen;
     graph_info.width		= sdl_offscreen->w;
@@ -370,7 +370,7 @@ static	int	search_mode(int w, int h, double aspect)
     double fit_a = 0.0;
 
     for (i=0; sdl_mode[i]; i++) {
-	/* ���̥������˼��ޤäƤ��뤳�� */
+	/* 画面サイズに収まっていること */
 	if (w <= sdl_mode[i]->w &&
 	    h <= sdl_mode[i]->h) {
 
@@ -378,7 +378,7 @@ static	int	search_mode(int w, int h, double aspect)
 	    int tmp_h = sdl_mode[i]->h;
 	    double tmp_a = FABS(((double)tmp_w / tmp_h) - aspect);
 
-	    /* �ǽ�˸��Ĥ��ä���Τ�ޤ��ϥ��祤�� */
+	    /* 最初に見つかったものをまずはチョイス */
 	    if (fit == -1) {
 		fit = i;
 		fit_w = tmp_w;
@@ -386,12 +386,12 @@ static	int	search_mode(int w, int h, double aspect)
 		fit_a = tmp_a;
 
 	    } else {
-	    /* ������ϡ�����Τ���٤ơ����ե��åȤ���Х��祤�� */
+	    /* 次からは、前回のと比べて、よりフィットすればチョイス */
 
-		/* ��Ĺ��˥������ʤ����������ڥ���̤����ξ�� */
+		/* 横長モニター、ないし、アスペクト未指定の場合 */
 		if (aspect >= 1.0 || aspect < 0.01) {
 
-		    /* �Ĥκ��ξ��ʤ��ۤ����ޤ��ϥ����ڥ�����ζᤤ�ۤ� */
+		    /* 縦の差の少ないほう、またはアスペクト比の近いほう */
 		    if (((tmp_h - h) < (fit_h - h)) ||
 			((tmp_h == fit_h) && (tmp_a < fit_a))) {
 			fit = i;
@@ -400,9 +400,9 @@ static	int	search_mode(int w, int h, double aspect)
 			fit_a = tmp_a;
 		    }
 
-		} else {	/* ��Ĺ��˥��� (�ʤ�ư���Ū�ʤ�?) �ξ�� */
+		} else {	/* 縦長モニター (なんて一般的なの?) の場合 */
 
-		    /* ���κ��ξ��ʤ��ۤ����ޤ��ϥ����ڥ�����ζᤤ�ۤ� */
+		    /* 横の差の少ないほう、またはアスペクト比の近いほう */
 		    if (((tmp_w - w) < (fit_w - w)) ||
 			((tmp_w == fit_w) && (tmp_a < fit_a))) {
 			fit = i;
@@ -414,7 +414,7 @@ static	int	search_mode(int w, int h, double aspect)
 	    }
 	}
     }
-    /* ��������Τ������ʤ����ϡ� -1 ���֤� */
+    /* 該当するのが全くない場合は、 -1 が返る */
     return fit;
 }
 
@@ -429,8 +429,8 @@ void	graph_exit(void)
 
 
 /************************************************************************
- *	���γ���
- *	���β���
+ *	色の確保
+ *	色の解放
  ************************************************************************/
 
 void	graph_add_color(const PC88_PALETTE_T color[],
@@ -447,13 +447,13 @@ void	graph_add_color(const PC88_PALETTE_T color[],
 
 void	graph_remove_color(int nr_pixel, unsigned long pixel[])
 {
-    /* ���˴ؤ��Ƥϲ���������ʤ��Τǡ������Ǥ�ʤˤ⤷�ʤ� */
+    /* 色に関しては何も管理しないので、ここでもなにもしない */
 }
 
 
 
 /************************************************************************
- *	����ե��å��ι���
+ *	グラフィックの更新
  ************************************************************************/
 
 void	graph_update(int nr_rect, T_GRAPH_RECT rect[])
@@ -496,8 +496,8 @@ void	graph_update(int nr_rect, T_GRAPH_RECT rect[])
 
 
 /************************************************************************
- *	�����ȥ������
- *	°��������
+ *	タイトルの設定
+ *	属性の設定
  ************************************************************************/
 
 void	graph_set_window_title(const char *title)
@@ -521,38 +521,38 @@ void	graph_set_attribute(int mouse_show, int grab, int keyrepeat_on)
 
     sdl_mouse_rel_move = (mouse_show == FALSE && grab) ? TRUE : FALSE;
 
-    /* SDL �ϡ�������椫�ĥޥ������դʤ顢������ɥ���ü�˥ޥ�����
-       �Ҥä����äƤ⡢�ޥ�����ư�������̤��ΤǤ��롣
+    /* SDL は、グラブ中かつマウスオフなら、ウインドウの端にマウスが
+       ひっかかっても、マウス移動の相対量を検知できる。
 
-       �ʤΤǡ����ξ��� sdl_mouse_rel_move �˥��åȤ��Ƥ�����
-       ���ʤ顢�ޥ�����ư�������̡����ʤ����а��֤Ȥ��� (event.c)
+       なので、この条件を sdl_mouse_rel_move にセットしておき、
+       真なら、マウス移動は相対量、偽なら絶対位置とする (event.c)
 
-       ��˥塼�Ǥϡ����ʤ餺����֤ʤ� (�ޥ����Ϥ��� or �ʤ�) �ʤΤǡ�
-       ���ξ��ˤϤ����餺����˥�����ɥ���ü�ǥޥ�������ߤ��롣
+       メニューでは、かならずグラブなし (マウスはあり or なし) なので、
+       この条件にはかからず、常にウインドウの端でマウスは停止する。
     */
 }
 
 /*
-  -videodrv directx �ˤĤ���
+  -videodrv directx について
 
-  ����֤��ꡢ�ޥ�������ξ�硢����֤���ʤ�������
+  グラブあり、マウスありの場合、グラブされない・・・
 
-  �����̤ǡ�����֤ʤ����ޥ����ʤ��ˤ���ȡ�
-  �ޥ��������̤�ü����ߤ��Ƥ��ޤ���������ޤ�������
-  �����̤ξ�硢����֤ʤ��ϰ�̣������Τ��� �ޥ���ǥ����ץ쥤�Ǹ���
+  全画面で、グラブなし、マウスなしにすると、
+  マウスが画面の端で停止してしまう。あたりまえだが…
+  全画面の場合、グラブなしは意味があるのか？ マルチディスプレイで検証
 
 
 
-  -videodrv dga �ˤĤ���
+  -videodrv dga について
 
-  ������ɥ��Ǥ������̤Ǥ⡢�����̥ե饰��Ω�äƤ��롣
-  �ǥե���Ȥ� -hwsurface �ˤʤäƤ��롣 -swsurface �λ���ϲ�ǽ��
-  -doublebuf ����ꤹ��ȡ� -hwsurface �⥻�åȤ�ͭ���ˤʤ롣
+  ウインドウでも全画面でも、全画面フラグが立っている。
+  デフォルトで -hwsurface になっている。 -swsurface の指定は可能。
+  -doublebuf を指定すると、 -hwsurface もセットで有効になる。
 
-  �����̢���������ɥ��򷫤��֤��ȥ������Ǥ���
+  全画面←→ウインドウを繰り返すとコアを吐く。
 
-  -hwsurface �Ǥϡ��ޥ�����ɽ���˻����ĳ����Ĥ롣
-  -swsurface �����ꤵ�ʤ���
+  -hwsurface では、マウスの表示に時々残骸が残る。
+  -swsurface は問題さなげ。
 
-  -doublebuf ����ꤹ��ȡ��ޥ�����ɽ������ʤ��ʤ롣
+  -doublebuf を指定すると、マウスは表示されなくなる。
 */

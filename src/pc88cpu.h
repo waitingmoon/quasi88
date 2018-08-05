@@ -5,8 +5,8 @@
 #include  "z80.h"
 
 
-extern	z80arch	z80main_cpu;		/* ¥á¥¤¥ó CPU	*/
-extern	z80arch	z80sub_cpu;		/* ¥µ¥Ö CPU	*/
+extern	z80arch	z80main_cpu;		/* ãƒ¡ã‚¤ãƒ³ CPU	*/
+extern	z80arch	z80sub_cpu;		/* ã‚µãƒ– CPU	*/
 
 
 #endif	/* PC88CPU_H_INCLUDED */

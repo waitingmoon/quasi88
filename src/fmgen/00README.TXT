@@ -1,49 +1,49 @@
 
-�� ���Υǥ��쥯�ȥ�ʲ��ˤϡ�fmgen008 �Υ��������ޤޤ�Ƥ��ޤ���
+※ このディレクトリ以下には、fmgen008 のソースが含まれています。
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-  QUASI88 �Υ���ѥ������ fmgen ��ͭ���ˤ��Ƥ����ȡ����Υǥ��쥯�ȥ�
-�ʲ��Υե����뤬�Ȥ߹��ޤ졢fmgen008 �� FM���������ͥ졼������Ѥ���
-���Ȥ��Ǥ���褦�ˤʤ�ޤ���
+  QUASI88 のコンパイル時に fmgen を有効にしておくと、このディレクトリ
+以下のファイルが組み込まれ、fmgen008 の FM音源ジェネレータを使用する
+ことができるようになります。
 
-�ʤ������ξ�祳��ѥ��뤷���Х��ʥ�ϡ�fmgen008 �Υ饤���󥹤�Ŭ��
-����ޤ��ΤǤ����դ������������Υǥ��쥯�ȥ�ʲ��Υ������ե�����κ���������
-�Ĥ��Ƥ�Ʊ�ͤǤ���
+なお、この場合コンパイルしたバイナリは、fmgen008 のライセンスが適用
+されますのでご注意ください。このディレクトリ以下のソースファイルの再配布等に
+ついても同様です。
 
 
-fmgen008 �Υ饤���󥹤ˤĤ��Ƥϡ����Υǥ��쥯�ȥ�ˤ���
+fmgen008 のライセンスについては、このディレクトリにある
 
 	readme.txt
 
-�򻲾Ȥ��Ƥ���������
+を参照してください。
 
 
-(*) fmgen �� cisc�᤬�����ͭ���� OPN/OPM �� FM���������ͥ졼��
-    �Ǥ���
+(*) fmgen は cisc氏が著作権を有する OPN/OPM の FM音源ジェネレータ
+    です。
 
 -------------------------------------------------------------------------------
-fmgen008 ���Ȥ߹���ˤ����ꡢ�ʲ��Υե�������ѹ���ä��ޤ�����
+fmgen008 を組み込むにあたり、以下のファイルに変更を加えました。
 
-���ƤΥե�����		ʸ��������/���ԥ����ɤ��ѹ�
+全てのファイル		文字コード/改行コードの変更
 
 diag.h			-
-file.cpp		̤���ѤˤĤ������
-file.h			̤���ѤˤĤ������
-fmgen.cpp		�ǿ��Ǥ��֤�����
-fmgen.h			���Ϥ�16bit���ѹ� (FM_SAMPLETYPE)
-fmgeninl.h		�ǿ��Ǥ��֤�����
+file.cpp		未使用につき、削除
+file.h			未使用につき、削除
+fmgen.cpp		最新版に置き換え
+fmgen.h			出力を16bitに変更 (FM_SAMPLETYPE)
+fmgeninl.h		最新版に置き換え
 fmtimer.cpp		-
 fmtimer.h		-
-headers.h		Windows��¸������
+headers.h		Windows依存部を修正
 misc.h			-
-opm.cpp			̤���ѤˤĤ������
-opm.h			̤���ѤˤĤ������
-opna.cpp		Windows��¸������
+opm.cpp			未使用につき、削除
+opm.h			未使用につき、削除
+opna.cpp		Windows依存部を修正
 opna.h			-
 psg.cpp			-
-psg.h			���Ϥ�16bit���ѹ� (PSG_SAMPLETYPE)
+psg.h			出力を16bitに変更 (PSG_SAMPLETYPE)
 readme.txt		-
-types.h			QUASI88�Ѥ˽���
+types.h			QUASI88用に修正
 
 -------------------------------------------------------------------------------
-QUASI88 �ϡ� MAME �Υ�����ɥ��󥸥��𤷤ơ� fmgen ����Ѥ��Ƥ��ޤ���
+QUASI88 は、 MAME のサウンドエンジンを介して、 fmgen を使用しています。

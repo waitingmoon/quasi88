@@ -5,48 +5,48 @@
 #include "file-op.h"
 
 #include "initval.h"
-/*	е╔ещеде╓д╬┐Ї NR_DRIVE д╧бвinitval.h д╟─ъ╡┴║╤ */
-/*	едесб╝е╕д╬┐Ї NR_IMAGE д╧бвinitval.h д╟─ъ╡┴║╤ */
+/*	уГЙуГйуВдуГЦуБоцХ░ NR_DRIVE уБпуАБinitval.h уБзхоЪч╛йц╕И */
+/*	уВдуГбуГ╝уВ╕уБоцХ░ NR_IMAGE уБпуАБinitval.h уБзхоЪч╛йц╕И */
 
 
 
 
-	/**** е╔ещеде╓└й╕цеяб╝еп ****/
+	/**** уГЙуГйуВдуГЦхИ╢х╛буГпуГ╝уВп ****/
 
 typedef	struct{
 
-  OSD_FILE *fp;			/* FILE е▌едеєе┐			*/
+  OSD_FILE *fp;			/* FILE уГЭуВдуГ│уВ┐			*/
 
-  char	read_only;		/* еъб╝е╔екеєеъб╝д╟е╒ебедеыдЄ│лддд┐дщ┐┐	*/
-  char	over_image;		/* едесб╝е╕┐Їдм┬┐▓сдоды╗■д╦┐┐		*/
-  char	detect_broken_image;	/* ▓їдьд┐едесб╝е╕дм╕лд─длд├д┐дщ┐┐	*/
-  char	empty;			/* е╔ещеде╓д╦╢їдЄ╗╪─ъд╖д╞дддыд╩дщ┐┐	*/
+  char	read_only;		/* уГкуГ╝уГЙуВкуГ│уГкуГ╝уБзуГХуВбуВдуГлуВТщЦЛуБДуБЯуВЙчЬЯ	*/
+  char	over_image;		/* уВдуГбуГ╝уВ╕цХ░уБМхдЪщБОуБОуВЛцЩВуБлчЬЯ		*/
+  char	detect_broken_image;	/* хгКуВМуБЯуВдуГбуГ╝уВ╕уБМшжЛуБдуБЛуБгуБЯуВЙчЬЯ	*/
+  char	empty;			/* уГЙуГйуВдуГЦуБлчй║уВТцМЗхоЪуБЧуБжуБДуВЛуБкуВЙчЬЯ	*/
 
-  int	selected_image;		/* ┴к┬Єд╖д╞дддыедесб╝е╕╚╓╣ц (0б┴)	*/
-  int	image_nr;		/* е╒ебедеы╞тд╬едесб╝е╕┐Ї   (1б┴)	*/
+  int	selected_image;		/* щБ╕цКЮуБЧуБжуБДуВЛуВдуГбуГ╝уВ╕чХкхП╖ (0уАЬ)	*/
+  int	image_nr;		/* уГХуВбуВдуГлхЖЕуБоуВдуГбуГ╝уВ╕цХ░   (1уАЬ)	*/
 
-  struct{			/* е╒ебедеы╞тд╬┴┤едесб╝е╕д╬╛Ё╩є		*/
-    char	name[17];	/*	едесб╝е╕╠╛			*/
-    char	protect;	/*	е╫еэе╞епе╚			*/
-    char	type;		/*	е╟еге╣епе┐еде╫			*/
-    long	size;		/*	е╡еде║				*/
+  struct{			/* уГХуВбуВдуГлхЖЕуБохЕиуВдуГбуГ╝уВ╕уБоцГЕха▒		*/
+    char	name[17];	/*	уВдуГбуГ╝уВ╕хРН			*/
+    char	protect;	/*	уГЧуГнуГЖуВпуГИ			*/
+    char	type;		/*	уГЗуВгуВ╣уВпуВ┐уВдуГЧ			*/
+    long	size;		/*	уВ╡уВдуВ║				*/
   }image[ MAX_NR_IMAGE ];
 
-				/* д│д│длдщбв┴к┬Є├цедесб╝е╕д╬еяб╝еп	*/
+				/* уБУуБУуБЛуВЙуАБщБ╕цКЮф╕нуВдуГбуГ╝уВ╕уБоуГпуГ╝уВп	*/
 
-  int	track;			/* ╕╜║▀д╬е╚еще├еп╚╓╣ц			*/
-  int	sec_nr;			/* е╚еще├еп╞тд╬е╗епе┐┐Ї			*/
-  int	sec;			/* ╕╜║▀д╬е╗епе┐╚╓╣ц			*/
+  int	track;			/* чП╛хЬиуБоуГИуГйуГГуВпчХкхП╖			*/
+  int	sec_nr;			/* уГИуГйуГГуВпхЖЕуБоуВ╗уВпуВ┐цХ░			*/
+  int	sec;			/* чП╛хЬиуБоуВ╗уВпуВ┐чХкхП╖			*/
 
-  long	sec_pos;		/* е╗епе┐  д╬╕╜║▀░╠├╓			*/
-  long	track_top;		/* е╚еще├епд╬└ш╞м░╠├╓			*/
-  long	disk_top;		/* е╟еге╣епд╬└ш╞м░╠├╓			*/
-  long	disk_end;		/* едесб╝е╕д╬╜к├╝░╠├╓			*/
+  long	sec_pos;		/* уВ╗уВпуВ┐  уБочП╛хЬиф╜Нч╜о			*/
+  long	track_top;		/* уГИуГйуГГуВпуБохЕИщанф╜Нч╜о			*/
+  long	disk_top;		/* уГЗуВгуВ╣уВпуБохЕИщанф╜Нч╜о			*/
+  long	disk_end;		/* уВдуГбуГ╝уВ╕уБоч╡Вчлпф╜Нч╜о			*/
 
-  char	protect;		/* ещеде╚е╫еэе╞епе╚			*/
-  char	type;			/* е╟еге╣епе┐еде╫			*/
+  char	protect;		/* уГйуВдуГИуГЧуГнуГЖуВпуГИ			*/
+  char	type;			/* уГЗуВгуВ╣уВпуВ┐уВдуГЧ			*/
 
-				/* е╒ебедеы╠╛				*/
+				/* уГХуВбуВдуГлхРН				*/
 
   /* char	filename[ QUASI88_MAX_FILENAME ];*/
 
@@ -59,14 +59,14 @@ extern	PC88_DRIVE_T	drive[ NR_DRIVE ];
 
 
 
-	/**** е╟еге╣еп╛Ё╩є еке╒е╗е├е╚ ****/
+	/**** уГЗуВгуВ╣уВпцГЕха▒ уВкуГХуВ╗уГГуГИ ****/
 #define	DISK_FILENAME	(0)		/* char x [17]	*/
 #define	DISK_PROTECT	(26)		/* char		*/
 #define	DISK_TYPE	(27)		/* char		*/
 #define	DISK_SIZE	(28)		/* long		*/
 #define	DISK_TRACK	(32)		/* long x [164]	*/
 
-	/**** ID╛Ё╩є еке╒е╗е├е╚ ****/
+	/**** IDцГЕха▒ уВкуГХуВ╗уГГуГИ ****/
 #define	DISK_C		(0)		/* char		*/
 #define	DISK_H		(1)		/* char		*/
 #define	DISK_R		(2)		/* char		*/
@@ -78,10 +78,10 @@ extern	PC88_DRIVE_T	drive[ NR_DRIVE ];
 #define	DISK_RESERVED	(9)		/* char	x [5]	*/
 #define	DISK_SEC_SZ	(14)		/* char	x [???]	*/
 
-#define	SZ_DISK_ID	(16)		/* ID╛Ё╩є 16Byte*/
+#define	SZ_DISK_ID	(16)		/* IDцГЕха▒ 16Byte*/
 
 
-	/**** е╟еге╣еп/ID╛Ё╩є ─ъ┐Ї ****/
+	/**** уГЗуВгуВ╣уВп/IDцГЕха▒ хоЪцХ░ ****/
 #define DISK_PROTECT_TRUE	(0x10)
 #define	DISK_PROTECT_FALSE	(0x00)
 
@@ -97,7 +97,7 @@ extern	PC88_DRIVE_T	drive[ NR_DRIVE ];
 
 
 
-	/**** ┤╪┐Ї ****/
+	/**** щЦвцХ░ ****/
 
 
 void	drive_init( void );

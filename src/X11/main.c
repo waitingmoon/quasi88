@@ -20,12 +20,12 @@
 
 
 /***********************************************************************
- * ���ץ����
+ * オプション
  ************************************************************************/
 static	int	invalid_arg;
 static	const	T_CONFIG_TABLE x11_options[] =
 {
-  /* 300��349: �����ƥ��¸���ץ���� */
+  /* 300〜349: システム依存オプション */
 
   /*  -- GRAPHIC -- */
   { 300, "cmap",         X_INT,  &colormap_type,   0, 2,                    0, 0        },
@@ -60,7 +60,7 @@ static	const	T_CONFIG_TABLE x11_options[] =
   { 322, "hide_fps",     X_FIX,  &show_fps,        FALSE,                 0,0, 0        },
 
 
-  /*  -- ̵�� -- (¾�����ƥ�ΰ����Ĥ����ץ����) */
+  /*  -- 無視 -- (他システムの引数つきオプション) */
   {   0, "videodrv",     X_INV,  &invalid_arg,                          0,0,0, 0        },
   {   0, "audiodrv",     X_INV,  &invalid_arg,                          0,0,0, 0        },
 
@@ -68,7 +68,7 @@ static	const	T_CONFIG_TABLE x11_options[] =
   {   0, "sdlbufnum",    X_INV,  &invalid_arg,                          0,0,0, 0        },
 
 
-  /* ��ü */
+  /* 終端 */
   {   0, NULL,           X_INV,                                       0,0,0,0, 0        },
 };
 
@@ -102,7 +102,7 @@ static	void	help_msg_x11(void)
 
 
 /***********************************************************************
- * �ᥤ�����
+ * メイン処理
  ************************************************************************/
 static	void	finish(void);
 
@@ -110,12 +110,12 @@ int	main(int argc, char *argv[])
 {
     int x = 1;
 
-	/* root���¤�ɬ�פʽ��� (X11��Ϣ) �򿿤���˹Ԥ� */
+	/* root権限の必要な処理 (X11関連) を真っ先に行う */
 
-    x11_init();	/* �����ǥ��顼���ФƤ⥪�ץ������Ϥ���Τ���˿ʤ� */
+    x11_init();	/* ここでエラーが出てもオプション解析するので先に進む */
 
 
-	/* �ǡ����줬�����С� root ���¤������ */
+	/* で、それが終われば、 root 権限を手放す */
 
     if (setuid( getuid() ) != 0) {
 	fprintf(stderr, "%s : setuid error\n", argv[0]);
@@ -123,12 +123,12 @@ int	main(int argc, char *argv[])
 	return -1;
     }
 
-	/* root �� exec() �Ǥ���Τϴ����ʤΤǡ����Ȥ� */
+	/* root で exec() できるのは危険なので、やめとく */
 
     if (getuid() == 0) snapshot_cmd_enable = FALSE;
 
 
-	/* ����ǥ�����ͥ������å� */
+	/* エンディアンネスチェック */
 
 #ifdef LSB_FIRST
     if (*(char *)&x != 1) {
@@ -153,18 +153,18 @@ int	main(int argc, char *argv[])
 #endif
 
 
-    if (config_init(argc, argv,		/* �Ķ������ & �������� */
+    if (config_init(argc, argv,		/* 環境初期化 & 引数処理 */
 		    x11_options,
 		    help_msg_x11)) {
 
-	quasi88_atexit(finish);		/* quasi88() �¹���˶�����λ�����ݤ�
-					   ������Хå��ؿ�����Ͽ���� */
-	quasi88();			/* PC-8801 ���ߥ�졼����� */
+	quasi88_atexit(finish);		/* quasi88() 実行中に強制終了した際の
+					   コールバック関数を登録する */
+	quasi88();			/* PC-8801 エミュレーション */
 
-	config_exit();			/* ������������� */
+	config_exit();			/* 引数処理後始末 */
     }
 
-    x11_exit();				/* X11��Ϣ����� */
+    x11_exit();				/* X11関連後始末 */
 
     return 0;
 }
@@ -172,22 +172,22 @@ int	main(int argc, char *argv[])
 
 
 /*
- * ������λ���Υ�����Хå��ؿ� (quasi88_exit()�ƽл��ˡ����������)
+ * 強制終了時のコールバック関数 (quasi88_exit()呼出時に、処理される)
  */
 static	void	finish(void)
 {
-    config_exit();			/* ������������� */
-    x11_exit();				/* X11��Ϣ����� */
+    config_exit();			/* 引数処理後始末 */
+    x11_exit();				/* X11関連後始末 */
 }
 
 
 
 /***********************************************************************
- * ���ơ��ȥ����ɡ����ơ��ȥ�����
+ * ステートロード／ステートセーブ
  ************************************************************************/
 
-/*	¾�ξ��󤹤٤Ƥ������� or �����֤��줿��˸ƤӽФ���롣
- *	ɬ�פ˱����ơ������ƥ��ͭ�ξ�����ղä��Ƥ⤤�����ȡ�
+/*	他の情報すべてがロード or セーブされた後に呼び出される。
+ *	必要に応じて、システム固有の情報を付加してもいいかと。
  */
 
 int	stateload_system( void )
@@ -202,7 +202,7 @@ int	statesave_system( void )
 
 
 /***********************************************************************
- * ��˥塼���̤�ɽ�����롢�����ƥ��ͭ��å�����
+ * メニュー画面に表示する、システム固有メッセージ
  ************************************************************************/
 
 int	menu_about_osd_msg(int        req_japanese,
@@ -237,30 +237,30 @@ int	menu_about_osd_msg(int        req_japanese,
     static const char *about_jp =
     {
 #ifdef	MITSHM
-	"MIT-SHM �����ݡ��Ȥ���Ƥ��ޤ�\n"
+	"MIT-SHM がサポートされています\n"
 #endif
 
 #ifdef	USE_DGA
-	"XFree86-DGA �����ݡ��Ȥ���Ƥ��ޤ�\n"
+	"XFree86-DGA がサポートされています\n"
 #endif
 
 #ifdef	USE_XV
-	"XVideo �����ݡ��Ȥ���Ƥ��ޤ�\n"
+	"XVideo がサポートされています\n"
 #endif
 
 #if	defined (JOY_SDL)
-	"���祤���ƥ��å� (SDL) �����ݡ��Ȥ���Ƥ��ޤ�\n"
+	"ジョイスティック (SDL) がサポートされています\n"
 #elif	defined (JOY_LINUX_USB)
-	"���祤���ƥ��å� (Linux USB-joystick) �����ݡ��Ȥ���Ƥ��ޤ�\n"
+	"ジョイスティック (Linux USB-joystick) がサポートされています\n"
 #elif	defined (JOY_BSD_USB)
-	"���祤���ƥ��å� (BSD USB-joystick) �����ݡ��Ȥ���Ƥ��ޤ�\n"
+	"ジョイスティック (BSD USB-joystick) がサポートされています\n"
 #else
-	"���祤���ƥ��å� �ϥ��ݡ��Ȥ���Ƥ��ޤ���\n"
+	"ジョイスティック はサポートされていません\n"
 #endif  
     };
 
 
-    *result_code = -1;				/* ʸ�������ɻ���ʤ� */
+    *result_code = -1;				/* 文字コード指定なし */
 
     if (req_japanese == FALSE) {
 	*message = about_en;

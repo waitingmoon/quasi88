@@ -1,71 +1,71 @@
 #----------------------------------------------------------------------
 # keyconf.rc
 
-#	���Υե�����ϡ�UNIX�� QUASI88 �Υ�������ե�����Ǥ���
-#	���Υե�����ϡ�QUASI88��ư���Υ��ץ���󡢤ʤ�������ե�����ˤ�
-#	��-keyboard 0�פ���ꤷ�����˸¤ꡢ�ɤ߹��ޤ�ޤ���
-#	�嵭���̵꤬�����ϡ����Υե�������ɤޤ�ޤ���
+#	このファイルは、UNIX版 QUASI88 のキー設定ファイルです。
+#	このファイルは、QUASI88起動時のオプション、ないし設定ファイルにて
+#	「-keyboard 0」を指定した場合に限り、読み込まれます。
+#	上記指定が無い場合は、このファイルは読まれません。
 #
-#	���Υե�����ϡ� ~/.quasi88/keyconf.rc �˥��ԡ����Ƥ��Ȥ���������
+#	このファイルは、 ~/.quasi88/keyconf.rc にコピーしてお使いください
 
 #----------------------------------------------------------------------
 
-# ��ñ������
+# 簡単な説明
 #
-#	��1�Ԥ� 255ʸ������Ȥ��Ƥ���������
-#	��# ��������ޤǤϡ������ȤȤߤʤ���ޤ���
-#	���ƥѥ�᡼���ζ��ڤ�ϡ�1�İʾ�Υ��ڡ��������֤Ǥ���
+#	・1行は 255文字以内としてください。
+#	・# から行末までは、コメントとみなされます。
+#	・各パラメータの区切りは、1個以上のスペースかタブです。
 #
-#	X11 (X.Org,XFree86) �Ǥϡ�ESC �����򲡤��ȡ���XK_Escape�פΥ�������ܥ�
-#	��ȯ�����ޤ����ʲ��ιԤΤ褦�˽񤤤Ƥ����ȡ����Υ�������ܥ�ȯ�����ˡ�
-#	QUASI88 �Ǥ� ��KEY88_ESC�פΥ���(ESC����)�򲡤����Ȥߤʤ���ޤ���
+#	X11 (X.Org,XFree86) では、ESC キーを押すと、「XK_Escape」のキーシンボル
+#	が発生します。以下の行のように書いておくと、このキーシンボル発生時に、
+#	QUASI88 では 「KEY88_ESC」のキー(ESCキー)を押したとみなされます。
 #
 #		XK_Escape		KEY88_ESC
 #
-#	�ޤ���1 �����򲡤��� ��XK_1�פΥ�������ܥ뤬�����եȥ����򲡤��ʤ���
-#	1 �����򲡤��ȡ���XK_exclam�פΥ�������ܥ뤬ȯ�����ޤ���
+#	また、1 キーを押すと 「XK_1」のキーシンボルが、シフトキーを押しながら
+#	1 キーを押すと、「XK_exclam」のキーシンボルが発生します。
 #	
 #		XK_1			KEY88_1
 #		XK_exclam		KEY88_EXCLAM
 #
-#	QUASI88 �Ǥ� 1 ���� �� ! ���� �ζ��̤Ϥʤ��Τǡ��ʲ��Τ褦�˽񤤤Ƥ�
-#	���ꤢ��ޤ���
+#	QUASI88 では 1 キー と ! キー の区別はないので、以下のように書いても
+#	問題ありません。
 #
 #		XK_1			KEY88_1
 #		XK_exclam		KEY88_1
 #
-#	Ⱦ��/���ѥ����򲡤��ȡ���XK_Zenkaku_Hankaku�פΥ�������ܥ뤬ȯ��
-#	���ޤ����ʲ��Τ褦�˽񤯤ȡ����Υ�����̵��Ǥ��ޤ���
+#	半角/全角キーを押すと、「XK_Zenkaku_Hankaku」のキーシンボルが発生
+#	します。以下のように書くと、このキーを無視できます。
 #
 #		XK_Zenkaku_Hankaku	0
 #
-#	�Хå����ڡ����κ��� \ �����ȡ���¦���եȥ����κ��� \ �����ϡ�
-#	�ɤ���򲡤��Ƥ��XK_backslash�פΥ�������ܥ뤬ȯ�����ޤ���
-#	���ԤΥ����ϥ��������� 133����ԤΥ����ϥ��������� 123 ���������
-#	���Ƥ���Τǡ��ʲ��Τ褦�˥��������ɤǶ��̤��ޤ���
+#	バックスペースの左の \ キーと、右側シフトキーの左の \ キーは、
+#	どちらを押しても「XK_backslash」のキーシンボルが発生します。
+#	前者のキーはキーコード 133、後者のキーはキーコード 123 が割り当て
+#	られているので、以下のようにキーコードで区別します。
 #
 #		<133>			KEY88_YEN
 #		<123>			KEY88_UNDERSCORE
 #
-#	���եȥ�����NumLock ��ͭ���ˤ����ݤˡ� U ������ƥ󥭡��� 4 �Ȥߤʤ�
-#	�褦�ˤ�������硢�ʲ��Τ褦�˽񤭤ޤ���
+#	ソフトウェアNumLock を有効にした際に、 U キーをテンキーの 4 とみなす
+#	ようにしたい場合、以下のように書きます。
 #
 #		XK_u			KEY88_u			KEY88_KP_4
 #		XK_U			KEY88_U			KEY88_KP_4
 #
 #
-#	SDL �ξ��⡢X11 �ξ���Ʊ�ͤǤ�������������ܥ�̾���ۤʤ�ޤ���
-#	��������ܥ��̵�������ˤϡ����������ɤˤ�������Ƥ�񤭤ޤ���
+#	SDL の場合も、X11 の場合と同様ですが、キーシンボル名が異なります。
+#	キーシンボルの無いキーには、キーコードによる割り当てを書きます。
 
 #----------------------------------------------------------------------
 
-#	�ʲ��ϡ�X11 (X.Org,XFree86)�� jp106�����ܡ��ɸ�������ץ�Ǥ���
-#	�Ƽ��ǹ����ʤ褦�˥������ޥ������Ƥ���������
+#	以下は、X11 (X.Org,XFree86)の jp106キーボード向けサンプルです。
+#	各自で好きなようにカスタマイズしてください。
 
 #----------------------------------------------------------------------
 
 #
-# X11 �ξ��
+# X11 の場合
 #	
 
 [X11]
@@ -87,7 +87,7 @@ XK_Print		KEY88_COPY				#
 XK_Scroll_Lock		KEY88_KANA				#
 XK_Pause		KEY88_STOP				#
 
-XK_Zenkaku_Hankaku	KEY88_ZENKAKU				# Ⱦ������ ����
+XK_Zenkaku_Hankaku	KEY88_ZENKAKU				# 半角全角 キー
 XK_1			KEY88_1					#
 XK_2			KEY88_2					#
 XK_3			KEY88_3					#
@@ -160,7 +160,7 @@ XK_m			KEY88_m			KEY88_KP_0	#
 XK_comma		KEY88_COMMA		KEY88_KP_COMMA	# ,
 XK_period		KEY88_PERIOD		KEY88_KP_PERIOD	# .
 XK_slash		KEY88_SLASH		KEY88_RETURNR	# /
-<123>			KEY88_UNDERSCORE			# \ _ ��
+<123>			KEY88_UNDERSCORE			# \ _ ロ
 XK_Shift_R		KEY88_SHIFTR				#
 XK_Up			KEY88_UP				#
 XK_KP_End		KEY88_KP_1				#
@@ -171,10 +171,10 @@ XK_KP_Enter		KEY88_RETURNR				#
 XK_Control_L		KEY88_CTRL				#
 XK_Super_L		KEY88_KANA				# Windows
 XK_Alt_L		KEY88_GRAPH				#
-XK_Muhenkan		KEY88_KETTEI				# ̵�Ѵ�
+XK_Muhenkan		KEY88_KETTEI				# 無変換
 XK_space		KEY88_SPACE				#
-XK_Henkan_Mode		KEY88_HENKAN				# �Ѵ�
-XK_Hiragana_Katakana	KEY88_KANA				# �Ҥ餬��
+XK_Henkan_Mode		KEY88_HENKAN				# 変換
+XK_Hiragana_Katakana	KEY88_KANA				# ひらがな
 XK_Alt_R		KEY88_ZENKAKU				#
 XK_Super_R		0					# Windows
 XK_Menu			KEY88_SYS_MENU				# Application
@@ -268,7 +268,7 @@ XK_KP_TAB		KEY88_TAB				#
 ################################################
 
 #
-# SDL �ξ�� (SDL_VIDEODRIVER �� x11 ������������)
+# SDL の場合 (SDL_VIDEODRIVER に x11 を定義した場合)
 #	
 
 [SDL]			x11
@@ -303,7 +303,7 @@ SDLK_9			KEY88_9			KEY88_KP_9	#
 SDLK_0			KEY88_0			KEY88_KP_MULTIPLY
 SDLK_MINUS		KEY88_MINUS		KEY88_KP_SUB	#
 SDLK_CARET		KEY88_CARET		KEY88_KP_DIVIDE	#
-<133>			KEY88_YEN				# \ | ����
+<133>			KEY88_YEN				# \ | キー
 SDLK_BACKSPACE		KEY88_INS_DEL				#
 SDLK_INSERT		KEY88_INS				#
 SDLK_HOME		KEY88_HOME				#
@@ -347,7 +347,7 @@ SDLK_k			KEY88_k			KEY88_KP_2	#
 SDLK_l			KEY88_l			KEY88_KP_3	#
 SDLK_SEMICOLON		KEY88_SEMICOLON		KEY88_KP_EQUAL	#
 SDLK_COLON		KEY88_COLON				#
-SDLK_RIGHTBRACKET	KEY88_BRACKETRIGHT			# ] } ����
+SDLK_RIGHTBRACKET	KEY88_BRACKETRIGHT			# ] } キー
 SDLK_KP4		KEY88_KP_4				#
 SDLK_KP5		KEY88_KP_5				#
 SDLK_KP6		KEY88_KP_6				#
@@ -363,7 +363,7 @@ SDLK_m			KEY88_m			KEY88_KP_0	#
 SDLK_COMMA		KEY88_COMMA		KEY88_KP_COMMA	#
 SDLK_PERIOD		KEY88_PERIOD		KEY88_KP_PERIOD	#
 SDLK_SLASH		KEY88_SLASH		KEY88_RETURNR	#
-<123>			KEY88_UNDERSCORE			# \ _ ����
+<123>			KEY88_UNDERSCORE			# \ _ キー
 SDLK_RSHIFT		KEY88_SHIFTR				#
 SDLK_UP			KEY88_UP				#
 SDLK_KP1		KEY88_KP_1				#
@@ -372,15 +372,15 @@ SDLK_KP3		KEY88_KP_3				#
 SDLK_KP_ENTER		KEY88_RETURNR				#
 
 SDLK_LCTRL		KEY88_CTRL				#
-SDLK_LSUPER		KEY88_KANA				# Windows ����
+SDLK_LSUPER		KEY88_KANA				# Windows キー
 SDLK_LALT		KEY88_GRAPH				#
-<131>			KEY88_KETTEI				# ̵�Ѵ� ����
+<131>			KEY88_KETTEI				# 無変換 キー
 SDLK_SPACE		KEY88_SPACE				#
-<129>			KEY88_HENKAN				# �Ѵ� ����
-<120>			KEY88_KANA				# �Ҥ餬�� ����
+<129>			KEY88_HENKAN				# 変換 キー
+<120>			KEY88_KANA				# ひらがな キー
 SDLK_RALT		KEY88_ZENKAKU				#
-SDLK_RSUPER		0					# Windows ����
-SDLK_MENU		KEY88_SYS_MENU				# Menu ����
+SDLK_RSUPER		0					# Windows キー
+SDLK_MENU		KEY88_SYS_MENU				# Menu キー
 SDLK_RCTRL		KEY88_CTRL				#
 SDLK_LEFT		KEY88_LEFT				#
 SDLK_DOWN		KEY88_DOWN				#
@@ -393,7 +393,7 @@ SDLK_KP_PERIOD		KEY88_KP_PERIOD				#
 ################################################
 
 #
-# SDL �ξ�� (SDL_VIDEODRIVER �� dga ������������)
+# SDL の場合 (SDL_VIDEODRIVER に dga を定義した場合)
 #	
 
 [SDL]			dga
@@ -428,7 +428,7 @@ SDLK_9			KEY88_9			KEY88_KP_9	#
 SDLK_0			KEY88_0			KEY88_KP_MULTIPLY
 SDLK_MINUS		KEY88_MINUS		KEY88_KP_SUB	#
 SDLK_CARET		KEY88_CARET		KEY88_KP_DIVIDE	#
-<133>			KEY88_YEN				# \ | ����
+<133>			KEY88_YEN				# \ | キー
 SDLK_BACKSPACE		KEY88_INS_DEL				#
 SDLK_INSERT		KEY88_INS				#
 SDLK_HOME		KEY88_HOME				#
@@ -472,7 +472,7 @@ SDLK_k			KEY88_k			KEY88_KP_2	#
 SDLK_l			KEY88_l			KEY88_KP_3	#
 SDLK_SEMICOLON		KEY88_SEMICOLON		KEY88_KP_EQUAL	#
 SDLK_COLON		KEY88_COLON				#
-SDLK_RIGHTBRACKET	KEY88_BRACKETRIGHT			# ] } ����
+SDLK_RIGHTBRACKET	KEY88_BRACKETRIGHT			# ] } キー
 SDLK_KP4		KEY88_KP_4				#
 SDLK_KP5		KEY88_KP_5				#
 SDLK_KP6		KEY88_KP_6				#
@@ -488,7 +488,7 @@ SDLK_m			KEY88_m			KEY88_KP_0	#
 SDLK_COMMA		KEY88_COMMA		KEY88_KP_COMMA	#
 SDLK_PERIOD		KEY88_PERIOD		KEY88_KP_PERIOD	#
 SDLK_SLASH		KEY88_SLASH		KEY88_RETURNR	#
-<123>			KEY88_UNDERSCORE			# \ _ ����
+<123>			KEY88_UNDERSCORE			# \ _ キー
 SDLK_RSHIFT		KEY88_SHIFTR				#
 SDLK_UP			KEY88_UP				#
 SDLK_KP1		KEY88_KP_1				#
@@ -497,15 +497,15 @@ SDLK_KP3		KEY88_KP_3				#
 SDLK_KP_ENTER		KEY88_RETURNR				#
 
 SDLK_LCTRL		KEY88_CTRL				#
-SDLK_LSUPER		KEY88_KANA				# Windows ����
+SDLK_LSUPER		KEY88_KANA				# Windows キー
 SDLK_LALT		KEY88_GRAPH				#
-<131>			KEY88_KETTEI				# ̵�Ѵ� ����
+<131>			KEY88_KETTEI				# 無変換 キー
 SDLK_SPACE		KEY88_SPACE				#
-<129>			KEY88_HENKAN				# �Ѵ� ����
-<120>			KEY88_KANA				# �Ҥ餬�� ����
+<129>			KEY88_HENKAN				# 変換 キー
+<120>			KEY88_KANA				# ひらがな キー
 SDLK_RALT		KEY88_ZENKAKU				#
-SDLK_RSUPER		0					# Windows ����
-SDLK_MENU		KEY88_SYS_MENU				# Menu ����
+SDLK_RSUPER		0					# Windows キー
+SDLK_MENU		KEY88_SYS_MENU				# Menu キー
 SDLK_RCTRL		KEY88_CTRL				#
 SDLK_LEFT		KEY88_LEFT				#
 SDLK_DOWN		KEY88_DOWN				#

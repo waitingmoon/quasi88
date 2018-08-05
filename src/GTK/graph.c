@@ -1,7 +1,7 @@
 /***********************************************************************
- * ¥°¥é¥Õ¥£¥Ã¥¯½èÍı (¥·¥¹¥Æ¥à°ÍÂ¸)
+ * ã‚°ãƒ©ãƒ•ã‚£ãƒƒã‚¯å‡¦ç† (ã‚·ã‚¹ãƒ†ãƒ ä¾å­˜)
  *
- *	¾ÜºÙ¤Ï¡¢ graph.h »²¾È
+ *	è©³ç´°ã¯ã€ graph.h å‚ç…§
  ************************************************************************/
 
 #include <stdio.h>
@@ -13,18 +13,18 @@
 #include "device.h"
 
 
-int	use_gdk_image = TRUE;			/* ¿¿¤Ç¡¢GdkImage¤ò»ÈÍÑ */
+int	use_gdk_image = TRUE;			/* çœŸã§ã€GdkImageã‚’ä½¿ç”¨ */
 
-static	T_GRAPH_SPEC	graph_spec;		/* ´ğËÜ¾ğÊó		*/
+static	T_GRAPH_SPEC	graph_spec;		/* åŸºæœ¬æƒ…å ±		*/
 
-static	int		graph_exist;		/* ¿¿¤Ç¡¢²èÌÌÀ¸À®ºÑ¤ß	*/
-static	T_GRAPH_INFO	graph_info;		/* ¤½¤Î»ş¤Î¡¢²èÌÌ¾ğÊó	*/
+static	int		graph_exist;		/* çœŸã§ã€ç”»é¢ç”Ÿæˆæ¸ˆã¿	*/
+static	T_GRAPH_INFO	graph_info;		/* ãã®æ™‚ã®ã€ç”»é¢æƒ…å ±	*/
 
 
 /************************************************************************
- *	¥°¥é¥Õ¥£¥Ã¥¯½èÍı¤Î½é´ü²½
- *	¥°¥é¥Õ¥£¥Ã¥¯½èÍı¤ÎÆ°ºî
- *	¥°¥é¥Õ¥£¥Ã¥¯½èÍı¤Î½ªÎ»
+ *	ã‚°ãƒ©ãƒ•ã‚£ãƒƒã‚¯å‡¦ç†ã®åˆæœŸåŒ–
+ *	ã‚°ãƒ©ãƒ•ã‚£ãƒƒã‚¯å‡¦ç†ã®å‹•ä½œ
+ *	ã‚°ãƒ©ãƒ•ã‚£ãƒƒã‚¯å‡¦ç†ã®çµ‚äº†
  ************************************************************************/
 
 static	GdkVisual 	*visual;
@@ -36,13 +36,13 @@ const T_GRAPH_SPEC	*graph_init(void)
 	printf("Initializing Graphic System ... ");
     }
 
-    /* ??? ¤è¤¯¤ï¤«¤é¤ó */
+    /* ??? ã‚ˆãã‚ã‹ã‚‰ã‚“ */
     {
 	GtkStyle *style = gtk_widget_get_default_style();
 	if (style != NULL) {
 	    GdkFont* font = NULL;
 #if 0
-#ifdef ¥¦¥¤¥ó¥É¥¦¥º¡©
+#ifdef ã‚¦ã‚¤ãƒ³ãƒ‰ã‚¦ã‚ºï¼Ÿ
 	    font = gdk_font_load("-*-*-*-*-*--*-*-*-*-*-*-windows-shiftjis");
 #else
 #ifdef __CYGWIN__
@@ -62,7 +62,7 @@ const T_GRAPH_SPEC	*graph_init(void)
 	}
     }
 
-    /* ¤ä¤Ï¤ê¤ï¤«¤é¤ó */
+    /* ã‚„ã¯ã‚Šã‚ã‹ã‚‰ã‚“ */
     {
 	int found = FALSE;
 	GdkVisual *v = gdk_visual_get_system();
@@ -109,7 +109,7 @@ const T_GRAPH_SPEC	*graph_init(void)
 	    gtk_widget_set_default_colormap(gdk_rgb_get_cmap());
 	    gtk_widget_set_default_visual(gdk_rgb_get_visual());
 
-	    visual   = gdk_rgb_get_visual();	/* Ì¤»ÈÍÑ¤À¤±¤É */
+	    visual   = gdk_rgb_get_visual();	/* æœªä½¿ç”¨ã ã‘ã© */
 	    colormap = gdk_rgb_get_cmap();
 
 #else
@@ -153,25 +153,25 @@ const T_GRAPH_INFO	*graph_setup(int width, int height,
 {
     GtkWidget *vbox;
 
-    /* fullscreen, aspect ¤ÏÌ¤»ÈÍÑ */
+    /* fullscreen, aspect ã¯æœªä½¿ç”¨ */
 
     if (graph_exist == FALSE) {
 
-	/* ¥¦¥¤¥ó¥É¥¦¤òÀ¸À®¤¹¤ë */
+	/* ã‚¦ã‚¤ãƒ³ãƒ‰ã‚¦ã‚’ç”Ÿæˆã™ã‚‹ */
 	main_window = gtk_window_new(GTK_WINDOW_TOPLEVEL);
 	{
 	    gtk_window_set_policy(GTK_WINDOW(main_window), FALSE, FALSE, TRUE);
 	    gtksys_set_signal_frame(main_window);
 	}
 
-	/* ¥á¥Ë¥å¡¼¥Ğ¡¼¤òÀ¸À®¤¹¤ë */
+	/* ãƒ¡ãƒ‹ãƒ¥ãƒ¼ãƒãƒ¼ã‚’ç”Ÿæˆã™ã‚‹ */
 	{
 	    create_menubar(main_window, &menu_bar);
 	    gtk_widget_show(menu_bar);
 	}
 
 
-	/* ÉÁ²èÎÎ°è¤òÀ¸À®¤¹¤ë */
+	/* æç”»é ˜åŸŸã‚’ç”Ÿæˆã™ã‚‹ */
 	drawing_area = gtk_drawing_area_new();
 	{
 	    gtk_drawing_area_size(GTK_DRAWING_AREA(drawing_area),
@@ -181,10 +181,10 @@ const T_GRAPH_INFO	*graph_setup(int width, int height,
 	gtk_widget_show(drawing_area);
 
 
-	/* ¥¢¥¯¥»¥é¥ì¡¼¥¿¡¼ */
+	/* ã‚¢ã‚¯ã‚»ãƒ©ãƒ¬ãƒ¼ã‚¿ãƒ¼ */
 
 
-	/* ¥á¥Ë¥å¡¼¥Ğ¡¼¤ÈÉÁ²èÎÎ°è¤ò¥Ñ¥Ã¥¯¤·¤ÆÉ½¼¨ */
+	/* ãƒ¡ãƒ‹ãƒ¥ãƒ¼ãƒãƒ¼ã¨æç”»é ˜åŸŸã‚’ãƒ‘ãƒƒã‚¯ã—ã¦è¡¨ç¤º */
 	vbox = gtk_vbox_new(FALSE, 0);
 	gtk_widget_show(vbox);
 	gtk_box_pack_start(GTK_BOX(vbox), menu_bar, FALSE, TRUE, 0);
@@ -194,7 +194,7 @@ const T_GRAPH_INFO	*graph_setup(int width, int height,
 	gtk_widget_show(main_window);
 
 
-	/* ¥°¥é¥Õ¥£¥Ã¥¯¥³¥ó¥Æ¥­¥¹¥È¤ÎÀßÄê (É½¼¨¸å¤Ç¤Ê¤¤¤È¤À¤á) ? */
+	/* ã‚°ãƒ©ãƒ•ã‚£ãƒƒã‚¯ã‚³ãƒ³ãƒ†ã‚­ã‚¹ãƒˆã®è¨­å®š (è¡¨ç¤ºå¾Œã§ãªã„ã¨ã ã‚) ? */
 	graphic_context = gdk_gc_new(drawing_area->window);
     }
 
@@ -282,11 +282,11 @@ void	graph_exit(void)
 }
 
 /************************************************************************
- *	¿§¤Î³ÎÊİ
- *	¿§¤Î²òÊü
+ *	è‰²ã®ç¢ºä¿
+ *	è‰²ã®è§£æ”¾
  ************************************************************************/
-static	GdkColor	color_cell[256];	/* ³ÎÊİ¤·¤¿¿§¤ÎÆâÍÆ */
-static	int		nr_color_cell;		/* ³ÎÊİ¤·¤¿¿§¤Î¸Ä¿ô */
+static	GdkColor	color_cell[256];	/* ç¢ºä¿ã—ãŸè‰²ã®å†…å®¹ */
+static	int		nr_color_cell;		/* ç¢ºä¿ã—ãŸè‰²ã®å€‹æ•° */
 
 void	graph_add_color(const PC88_PALETTE_T color[],
 			int nr_color, unsigned long pixel[])
@@ -361,7 +361,7 @@ static void color_trash(void)
 
 
 /************************************************************************
- *	¥°¥é¥Õ¥£¥Ã¥¯¤Î¹¹¿·
+ *	ã‚°ãƒ©ãƒ•ã‚£ãƒƒã‚¯ã®æ›´æ–°
  ************************************************************************/
 
 void	graph_update(int nr_rect, T_GRAPH_RECT rect[])
@@ -392,8 +392,8 @@ void	graph_update(int nr_rect, T_GRAPH_RECT rect[])
 
 
 /************************************************************************
- *	¥¿¥¤¥È¥ë¤ÎÀßÄê
- *	Â°À­¤ÎÀßÄê
+ *	ã‚¿ã‚¤ãƒˆãƒ«ã®è¨­å®š
+ *	å±æ€§ã®è¨­å®š
  ************************************************************************/
 
 void	graph_set_window_title(const char *title)
@@ -423,8 +423,8 @@ void	gtksys_set_attribute_focus_in(void)
 
 void	graph_set_attribute(int mouse_show, int grab, int keyrepeat_on)
 {
-    /* ¥Ş¥¦¥¹¤ÏÌ¤ÂĞ±ş */
-    /* ¥°¥é¥Ö¤ÏÌ¤ÂĞ±ş */
+    /* ãƒã‚¦ã‚¹ã¯æœªå¯¾å¿œ */
+    /* ã‚°ãƒ©ãƒ–ã¯æœªå¯¾å¿œ */
     gtksys_keyrepeat_on = keyrepeat_on;
 
     if (gtksys_get_focus) {

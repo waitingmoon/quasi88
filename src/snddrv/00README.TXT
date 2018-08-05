@@ -1,80 +1,80 @@
 
-¢¨ ¤³¤Î¥Ç¥£¥ì¥¯¥È¥ê°Ê²¼¤Ë¤Ï¡¢MAME 0.112/XMAME 0.106 ¤Î¥½¡¼¥¹¤¬´Ş¤Ş¤ì¤Æ¤¤¤Ş¤¹¡£
+â€» ã“ã®ãƒ‡ã‚£ãƒ¬ã‚¯ãƒˆãƒªä»¥ä¸‹ã«ã¯ã€MAME 0.112/XMAME 0.106 ã®ã‚½ãƒ¼ã‚¹ãŒå«ã¾ã‚Œã¦ã„ã¾ã™ã€‚
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-  QUASI88 ¤Î¥³¥ó¥Ñ¥¤¥ë»ş¤Ë¥µ¥¦¥ó¥É½ĞÎÏ¤òÍ­¸ú¤Ë¤·¤Æ¤ª¤¯¤È¡¢¤³¤Î¥Ç¥£¥ì¥¯¥È¥ê
-°Ê²¼¤Î¥Õ¥¡¥¤¥ë¤¬ÁÈ¤ß¹ş¤Ş¤ì¡¢MAME/XMAME ¤Î¥µ¥¦¥ó¥É½ĞÎÏµ¡Ç½ (¥µ¥¦¥ó¥É¥É¥é¥¤¥Ğ)
-¤¬»ÈÍÑ¤¹¤ë¤³¤È¤¬¤Ç¤­¤ë¤è¤¦¤Ë¤Ê¤ê¤Ş¤¹¡£
+  QUASI88 ã®ã‚³ãƒ³ãƒ‘ã‚¤ãƒ«æ™‚ã«ã‚µã‚¦ãƒ³ãƒ‰å‡ºåŠ›ã‚’æœ‰åŠ¹ã«ã—ã¦ãŠãã¨ã€ã“ã®ãƒ‡ã‚£ãƒ¬ã‚¯ãƒˆãƒª
+ä»¥ä¸‹ã®ãƒ•ã‚¡ã‚¤ãƒ«ãŒçµ„ã¿è¾¼ã¾ã‚Œã€MAME/XMAME ã®ã‚µã‚¦ãƒ³ãƒ‰å‡ºåŠ›æ©Ÿèƒ½ (ã‚µã‚¦ãƒ³ãƒ‰ãƒ‰ãƒ©ã‚¤ãƒ)
+ãŒä½¿ç”¨ã™ã‚‹ã“ã¨ãŒã§ãã‚‹ã‚ˆã†ã«ãªã‚Šã¾ã™ã€‚
 
-¤Ê¤ª¡¢¤³¤Î¾ì¹ç¥³¥ó¥Ñ¥¤¥ë¤·¤¿¥Ğ¥¤¥Ê¥ê¤Ï¡¢MAME ¤ª¤è¤Ó XMAME ¤Î¥é¥¤¥»¥ó¥¹¤¬Å¬ÍÑ
-¤µ¤ì¤Ş¤¹¤Î¤Ç¤´Ãí°Õ¤¯¤À¤µ¤¤¡£¤³¤Î¥Ç¥£¥ì¥¯¥È¥ê°Ê²¼¤Î¥½¡¼¥¹¥Õ¥¡¥¤¥ë¤ÎºÆÇÛÉÛÅù¤Ë
-¤Ä¤¤¤Æ¤âÆ±ÍÍ¤Ç¤¹¡£
+ãªãŠã€ã“ã®å ´åˆã‚³ãƒ³ãƒ‘ã‚¤ãƒ«ã—ãŸãƒã‚¤ãƒŠãƒªã¯ã€MAME ãŠã‚ˆã³ XMAME ã®ãƒ©ã‚¤ã‚»ãƒ³ã‚¹ãŒé©ç”¨
+ã•ã‚Œã¾ã™ã®ã§ã”æ³¨æ„ãã ã•ã„ã€‚ã“ã®ãƒ‡ã‚£ãƒ¬ã‚¯ãƒˆãƒªä»¥ä¸‹ã®ã‚½ãƒ¼ã‚¹ãƒ•ã‚¡ã‚¤ãƒ«ã®å†é…å¸ƒç­‰ã«
+ã¤ã„ã¦ã‚‚åŒæ§˜ã§ã™ã€‚
 
 
-MAME ¤Î¥é¥¤¥»¥ó¥¹¤Ë¤Ä¤¤¤Æ¤Ï¡¢¤³¤Î¥Ç¥£¥ì¥¯¥È¥ê¤Ë¤¢¤ë
+MAME ã®ãƒ©ã‚¤ã‚»ãƒ³ã‚¹ã«ã¤ã„ã¦ã¯ã€ã“ã®ãƒ‡ã‚£ãƒ¬ã‚¯ãƒˆãƒªã«ã‚ã‚‹
 
 	license.txt
 
-¤ò»²¾È¤·¤Æ¤¯¤À¤µ¤¤¡£(XMAME¤Î¥é¥¤¥»¥ó¥¹¤â¤³¤ì¤Ë½àµò¤·¤Ş¤¹)
+ã‚’å‚ç…§ã—ã¦ãã ã•ã„ã€‚(XMAMEã®ãƒ©ã‚¤ã‚»ãƒ³ã‚¹ã‚‚ã“ã‚Œã«æº–æ‹ ã—ã¾ã™)
 
 
-(*) MAME ¤Ï¡¢Nicola Salmoria »á ¤È The MAME Team ¤¬Ãøºî¸¢¤òÍ­¤¹¤ë¡¢¥Ş¥ë¥Á
-    ¥¢¡¼¥±¡¼¥É¥Ş¥·¥ó¥¨¥ß¥å¥ì¡¼¥¿¤Ç¤¹¡£
-    XMAME ¤Ï¡¢XMAME project ¤Ë¤è¤ë MAME ¤Î UNIX°Ü¿¢ÈÇ¤Ç¤¹¡£(¸½ºß¡¢µÙ»ßÃæ)
+(*) MAME ã¯ã€Nicola Salmoria æ° ã¨ The MAME Team ãŒè‘—ä½œæ¨©ã‚’æœ‰ã™ã‚‹ã€ãƒãƒ«ãƒ
+    ã‚¢ãƒ¼ã‚±ãƒ¼ãƒ‰ãƒã‚·ãƒ³ã‚¨ãƒŸãƒ¥ãƒ¬ãƒ¼ã‚¿ã§ã™ã€‚
+    XMAME ã¯ã€XMAME project ã«ã‚ˆã‚‹ MAME ã® UNIXç§»æ¤ç‰ˆã§ã™ã€‚(ç¾åœ¨ã€ä¼‘æ­¢ä¸­)
 
-    MAME ¤Ë¤Ä¤¤¤Æ¤Î¡¢¤è¤êÂ¿¤¯¤Î¾ğÊó¤Ï°Ê²¼¤Î¥¦¥§¥Ö¥µ¥¤¥È¤ò¸æÍ÷²¼¤µ¤¤¡£
+    MAME ã«ã¤ã„ã¦ã®ã€ã‚ˆã‚Šå¤šãã®æƒ…å ±ã¯ä»¥ä¸‹ã®ã‚¦ã‚§ãƒ–ã‚µã‚¤ãƒˆã‚’å¾¡è¦§ä¸‹ã•ã„ã€‚
 
 	http://www.mamedev.org/
 
 
 -------------------------------------------------------------------------------
 
-¡üsrc ¥Ç¥£¥ì¥¯¥È¥ê ¤ª¤è¤Ó src/sound ¥Ç¥£¥ì¥¯¥È¥ê¤Î¥½¡¼¥¹¤Ï¡¢
-  MAME 0.112 ¤Î¥½¡¼¥¹¤ò QUASI88 ¸ş¤±¤Ë²şÊÑ¤·¤¿¤â¤Î¤Ç¤¹¡£
+â—src ãƒ‡ã‚£ãƒ¬ã‚¯ãƒˆãƒª ãŠã‚ˆã³ src/sound ãƒ‡ã‚£ãƒ¬ã‚¯ãƒˆãƒªã®ã‚½ãƒ¼ã‚¹ã¯ã€
+  MAME 0.112 ã®ã‚½ãƒ¼ã‚¹ã‚’ QUASI88 å‘ã‘ã«æ”¹å¤‰ã—ãŸã‚‚ã®ã§ã™ã€‚
 
 
-src/cpuintrf.h			¥À¥ß¡¼
-src/driver.c			Ì¤»ÈÍÑÉôÊ¬¤ò¥³¥á¥ó¥È¥¢¥¦¥È¡£
-src/driver.h			¥À¥ß¡¼
-src/mame.h			¥À¥ß¡¼
-src/mamecore.h			¥À¥ß¡¼
-src/osdepend.h			¥À¥ß¡¼
-src/profiler.h			¥À¥ß¡¼
-src/restrack.c			Ì¤»ÈÍÑÉôÊ¬¤ò¥³¥á¥ó¥È¥¢¥¦¥È¡£
-src/restrack.h			¥À¥ß¡¼
-src/sndintrf.c			BEEP, fmgenÂĞ±şÉô¤òÄÉ²Ã¡£
-src/sndintrf.h			BEEP, fmgenÂĞ±şÉô¤òÄÉ²Ã¡£
-src/sound.c			¥×¥í¥È¥¿¥¤¥×ÊÑ¹¹¤Ê¤É
-src/sound.h			¥×¥í¥È¥¿¥¤¥×ÊÑ¹¹
-src/streams.c			MAME 0.106 ÁêÅö¤ËÊÑ¹¹
+src/cpuintrf.h			ãƒ€ãƒŸãƒ¼
+src/driver.c			æœªä½¿ç”¨éƒ¨åˆ†ã‚’ã‚³ãƒ¡ãƒ³ãƒˆã‚¢ã‚¦ãƒˆã€‚
+src/driver.h			ãƒ€ãƒŸãƒ¼
+src/mame.h			ãƒ€ãƒŸãƒ¼
+src/mamecore.h			ãƒ€ãƒŸãƒ¼
+src/osdepend.h			ãƒ€ãƒŸãƒ¼
+src/profiler.h			ãƒ€ãƒŸãƒ¼
+src/restrack.c			æœªä½¿ç”¨éƒ¨åˆ†ã‚’ã‚³ãƒ¡ãƒ³ãƒˆã‚¢ã‚¦ãƒˆã€‚
+src/restrack.h			ãƒ€ãƒŸãƒ¼
+src/sndintrf.c			BEEP, fmgenå¯¾å¿œéƒ¨ã‚’è¿½åŠ ã€‚
+src/sndintrf.h			BEEP, fmgenå¯¾å¿œéƒ¨ã‚’è¿½åŠ ã€‚
+src/sound.c			ãƒ—ãƒ­ãƒˆã‚¿ã‚¤ãƒ—å¤‰æ›´ãªã©
+src/sound.h			ãƒ—ãƒ­ãƒˆã‚¿ã‚¤ãƒ—å¤‰æ›´
+src/streams.c			MAME 0.106 ç›¸å½“ã«å¤‰æ›´
 src/streams.h			
-src/timer.h			¥À¥ß¡¼
+src/timer.h			ãƒ€ãƒŸãƒ¼
 
-src/sound/2203intf.c		¥¿¥¤¥Ş¡¼¡¢²»ÎÌ½èÍıÄÉ²Ã
-src/sound/2203intf.h		¥¿¥¤¥Ş¡¼¡¢²»ÎÌ½èÍıÄÉ²Ã
-src/sound/2608intf.c		¥¿¥¤¥Ş¡¼¡¢²»ÎÌ½èÍıÄÉ²Ã
-src/sound/2608intf.h		¥¿¥¤¥Ş¡¼¡¢²»ÎÌ½èÍıÄÉ²Ã
-src/sound/ay8910.c		²»ÎÌ½èÍıÄÉ²Ã
-src/sound/ay8910.h		²»ÎÌ½èÍıÄÉ²Ã
+src/sound/2203intf.c		ã‚¿ã‚¤ãƒãƒ¼ã€éŸ³é‡å‡¦ç†è¿½åŠ 
+src/sound/2203intf.h		ã‚¿ã‚¤ãƒãƒ¼ã€éŸ³é‡å‡¦ç†è¿½åŠ 
+src/sound/2608intf.c		ã‚¿ã‚¤ãƒãƒ¼ã€éŸ³é‡å‡¦ç†è¿½åŠ 
+src/sound/2608intf.h		ã‚¿ã‚¤ãƒãƒ¼ã€éŸ³é‡å‡¦ç†è¿½åŠ 
+src/sound/ay8910.c		éŸ³é‡å‡¦ç†è¿½åŠ 
+src/sound/ay8910.h		éŸ³é‡å‡¦ç†è¿½åŠ 
 src/sound/flt_rc.c		
 src/sound/flt_rc.h		
 src/sound/flt_vol.c		
 src/sound/flt_vol.h		
-src/sound/fm.c			½¤Àµ
-src/sound/fm.h			define½¤Àµ
-src/sound/samples.c		¥Õ¥¡¥¤¥ë½èÍıÊÑ¹¹
+src/sound/fm.c			ä¿®æ­£
+src/sound/fm.h			defineä¿®æ­£
+src/sound/samples.c		ãƒ•ã‚¡ã‚¤ãƒ«å‡¦ç†å¤‰æ›´
 src/sound/samples.h		
-src/sound/wavwrite.c		½¤Àµ
+src/sound/wavwrite.c		ä¿®æ­£
 src/sound/wavwrite.h		
-src/sound/ymdeltat.c		²»ÎÌ½èÍıÄÉ²Ã
+src/sound/ymdeltat.c		éŸ³é‡å‡¦ç†è¿½åŠ 
 src/sound/ymdeltat.h		
 
 
-¡üsrc/unix ¥Ç¥£¥ì¥¯¥È¥ê°Ê²¼¤Î¥½¡¼¥¹¤Ï¡¢
-  XMAME 0.106 ¤Î¥½¡¼¥¹¤ò QUASI88¸ş¤±¤Ë²şÊÑ¤·¤¿¤â¤Î¤Ç¤¹¡£
+â—src/unix ãƒ‡ã‚£ãƒ¬ã‚¯ãƒˆãƒªä»¥ä¸‹ã®ã‚½ãƒ¼ã‚¹ã¯ã€
+  XMAME 0.106 ã®ã‚½ãƒ¼ã‚¹ã‚’ QUASI88å‘ã‘ã«æ”¹å¤‰ã—ãŸã‚‚ã®ã§ã™ã€‚
 
 
-src/unix/sound.c				¥ª¥×¥·¥ç¥ó½¤Àµ
+src/unix/sound.c				ã‚ªãƒ—ã‚·ãƒ§ãƒ³ä¿®æ­£
 src/unix/sysdep/begin_code.h			
 src/unix/sysdep/end_code.h			
 src/unix/sysdep/fifo.h				
@@ -83,66 +83,66 @@ src/unix/sysdep/misc.h
 src/unix/sysdep/plugin_manager.c		
 src/unix/sysdep/plugin_manager.h		
 src/unix/sysdep/plugin_manager_priv.h		
-src/unix/sysdep/rc.c				ÆÈ¼«¥ª¥×¥·¥ç¥ó½èÍıÄÉ²Ã
-src/unix/sysdep/rc.h				ÆÈ¼«¥ª¥×¥·¥ç¥ó½èÍıÄÉ²Ã
+src/unix/sysdep/rc.c				ç‹¬è‡ªã‚ªãƒ—ã‚·ãƒ§ãƒ³å‡¦ç†è¿½åŠ 
+src/unix/sysdep/rc.h				ç‹¬è‡ªã‚ªãƒ—ã‚·ãƒ§ãƒ³å‡¦ç†è¿½åŠ 
 src/unix/sysdep/rc_priv.h			
-src/unix/sysdep/sysdep_dsp.c			VERBOSEÂĞ±ş
+src/unix/sysdep/sysdep_dsp.c			VERBOSEå¯¾å¿œ
 src/unix/sysdep/sysdep_dsp.h			
 src/unix/sysdep/sysdep_dsp_plugins.h		
 src/unix/sysdep/sysdep_dsp_priv.h		
-src/unix/sysdep/sysdep_mixer.c			VERBOSEÂĞ±ş
+src/unix/sysdep/sysdep_mixer.c			VERBOSEå¯¾å¿œ
 src/unix/sysdep/sysdep_mixer.h			
 src/unix/sysdep/sysdep_mixer_plugins.h		
 src/unix/sysdep/sysdep_mixer_priv.h		
-src/unix/sysdep/sysdep_sound_stream.c		ÆÈ¼«¥ª¥×¥·¥ç¥ó½èÍıÄÉ²Ã
+src/unix/sysdep/sysdep_sound_stream.c		ç‹¬è‡ªã‚ªãƒ—ã‚·ãƒ§ãƒ³å‡¦ç†è¿½åŠ 
 src/unix/sysdep/sysdep_sound_stream.h		
 src/unix/sysdep/sysdep_sound_stream_priv.h	
 src/unix/sysdep/dsp-drivers/alsa.c		
 src/unix/sysdep/dsp-drivers/arts.c		
 src/unix/sysdep/dsp-drivers/artssound.c		
 src/unix/sysdep/dsp-drivers/coreaudio.c		
-src/unix/sysdep/dsp-drivers/esound.c		VERBOSEÂĞ±ş
+src/unix/sysdep/dsp-drivers/esound.c		VERBOSEå¯¾å¿œ
 src/unix/sysdep/dsp-drivers/io-audio.c		
 src/unix/sysdep/dsp-drivers/irix.c		
 src/unix/sysdep/dsp-drivers/irix_al.c		
 src/unix/sysdep/dsp-drivers/netbsd.c		
-src/unix/sysdep/dsp-drivers/oss.c		VERBOSEÂĞ±ş
-src/unix/sysdep/dsp-drivers/sdl.c		VERBOSEÂĞ±ş
+src/unix/sysdep/dsp-drivers/oss.c		VERBOSEå¯¾å¿œ
+src/unix/sysdep/dsp-drivers/sdl.c		VERBOSEå¯¾å¿œ
 src/unix/sysdep/dsp-drivers/solaris.c		
 src/unix/sysdep/dsp-drivers/soundkit.m		
-src/unix/sysdep/dsp-drivers/waveout.c		VERBOSEÂĞ±ş
+src/unix/sysdep/dsp-drivers/waveout.c		VERBOSEå¯¾å¿œ
 src/unix/sysdep/mixer-drivers/alsa.c		
 src/unix/sysdep/mixer-drivers/oss.c		
 src/unix/sysdep/mixer-drivers/solaris.c		
 
 
 -------------------------------------------------------------------------------
-¡üMAME ¤ÇÉ¬Í×¤Ê¥ï¡¼¥¯¤ÎÀë¸À¡¦ÄêµÁÍÑ¤Ë¡¢°Ê²¼¤Î¥Õ¥¡¥¤¥ë¤òºîÀ®¤·¤Ş¤·¤¿¡£
+â—MAME ã§å¿…è¦ãªãƒ¯ãƒ¼ã‚¯ã®å®£è¨€ãƒ»å®šç¾©ç”¨ã«ã€ä»¥ä¸‹ã®ãƒ•ã‚¡ã‚¤ãƒ«ã‚’ä½œæˆã—ã¾ã—ãŸã€‚
 
 	snddrv/quasi88/mame-quasi88.c
 	snddrv/quasi88/mame-quasi88.h
 	snddrv/quasi88/machine.c
 
 
-¡üX11ÈÇ QUASI88 ¤È MAME/XMAME ¤È¤Î¥¤¥ó¥¿¡¼¥Õ¥§¥¤¥¹Éô¤È¤·¤Æ¡¢°Ê²¼¤Î¥Õ¥¡¥¤¥ë¤ò
-  ºîÀ®¤·¤Ş¤·¤¿¡£
+â—X11ç‰ˆ QUASI88 ã¨ MAME/XMAME ã¨ã®ã‚¤ãƒ³ã‚¿ãƒ¼ãƒ•ã‚§ã‚¤ã‚¹éƒ¨ã¨ã—ã¦ã€ä»¥ä¸‹ã®ãƒ•ã‚¡ã‚¤ãƒ«ã‚’
+  ä½œæˆã—ã¾ã—ãŸã€‚
 
 	snddrv/quasi88/X11/audio.c
 	snddrv/quasi88/X11/audio.h
 
 
-¡üSDLÈÇ QUASI88 ¤È MAME ¤È¤Î¥¤¥ó¥¿¡¼¥Õ¥§¥¤¥¹Éô¤È¤·¤Æ¡¢°Ê²¼¤Î¥Õ¥¡¥¤¥ë¤ò
-  ºîÀ®¤·¤Ş¤·¤¿¡£
-  (snddrv/quasi88/SDL/sdl.c ¤Ï¡¢ src/unix/sysdep/dsp-drivers/sdl.c ¤ò
-   ¥Ù¡¼¥¹¤ËºîÀ®¤·¤Ş¤·¤¿)
+â—SDLç‰ˆ QUASI88 ã¨ MAME ã¨ã®ã‚¤ãƒ³ã‚¿ãƒ¼ãƒ•ã‚§ã‚¤ã‚¹éƒ¨ã¨ã—ã¦ã€ä»¥ä¸‹ã®ãƒ•ã‚¡ã‚¤ãƒ«ã‚’
+  ä½œæˆã—ã¾ã—ãŸã€‚
+  (snddrv/quasi88/SDL/sdl.c ã¯ã€ src/unix/sysdep/dsp-drivers/sdl.c ã‚’
+   ãƒ™ãƒ¼ã‚¹ã«ä½œæˆã—ã¾ã—ãŸ)
 
 	snddrv/quasi88/SDL/audio.c
 	snddrv/quasi88/SDL/audio.h
 	snddrv/quasi88/SDL/sdl.c
 
 
-¡üMAME ¤Î¥µ¥¦¥ó¥É¥É¥é¥¤¥Ğ¤Ç BEEP ²»¤ò½ĞÎÏ¤µ¤»¤ë¤¿¤á¤Ë¡¢°Ê²¼¤Î¥Õ¥¡¥¤¥ë¤ò
-  ¿·µ¬¤ËÄÉ²Ã¤·¤Ş¤·¤¿¡£
+â—MAME ã®ã‚µã‚¦ãƒ³ãƒ‰ãƒ‰ãƒ©ã‚¤ãƒã§ BEEP éŸ³ã‚’å‡ºåŠ›ã•ã›ã‚‹ãŸã‚ã«ã€ä»¥ä¸‹ã®ãƒ•ã‚¡ã‚¤ãƒ«ã‚’
+  æ–°è¦ã«è¿½åŠ ã—ã¾ã—ãŸã€‚
 
 	snddrv/quasi88/beepintf.c
 	snddrv/quasi88/beepintf.h
@@ -150,8 +150,8 @@ src/unix/sysdep/mixer-drivers/solaris.c
 	snddrv/quasi88/beep.h
 
 
-¡üMAME ¤Î¥µ¥¦¥ó¥É¥É¥é¥¤¥Ğ¤Ç fmgen ¤Î¥µ¥¦¥ó¥É¤ò½ĞÎÏ¤µ¤»¤ë¤¿¤á¤Ë¡¢°Ê²¼¤Î¥Õ¥¡¥¤¥ë
-  ¤ò¿·µ¬¤ËÄÉ²Ã¤·¤Ş¤·¤¿¡£
+â—MAME ã®ã‚µã‚¦ãƒ³ãƒ‰ãƒ‰ãƒ©ã‚¤ãƒã§ fmgen ã®ã‚µã‚¦ãƒ³ãƒ‰ã‚’å‡ºåŠ›ã•ã›ã‚‹ãŸã‚ã«ã€ä»¥ä¸‹ã®ãƒ•ã‚¡ã‚¤ãƒ«
+  ã‚’æ–°è¦ã«è¿½åŠ ã—ã¾ã—ãŸã€‚
 
 	snddrv/quasi88/2203fmgen.cpp
 	snddrv/quasi88/2203fmgen.h

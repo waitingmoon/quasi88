@@ -3,30 +3,30 @@
 
 
 /*----------------------------------------------------------------------*/
-/* �����ƥࡦ�Ķ���¸�����						*/
+/* システム・環境依存の定義						*/
 /*----------------------------------------------------------------------*/
 #include "config.h"
 
 
 /*----------------------------------------------------------------------*/
-/* �ե����륷���ƥ��¸�����						*/
+/* ファイルシステム依存の定義						*/
 /*----------------------------------------------------------------------*/
 #include "filename.h"
 
 
-/* QUASI88 ���������ݻ���ǽ�ʥѥ����ߤΥե�����̾�Х��ȿ� (NUL�ޤ�) */
+/* QUASI88 が内部で保持可能なパス込みのファイル名バイト数 (NUL含む) */
 #define	QUASI88_MAX_FILENAME	(1024)
 
 
 /*----------------------------------------------------------------------*/
-/* �С���������							*/
+/* バージョン情報							*/
 /*----------------------------------------------------------------------*/
 #include "version.h"
 
 
 
 /*----------------------------------------------------------------------*/
-/* �������								*/
+/* 共通定義								*/
 /*----------------------------------------------------------------------*/
 
 typedef	unsigned char	Uchar;
@@ -56,7 +56,7 @@ typedef unsigned int   bit32;
 #define	BETWEEN(l,x,h)	((l) <= (x) && (x) <= (h))
 
 
-#ifdef LSB_FIRST			/* ��ȥ륨��ǥ����� */
+#ifdef LSB_FIRST			/* リトルエンディアン */
 
 typedef union
 {
@@ -64,7 +64,7 @@ typedef union
   word			W;
 } pair;
 
-#else					/* �ӥå�����ǥ����� */
+#else					/* ビッグエンデイアン */
 
 typedef union
 {
@@ -92,17 +92,17 @@ typedef union
 
 
 /*----------------------------------------------------------------------*/
-/* �ѿ� (verbose_*)���ؿ�						*/
+/* 変数 (verbose_*)、関数						*/
 /*----------------------------------------------------------------------*/
-extern	int	verbose_level;		/* ��Ĺ��٥�			*/
-extern	int	verbose_proc;		/* �����οʹԾ�����ɽ��		*/
-extern	int	verbose_z80;		/* Z80�������顼��ɽ��		*/
-extern	int	verbose_io;		/* ̤���� I/O�������������	*/
-extern	int	verbose_pio;		/* PIO ���������Ѥ�ɽ��		*/
-extern	int	verbose_fdc;		/* FD���᡼���۾�����		*/
-extern	int	verbose_wait;		/* ���������Ԥ����ΰ۾�����	*/
-extern	int	verbose_suspend;	/* �����ڥ�ɻ��ΰ۾�����	*/
-extern	int	verbose_snd;		/* ������ɤΥ�å�����		*/
+extern	int	verbose_level;		/* 冗長レベル			*/
+extern	int	verbose_proc;		/* 処理の進行状況の表示		*/
+extern	int	verbose_z80;		/* Z80処理エラーを表示		*/
+extern	int	verbose_io;		/* 未実装 I/Oアクセスを報告	*/
+extern	int	verbose_pio;		/* PIO の不正使用を表示		*/
+extern	int	verbose_fdc;		/* FDイメージ異常を報告		*/
+extern	int	verbose_wait;		/* ウエイト待ち時の異常を報告	*/
+extern	int	verbose_suspend;	/* サスペンド時の異常を報告	*/
+extern	int	verbose_snd;		/* サウンドのメッセージ		*/
 
 
 enum {
@@ -114,7 +114,7 @@ enum {
     EVENT_QUIT		= 0x0010
 };
 extern	int	quasi88_event_flags;
-extern	int	quasi88_debug_pause;	/* 1�ʤ�pause, 0�ʤ�monitor */
+extern	int	quasi88_debug_pause;	/* 1ならpause, 0ならmonitor */
 
 enum EmuMode
 {
@@ -169,7 +169,7 @@ int	quasi88_is_monitor(void);
 
 
 /*----------------------------------------------------------------------*/
-/* ����¾	(���Τϡ� quasi88.c  �ˤ�������Ƥ���)			*/
+/* その他	(実体は、 quasi88.c  にて定義してある)			*/
 /*----------------------------------------------------------------------*/
 void	wait_vsync_switch(void);
 
@@ -205,7 +205,7 @@ char	*filename_alloc_keyboard_cfgname(void);
 
 
 /*----------------------------------------------------------------------*/
-/*	�ǥХå���							*/
+/*	デバッグ用							*/
 /*----------------------------------------------------------------------*/
 #ifdef	DEBUGPRINTF
 void	debugprintf(const char *format, ...);

@@ -9,7 +9,7 @@
 
 
 /*
- *	src/CLASSIC/ �ʲ��ǤΥ������Х��ѿ�
+ *	src/CLASSIC/ 以下でのグローバル変数
  */
 extern	WindowRef	macWin;
 extern	GWorldPtr	macGw;
@@ -19,9 +19,9 @@ extern	QDGlobals	macQd;
 
 
 /*
- *	src/CLASSIC/ �ʲ��ǤΥ������Х��ѿ� (���ץ���������ǽ���ѿ�)
+ *	src/CLASSIC/ 以下でのグローバル変数 (オプション設定可能な変数)
  */
-extern	int		mac_8bpp;	/* ͥ��Ū�ˡ�256���⡼�ɤ�ư����� */
+extern	int		mac_8bpp;	/* 優先的に、256色モードで動作させる */
 
 
 

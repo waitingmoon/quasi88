@@ -1,17 +1,17 @@
 /************************************************************************/
 /*                                                                      */
-/* ¤³¤ì¤Ï¥á¥Ã¥»¡¼¥¸¤ÎÊ¸»úÎó¤òÄêµÁ¤·¤Æ¤¤¤ë¥Õ¥¡¥¤¥ë¤Ç¤¹¡£			*/
-/* ¤³¤³¤Ç¤Ï¡¢ÆüËÜ¸ì¤ÎÊ¸»úÎó ¤ò char ·¿¤ÎÊÑ¿ô¤Ë¥»¥Ã¥È¤·¤Æ¤¤¤ë¤¿¤á¡¢	*/
-/* 8bitÊ¸»ú¥ê¥Æ¥é¥ë¤Î°·¤¨¤ë¥³¥ó¥Ñ¥¤¥é¤Ç¤Ê¤¤¤È¡¢Àµ¾ï¤ËÆ°ºî¤·¤Ş¤»¤ó¡£	*/
+/* ã“ã‚Œã¯ãƒ¡ãƒƒã‚»ãƒ¼ã‚¸ã®æ–‡å­—åˆ—ã‚’å®šç¾©ã—ã¦ã„ã‚‹ãƒ•ã‚¡ã‚¤ãƒ«ã§ã™ã€‚			*/
+/* ã“ã“ã§ã¯ã€æ—¥æœ¬èªã®æ–‡å­—åˆ— ã‚’ char å‹ã®å¤‰æ•°ã«ã‚»ãƒƒãƒˆã—ã¦ã„ã‚‹ãŸã‚ã€	*/
+/* 8bitæ–‡å­—ãƒªãƒ†ãƒ©ãƒ«ã®æ‰±ãˆã‚‹ã‚³ãƒ³ãƒ‘ã‚¤ãƒ©ã§ãªã„ã¨ã€æ­£å¸¸ã«å‹•ä½œã—ã¾ã›ã‚“ã€‚	*/
 /*                                                                      */
 /************************************************************************/
 
 /*----------------------------------------------------------------------*/
-/* ¤³¤Î¥Õ¥¡¥¤¥ë¤Ï¡¢menu.c ¥Õ¥¡¥¤¥ëÆâ¤Ë¤Æ include ¤µ¤ì¤Æ¤¤¤Ş¤¹¡£		*/
+/* ã“ã®ãƒ•ã‚¡ã‚¤ãƒ«ã¯ã€menu.c ãƒ•ã‚¡ã‚¤ãƒ«å†…ã«ã¦ include ã•ã‚Œã¦ã„ã¾ã™ã€‚		*/
 /*----------------------------------------------------------------------*/
 /*									*/
-/* QUASI88 ¤Î ¥¿¥¤¥È¥ëÉ½¼¨¤ª¤è¤Ó¥á¥Ë¥å¡¼²èÌÌÉ½¼¨¤Ë¤ÆÉ½¼¨¤µ¤ì¤ëÊ¸»úÎó¤Ï	*/
-/* Á´¤Æ¤³¤Î¥Õ¥¡¥¤¥ë¤ÇÄêµÁ¤µ¤ì¤Æ¤¤¤Ş¤¹¡£					*/
+/* QUASI88 ã® ã‚¿ã‚¤ãƒˆãƒ«è¡¨ç¤ºãŠã‚ˆã³ãƒ¡ãƒ‹ãƒ¥ãƒ¼ç”»é¢è¡¨ç¤ºã«ã¦è¡¨ç¤ºã•ã‚Œã‚‹æ–‡å­—åˆ—ã¯	*/
+/* å…¨ã¦ã“ã®ãƒ•ã‚¡ã‚¤ãƒ«ã§å®šç¾©ã•ã‚Œã¦ã„ã¾ã™ã€‚					*/
 /*									*/
 /*----------------------------------------------------------------------*/
 
@@ -21,36 +21,36 @@
 #endif
 */
 
-/* 0xb4, 0xc1, 0xbb, 0xfa ¤Ê¤é¡¢ EUC-Japan */
-/* 0x8a, 0xbf, 0x8e, 0x9a ¤Ê¤é¡¢ Shift-JIS */
-/* ¤½¤ì°Ê³°¤Ê¤é¡¢                ÉÔÌÀ¡Ä¡Ä  */
+/* 0xb4, 0xc1, 0xbb, 0xfa ãªã‚‰ã€ EUC-Japan */
+/* 0x8a, 0xbf, 0x8e, 0x9a ãªã‚‰ã€ Shift-JIS */
+/* ãã‚Œä»¥å¤–ãªã‚‰ã€                ä¸æ˜â€¦â€¦  */
 
-/* ¤³¤Î¥Õ¥¡¥¤¥ë¤¬ EUC-japan ¤« Shift-JIS ¤«¤ò¥Á¥§¥Ã¥¯¤¹¤ë¡¦¡¦¡¦ */
+/* ã“ã®ãƒ•ã‚¡ã‚¤ãƒ«ãŒ EUC-japan ã‹ Shift-JIS ã‹ã‚’ãƒã‚§ãƒƒã‚¯ã™ã‚‹ãƒ»ãƒ»ãƒ» */
 
-const char *menu_kanji_code = "´Á»ú";
+const char *menu_kanji_code = "æ¼¢å­—";
 const char menu_kanji_code_euc[]  = { 0xb4, 0xc1, 0xbb, 0xfa, 0x00 };
 const char menu_kanji_code_sjis[] = { 0x8a, 0xbf, 0x8e, 0x9a, 0x00 };
 const char menu_kanji_code_utf8[] = { 0xe6, 0xbc, 0xa2, 0xe5, 0xad, 0x97, 0x00 };
 
 
 typedef struct {
-    char	*str[2];	/* [0]¡ÄANKÊ¸»úÎó  [1]¡ÄÆüËÜ¸ìÊ¸»úÎó	*/
-    int		val;		/* intÃÍ ÈÆÍÑ				*/
+    char	*str[2];	/* [0]â€¦ANKæ–‡å­—åˆ—  [1]â€¦æ—¥æœ¬èªæ–‡å­—åˆ—	*/
+    int		val;		/* intå€¤ æ±ç”¨				*/
 } t_menudata;
 
 typedef struct {
-    char	*str[2];	/* [0]¡ÄANKÊ¸»úÎó  [1]¡ÄÆüËÜ¸ìÊ¸»úÎó	*/
+    char	*str[2];	/* [0]â€¦ANKæ–‡å­—åˆ—  [1]â€¦æ—¥æœ¬èªæ–‡å­—åˆ—	*/
 } t_menulabel;
 
 
 
 
 /***************************************************************
- * QUASI88 ¤Î ¥á¥Ë¥å¡¼¤Ë¤Æ»ÈÍÑ¤¹¤ëÊ¸»úÎó
+ * QUASI88 ã® ãƒ¡ãƒ‹ãƒ¥ãƒ¼ã«ã¦ä½¿ç”¨ã™ã‚‹æ–‡å­—åˆ—
  ****************************************************************/
 
 /*--------------------------------------------------------------
- *	¥á¥Ë¥å¡¼¤Î '*' ¥¿¥Ö¤Ë¤ÆÉ½¼¨¤µ¤ì¤ë¾ğÊó
+ *	ãƒ¡ãƒ‹ãƒ¥ãƒ¼ã® '*' ã‚¿ãƒ–ã«ã¦è¡¨ç¤ºã•ã‚Œã‚‹æƒ…å ±
  *--------------------------------------------------------------*/
 
 static const char *data_about_en[] =
@@ -74,32 +74,32 @@ static const char *data_about_en[] =
     "",
 #endif
 
-    NULL,	/* ½ªÃ¼ */
+    NULL,	/* çµ‚ç«¯ */
 };
 
 
 static const char *data_about_jp[] =
 {
 #ifdef	USE_SOUND
-    "MAME ¥µ¥¦¥ó¥É¥É¥é¥¤¥Ğ ¤¬ÁÈ¤ß¹ş¤Ş¤ì¤Æ¤¤¤Ş¤¹",
+    "MAME ã‚µã‚¦ãƒ³ãƒ‰ãƒ‰ãƒ©ã‚¤ãƒ ãŒçµ„ã¿è¾¼ã¾ã‚Œã¦ã„ã¾ã™",
     "   " Q_MAME_COPYRIGHT,
     "@MAMEVER",
 #ifdef	USE_FMGEN
     "",
-    "FM Sound Generator ¤¬ÁÈ¤ß¹ş¤Ş¤ì¤Æ¤¤¤Ş¤¹",
+    "FM Sound Generator ãŒçµ„ã¿è¾¼ã¾ã‚Œã¦ã„ã¾ã™",
     "   " Q_FMGEN_COPYRIGHT,
     "@FMGENVER",
 #endif
 #else
-    "¥µ¥¦¥ó¥É½ĞÎÏ ¤ÏÁÈ¤ß¹ş¤Ş¤ì¤Æ¤¤¤Ş¤»¤ó",
+    "ã‚µã‚¦ãƒ³ãƒ‰å‡ºåŠ› ã¯çµ„ã¿è¾¼ã¾ã‚Œã¦ã„ã¾ã›ã‚“",
 #endif
     "",
 #ifdef	USE_MONITOR
-    "¥â¥Ë¥¿¡¼¥â¡¼¥É¤¬»ÈÍÑ¤Ç¤­¤Ş¤¹",
+    "ãƒ¢ãƒ‹ã‚¿ãƒ¼ãƒ¢ãƒ¼ãƒ‰ãŒä½¿ç”¨ã§ãã¾ã™",
     "",
 #endif
 
-    NULL,	/* ½ªÃ¼ */
+    NULL,	/* çµ‚ç«¯ */
 };
 
 
@@ -107,7 +107,7 @@ static const char *data_about_jp[] =
 
 
 /*--------------------------------------------------------------
- *	¥á¥¤¥ó¥á¥Ë¥å¡¼²èÌÌ
+ *	ãƒ¡ã‚¤ãƒ³ãƒ¡ãƒ‹ãƒ¥ãƒ¼ç”»é¢
  *--------------------------------------------------------------*/
 enum {
   DATA_TOP_RESET,
@@ -123,16 +123,16 @@ enum {
 };
 static const t_menudata data_top[] =
 {
-  { { " RESET ",        " ¥ê¥»¥Ã¥È ",       }, DATA_TOP_RESET  },
+  { { " RESET ",        " ãƒªã‚»ãƒƒãƒˆ ",       }, DATA_TOP_RESET  },
   { { " CPU ",          " CPU  ",           }, DATA_TOP_CPU    },
-  { { " SCREEN ",       " ²èÌÌ ",           }, DATA_TOP_GRAPH  },
-  { { " VOLUME ",       " ²»ÎÌ ",           }, DATA_TOP_VOLUME },
-  { { " DISK ",         " ¥Ç¥£¥¹¥¯ ",       }, DATA_TOP_DISK   },
-  { { " KEY ",          " ¥­¡¼ ",           }, DATA_TOP_KEY    },
-  { { " MOUSE ",        " ¥Ş¥¦¥¹ ",         }, DATA_TOP_MOUSE  },
-  { { " TAPE ",         " ¥Æ¡¼¥× ",         }, DATA_TOP_TAPE   },
-  { { " MISC ",         "  Â¾  ",           }, DATA_TOP_MISC   },
-  { { " ABOUT ",        "¢¨",               }, DATA_TOP_ABOUT  },
+  { { " SCREEN ",       " ç”»é¢ ",           }, DATA_TOP_GRAPH  },
+  { { " VOLUME ",       " éŸ³é‡ ",           }, DATA_TOP_VOLUME },
+  { { " DISK ",         " ãƒ‡ã‚£ã‚¹ã‚¯ ",       }, DATA_TOP_DISK   },
+  { { " KEY ",          " ã‚­ãƒ¼ ",           }, DATA_TOP_KEY    },
+  { { " MOUSE ",        " ãƒã‚¦ã‚¹ ",         }, DATA_TOP_MOUSE  },
+  { { " TAPE ",         " ãƒ†ãƒ¼ãƒ— ",         }, DATA_TOP_TAPE   },
+  { { " MISC ",         "  ä»–  ",           }, DATA_TOP_MISC   },
+  { { " ABOUT ",        "â€»",               }, DATA_TOP_ABOUT  },
 };
 
 
@@ -144,7 +144,7 @@ enum {
 static const t_menulabel data_top_status[] =
 {
   { { "              ",  "              " } },
-  { { "Status",          "¥¹¥Æ¡¼¥¿¥¹"     } },
+  { { "Status",          "ã‚¹ãƒ†ãƒ¼ã‚¿ã‚¹"     } },
   { { "        (F11) ",  "         (F11)" } },
 };
 
@@ -156,7 +156,7 @@ enum {
 static const t_menulabel data_top_monitor[] =
 {
   { { "            ",  "            ", } },
-  { { " MONITOR  ",    " ¥â¥Ë¥¿¡¼ ",   } },
+  { { " MONITOR  ",    " ãƒ¢ãƒ‹ã‚¿ãƒ¼ ",   } },
 };
 
 
@@ -167,9 +167,9 @@ enum {
 };
 static const t_menudata data_top_button[] =
 {
-  { { " Save Cfg.",    " ÀßÄêÊİÂ¸ ",      }, DATA_TOP_SAVECFG },
-  { { " QUIT(F12) ",   " ½ªÎ»(F12) ",     }, DATA_TOP_QUIT    },
-  { { " EXIT(ESC) ",   " Ìá¤ë(ESC) ",     }, DATA_TOP_EXIT    },
+  { { " Save Cfg.",    " è¨­å®šä¿å­˜ ",      }, DATA_TOP_SAVECFG },
+  { { " QUIT(F12) ",   " çµ‚äº†(F12) ",     }, DATA_TOP_QUIT    },
+  { { " EXIT(ESC) ",   " æˆ»ã‚‹(ESC) ",     }, DATA_TOP_EXIT    },
 };
 
 
@@ -182,11 +182,11 @@ enum {
 };
 static const t_menulabel data_top_savecfg[] =
 {
-  { { "Save settings in following file. ", "¸½ºß¤ÎÀßÄê¤ò¡¢°Ê²¼¤Î´Ä¶­ÀßÄê¥Õ¥¡¥¤¥ë¤ËÊİÂ¸¤·¤Ş¤¹" } },
-  { { "(Some settings are not saved)    ", "¡Ê°ìÉô¤ÎÀßÄê¤Ï¡¢ÊİÂ¸¤µ¤ì¤Ş¤»¤ó¡Ë                " } },
-  { { "Save when QUASI88 exit. ",          "½ªÎ»»ş¤Ë¡¢¼«Æ°¤ÇÊİÂ¸¤¹¤ë"                         } },
-  { { "   OK   ",                          " ÊİÂ¸ "                                           } },
-  { { " CANCEL ",                          " ¼è¾Ã "                                           } },
+  { { "Save settings in following file. ", "ç¾åœ¨ã®è¨­å®šã‚’ã€ä»¥ä¸‹ã®ç’°å¢ƒè¨­å®šãƒ•ã‚¡ã‚¤ãƒ«ã«ä¿å­˜ã—ã¾ã™" } },
+  { { "(Some settings are not saved)    ", "ï¼ˆä¸€éƒ¨ã®è¨­å®šã¯ã€ä¿å­˜ã•ã‚Œã¾ã›ã‚“ï¼‰                " } },
+  { { "Save when QUASI88 exit. ",          "çµ‚äº†æ™‚ã«ã€è‡ªå‹•ã§ä¿å­˜ã™ã‚‹"                         } },
+  { { "   OK   ",                          " ä¿å­˜ "                                           } },
+  { { " CANCEL ",                          " å–æ¶ˆ "                                           } },
 };
 
 
@@ -197,9 +197,9 @@ enum {
 };
 static const t_menulabel data_top_quit[] =
 {
-  { { " *** QUIT NOW, REALLY ? *** ", "ËÜÅö¤Ë½ªÎ»¤·¤Æ¡¢¤è¤í¤·¤¤¤«¡©" } },
-  { { "   OK   (F12) ",               " ½ªÎ» (F12) "                 } },
-  { { " CANCEL (ESC) ",               " ¼è¾Ã (ESC) "                 } },
+  { { " *** QUIT NOW, REALLY ? *** ", "æœ¬å½“ã«çµ‚äº†ã—ã¦ã€ã‚ˆã‚ã—ã„ã‹ï¼Ÿ" } },
+  { { "   OK   (F12) ",               " çµ‚äº† (F12) "                 } },
+  { { " CANCEL (ESC) ",               " å–æ¶ˆ (ESC) "                 } },
 };
 
 
@@ -208,7 +208,7 @@ static const t_menudata data_quickres_basic[] =
   { { "V2 ", "V2 ", }, BASIC_V2,  },
   { { "V1H", "V1H", }, BASIC_V1H, },
   { { "V1S", "V1S", }, BASIC_V1S, },
-  { { "N",   "N",   }, BASIC_N,   },	/* ÈóÉ½¼¨¡Ä */
+  { { "N",   "N",   }, BASIC_N,   },	/* éè¡¨ç¤ºâ€¦ */
 };
 static const t_menudata data_quickres_clock[] =
 {
@@ -226,7 +226,7 @@ static const t_menulabel data_quickres_reset[] =
 
 
 /*--------------------------------------------------------------
- *	¡Ö²èÌÌ¡× ¥¿¥Ö
+ *	ã€Œç”»é¢ã€ ã‚¿ãƒ–
  *--------------------------------------------------------------*/
 enum {
   DATA_GRAPH_FRATE,
@@ -236,10 +236,10 @@ enum {
 };
 static const t_menulabel data_graph[] =
 {
-  { { " <<< FRAME RATE >>> ", " ¥Õ¥ì¡¼¥à¥ì¡¼¥È " } },
-  { { " <<< RESIZE >>> ",     " ²èÌÌ¥µ¥¤¥º "     } },
+  { { " <<< FRAME RATE >>> ", " ãƒ•ãƒ¬ãƒ¼ãƒ ãƒ¬ãƒ¼ãƒˆ " } },
+  { { " <<< RESIZE >>> ",     " ç”»é¢ã‚µã‚¤ã‚º "     } },
   { { " <<< PCG-8100 >>>",    " PCG-8100 "       } },
-  { { " <<< FONT >>> ",       " ¥Õ¥©¥ó¥È "       } },
+  { { " <<< FONT >>> ",       " ãƒ•ã‚©ãƒ³ãƒˆ "       } },
 };
 
 static const t_menudata data_graph_frate[] =
@@ -260,21 +260,21 @@ static const t_menudata data_graph_frate[] =
 
 static const t_menulabel data_graph_autoskip[] =
 {
-  { { "Auto frame skip (-autoskip) ", "¥ª¡¼¥È¥¹¥­¥Ã¥×¤òÍ­¸ú¤Ë¤¹¤ë (-autoskip) ", } },
+  { { "Auto frame skip (-autoskip) ", "ã‚ªãƒ¼ãƒˆã‚¹ã‚­ãƒƒãƒ—ã‚’æœ‰åŠ¹ã«ã™ã‚‹ (-autoskip) ", } },
 };
 
 static const t_menudata data_graph_resize[] =
 {
-  { { " HALF SIZE (-half) ",     " È¾Ê¬¥µ¥¤¥º (-half) ", }, SCREEN_SIZE_HALF,   },
-  { { " FULL SIZE (-full) ",     " É¸½à¥µ¥¤¥º (-full) ", }, SCREEN_SIZE_FULL,   },
+  { { " HALF SIZE (-half) ",     " åŠåˆ†ã‚µã‚¤ã‚º (-half) ", }, SCREEN_SIZE_HALF,   },
+  { { " FULL SIZE (-full) ",     " æ¨™æº–ã‚µã‚¤ã‚º (-full) ", }, SCREEN_SIZE_FULL,   },
 #ifdef	SUPPORT_DOUBLE
-  { { " DOUBLE SIZE (-double) ", " ÇÜ¥µ¥¤¥º (-double) ", }, SCREEN_SIZE_DOUBLE, },
+  { { " DOUBLE SIZE (-double) ", " å€ã‚µã‚¤ã‚º (-double) ", }, SCREEN_SIZE_DOUBLE, },
 #endif
 };
 
 static const t_menulabel data_graph_fullscreen[] =
 {
-  { { "Full Screen (-fullscreen)", "¥Õ¥ë¥¹¥¯¥ê¡¼¥ó (-fullscreen) ", } },
+  { { "Full Screen (-fullscreen)", "ãƒ•ãƒ«ã‚¹ã‚¯ãƒªãƒ¼ãƒ³ (-fullscreen) ", } },
 };
 
 enum {
@@ -284,53 +284,53 @@ enum {
 };
 static const t_menudata data_graph_misc[] =
 {
-  { { "Monitor Freq. 15k       (-15k)",         "¥â¥Ë¥¿¼şÇÈ¿ô¤ò15k¤ËÀßÄê      (-15k)"        }, DATA_GRAPH_MISC_15K        },
-  { { "Digital Monitor         (-digital)",     "¥Ç¥¸¥¿¥ë¥â¥Ë¥¿¤ËÀßÄê         (-digital)"    }, DATA_GRAPH_MISC_DIGITAL    },
-  { { "No reduce interpolation (-nointerp)",    "È¾Ê¬¥µ¥¤¥º»ş¤Ë½Ì¾®Êä´Ö¤·¤Ê¤¤ (-nointerp)"   }, DATA_GRAPH_MISC_NOINTERP   },
+  { { "Monitor Freq. 15k       (-15k)",         "ãƒ¢ãƒ‹ã‚¿å‘¨æ³¢æ•°ã‚’15kã«è¨­å®š      (-15k)"        }, DATA_GRAPH_MISC_15K        },
+  { { "Digital Monitor         (-digital)",     "ãƒ‡ã‚¸ã‚¿ãƒ«ãƒ¢ãƒ‹ã‚¿ã«è¨­å®š         (-digital)"    }, DATA_GRAPH_MISC_DIGITAL    },
+  { { "No reduce interpolation (-nointerp)",    "åŠåˆ†ã‚µã‚¤ã‚ºæ™‚ã«ç¸®å°è£œé–“ã—ãªã„ (-nointerp)"   }, DATA_GRAPH_MISC_NOINTERP   },
 };
 
 static const t_menudata data_graph_misc2[] =
 {
-  { { "Fill-Line Display       (-noskipline)",  "¥é¥¤¥ó¤Î·ä´Ö¤òËä¤á¤ë         (-noskipline)" }, SCREEN_INTERLACE_NO   },
-  { { "Skip-Line Display       (-skipline)",    "1¥é¥¤¥ó¤ª¤­¤ËÉ½¼¨¤¹¤ë        (-skipline)"   }, SCREEN_INTERLACE_SKIP },
-  { { "Interlace Display       (-interlace)",   "¥¤¥ó¥¿¡¼¥ì¡¼¥¹É½¼¨¤¹¤ë       (-interlace)"  }, SCREEN_INTERLACE_YES  },
+  { { "Fill-Line Display       (-noskipline)",  "ãƒ©ã‚¤ãƒ³ã®éš™é–“ã‚’åŸ‹ã‚ã‚‹         (-noskipline)" }, SCREEN_INTERLACE_NO   },
+  { { "Skip-Line Display       (-skipline)",    "1ãƒ©ã‚¤ãƒ³ãŠãã«è¡¨ç¤ºã™ã‚‹        (-skipline)"   }, SCREEN_INTERLACE_SKIP },
+  { { "Interlace Display       (-interlace)",   "ã‚¤ãƒ³ã‚¿ãƒ¼ãƒ¬ãƒ¼ã‚¹è¡¨ç¤ºã™ã‚‹       (-interlace)"  }, SCREEN_INTERLACE_YES  },
 };
 
 static const t_menudata data_graph_pcg[] =
 {
-  { { " Noexist ", " ¤Ê¤· "  }, FALSE },
-  { { " Exist ",   " ¤¢¤ê  " }, TRUE  },
+  { { " Noexist ", " ãªã— "  }, FALSE },
+  { { " Exist ",   " ã‚ã‚Š  " }, TRUE  },
 };
 
 #if 0
 static const t_menudata data_graph_font[] =
 {
-  { { " Standard Font ",  " É¸½à¥Õ¥©¥ó¥È " }, 0 },
-  { { " 2nd Font ",       " Âè£²¥Õ¥©¥ó¥È " }, 1 },
-  { { " 3rd Font ",       " Âè£³¥Õ¥©¥ó¥È " }, 2 },
+  { { " Standard Font ",  " æ¨™æº–ãƒ•ã‚©ãƒ³ãƒˆ " }, 0 },
+  { { " 2nd Font ",       " ç¬¬ï¼’ãƒ•ã‚©ãƒ³ãƒˆ " }, 1 },
+  { { " 3rd Font ",       " ç¬¬ï¼“ãƒ•ã‚©ãƒ³ãƒˆ " }, 2 },
 };
 #else
 static const t_menudata data_graph_font1[2] =
 {
-  { { " Built-in Font ",  " Æâ Â¢ ¥Õ¥©¥ó¥È " }, 0 },
-  { { " Standard Font ",  " É¸ ½à ¥Õ¥©¥ó¥È " }, 0 },
+  { { " Built-in Font ",  " å†… è”µ ãƒ•ã‚©ãƒ³ãƒˆ " }, 0 },
+  { { " Standard Font ",  " æ¨™ æº– ãƒ•ã‚©ãƒ³ãƒˆ " }, 0 },
 };
 static const t_menudata data_graph_font2[2] =
 {
-  { { " Hiragana Font ",  " Ê¿²¾Ì¾¥Õ¥©¥ó¥È " }, 1 },
-  { { " 2nd Font ",       " Âè £² ¥Õ¥©¥ó¥È " }, 1 },
+  { { " Hiragana Font ",  " å¹³ä»®åãƒ•ã‚©ãƒ³ãƒˆ " }, 1 },
+  { { " 2nd Font ",       " ç¬¬ ï¼’ ãƒ•ã‚©ãƒ³ãƒˆ " }, 1 },
 };
 static const t_menudata data_graph_font3[2] =
 {
-  { { " Transparent Font ", " Æ© ÌÀ ¥Õ¥©¥ó¥È " }, 2 },
-  { { " 3rd Font ",         " Âè £³ ¥Õ¥©¥ó¥È " }, 2 },
+  { { " Transparent Font ", " é€ æ˜ ãƒ•ã‚©ãƒ³ãƒˆ " }, 2 },
+  { { " 3rd Font ",         " ç¬¬ ï¼“ ãƒ•ã‚©ãƒ³ãƒˆ " }, 2 },
 };
 #endif
 
 
 
 /*--------------------------------------------------------------
- *	¡ÖCPU¡× ¥¿¥Ö
+ *	ã€ŒCPUã€ ã‚¿ãƒ–
  *--------------------------------------------------------------*/
 enum {
   DATA_CPU_CPU,
@@ -341,20 +341,20 @@ enum {
 };
 static const t_menulabel data_cpu[] =
 {
-  { { " <<< SUB-CPU MODE >>> ", " SUB-CPU¶îÆ° <ÊÑ¹¹»ş¤Ï¥ê¥»¥Ã¥È¤ò¿ä¾©> ", } },
-  { { " << CLOCK >> ",          " CPU ¥¯¥í¥Ã¥¯ (-clock) ",                } },
-  { { " << WAIT >> ",           " Â®ÅÙ (-speed, -nowait) ",               } },
-  { { " << BOOST >> ",          " ¥Ö¡¼¥¹¥È (-boost) ",                    } },
-  { { " HELP ",                 " ÀâÌÀ ",                                 } },
+  { { " <<< SUB-CPU MODE >>> ", " SUB-CPUé§†å‹• <å¤‰æ›´æ™‚ã¯ãƒªã‚»ãƒƒãƒˆã‚’æ¨å¥¨> ", } },
+  { { " << CLOCK >> ",          " CPU ã‚¯ãƒ­ãƒƒã‚¯ (-clock) ",                } },
+  { { " << WAIT >> ",           " é€Ÿåº¦ (-speed, -nowait) ",               } },
+  { { " << BOOST >> ",          " ãƒ–ãƒ¼ã‚¹ãƒˆ (-boost) ",                    } },
+  { { " HELP ",                 " èª¬æ˜ ",                                 } },
 };
 
 
 
 static const t_menudata data_cpu_cpu[] =
 {
-  { { "   0  Run SUB-CPU only during the disk access. (-cpu 0)  ", "   0  ¥Ç¥£¥¹¥¯½èÍıÃæ¡¢¥µ¥ÖCPU¤Î¤ß¶îÆ°¤µ¤»¤ë (-cpu 0)  ", }, 0 },
-  { { "   1  Run both CPUs during the disk access.    (-cpu 1)  ", "   1  ¥Ç¥£¥¹¥¯½èÍıÃæ¡¢Î¾CPU¤ò¶îÆ°¤µ¤»¤ë     (-cpu 1)  ", }, 1 },
-  { { "   2  Always run both CPUs.                    (-cpu 2)  ", "   2  ¾ï»ş¡¢Î¾CPU¤ò¶îÆ°¤µ¤»¤ë               (-cpu 2)  ", }, 2 },
+  { { "   0  Run SUB-CPU only during the disk access. (-cpu 0)  ", "   0  ãƒ‡ã‚£ã‚¹ã‚¯å‡¦ç†ä¸­ã€ã‚µãƒ–CPUã®ã¿é§†å‹•ã•ã›ã‚‹ (-cpu 0)  ", }, 0 },
+  { { "   1  Run both CPUs during the disk access.    (-cpu 1)  ", "   1  ãƒ‡ã‚£ã‚¹ã‚¯å‡¦ç†ä¸­ã€ä¸¡CPUã‚’é§†å‹•ã•ã›ã‚‹     (-cpu 1)  ", }, 1 },
+  { { "   2  Always run both CPUs.                    (-cpu 2)  ", "   2  å¸¸æ™‚ã€ä¸¡CPUã‚’é§†å‹•ã•ã›ã‚‹               (-cpu 2)  ", }, 2 },
 };
 
 
@@ -365,9 +365,9 @@ enum {
 };
 static const t_menulabel data_cpu_clock[] =
 {
-  { { " CLOCK     ",          " ¼şÇÈ¿ô "              }, },
+  { { " CLOCK     ",          " å‘¨æ³¢æ•° "              }, },
   { { "[MHz] ",               "[MHz] "                }, },
-  { { "(Range = 0.1-999.9) ", "¡ÊÈÏ°Ï¡á0.1¡Á999.9¡Ë " }, },
+  { { "(Range = 0.1-999.9) ", "ï¼ˆç¯„å›²ï¼0.1ã€œ999.9ï¼‰ " }, },
 };
 static const t_menudata data_cpu_clock_combo[] =
 {
@@ -389,10 +389,10 @@ enum {
 };
 static const t_menulabel data_cpu_wait[] =
 {
-  { { "No Wait             ", "¥¦¥¨¥¤¥È¤Ê¤·¤Ë¤¹¤ë  "  } },
-  { { " Rate of Speed ",      " Â®ÅÙÈæ     "          } },
-  { { "[%]   ",               "[¡ó]  "                } },
-  { { "(Range =   5-5000)  ", "¡ÊÈÏ°Ï¡á  5¡Á5000¡Ë  " } },
+  { { "No Wait             ", "ã‚¦ã‚¨ã‚¤ãƒˆãªã—ã«ã™ã‚‹  "  } },
+  { { " Rate of Speed ",      " é€Ÿåº¦æ¯”     "          } },
+  { { "[%]   ",               "[ï¼…]  "                } },
+  { { "(Range =   5-5000)  ", "ï¼ˆç¯„å›²ï¼  5ã€œ5000ï¼‰  " } },
 };
 static const t_menudata data_cpu_wait_combo[] =
 {
@@ -413,9 +413,9 @@ enum {
 };
 static const t_menulabel data_cpu_boost[] =
 {
-  { { " Power         ",      " ÇÜÎ¨       "          } },
-  { { "      ",               "ÇÜ    "                } },
-  { { "(Range =   1-100)   ", "¡ÊÈÏ°Ï¡á  1¡Á100¡Ë   " } },
+  { { " Power         ",      " å€ç‡       "          } },
+  { { "      ",               "å€    "                } },
+  { { "(Range =   1-100)   ", "ï¼ˆç¯„å›²ï¼  1ã€œ100ï¼‰   " } },
 };
 static const t_menudata data_cpu_boost_combo[] =
 {
@@ -441,13 +441,13 @@ enum {
 };
 static const t_menudata data_cpu_misc[] =
 {
-  { { "FDC Wait ON",        "FDC¥¦¥¨¥¤¥È¤¢¤ê ",       }, DATA_CPU_MISC_FDCWAIT },
+  { { "FDC Wait ON",        "FDCã‚¦ã‚¨ã‚¤ãƒˆã‚ã‚Š ",       }, DATA_CPU_MISC_FDCWAIT },
   { { "(-fdc_wait)",        "(-fdc_wait)",            }, -1                    },
   { { "",                   "",                       }, -1                    },
-  { { "HighSpeed BASIC ON", "¹âÂ®BASIC½èÍı Í­¸ú ",    }, DATA_CPU_MISC_HSBASIC },
+  { { "HighSpeed BASIC ON", "é«˜é€ŸBASICå‡¦ç† æœ‰åŠ¹ ",    }, DATA_CPU_MISC_HSBASIC },
   { { "(-hsbasic)",         "(-hsbasic)",             }, -1                    },
   { { "",                   "",                       }, -1                    },
-  { { "Memory Wait(dummy)", "µ¶¥á¥â¥ê¥¦¥§¥¤¥È",       }, DATA_CPU_MISC_MEMWAIT },
+  { { "Memory Wait(dummy)", "å½ãƒ¡ãƒ¢ãƒªã‚¦ã‚§ã‚¤ãƒˆ",       }, DATA_CPU_MISC_MEMWAIT },
   { { "(-mem_wait)",        "(-mem_wait)",            }, -1                    },
 
 #if 0
@@ -459,7 +459,7 @@ static const t_menudata data_cpu_misc[] =
 
 
 /*--------------------------------------------------------------
- *	¡Ö¥ê¥»¥Ã¥È¡× ¥¿¥Ö
+ *	ã€Œãƒªã‚»ãƒƒãƒˆã€ ã‚¿ãƒ–
  *--------------------------------------------------------------*/
 enum {
   DATA_RESET_CURRENT,
@@ -480,23 +480,23 @@ enum {
 };
 static const t_menulabel data_reset[] =
 {
-  { { " Current Mode : ",         " ¸½ºß¤Î¥â¡¼¥É ¡§"               } },
-  { { " BASIC MODE ",             " BASIC ¥â¡¼¥É "                 } },
-  { { " CPU CLOCK ",              " CPU ¥¯¥í¥Ã¥¯ "                 } },
-  { { " ROM VERSION ",            " ROM ¥Ğ¡¼¥¸¥ç¥ó "               } },
-  { { " DIP-Switch ",             " ¥Ç¥£¥Ã¥×¥¹¥¤¥Ã¥Á "             } },
-  { { " Setting ",                " ÀßÄê "                         } },
-  { { " Sound Board",             " ¥µ¥¦¥ó¥É¥Ü¡¼¥É "               } },
-  { { " ExtRAM",                  " ³ÈÄ¥RAM "                      } },
-  { { " Dict.ROM",                " ¼­½ñROM "                      } },
+  { { " Current Mode : ",         " ç¾åœ¨ã®ãƒ¢ãƒ¼ãƒ‰ ï¼š"               } },
+  { { " BASIC MODE ",             " BASIC ãƒ¢ãƒ¼ãƒ‰ "                 } },
+  { { " CPU CLOCK ",              " CPU ã‚¯ãƒ­ãƒƒã‚¯ "                 } },
+  { { " ROM VERSION ",            " ROM ãƒãƒ¼ã‚¸ãƒ§ãƒ³ "               } },
+  { { " DIP-Switch ",             " ãƒ‡ã‚£ãƒƒãƒ—ã‚¹ã‚¤ãƒƒãƒ "             } },
+  { { " Setting ",                " è¨­å®š "                         } },
+  { { " Sound Board",             " ã‚µã‚¦ãƒ³ãƒ‰ãƒœãƒ¼ãƒ‰ "               } },
+  { { " ExtRAM",                  " æ‹¡å¼µRAM "                      } },
+  { { " Dict.ROM",                " è¾æ›¸ROM "                      } },
   { { "(*) When checked, Real CPU clock depend on the 'CPU'-TAB setting. ",
-      "(¡ö) ¥Á¥§¥Ã¥¯¤¬Æş¤Ã¤Æ¤¤¤ë¾ì¹ç¡¢¼Âºİ¤Î¥¯¥í¥Ã¥¯¤Ï¡ØCPU¡Ù¥¿¥ÖÀßÄê¤Î¤Ş¤Ş¤È¤Ê¤ê¤Ş¤¹" } },
-  { { " <<< DIP-SW Setting >>> ", " <<< ¥Ç¥£¥Ã¥×¥¹¥¤¥Ã¥ÁÀßÄê >>> " } },
-  { { " EXIT ",                   " Ìá¤ë "                         } },
-  { { " BOOT ",                   " µ¯Æ° "                         } },
-  { { " RESET now ! ",            " ¤³¤ÎÀßÄê¤Ç¥ê¥»¥Ã¥È¤¹¤ë "       } },
+      "(ï¼Š) ãƒã‚§ãƒƒã‚¯ãŒå…¥ã£ã¦ã„ã‚‹å ´åˆã€å®Ÿéš›ã®ã‚¯ãƒ­ãƒƒã‚¯ã¯ã€CPUã€ã‚¿ãƒ–è¨­å®šã®ã¾ã¾ã¨ãªã‚Šã¾ã™" } },
+  { { " <<< DIP-SW Setting >>> ", " <<< ãƒ‡ã‚£ãƒƒãƒ—ã‚¹ã‚¤ãƒƒãƒè¨­å®š >>> " } },
+  { { " EXIT ",                   " æˆ»ã‚‹ "                         } },
+  { { " BOOT ",                   " èµ·å‹• "                         } },
+  { { " RESET now ! ",            " ã“ã®è¨­å®šã§ãƒªã‚»ãƒƒãƒˆã™ã‚‹ "       } },
   { { " (Without a reset, the setting is not applied.) ",
-      " ¡Ê¥ê¥»¥Ã¥È¤ò¤·¤Ê¤¤¤È¡¢ÀßÄê¤ÏÈ¿±Ç¤µ¤ì¤Ş¤»¤ó¡Ë"              } },
+      " ï¼ˆãƒªã‚»ãƒƒãƒˆã‚’ã—ãªã„ã¨ã€è¨­å®šã¯åæ˜ ã•ã‚Œã¾ã›ã‚“ï¼‰"              } },
 };
 
 static const t_menudata data_reset_basic[] =
@@ -515,12 +515,12 @@ static const t_menudata data_reset_clock[] =
 
 static const t_menulabel data_reset_clock_async[] =
 {
-  { { "Async (*) ",   "ÈóÏ¢Æ° (¡ö) ", }, },
+  { { "Async (*) ",   "éé€£å‹• (ï¼Š) ", }, },
 };
 
 static const t_menudata data_reset_version[] =
 {
-  { { "Default",  " ´ûÄêÃÍ" }, 0   },
+  { { "Default",  " æ—¢å®šå€¤" }, 0   },
   { { "  1.0",    "  1.0"   }, '0' },
   { { "  1.1",    "  1.1"   }, '1' },
   { { "  1.2",    "  1.2"   }, '2' },
@@ -535,19 +535,19 @@ static const t_menudata data_reset_version[] =
 
 static const t_menulabel data_reset_boot[] =
 {
-  { { " Boot from DISK  ", "  ¥Ç¥£¥¹¥¯ " } },
-  { { " Boot from ROM   ", "  £Ò£Ï£Í   " } },
+  { { " Boot from DISK  ", "  ãƒ‡ã‚£ã‚¹ã‚¯ " } },
+  { { " Boot from ROM   ", "  ï¼²ï¼¯ï¼­   " } },
 };
 
 static const t_menudata data_reset_sound[] =
 {
-  { { " Sound board    (OPN)  ", " ¥µ¥¦¥ó¥É¥Ü¡¼¥É   (OPN)  ", }, SOUND_I  },
-  { { " Sound board II (OPNA) ", " ¥µ¥¦¥ó¥É¥Ü¡¼¥ÉII (OPNA) ", }, SOUND_II },
+  { { " Sound board    (OPN)  ", " ã‚µã‚¦ãƒ³ãƒ‰ãƒœãƒ¼ãƒ‰   (OPN)  ", }, SOUND_I  },
+  { { " Sound board II (OPNA) ", " ã‚µã‚¦ãƒ³ãƒ‰ãƒœãƒ¼ãƒ‰II (OPNA) ", }, SOUND_II },
 };
 
 static const t_menudata data_reset_extram[] =
 {
-  { { " Nothing ",   " ¤Ê¤·    "  },  0 },
+  { { " Nothing ",   " ãªã—    "  },  0 },
   { { "    128KB",   "    128KB"  },  1 },
   { { "    256KB",   "    256KB"  },  2 },
   { { "    384KB",   "    384KB"  },  3 },
@@ -560,26 +560,26 @@ static const t_menudata data_reset_extram[] =
 
 static const t_menudata data_reset_jisho[] =
 {
-  { { " no-jisho ",  " ¤Ê¤· ", }, 0 },
-  { { " has jisho ", " ¤¢¤ê ", }, 1 },
+  { { " no-jisho ",  " ãªã— ", }, 0 },
+  { { " has jisho ", " ã‚ã‚Š ", }, 1 },
 };
 
 static const t_menulabel data_reset_current[] =
 {
-  { { " ExtRAM", "³ÈÄ¥RAM" } },
-  { { "DictROM", "¼­½ñROM" } },
+  { { " ExtRAM", "æ‹¡å¼µRAM" } },
+  { { "DictROM", "è¾æ›¸ROM" } },
 };
 
 static const t_menulabel data_reset_detail[] =
 {
-  { { " Misc. << ", " ¤½¤ÎÂ¾ << " } },
-  { { " Misc. >> ", " ¤½¤ÎÂ¾ >> " } },
+  { { " Misc. << ", " ãã®ä»– << " } },
+  { { " Misc. >> ", " ãã®ä»– >> " } },
 };
 
 
 
 /*--------------------------------------------------------------
- *	¡Ö²»ÎÌ¡× ¥¿¥Ö
+ *	ã€ŒéŸ³é‡ã€ ã‚¿ãƒ–
  *--------------------------------------------------------------*/
 enum {
   DATA_VOLUME_TOTAL,
@@ -592,34 +592,34 @@ enum {
 };
 static const t_menulabel data_volume[] =
 {
-  { { " Volume ",             " ²»ÎÌ "                       } },
-  { { " Level ",              " ¥ì¥Ù¥ë "                     } },
-  { { " depend on FM-level ", " °Ê²¼¤Ï£Æ£Í²»ÎÌ¤Ë°ÍÂ¸¤·¤Ş¤¹ " } },
+  { { " Volume ",             " éŸ³é‡ "                       } },
+  { { " Level ",              " ãƒ¬ãƒ™ãƒ« "                     } },
+  { { " depend on FM-level ", " ä»¥ä¸‹ã¯ï¼¦ï¼­éŸ³é‡ã«ä¾å­˜ã—ã¾ã™ " } },
 
-  { { " Setting ",                                               " ¾ÜºÙÀßÄê "                                        } },
-  { { " <<< Sound-device Setting >>> ",                          " <<< ¥µ¥¦¥ó¥É¥Ç¥Ğ¥¤¥¹¾ÜºÙÀßÄê >>> "                } },
-  { { " EXIT ",                                                  " Ìá¤ë "                                            } },
-  { { " The settings are applied in the return from the menu. ", " ÀßÄê¤Ï¡¢¥á¥Ë¥å¡¼¥â¡¼¥É¤«¤éÌá¤ëºİ¤ËÈ¿±Ç¤µ¤ì¤Ş¤¹¡£" } },
+  { { " Setting ",                                               " è©³ç´°è¨­å®š "                                        } },
+  { { " <<< Sound-device Setting >>> ",                          " <<< ã‚µã‚¦ãƒ³ãƒ‰ãƒ‡ãƒã‚¤ã‚¹è©³ç´°è¨­å®š >>> "                } },
+  { { " EXIT ",                                                  " æˆ»ã‚‹ "                                            } },
+  { { " The settings are applied in the return from the menu. ", " è¨­å®šã¯ã€ãƒ¡ãƒ‹ãƒ¥ãƒ¼ãƒ¢ãƒ¼ãƒ‰ã‹ã‚‰æˆ»ã‚‹éš›ã«åæ˜ ã•ã‚Œã¾ã™ã€‚" } },
 };
 
 
 
 static const t_menulabel data_volume_no[] =
 {
-  { { " SoundBoard (OPN)                        [ Sound Output is not available. ] "," ¥µ¥¦¥ó¥É¥Ü¡¼¥É (OPN)                [ ¥µ¥¦¥ó¥É½ĞÎÏ¤ÏÁÈ¤ß¹ş¤Ş¤ì¤Æ¤¤¤Ş¤»¤ó ] " } },
-  { { " SoundBoard II (OPNA)                    [ Sound Output is not available. ] "," ¥µ¥¦¥ó¥É¥Ü¡¼¥ÉII (OPNA)             [ ¥µ¥¦¥ó¥É½ĞÎÏ¤ÏÁÈ¤ß¹ş¤Ş¤ì¤Æ¤¤¤Ş¤»¤ó ] " } },
-  { { " SoundBoard (OPN)                   [ Sound Output is OFF. ] ",               " ¥µ¥¦¥ó¥É¥Ü¡¼¥É (OPN)       [ ¥µ¥¦¥ó¥É½ĞÎÏ¤Ï¥ª¥Õ¾õÂÖ¤Ç¤¹ ] " } },
-  { { " SoundBoard II (OPNA)               [ Sound Output is OFF. ] ",               " ¥µ¥¦¥ó¥É¥Ü¡¼¥ÉII (OPNA)    [ ¥µ¥¦¥ó¥É½ĞÎÏ¤Ï¥ª¥Õ¾õÂÖ¤Ç¤¹ ] " } },
+  { { " SoundBoard (OPN)                        [ Sound Output is not available. ] "," ã‚µã‚¦ãƒ³ãƒ‰ãƒœãƒ¼ãƒ‰ (OPN)                [ ã‚µã‚¦ãƒ³ãƒ‰å‡ºåŠ›ã¯çµ„ã¿è¾¼ã¾ã‚Œã¦ã„ã¾ã›ã‚“ ] " } },
+  { { " SoundBoard II (OPNA)                    [ Sound Output is not available. ] "," ã‚µã‚¦ãƒ³ãƒ‰ãƒœãƒ¼ãƒ‰II (OPNA)             [ ã‚µã‚¦ãƒ³ãƒ‰å‡ºåŠ›ã¯çµ„ã¿è¾¼ã¾ã‚Œã¦ã„ã¾ã›ã‚“ ] " } },
+  { { " SoundBoard (OPN)                   [ Sound Output is OFF. ] ",               " ã‚µã‚¦ãƒ³ãƒ‰ãƒœãƒ¼ãƒ‰ (OPN)       [ ã‚µã‚¦ãƒ³ãƒ‰å‡ºåŠ›ã¯ã‚ªãƒ•çŠ¶æ…‹ã§ã™ ] " } },
+  { { " SoundBoard II (OPNA)               [ Sound Output is OFF. ] ",               " ã‚µã‚¦ãƒ³ãƒ‰ãƒœãƒ¼ãƒ‰II (OPNA)    [ ã‚µã‚¦ãƒ³ãƒ‰å‡ºåŠ›ã¯ã‚ªãƒ•çŠ¶æ…‹ã§ã™ ] " } },
 };
 
 
 
 static const t_menulabel data_volume_type[] =
 {
-  { { " SoundBoard (OPN)            [ MAME built-in FM Generator ] ",                " ¥µ¥¦¥ó¥É¥Ü¡¼¥É (OPN)      [ FM²»¸»¥¸¥§¥Í¥ì¡¼¥¿¡§MAMEÆâÂ¢ ] " } },
-  { { " SoundBoard II (OPNA)        [ MAME built-in FM-Generator ] ",                " ¥µ¥¦¥ó¥É¥Ü¡¼¥ÉII (OPNA)   [ FM²»¸»¥¸¥§¥Í¥ì¡¼¥¿¡§MAMEÆâÂ¢ ] " } },
-  { { " SoundBoard (OPN)                    [ fmgen FM-Generator ] ",                " ¥µ¥¦¥ó¥É¥Ü¡¼¥É (OPN)         [ FM²»¸»¥¸¥§¥Í¥ì¡¼¥¿¡§fmgen ] " } },
-  { { " SoundBoard II (OPNA)                [ fmgen FM-Generator ] ",                " ¥µ¥¦¥ó¥É¥Ü¡¼¥ÉII (OPNA)      [ FM²»¸»¥¸¥§¥Í¥ì¡¼¥¿¡§fmgen ] " } },
+  { { " SoundBoard (OPN)            [ MAME built-in FM Generator ] ",                " ã‚µã‚¦ãƒ³ãƒ‰ãƒœãƒ¼ãƒ‰ (OPN)      [ FMéŸ³æºã‚¸ã‚§ãƒãƒ¬ãƒ¼ã‚¿ï¼šMAMEå†…è”µ ] " } },
+  { { " SoundBoard II (OPNA)        [ MAME built-in FM-Generator ] ",                " ã‚µã‚¦ãƒ³ãƒ‰ãƒœãƒ¼ãƒ‰II (OPNA)   [ FMéŸ³æºã‚¸ã‚§ãƒãƒ¬ãƒ¼ã‚¿ï¼šMAMEå†…è”µ ] " } },
+  { { " SoundBoard (OPN)                    [ fmgen FM-Generator ] ",                " ã‚µã‚¦ãƒ³ãƒ‰ãƒœãƒ¼ãƒ‰ (OPN)         [ FMéŸ³æºã‚¸ã‚§ãƒãƒ¬ãƒ¼ã‚¿ï¼šfmgen ] " } },
+  { { " SoundBoard II (OPNA)                [ fmgen FM-Generator ] ",                " ã‚µã‚¦ãƒ³ãƒ‰ãƒœãƒ¼ãƒ‰II (OPNA)      [ FMéŸ³æºã‚¸ã‚§ãƒãƒ¬ãƒ¼ã‚¿ï¼šfmgen ] " } },
 };
 
 
@@ -648,31 +648,31 @@ enum {
 
 static const t_volume data_volume_total[] =
 {
-  { { " VOLUME [db]    :",  " ²»ÎÌ [£ä£â]    ¡§" }, VOL_TOTAL, VOL_MIN,      VOL_MAX,      1, 4},
+  { { " VOLUME [db]    :",  " éŸ³é‡ [ï½„ï½‚]    ï¼š" }, VOL_TOTAL, VOL_MIN,      VOL_MAX,      1, 4},
 };
 
 static const t_volume data_volume_level[] =
 {
-  { { " FM sound   [%] :",  " £Æ£Í²»ÎÌ   [¡ó]¡§" }, VOL_FM,    FMVOL_MIN,    FMVOL_MAX,    1,10},
-  { { " PSG sound  [%] :",  " £Ğ£Ó£Ç²»ÎÌ [¡ó]¡§" }, VOL_PSG,   PSGVOL_MIN,   PSGVOL_MAX,   1,10},
-  { { " BEEP sound [%] :",  " £Â£Å£Å£Ğ²» [¡ó]¡§" }, VOL_BEEP,  BEEPVOL_MIN,  BEEPVOL_MAX,  1,10},
+  { { " FM sound   [%] :",  " ï¼¦ï¼­éŸ³é‡   [ï¼…]ï¼š" }, VOL_FM,    FMVOL_MIN,    FMVOL_MAX,    1,10},
+  { { " PSG sound  [%] :",  " ï¼°ï¼³ï¼§éŸ³é‡ [ï¼…]ï¼š" }, VOL_PSG,   PSGVOL_MIN,   PSGVOL_MAX,   1,10},
+  { { " BEEP sound [%] :",  " ï¼¢ï¼¥ï¼¥ï¼°éŸ³ [ï¼…]ï¼š" }, VOL_BEEP,  BEEPVOL_MIN,  BEEPVOL_MAX,  1,10},
 };
 
 static const t_volume data_volume_rhythm[] =
 {
-  { { " RHYTHM     [%] :",  " ¥ê¥º¥à²»ÎÌ [¡ó]¡§" }, VOL_RHYTHM,RHYTHMVOL_MIN,RHYTHMVOL_MAX,1,10},
-  { { " ADPCM      [%] :",  " ADPCM ²»ÎÌ [¡ó]¡§" }, VOL_ADPCM, ADPCMVOL_MIN, ADPCMVOL_MAX, 1,10},
+  { { " RHYTHM     [%] :",  " ãƒªã‚ºãƒ éŸ³é‡ [ï¼…]ï¼š" }, VOL_RHYTHM,RHYTHMVOL_MIN,RHYTHMVOL_MAX,1,10},
+  { { " ADPCM      [%] :",  " ADPCM éŸ³é‡ [ï¼…]ï¼š" }, VOL_ADPCM, ADPCMVOL_MIN, ADPCMVOL_MAX, 1,10},
 };
 
 static const t_volume data_volume_fmgen[] =
 {
-  { { " FM & PSG   [%] :",  " FM/PSG²»ÎÌ [¡ó]¡§" }, VOL_FMGEN, FMGENVOL_MIN, FMGENVOL_MAX, 1,10},
-  { { " BEEP sound [%] :",  " £Â£Å£Å£Ğ²» [¡ó]¡§" }, VOL_BEEP,  BEEPVOL_MIN,  BEEPVOL_MAX,  1,10},
+  { { " FM & PSG   [%] :",  " FM/PSGéŸ³é‡ [ï¼…]ï¼š" }, VOL_FMGEN, FMGENVOL_MIN, FMGENVOL_MAX, 1,10},
+  { { " BEEP sound [%] :",  " ï¼¢ï¼¥ï¼¥ï¼°éŸ³ [ï¼…]ï¼š" }, VOL_BEEP,  BEEPVOL_MIN,  BEEPVOL_MAX,  1,10},
 };
 
 static const t_volume data_volume_sample[] =
 {
-  { { " SAMPLE snd [%] :",  " ¥µ¥ó¥×¥ë²» [¡ó]¡§" }, VOL_SAMPLE,SAMPLEVOL_MIN,SAMPLEVOL_MAX,1,10},
+  { { " SAMPLE snd [%] :",  " ã‚µãƒ³ãƒ—ãƒ«éŸ³ [ï¼…]ï¼š" }, VOL_SAMPLE,SAMPLEVOL_MIN,SAMPLEVOL_MAX,1,10},
 };
 
 
@@ -683,14 +683,14 @@ enum {
 };
 static const t_menulabel data_volume_audio[] =
 {
-  { { " FM Generator     ",                            " FM²»¸»¥¸¥§¥Í¥ì¡¼¥¿       ",                    } },
-  { { " Sample-Frequency ([Hz], Range = 8000-48000) ", " ¥µ¥ó¥×¥ê¥ó¥°¼şÇÈ¿ô ([Hz],ÈÏ°Ï¡á8000¡Á48000) ", } },
-  { { " Sample Data      ",                            " ¥µ¥ó¥×¥ë²»¤Î»ÈÍÑÍ­Ìµ     ",                    } },
+  { { " FM Generator     ",                            " FMéŸ³æºã‚¸ã‚§ãƒãƒ¬ãƒ¼ã‚¿       ",                    } },
+  { { " Sample-Frequency ([Hz], Range = 8000-48000) ", " ã‚µãƒ³ãƒ—ãƒªãƒ³ã‚°å‘¨æ³¢æ•° ([Hz],ç¯„å›²ï¼8000ã€œ48000) ", } },
+  { { " Sample Data      ",                            " ã‚µãƒ³ãƒ—ãƒ«éŸ³ã®ä½¿ç”¨æœ‰ç„¡     ",                    } },
 };
 
 static const t_menudata data_volume_audio_fmgen[] =
 {
-  { { " MAME built-in ", " MAME ÆâÂ¢  ", }, FALSE  },
+  { { " MAME built-in ", " MAME å†…è”µ  ", }, FALSE  },
   { { " fmgen",          " fmgen",       }, TRUE   },
 };
 static const t_menudata data_volume_audio_freq_combo[] =
@@ -702,14 +702,14 @@ static const t_menudata data_volume_audio_freq_combo[] =
 };
 static const t_menudata data_volume_audio_sample[] =
 {
-  { { " Not Use       ", " »ÈÍÑ¤·¤Ê¤¤ ", }, FALSE  },
-  { { " Use",            " »ÈÍÑ¤¹¤ë ",   }, TRUE   },
+  { { " Not Use       ", " ä½¿ç”¨ã—ãªã„ ", }, FALSE  },
+  { { " Use",            " ä½¿ç”¨ã™ã‚‹ ",   }, TRUE   },
 };
 
 
 static const t_menulabel data_volume_audiodevice_stop[] =
 {
-  { { " (The sound device is stopping.)", " ¡Ê¥µ¥¦¥ó¥É¥Ç¥Ğ¥¤¥¹¤Ï¡¢Ää»ßÃæ¤Ç¤¹¡Ë", } },
+  { { " (The sound device is stopping.)", " ï¼ˆã‚µã‚¦ãƒ³ãƒ‰ãƒ‡ãƒã‚¤ã‚¹ã¯ã€åœæ­¢ä¸­ã§ã™ï¼‰", } },
 };
 
 
@@ -719,7 +719,7 @@ static const t_menulabel data_volume_audiodevice_stop[] =
 
 
 /*--------------------------------------------------------------
- *	¡ÖDIP-SW¡×
+ *	ã€ŒDIP-SWã€
  *--------------------------------------------------------------*/
 enum {
   DATA_DIPSW_B,
@@ -727,8 +727,8 @@ enum {
 };
 static const t_menulabel data_dipsw[] =
 {
-  { { " Boot up ", " ½é´üÀßÄê "    } },
-  { { " RC232C ",  " RS232C ÀßÄê " } },
+  { { " Boot up ", " åˆæœŸè¨­å®š "    } },
+  { { " RC232C ",  " RS232C è¨­å®š " } },
 };
 
 
@@ -743,34 +743,34 @@ typedef struct{
 
 static const t_menudata data_dipsw_b_term[] =
 {
-  { { "TERMINAL   ", "¥¿¡¼¥ß¥Ê¥ë " }, (0<<1) | 0 },
-  { { "BASIC      ", "£Â£Á£Ó£É£Ã " }, (0<<1) | 1 },
+  { { "TERMINAL   ", "ã‚¿ãƒ¼ãƒŸãƒŠãƒ« " }, (0<<1) | 0 },
+  { { "BASIC      ", "ï¼¢ï¼¡ï¼³ï¼©ï¼£ " }, (0<<1) | 1 },
 };
 static const t_menudata data_dipsw_b_ch80[] =
 {
-  { { "80ch / line", "£¸£°»ú     " }, (1<<1) | 0 },
-  { { "40ch / line", "£´£°»ú     " }, (1<<1) | 1 },
+  { { "80ch / line", "ï¼˜ï¼å­—     " }, (1<<1) | 0 },
+  { { "40ch / line", "ï¼”ï¼å­—     " }, (1<<1) | 1 },
 };
 static const t_menudata data_dipsw_b_ln25[] =
 {
-  { { "25line/scrn", "£²£µ¹Ô     " }, (2<<1) | 0 },
-  { { "20line/scrn", "£²£°¹Ô     " }, (2<<1) | 1 },
+  { { "25line/scrn", "ï¼’ï¼•è¡Œ     " }, (2<<1) | 0 },
+  { { "20line/scrn", "ï¼’ï¼è¡Œ     " }, (2<<1) | 1 },
 };
 static const t_menudata data_dipsw_b_boot[] =
 {
-  { { "DISK       ", "¥Ç¥£¥¹¥¯   " }, FALSE },
-  { { "ROM        ", "£Ò£Ï£Í     " }, TRUE  },
+  { { "DISK       ", "ãƒ‡ã‚£ã‚¹ã‚¯   " }, FALSE },
+  { { "ROM        ", "ï¼²ï¼¯ï¼­     " }, TRUE  },
 };
 
 static const t_dipsw data_dipsw_b[] =
 {
-  { { "BOOT MODE           :", "Î©¤Á¾å¤²¥â¡¼¥É     ¡§" },  1, data_dipsw_b_term },
-  { { "Chars per Line      :", "£±¹Ô¤¢¤¿¤ê¤ÎÊ¸»ú¿ô ¡§" },  2, data_dipsw_b_ch80 },
-  { { "Lines per screen    :", "£±²èÌÌ¤¢¤¿¤ê¤Î¹Ô¿ô ¡§" },  3, data_dipsw_b_ln25 },
+  { { "BOOT MODE           :", "ç«‹ã¡ä¸Šã’ãƒ¢ãƒ¼ãƒ‰     ï¼š" },  1, data_dipsw_b_term },
+  { { "Chars per Line      :", "ï¼‘è¡Œã‚ãŸã‚Šã®æ–‡å­—æ•° ï¼š" },  2, data_dipsw_b_ch80 },
+  { { "Lines per screen    :", "ï¼‘ç”»é¢ã‚ãŸã‚Šã®è¡Œæ•° ï¼š" },  3, data_dipsw_b_ln25 },
 };
 static const t_dipsw data_dipsw_b2[] =
 {
-  { { "Boot Up from        :", "¥·¥¹¥Æ¥à¤ÎÎ©¤Á¾å¤² ¡§" }, -1, data_dipsw_b_boot },
+  { { "Boot Up from        :", "ã‚·ã‚¹ãƒ†ãƒ ã®ç«‹ã¡ä¸Šã’ ï¼š" }, -1, data_dipsw_b_boot },
 };
 
 
@@ -791,64 +791,64 @@ static const t_menudata data_dipsw_r_baudrate[] =
 
 static const t_menudata data_dipsw_r_hdpx[] =
 {
-  { { "HALF       ", "È¾Æó½Å     " }, (0<<1) | 0 },
-  { { "FULL       ", "Á´Æó½Å     " }, (0<<1) | 1 },
+  { { "HALF       ", "åŠäºŒé‡     " }, (0<<1) | 0 },
+  { { "FULL       ", "å…¨äºŒé‡     " }, (0<<1) | 1 },
 };
 static const t_menudata data_dipsw_r_xprm[] =
 {
-  { { "Enable     ", "Í­  ¸ú     " }, (1<<1) | 0 },
-  { { "Disable    ", "Ìµ  ¸ú     " }, (1<<1) | 1 },
+  { { "Enable     ", "æœ‰  åŠ¹     " }, (1<<1) | 0 },
+  { { "Disable    ", "ç„¡  åŠ¹     " }, (1<<1) | 1 },
 };
 static const t_menudata data_dipsw_r_st2b[] =
 {
-  { { "2 bit      ", "£² bit     " }, (2<<1) | 0 },
-  { { "1 bit      ", "£± bit     " }, (2<<1) | 1 },
+  { { "2 bit      ", "ï¼’ bit     " }, (2<<1) | 0 },
+  { { "1 bit      ", "ï¼‘ bit     " }, (2<<1) | 1 },
 };
 static const t_menudata data_dipsw_r_dt8b[] =
 {
-  { { "8 bit      ", "£¸ bit     " }, (3<<1) | 0 },
-  { { "7 bit      ", "£· bit     " }, (3<<1) | 1 },
+  { { "8 bit      ", "ï¼˜ bit     " }, (3<<1) | 0 },
+  { { "7 bit      ", "ï¼— bit     " }, (3<<1) | 1 },
 };
 static const t_menudata data_dipsw_r_sprm[] =
 {
-  { { "Enable     ", "Í­  ¸ú     " }, (4<<1) | 0 },
-  { { "Disable    ", "Ìµ  ¸ú     " }, (4<<1) | 1 },
+  { { "Enable     ", "æœ‰  åŠ¹     " }, (4<<1) | 0 },
+  { { "Disable    ", "ç„¡  åŠ¹     " }, (4<<1) | 1 },
 };
 static const t_menudata data_dipsw_r_pdel[] =
 {
-  { { "Enable     ", "Í­  ¸ú     " }, (5<<1) | 0 },
-  { { "Disable    ", "Ìµ  ¸ú     " }, (5<<1) | 1 },
+  { { "Enable     ", "æœ‰  åŠ¹     " }, (5<<1) | 0 },
+  { { "Disable    ", "ç„¡  åŠ¹     " }, (5<<1) | 1 },
 };
 static const t_menudata data_dipsw_r_enpty[] =
 {
-  { { "Yes        ", "Í­  ¤ê     " }, (6<<1) | 0 },
-  { { "No         ", "Ìµ  ¤·     " }, (6<<1) | 1 },
+  { { "Yes        ", "æœ‰  ã‚Š     " }, (6<<1) | 0 },
+  { { "No         ", "ç„¡  ã—     " }, (6<<1) | 1 },
 };
 static const t_menudata data_dipsw_r_evpty[] =
 {
-  { { "Even       ", "¶ö  ¿ô     " }, (7<<1) | 0 },
-  { { "Odd        ", "´ñ  ¿ô     " }, (7<<1) | 1 },
+  { { "Even       ", "å¶  æ•°     " }, (7<<1) | 0 },
+  { { "Odd        ", "å¥‡  æ•°     " }, (7<<1) | 1 },
 };
 
 static const t_menulabel data_dipsw_r2[] =
 {
-  { { "Baud Rate (BPS)     :", "ÄÌ¿®Â®ÅÙ¡Î¥Ü¡¼¡Ï   ¡§" } },
+  { { "Baud Rate (BPS)     :", "é€šä¿¡é€Ÿåº¦ï¼»ãƒœãƒ¼ï¼½   ï¼š" } },
 };
 static const t_dipsw data_dipsw_r[] =
 {
-  { { "Duplex              :", "ÄÌ  ¿®  Êı  ¼°     ¡§" }, 5 +8, data_dipsw_r_hdpx  },
-  { { "X parameter         :", "£Ø¥Ñ¥é¥á¡¼¥¿       ¡§" }, 4 +8, data_dipsw_r_xprm  },
-  { { "Stop Bit            :", "¥¹¥È¥Ã¥×¥Ó¥Ã¥ÈÄ¹   ¡§" }, 3 +8, data_dipsw_r_st2b  },
-  { { "Data Bit            :", "¥Ç¡¼¥¿¥Ó¥Ã¥ÈÄ¹     ¡§" }, 2 +8, data_dipsw_r_dt8b  },
-  { { "S parameter         :", "£Ó¥Ñ¥é¥á¡¼¥¿       ¡§" }, 4,    data_dipsw_r_sprm  },
-  { { "DEL code            :", "£Ä£Å£Ì¥³¡¼¥É       ¡§" }, 5,    data_dipsw_r_pdel  },
-  { { "Patiry Check        :", "¥Ñ¥ê¥Æ¥£¥Á¥§¥Ã¥¯   ¡§" }, 0 +8, data_dipsw_r_enpty },
-  { { "Patiry              :", "¥Ñ  ¥ê  ¥Æ¥£       ¡§" }, 1 +8, data_dipsw_r_evpty },
+  { { "Duplex              :", "é€š  ä¿¡  æ–¹  å¼     ï¼š" }, 5 +8, data_dipsw_r_hdpx  },
+  { { "X parameter         :", "ï¼¸ãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿       ï¼š" }, 4 +8, data_dipsw_r_xprm  },
+  { { "Stop Bit            :", "ã‚¹ãƒˆãƒƒãƒ—ãƒ“ãƒƒãƒˆé•·   ï¼š" }, 3 +8, data_dipsw_r_st2b  },
+  { { "Data Bit            :", "ãƒ‡ãƒ¼ã‚¿ãƒ“ãƒƒãƒˆé•·     ï¼š" }, 2 +8, data_dipsw_r_dt8b  },
+  { { "S parameter         :", "ï¼³ãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿       ï¼š" }, 4,    data_dipsw_r_sprm  },
+  { { "DEL code            :", "ï¼¤ï¼¥ï¼¬ã‚³ãƒ¼ãƒ‰       ï¼š" }, 5,    data_dipsw_r_pdel  },
+  { { "Patiry Check        :", "ãƒ‘ãƒªãƒ†ã‚£ãƒã‚§ãƒƒã‚¯   ï¼š" }, 0 +8, data_dipsw_r_enpty },
+  { { "Patiry              :", "ãƒ‘  ãƒª  ãƒ†ã‚£       ï¼š" }, 1 +8, data_dipsw_r_evpty },
 };
 
 
 /*--------------------------------------------------------------
- *	¡Ö¥Ç¥£¥¹¥¯¡× ¥¿¥Ö
+ *	ã€Œãƒ‡ã‚£ã‚¹ã‚¯ã€ ã‚¿ãƒ–
  *--------------------------------------------------------------*/
 static const t_menulabel data_disk_image_drive[] =
 {
@@ -867,32 +867,32 @@ enum {
 };
 static const t_menulabel data_disk_image[] =
 {
-  { { "< EMPTY >                 ", "< ¤Ê¤· >                  " } },
-  { { "  Create Blank  ",           " ¥Ö¥é¥ó¥¯¤ÎºîÀ® "           } },
+  { { "< EMPTY >                 ", "< ãªã— >                  " } },
+  { { "  Create Blank  ",           " ãƒ–ãƒ©ãƒ³ã‚¯ã®ä½œæˆ "           } },
 };
 
 enum {
-  DATA_DISK_INFO_STAT,		/* "STATUS     READY" ¤Ç16Ê¸»ú */
+  DATA_DISK_INFO_STAT,		/* "STATUS     READY" ã§16æ–‡å­— */
   DATA_DISK_INFO_STAT_READY,
   DATA_DISK_INFO_STAT_BUSY,
-  DATA_DISK_INFO_ATTR,		/* "ATTR  READ/WRITE" ¤Ç16Ê¸»ú */
+  DATA_DISK_INFO_ATTR,		/* "ATTR  READ/WRITE" ã§16æ–‡å­— */
   DATA_DISK_INFO_ATTR_RW,
   DATA_DISK_INFO_ATTR_RO,
-  DATA_DISK_INFO_NR,		/* "IMAGE  xxxxxxxxx" ¤Ç16Ê¸»ú¡¢ x ¤Ï 9Ê¸»ú */
+  DATA_DISK_INFO_NR,		/* "IMAGE  xxxxxxxxx" ã§16æ–‡å­—ã€ x ã¯ 9æ–‡å­— */
   DATA_DISK_INFO_NR_BROKEN,
   DATA_DISK_INFO_NR_OVER
 };
 static const t_menulabel data_disk_info[] =
 {
-  { { "STATUS     ",         "¾õÂÖ       "      } },
+  { { "STATUS     ",         "çŠ¶æ…‹       "      } },
   { {            "READY",               "READY" } },
   { {            "BUSY ",               "BUSY " } },
-  { { "ATTR  ",              "Â°À­  "           } },
-  { {       "  Writable",          "    ½ñ¹ş²Ä" } },
-  { {       " Read Only",          "  ÆÉ¹şÀìÍÑ" } },
-  { { "IMAGE  ",             "Áí¿ô   "          } },
-  { {          "+BROKEN",              " +ÇËÂ»" } },
-  { {            " OVER",              " °Ê¾å " } },
+  { { "ATTR  ",              "å±æ€§  "           } },
+  { {       "  Writable",          "    æ›¸è¾¼å¯" } },
+  { {       " Read Only",          "  èª­è¾¼å°‚ç”¨" } },
+  { { "IMAGE  ",             "ç·æ•°   "          } },
+  { {          "+BROKEN",              " +ç ´æ" } },
+  { {            " OVER",              " ä»¥ä¸Š " } },
 };
 
 
@@ -906,35 +906,35 @@ enum {
 };
 static const t_menulabel data_disk_button_drv1[] =
 {
-  { { " DRIVE [1:]           OPEN ", " DRIVE [1:]           ³«¤¯ " } },
-  { { " DRIVE [1:]          CLOSE ", " DRIVE [1:]         ÊÄ¤¸¤ë " } },
-  { { " DRIVE [1:][2:] BOTH  OPEN ", " DRIVE [1:][2:] Î¾Êı¤Ë³«¤¯ " } },
-  { { " DRIVE [1:] <= [2:]   OPEN ", " DRIVE [1:] ¢« [2:]   ³«¤¯ " } },
-  { { " CHANGE ATTRIBUTE of IMAGE ", " ¥¤¥á¡¼¥¸¤Î Â°À­¤òÊÑ¹¹¤¹¤ë " } },
+  { { " DRIVE [1:]           OPEN ", " DRIVE [1:]           é–‹ã " } },
+  { { " DRIVE [1:]          CLOSE ", " DRIVE [1:]         é–‰ã˜ã‚‹ " } },
+  { { " DRIVE [1:][2:] BOTH  OPEN ", " DRIVE [1:][2:] ä¸¡æ–¹ã«é–‹ã " } },
+  { { " DRIVE [1:] <= [2:]   OPEN ", " DRIVE [1:] â† [2:]   é–‹ã " } },
+  { { " CHANGE ATTRIBUTE of IMAGE ", " ã‚¤ãƒ¡ãƒ¼ã‚¸ã® å±æ€§ã‚’å¤‰æ›´ã™ã‚‹ " } },
 };
 static const t_menulabel data_disk_button_drv2[] =
 {
-  { { " DRIVE [2:]           OPEN ", " DRIVE [2:]           ³«¤¯ " } },
-  { { " DRIVE [2:]          CLOSE ", " DRIVE [2:]         ÊÄ¤¸¤ë " } },
-  { { " DRIVE [1:][2:] BOTH  OPEN ", " DRIVE [1:][2:] Î¾Êı¤Ë³«¤¯ " } },
-  { { " DRIVE [1:] => [2:]   OPEN ", " DRIVE [1:] ¢ª [2:]   ³«¤¯ " } },
-  { { " CHANGE ATTRIBUTE of IMAGE ", " ¥¤¥á¡¼¥¸¤Î Â°À­¤òÊÑ¹¹¤¹¤ë " } },
+  { { " DRIVE [2:]           OPEN ", " DRIVE [2:]           é–‹ã " } },
+  { { " DRIVE [2:]          CLOSE ", " DRIVE [2:]         é–‰ã˜ã‚‹ " } },
+  { { " DRIVE [1:][2:] BOTH  OPEN ", " DRIVE [1:][2:] ä¸¡æ–¹ã«é–‹ã " } },
+  { { " DRIVE [1:] => [2:]   OPEN ", " DRIVE [1:] â†’ [2:]   é–‹ã " } },
+  { { " CHANGE ATTRIBUTE of IMAGE ", " ã‚¤ãƒ¡ãƒ¼ã‚¸ã® å±æ€§ã‚’å¤‰æ›´ã™ã‚‹ " } },
 };
 static const t_menulabel data_disk_button_drv1swap[] =
 {
-  { { " OPEN           DRIVE [1:] ", " ³«¤¯           DRIVE [1:] " } },
-  { { " CLOSE          DRIVE [1:] ", " ÊÄ¤¸¤ë         DRIVE [1:] " } },
-  { { " OPEN  BOTH DRIVE [1:][2:] ", " Î¾Êı¤Ë³«¤¯ DRIVE [2:][1:] " } },
-  { { " OPEN   DRIVE [1:] => [2:] ", " ³«¤¯   DRIVE [2:] ¢ª [1:] " } },
-  { { " CHANGE ATTRIBUTE of IMAGE ", " ¥¤¥á¡¼¥¸¤Î Â°À­¤òÊÑ¹¹¤¹¤ë " } },
+  { { " OPEN           DRIVE [1:] ", " é–‹ã           DRIVE [1:] " } },
+  { { " CLOSE          DRIVE [1:] ", " é–‰ã˜ã‚‹         DRIVE [1:] " } },
+  { { " OPEN  BOTH DRIVE [1:][2:] ", " ä¸¡æ–¹ã«é–‹ã DRIVE [2:][1:] " } },
+  { { " OPEN   DRIVE [1:] => [2:] ", " é–‹ã   DRIVE [2:] â†’ [1:] " } },
+  { { " CHANGE ATTRIBUTE of IMAGE ", " ã‚¤ãƒ¡ãƒ¼ã‚¸ã® å±æ€§ã‚’å¤‰æ›´ã™ã‚‹ " } },
 };
 static const t_menulabel data_disk_button_drv2swap[] =
 {
-  { { " OPEN           DRIVE [2:] ", " ³«¤¯           DRIVE [2:] " } },
-  { { " CLOSE          DRIVE [2:] ", " ÊÄ¤¸¤ë         DRIVE [2:] " } },
-  { { " OPEN  BOTH DRIVE [1:][2:] ", " Î¾Êı¤Ë³«¤¯ DRIVE [2:][1:] " } },
-  { { " OPEN   DRIVE [1:] <= [2:] ", " ³«¤¯   DRIVE [2:] ¢« [1:] " } },
-  { { " CHANGE ATTRIBUTE of IMAGE ", " ¥¤¥á¡¼¥¸¤Î Â°À­¤òÊÑ¹¹¤¹¤ë " } },
+  { { " OPEN           DRIVE [2:] ", " é–‹ã           DRIVE [2:] " } },
+  { { " CLOSE          DRIVE [2:] ", " é–‰ã˜ã‚‹         DRIVE [2:] " } },
+  { { " OPEN  BOTH DRIVE [1:][2:] ", " ä¸¡æ–¹ã«é–‹ã DRIVE [2:][1:] " } },
+  { { " OPEN   DRIVE [1:] <= [2:] ", " é–‹ã   DRIVE [2:] â† [1:] " } },
+  { { " CHANGE ATTRIBUTE of IMAGE ", " ã‚¤ãƒ¡ãƒ¼ã‚¸ã® å±æ€§ã‚’å¤‰æ›´ã™ã‚‹ " } },
 };
 
 
@@ -945,13 +945,13 @@ enum {
 };
 static const t_menulabel data_disk_open_drv1[] =
 {
-  { { " OPEN FILE in DRIVE [1:] ",        " DRIVE [1:] ¤Ë¥¤¥á¡¼¥¸¥Õ¥¡¥¤¥ë¤ò¥»¥Ã¥È¤·¤Ş¤¹ "         } },
-  { { " OPEN FILE in DRIVE [1:] & [2:] ", " DRIVE [1:] ¤È [2:] ¤Ë¥¤¥á¡¼¥¸¥Õ¥¡¥¤¥ë¤ò¥»¥Ã¥È¤·¤Ş¤¹ " } },
+  { { " OPEN FILE in DRIVE [1:] ",        " DRIVE [1:] ã«ã‚¤ãƒ¡ãƒ¼ã‚¸ãƒ•ã‚¡ã‚¤ãƒ«ã‚’ã‚»ãƒƒãƒˆã—ã¾ã™ "         } },
+  { { " OPEN FILE in DRIVE [1:] & [2:] ", " DRIVE [1:] ã¨ [2:] ã«ã‚¤ãƒ¡ãƒ¼ã‚¸ãƒ•ã‚¡ã‚¤ãƒ«ã‚’ã‚»ãƒƒãƒˆã—ã¾ã™ " } },
 };
 static const t_menulabel data_disk_open_drv2[] =
 {
-  { { " OPEN FILE in DRIVE [2:] ",        " DRIVE [2:] ¤Ë¥¤¥á¡¼¥¸¥Õ¥¡¥¤¥ë¤ò¥»¥Ã¥È¤·¤Ş¤¹ "         } },
-  { { " OPEN FILE in DRIVE [1:] & [2:] ", " DRIVE [1:] ¤È [2:] ¤Ë¥¤¥á¡¼¥¸¥Õ¥¡¥¤¥ë¤ò¥»¥Ã¥È¤·¤Ş¤¹ " } },
+  { { " OPEN FILE in DRIVE [2:] ",        " DRIVE [2:] ã«ã‚¤ãƒ¡ãƒ¼ã‚¸ãƒ•ã‚¡ã‚¤ãƒ«ã‚’ã‚»ãƒƒãƒˆã—ã¾ã™ "         } },
+  { { " OPEN FILE in DRIVE [1:] & [2:] ", " DRIVE [1:] ã¨ [2:] ã«ã‚¤ãƒ¡ãƒ¼ã‚¸ãƒ•ã‚¡ã‚¤ãƒ«ã‚’ã‚»ãƒƒãƒˆã—ã¾ã™ " } },
 };
 
 
@@ -968,14 +968,14 @@ enum {
 };
 static const t_menulabel data_disk_attr[] =
 {
-  { { " Change Attribute of the image at drive 1: ", " ¥É¥é¥¤¥Ö 1: ¤Î¥¤¥á¡¼¥¸ "    } },
-  { { " Change Attribute of the image at drive 2: ", " ¥É¥é¥¤¥Ö 2: ¤Î¥¤¥á¡¼¥¸ "    } },
-  { { " ",                                           " ¤Î Â°À­ÊÑ¹¹¤Ê¤É¤ò¹Ô¤¤¤Ş¤¹ " } },
-  { { "RENAME",                                      "Ì¾Á°ÊÑ¹¹"                    } },
-  { { "PROTECT",                                     "Â°À­ÊÑ¹¹"                    } },
-  { { "(UN)FORMAT",                                  "(¥¢¥ó)¥Õ¥©¡¼¥Ş¥Ã¥È"          } },
-  { { "APPEND BLANK",                                "¥Ö¥é¥ó¥¯¤ÎÄÉ²Ã"              } },
-  { { "CANCEL",                                      " ¼è¾Ã "                      } },
+  { { " Change Attribute of the image at drive 1: ", " ãƒ‰ãƒ©ã‚¤ãƒ– 1: ã®ã‚¤ãƒ¡ãƒ¼ã‚¸ "    } },
+  { { " Change Attribute of the image at drive 2: ", " ãƒ‰ãƒ©ã‚¤ãƒ– 2: ã®ã‚¤ãƒ¡ãƒ¼ã‚¸ "    } },
+  { { " ",                                           " ã® å±æ€§å¤‰æ›´ãªã©ã‚’è¡Œã„ã¾ã™ " } },
+  { { "RENAME",                                      "åå‰å¤‰æ›´"                    } },
+  { { "PROTECT",                                     "å±æ€§å¤‰æ›´"                    } },
+  { { "(UN)FORMAT",                                  "(ã‚¢ãƒ³)ãƒ•ã‚©ãƒ¼ãƒãƒƒãƒˆ"          } },
+  { { "APPEND BLANK",                                "ãƒ–ãƒ©ãƒ³ã‚¯ã®è¿½åŠ "              } },
+  { { "CANCEL",                                      " å–æ¶ˆ "                      } },
 };
 
 enum {
@@ -987,11 +987,11 @@ enum {
 };
 static const t_menulabel data_disk_attr_rename[] =
 {
-  { { " Rename the image at drive 1: ", " ¥É¥é¥¤¥Ö 1: ¤Î¥¤¥á¡¼¥¸ " } },
-  { { " Rename the image at drive 2: ", " ¥É¥é¥¤¥Ö 2: ¤Î¥¤¥á¡¼¥¸ " } },
-  { { " ",                              " ¤Î Ì¾Á°¤òÊÑ¹¹¤·¤Ş¤¹ "    } },
-  { { "  OK  ",                         " ÊÑ¹¹ "                   } },
-  { { "CANCEL",                         " ¼è¾Ã "                   } },
+  { { " Rename the image at drive 1: ", " ãƒ‰ãƒ©ã‚¤ãƒ– 1: ã®ã‚¤ãƒ¡ãƒ¼ã‚¸ " } },
+  { { " Rename the image at drive 2: ", " ãƒ‰ãƒ©ã‚¤ãƒ– 2: ã®ã‚¤ãƒ¡ãƒ¼ã‚¸ " } },
+  { { " ",                              " ã® åå‰ã‚’å¤‰æ›´ã—ã¾ã™ "    } },
+  { { "  OK  ",                         " å¤‰æ›´ "                   } },
+  { { "CANCEL",                         " å–æ¶ˆ "                   } },
 };
 
 enum {
@@ -1004,12 +1004,12 @@ enum {
 };
 static const t_menulabel data_disk_attr_protect[] =
 {
-  { { " (Un)Peotect the image at drive 1: ", " ¥É¥é¥¤¥Ö 1: ¤Î¥¤¥á¡¼¥¸ "        } },
-  { { " (Un)Peotect the image at drive 2: ", " ¥É¥é¥¤¥Ö 2: ¤Î¥¤¥á¡¼¥¸ "        } },
-  { { " ",                                   " ¤Î ¥×¥í¥Æ¥¯¥È¾õÂÖ¤òÊÑ¹¹¤·¤Ş¤¹ " } },
-  { { " SET PROTECT ",                       " ¥×¥í¥Æ¥¯¥È¾õÂÖ¤Ë¤¹¤ë "          } },
-  { { " UNSET PROTECT ",                     " ¥×¥í¥Æ¥¯¥È¤ò²ò½ü¤¹¤ë "          } },
-  { { " CANCEL ",                            " ¼è¾Ã "                          } },
+  { { " (Un)Peotect the image at drive 1: ", " ãƒ‰ãƒ©ã‚¤ãƒ– 1: ã®ã‚¤ãƒ¡ãƒ¼ã‚¸ "        } },
+  { { " (Un)Peotect the image at drive 2: ", " ãƒ‰ãƒ©ã‚¤ãƒ– 2: ã®ã‚¤ãƒ¡ãƒ¼ã‚¸ "        } },
+  { { " ",                                   " ã® ãƒ—ãƒ­ãƒ†ã‚¯ãƒˆçŠ¶æ…‹ã‚’å¤‰æ›´ã—ã¾ã™ " } },
+  { { " SET PROTECT ",                       " ãƒ—ãƒ­ãƒ†ã‚¯ãƒˆçŠ¶æ…‹ã«ã™ã‚‹ "          } },
+  { { " UNSET PROTECT ",                     " ãƒ—ãƒ­ãƒ†ã‚¯ãƒˆã‚’è§£é™¤ã™ã‚‹ "          } },
+  { { " CANCEL ",                            " å–æ¶ˆ "                          } },
 };
 
 enum {
@@ -1023,13 +1023,13 @@ enum {
 };
 static const t_menulabel data_disk_attr_format[] =
 {
-  { { " (Un)Format the image at drive 1: ",       " ¥É¥é¥¤¥Ö 1: ¤Î¥¤¥á¡¼¥¸ "                  } },
-  { { " (Un)Format the image at drive 2: ",       " ¥É¥é¥¤¥Ö 2: ¤Î¥¤¥á¡¼¥¸ "                  } },
-  { { " ",                                        " ¤ò ¡Ê¥¢¥ó¡Ë¥Õ¥©¡¼¥Ş¥Ã¥È¤·¤Ş¤¹ "           } },
-  { { "[WARNING : data in the image will lost!]", "[Ãí°Õ:¥¤¥á¡¼¥¸Æâ¤Î¥Ç¡¼¥¿¤Ï¾Ãµî¤µ¤ì¤Ş¤¹¡ª]" } },
-  { { " FORMAT ",                                 " ¥Õ¥©¡¼¥Ş¥Ã¥È¤¹¤ë "                        } },
-  { { " UNFORMAT ",                               " ¥¢¥ó¥Õ¥©¡¼¥Ş¥Ã¥È¤¹¤ë "                    } },
-  { { " CANCEL ",                                 " ¼è¾Ã "                                    } },
+  { { " (Un)Format the image at drive 1: ",       " ãƒ‰ãƒ©ã‚¤ãƒ– 1: ã®ã‚¤ãƒ¡ãƒ¼ã‚¸ "                  } },
+  { { " (Un)Format the image at drive 2: ",       " ãƒ‰ãƒ©ã‚¤ãƒ– 2: ã®ã‚¤ãƒ¡ãƒ¼ã‚¸ "                  } },
+  { { " ",                                        " ã‚’ ï¼ˆã‚¢ãƒ³ï¼‰ãƒ•ã‚©ãƒ¼ãƒãƒƒãƒˆã—ã¾ã™ "           } },
+  { { "[WARNING : data in the image will lost!]", "[æ³¨æ„:ã‚¤ãƒ¡ãƒ¼ã‚¸å†…ã®ãƒ‡ãƒ¼ã‚¿ã¯æ¶ˆå»ã•ã‚Œã¾ã™ï¼]" } },
+  { { " FORMAT ",                                 " ãƒ•ã‚©ãƒ¼ãƒãƒƒãƒˆã™ã‚‹ "                        } },
+  { { " UNFORMAT ",                               " ã‚¢ãƒ³ãƒ•ã‚©ãƒ¼ãƒãƒƒãƒˆã™ã‚‹ "                    } },
+  { { " CANCEL ",                                 " å–æ¶ˆ "                                    } },
 };
 
 enum {
@@ -1042,11 +1042,11 @@ enum {
 };
 static const t_menulabel data_disk_attr_blank[] =
 {
-  { { " Append Blank image at drive 1: ", " ¥É¥é¥¤¥Ö 1: ¤Î¥Õ¥¡¥¤¥ë¤Ë "     } },
-  { { " Append Blank image at drive 2: ", " ¥É¥é¥¤¥Ö 2: ¤Î¥Õ¥¡¥¤¥ë¤Ë "     } },
-  { { " ",                                " ¥Ö¥é¥ó¥¯¥¤¥á¡¼¥¸¤òÄÉ²Ã¤·¤Ş¤¹ " } },
-  { { " APPEND ",                         " ¥Ö¥é¥ó¥¯¥¤¥á¡¼¥¸¤ÎÄÉ²Ã "       } },
-  { { " CANCEL ",                         " ¼è¾Ã "                         } },
+  { { " Append Blank image at drive 1: ", " ãƒ‰ãƒ©ã‚¤ãƒ– 1: ã®ãƒ•ã‚¡ã‚¤ãƒ«ã« "     } },
+  { { " Append Blank image at drive 2: ", " ãƒ‰ãƒ©ã‚¤ãƒ– 2: ã®ãƒ•ã‚¡ã‚¤ãƒ«ã« "     } },
+  { { " ",                                " ãƒ–ãƒ©ãƒ³ã‚¯ã‚¤ãƒ¡ãƒ¼ã‚¸ã‚’è¿½åŠ ã—ã¾ã™ " } },
+  { { " APPEND ",                         " ãƒ–ãƒ©ãƒ³ã‚¯ã‚¤ãƒ¡ãƒ¼ã‚¸ã®è¿½åŠ  "       } },
+  { { " CANCEL ",                         " å–æ¶ˆ "                         } },
 };
 
 
@@ -1060,11 +1060,11 @@ enum {
 };
 static const t_menulabel data_disk_blank[] =
 {
-  { { " Create a new file as blank image file.", " ¥Ö¥é¥ó¥¯¥¤¥á¡¼¥¸¥Õ¥¡¥¤¥ë¤ò¿·µ¬ºîÀ®¤·¤Ş¤¹ " } },
-  { { " This File Already Exist. ",              " »ØÄê¤·¤¿¥Õ¥¡¥¤¥ë¤Ï¤¹¤Ç¤ËÂ¸ºß¤·¤Ş¤¹¡£ "     } },
-  { { " Append a blank image ? ",                " ¥Ö¥é¥ó¥¯¥¤¥á¡¼¥¸¤òÄÉ²Ã¤·¤Ş¤¹¤«¡© "         } },
-  { { " APPEND ",                                " ÄÉ²Ã¤¹¤ë "                                 } },
-  { { " CANCEL ",                                " ¼è¾Ã "                                     } },
+  { { " Create a new file as blank image file.", " ãƒ–ãƒ©ãƒ³ã‚¯ã‚¤ãƒ¡ãƒ¼ã‚¸ãƒ•ã‚¡ã‚¤ãƒ«ã‚’æ–°è¦ä½œæˆã—ã¾ã™ " } },
+  { { " This File Already Exist. ",              " æŒ‡å®šã—ãŸãƒ•ã‚¡ã‚¤ãƒ«ã¯ã™ã§ã«å­˜åœ¨ã—ã¾ã™ã€‚ "     } },
+  { { " Append a blank image ? ",                " ãƒ–ãƒ©ãƒ³ã‚¯ã‚¤ãƒ¡ãƒ¼ã‚¸ã‚’è¿½åŠ ã—ã¾ã™ã‹ï¼Ÿ "         } },
+  { { " APPEND ",                                " è¿½åŠ ã™ã‚‹ "                                 } },
+  { { " CANCEL ",                                " å–æ¶ˆ "                                     } },
 };
 
 
@@ -1083,17 +1083,17 @@ enum {
 };
 static const t_menulabel data_disk_fname[] =
 {
-  { { " Show Filename  ",                                 " ¥Õ¥¡¥¤¥ëÌ¾³ÎÇ§ "                                 } },
-  { { " Disk Image Filename ",                            " ¥Ç¥£¥¹¥¯¥¤¥á¡¼¥¸¥Õ¥¡¥¤¥ëÌ¾³ÎÇ§ "                 } },
+  { { " Show Filename  ",                                 " ãƒ•ã‚¡ã‚¤ãƒ«åç¢ºèª "                                 } },
+  { { " Disk Image Filename ",                            " ãƒ‡ã‚£ã‚¹ã‚¯ã‚¤ãƒ¡ãƒ¼ã‚¸ãƒ•ã‚¡ã‚¤ãƒ«åç¢ºèª "                 } },
   { { "------------------------------------------------", "------------------------------------------------" } },
-  { { " Same file Drive 1: as Drive 2 ",                  " ¥É¥é¥¤¥Ö 1: ¤È 2: ¤ÏÆ±¤¸¥Õ¥¡¥¤¥ë¤Ç¤¹ "           } },
+  { { " Same file Drive 1: as Drive 2 ",                  " ãƒ‰ãƒ©ã‚¤ãƒ– 1: ã¨ 2: ã¯åŒã˜ãƒ•ã‚¡ã‚¤ãƒ«ã§ã™ "           } },
   { { " ",                                                " "                                                } },
-  { { "    * The disk image file(s) is read-only.      ", "¡üÆÉ¹şÀìÍÑ¤Î¥Ç¥£¥¹¥¯¥¤¥á¡¼¥¸¥Õ¥¡¥¤¥ë¤¬¤¢¤ê¤Ş¤¹¡£" } },
-  { { "      All images in this file are regarded      ", "  ¤³¤Î¥Õ¥¡¥¤¥ë¤Ë´Ş¤Ş¤ì¤ë¤¹¤Ù¤Æ¤Î¥¤¥á¡¼¥¸¤Ï¡¢    " } },
-  { { "      as WRITE-PROTECTED.                       ", "  ¥é¥¤¥È¥×¥í¥Æ¥¯¥È¾õÂÖ¤ÈÆ±ÍÍ¤Ë°·¤ï¤ì¤Ş¤¹¡£      " } },
-  { { "      Writing to the image is ignored, but      ", "  ¤³¤Î¥Õ¥¡¥¤¥ë¤Ø¤Î½ñ¤­¹ş¤ß¤ÏÁ´¤ÆÌµ»ë¤µ¤ì¤Ş¤¹¤¬¡¢" } },
-  { { "      not error depending on situation.         ", "  ¥¨¥é¡¼¤È¤ÏÇ§¼±¤µ¤ì¤Ê¤¤¾ì¹ç¤¬¤¢¤ê¤Ş¤¹¡£        " } },
-  { { "  OK  ",                                           " ³ÎÇ§ "                                           } },
+  { { "    * The disk image file(s) is read-only.      ", "â—èª­è¾¼å°‚ç”¨ã®ãƒ‡ã‚£ã‚¹ã‚¯ã‚¤ãƒ¡ãƒ¼ã‚¸ãƒ•ã‚¡ã‚¤ãƒ«ãŒã‚ã‚Šã¾ã™ã€‚" } },
+  { { "      All images in this file are regarded      ", "  ã“ã®ãƒ•ã‚¡ã‚¤ãƒ«ã«å«ã¾ã‚Œã‚‹ã™ã¹ã¦ã®ã‚¤ãƒ¡ãƒ¼ã‚¸ã¯ã€    " } },
+  { { "      as WRITE-PROTECTED.                       ", "  ãƒ©ã‚¤ãƒˆãƒ—ãƒ­ãƒ†ã‚¯ãƒˆçŠ¶æ…‹ã¨åŒæ§˜ã«æ‰±ã‚ã‚Œã¾ã™ã€‚      " } },
+  { { "      Writing to the image is ignored, but      ", "  ã“ã®ãƒ•ã‚¡ã‚¤ãƒ«ã¸ã®æ›¸ãè¾¼ã¿ã¯å…¨ã¦ç„¡è¦–ã•ã‚Œã¾ã™ãŒã€" } },
+  { { "      not error depending on situation.         ", "  ã‚¨ãƒ©ãƒ¼ã¨ã¯èªè­˜ã•ã‚Œãªã„å ´åˆãŒã‚ã‚Šã¾ã™ã€‚        " } },
+  { { "  OK  ",                                           " ç¢ºèª "                                           } },
 };
 
 
@@ -1106,10 +1106,10 @@ enum {
 };
 static const t_menulabel data_disk_dispswap[] =
 {
-  { { "Swap Drv-Disp",                                   "É½¼¨ º¸±¦Æş´¹"                                     } },
-  { { "Swap Drive-Display placement",                    "DRIVE [1:] ¤È [2:] ¤ÎÉ½¼¨°ÌÃÖ¤ò¡¢º¸±¦Æş¤ì´¹¤¨¤Ş¤¹" } },
-  { { "This setting effects next time. ",                "¤³¤ÎÀßÄê¤Ï¼¡²ó¤Î¥á¥Ë¥å¡¼¥â¡¼¥É¤è¤êÍ­¸ú¤È¤Ê¤ê¤Ş¤¹ " } },
-  { { "  OK  ",                                          " ³ÎÇ§ "                                            } },
+  { { "Swap Drv-Disp",                                   "è¡¨ç¤º å·¦å³å…¥æ›"                                     } },
+  { { "Swap Drive-Display placement",                    "DRIVE [1:] ã¨ [2:] ã®è¡¨ç¤ºä½ç½®ã‚’ã€å·¦å³å…¥ã‚Œæ›ãˆã¾ã™" } },
+  { { "This setting effects next time. ",                "ã“ã®è¨­å®šã¯æ¬¡å›ã®ãƒ¡ãƒ‹ãƒ¥ãƒ¼ãƒ¢ãƒ¼ãƒ‰ã‚ˆã‚Šæœ‰åŠ¹ã¨ãªã‚Šã¾ã™ " } },
+  { { "  OK  ",                                          " ç¢ºèª "                                            } },
 };
 
 
@@ -1121,15 +1121,15 @@ enum {
 };
 static const t_menulabel data_disk_dispstatus[] =
 {
-  { { "Show in status",                                  "É½¼¨ ¥¹¥Æ¡¼¥¿¥¹"                                   } },
-  { { "Display image name in status area. ",             "¥¹¥Æ¡¼¥¿¥¹Éô¤Ë¡¢¥¤¥á¡¼¥¸Ì¾¤òÉ½¼¨¤·¤Ş¤¹"            } },
-  { { "  OK  ",                                          " ³ÎÇ§ "                                            } },
+  { { "Show in status",                                  "è¡¨ç¤º ã‚¹ãƒ†ãƒ¼ã‚¿ã‚¹"                                   } },
+  { { "Display image name in status area. ",             "ã‚¹ãƒ†ãƒ¼ã‚¿ã‚¹éƒ¨ã«ã€ã‚¤ãƒ¡ãƒ¼ã‚¸åã‚’è¡¨ç¤ºã—ã¾ã™"            } },
+  { { "  OK  ",                                          " ç¢ºèª "                                            } },
 };
 
 
 
 /*--------------------------------------------------------------
- *	¡Ö¤½¤ÎÂ¾¡× ¥¿¥Ö
+ *	ã€Œãã®ä»–ã€ ã‚¿ãƒ–
  *--------------------------------------------------------------*/
 
 enum {
@@ -1139,9 +1139,9 @@ enum {
 };
 static const t_menulabel data_misc[] =
 {
-  { { "State Save     ",    "¥¹¥Æ¡¼¥È¥»¡¼¥Ö " } },
-  { { "Screen Shot    ",    "²èÌÌÊİÂ¸       " } },
-  { { "Sound Record   ",    "¥µ¥¦¥ó¥ÉÊİÂ¸   " } },
+  { { "State Save     ",    "ã‚¹ãƒ†ãƒ¼ãƒˆã‚»ãƒ¼ãƒ– " } },
+  { { "Screen Shot    ",    "ç”»é¢ä¿å­˜       " } },
+  { { "Sound Record   ",    "ã‚µã‚¦ãƒ³ãƒ‰ä¿å­˜   " } },
 };
 
 
@@ -1157,17 +1157,17 @@ enum {
 };
 static const t_menulabel data_misc_suspend[] =
 {
-  { { " Change ",                           " ¥Õ¥¡¥¤¥ëÊÑ¹¹ "                       } },
-  { { " SAVE ",                             " ¥»¡¼¥Ö "                             } },
-  { { " LOAD ",                             " ¥í¡¼¥É "                             } },
-  { { "                         number : ", "                 Ï¢ÈÖ¡§ "             } },
-  { { " Input (Select) a state filename. ", " ¥¹¥Æ¡¼¥È¥Õ¥¡¥¤¥ëÌ¾¤òÆşÎÏ¤·¤Æ²¼¤µ¤¤ " } },
+  { { " Change ",                           " ãƒ•ã‚¡ã‚¤ãƒ«å¤‰æ›´ "                       } },
+  { { " SAVE ",                             " ã‚»ãƒ¼ãƒ– "                             } },
+  { { " LOAD ",                             " ãƒ­ãƒ¼ãƒ‰ "                             } },
+  { { "                         number : ", "                 é€£ç•ªï¼š "             } },
+  { { " Input (Select) a state filename. ", " ã‚¹ãƒ†ãƒ¼ãƒˆãƒ•ã‚¡ã‚¤ãƒ«åã‚’å…¥åŠ›ã—ã¦ä¸‹ã•ã„ " } },
 };
 
 
 static const t_menudata data_misc_suspend_num[] =
 {
-  { { "(none)",  "(¤Ê¤·)" }, 0   },
+  { { "(none)",  "(ãªã—)" }, 0   },
   { { "0",       "0"      }, '0' },
   { { "1",       "1"      }, '1' },
   { { "2",       "2"      }, '2' },
@@ -1198,17 +1198,17 @@ enum {
 };
 static const t_menulabel data_misc_suspend_err[] =
 {
-  { { "State save Finished.",                           "¾õÂÖ¤òÊİÂ¸¤·¤Ş¤·¤¿¡£"                               } },
-  { { "State load Finished.",                           "¾õÂÖ¤òÉü¸µ¤·¤Ş¤·¤¿¡£"                               } },
+  { { "State save Finished.",                           "çŠ¶æ…‹ã‚’ä¿å­˜ã—ã¾ã—ãŸã€‚"                               } },
+  { { "State load Finished.",                           "çŠ¶æ…‹ã‚’å¾©å…ƒã—ã¾ã—ãŸã€‚"                               } },
   { { "----------------------------------------------", "----------------------------------------------"     } },
-  { { "      ( Following image files are set )       ", " ( °Ê²¼¤Î¥¤¥á¡¼¥¸¥Õ¥¡¥¤¥ë¤¬ÀßÄê¤µ¤ì¤Æ¤¤¤Ş¤¹ ) "     } },
-  { { " OK ",                                           "³ÎÇ§"                                               } },
-  { { "Error / State save failed.",                     "¥¨¥é¡¼¡¿¾õÂÖ¤ÏÊİÂ¸¤µ¤ì¤Ş¤»¤ó¤Ç¤·¤¿¡£"               } },
-  { { "Error / State load failed. Reset done",          "¥¨¥é¡¼¡¿¾õÂÖ¤ÎÉü¸µ¤Ë¼ºÇÔ¤·¤Ş¤·¤¿¡£¥ê¥»¥Ã¥È¤·¤Ş¤¹¡£" } },
-  { { "State-file already exist, Over write ?",         "¥Õ¥¡¥¤¥ë¤Ï¤¹¤Ç¤ËÂ¸ºß¤·¤Ş¤¹¡£¾å½ñ¤­¤·¤Ş¤¹¤«¡©"       } },
-  { { " Over Write ",                                   "¾å½ñ¤­"                                             } },
-  { { " Cancel ",                                       "¼è¾Ã"                                               } },
-  { { "State-file not exist or broken.",                "¥¹¥Æ¡¼¥È¥Õ¥¡¥¤¥ë¤¬Ìµ¤¤¤«¡¢²õ¤ì¤Æ¤¤¤Ş¤¹¡£"           } },
+  { { "      ( Following image files are set )       ", " ( ä»¥ä¸‹ã®ã‚¤ãƒ¡ãƒ¼ã‚¸ãƒ•ã‚¡ã‚¤ãƒ«ãŒè¨­å®šã•ã‚Œã¦ã„ã¾ã™ ) "     } },
+  { { " OK ",                                           "ç¢ºèª"                                               } },
+  { { "Error / State save failed.",                     "ã‚¨ãƒ©ãƒ¼ï¼çŠ¶æ…‹ã¯ä¿å­˜ã•ã‚Œã¾ã›ã‚“ã§ã—ãŸã€‚"               } },
+  { { "Error / State load failed. Reset done",          "ã‚¨ãƒ©ãƒ¼ï¼çŠ¶æ…‹ã®å¾©å…ƒã«å¤±æ•—ã—ã¾ã—ãŸã€‚ãƒªã‚»ãƒƒãƒˆã—ã¾ã™ã€‚" } },
+  { { "State-file already exist, Over write ?",         "ãƒ•ã‚¡ã‚¤ãƒ«ã¯ã™ã§ã«å­˜åœ¨ã—ã¾ã™ã€‚ä¸Šæ›¸ãã—ã¾ã™ã‹ï¼Ÿ"       } },
+  { { " Over Write ",                                   "ä¸Šæ›¸ã"                                             } },
+  { { " Cancel ",                                       "å–æ¶ˆ"                                               } },
+  { { "State-file not exist or broken.",                "ã‚¹ãƒ†ãƒ¼ãƒˆãƒ•ã‚¡ã‚¤ãƒ«ãŒç„¡ã„ã‹ã€å£Šã‚Œã¦ã„ã¾ã™ã€‚"           } },
 };
 
 
@@ -1223,12 +1223,12 @@ enum {
 };
 static const t_menulabel data_misc_snapshot[] =
 {
-  { { " Format   ",                                        " ²èÁü·Á¼°   "                                   } },
-  { { " Change ",                                          " ¥Ù¡¼¥¹Ì¾ÊÑ¹¹ "                                 } },
+  { { " Format   ",                                        " ç”»åƒå½¢å¼   "                                   } },
+  { { " Change ",                                          " ãƒ™ãƒ¼ã‚¹åå¤‰æ›´ "                                 } },
   { { "                    ",                              "            "                                   } },
-  { { " SAVE ",                                            " ÊİÂ¸ "                                         } },
-  { { " Input (Select) a screen-snapshot base-filename. ", " ÊİÂ¸¤¹¤ë¥Õ¥¡¥¤¥ë (¥Ù¡¼¥¹Ì¾) ¤òÆşÎÏ¤·¤Æ²¼¤µ¤¤ " } },
-  { { "Exec following Command",                            "¼¡¤Î¥³¥Ş¥ó¥É¤ò¼Â¹Ô¤¹¤ë"                         } },
+  { { " SAVE ",                                            " ä¿å­˜ "                                         } },
+  { { " Input (Select) a screen-snapshot base-filename. ", " ä¿å­˜ã™ã‚‹ãƒ•ã‚¡ã‚¤ãƒ« (ãƒ™ãƒ¼ã‚¹å) ã‚’å…¥åŠ›ã—ã¦ä¸‹ã•ã„ " } },
+  { { "Exec following Command",                            "æ¬¡ã®ã‚³ãƒãƒ³ãƒ‰ã‚’å®Ÿè¡Œã™ã‚‹"                         } },
 };
 
 static const t_menudata data_misc_snapshot_format[] =
@@ -1249,18 +1249,18 @@ enum {
 };
 static const t_menulabel data_misc_waveout[] =
 {
-  { { " Change ",                                       " ¥Ù¡¼¥¹Ì¾ÊÑ¹¹ "                                 } },
-  { { " START ",                                        " ³«»Ï "                                         } },
-  { { " STOP ",                                         " Ää»ß "                                         } },
+  { { " Change ",                                       " ãƒ™ãƒ¼ã‚¹åå¤‰æ›´ "                                 } },
+  { { " START ",                                        " é–‹å§‹ "                                         } },
+  { { " STOP ",                                         " åœæ­¢ "                                         } },
   { { "                                            ",   "                                       "        } },
-  { { " Input (Select) a sound-record base-filename. ", " ½ĞÎÏ¤¹¤ë¥Õ¥¡¥¤¥ë (¥Ù¡¼¥¹Ì¾) ¤òÆşÎÏ¤·¤Æ²¼¤µ¤¤ " } },
+  { { " Input (Select) a sound-record base-filename. ", " å‡ºåŠ›ã™ã‚‹ãƒ•ã‚¡ã‚¤ãƒ« (ãƒ™ãƒ¼ã‚¹å) ã‚’å…¥åŠ›ã—ã¦ä¸‹ã•ã„ " } },
 };
 
 
 
 static const t_menulabel data_misc_sync[] =
 {
-  { { "synchronize filename with disk-image filename", "³Æ¥Õ¥¡¥¤¥ëÌ¾¤ò¥Ç¥£¥¹¥¯¥¤¥á¡¼¥¸¤Î¥Õ¥¡¥¤¥ëÌ¾¤Ë¹ç¤ï¤»¤ë", } },
+  { { "synchronize filename with disk-image filename", "å„ãƒ•ã‚¡ã‚¤ãƒ«åã‚’ãƒ‡ã‚£ã‚¹ã‚¯ã‚¤ãƒ¡ãƒ¼ã‚¸ã®ãƒ•ã‚¡ã‚¤ãƒ«åã«åˆã‚ã›ã‚‹", } },
 };
 
 
@@ -1268,7 +1268,7 @@ static const t_menulabel data_misc_sync[] =
 
 
 /*--------------------------------------------------------------
- *	¡Ö¥­¡¼¡× ¥¿¥Ö
+ *	ã€Œã‚­ãƒ¼ã€ ã‚¿ãƒ–
  *--------------------------------------------------------------*/
 enum {
   DATA_KEY_FKEY,
@@ -1279,11 +1279,11 @@ enum {
 };
 static const t_menulabel data_key[] =
 {
-  { { " Function key Config ",             " ¥Õ¥¡¥ó¥¯¥·¥ç¥ó¥­¡¼ÀßÄê ",         } },
-  { { " Curosr Key Config ",               " ¥«¡¼¥½¥ë¥­¡¼ÀßÄê ",               } }, 
+  { { " Function key Config ",             " ãƒ•ã‚¡ãƒ³ã‚¯ã‚·ãƒ§ãƒ³ã‚­ãƒ¼è¨­å®š ",         } },
+  { { " Curosr Key Config ",               " ã‚«ãƒ¼ã‚½ãƒ«ã‚­ãƒ¼è¨­å®š ",               } }, 
   { { "                                 ", "                                ", } },
-  { { " Software ",                        " ¥½¥Õ¥È¥¦¥§¥¢ ",                   } },
-  { { "   Keyboard  ",                     "  ¥­¡¼¥Ü¡¼¥É  ",                   } },
+  { { " Software ",                        " ã‚½ãƒ•ãƒˆã‚¦ã‚§ã‚¢ ",                   } },
+  { { "   Keyboard  ",                     "  ã‚­ãƒ¼ãƒœãƒ¼ãƒ‰  ",                   } },
 };
 
 
@@ -1294,48 +1294,48 @@ enum {
 };
 static const t_menudata data_key_cfg[] =
 {
-  { { "Set numeric key to TEN-key (-tenkey) ",  "¿ô»ú¥­¡¼¤ò¥Æ¥ó¥­¡¼¤Ë³ä¤êÅö¤Æ¤ë   (-tenkey)  ", }, DATA_KEY_CFG_TENKEY,  },
-  { { "software NUM-Lock ON       (-numlock)",  "¥½¥Õ¥È¥¦¥§¥¢ NUM Lock ¤ò¥ª¥ó¤¹¤ë (-numlock) ", }, DATA_KEY_CFG_NUMLOCK, },
+  { { "Set numeric key to TEN-key (-tenkey) ",  "æ•°å­—ã‚­ãƒ¼ã‚’ãƒ†ãƒ³ã‚­ãƒ¼ã«å‰²ã‚Šå½“ã¦ã‚‹   (-tenkey)  ", }, DATA_KEY_CFG_TENKEY,  },
+  { { "software NUM-Lock ON       (-numlock)",  "ã‚½ãƒ•ãƒˆã‚¦ã‚§ã‚¢ NUM Lock ã‚’ã‚ªãƒ³ã™ã‚‹ (-numlock) ", }, DATA_KEY_CFG_NUMLOCK, },
 };
 
 
 
 static const t_menudata data_key_fkey[] =
 {
-  { { "   f6  key ",  "   f6  ¥­¡¼ ", },  6 },
-  { { "   f7  key ",  "   f7  ¥­¡¼ ", },  7 },
-  { { "   f8  key ",  "   f8  ¥­¡¼ ", },  8 },
-  { { "   f9  key ",  "   f9  ¥­¡¼ ", },  9 },
-  { { "   f10 key ",  "   f10 ¥­¡¼ ", }, 10 },
+  { { "   f6  key ",  "   f6  ã‚­ãƒ¼ ", },  6 },
+  { { "   f7  key ",  "   f7  ã‚­ãƒ¼ ", },  7 },
+  { { "   f8  key ",  "   f8  ã‚­ãƒ¼ ", },  8 },
+  { { "   f9  key ",  "   f9  ã‚­ãƒ¼ ", },  9 },
+  { { "   f10 key ",  "   f10 ã‚­ãƒ¼ ", }, 10 },
 };
 static const t_menudata data_key_fkey_fn[] =
 {
-  { { "----------- : function or another key",  "----------- : ¥Õ¥¡¥ó¥¯¥·¥ç¥ó¤Ş¤¿¤ÏÇ¤°Õ¥­¡¼", },  FN_FUNC,        },
-  { { "FRATE-UP    : Frame Rate  Up",           "FRATE-UP    : ¥Õ¥ì¡¼¥à¥ì¡¼¥È ¾å¤²¤ë ",       },  FN_FRATE_UP,    },
-  { { "FRATE-DOWN  : Frame Rate  Down",         "FRATE-DOWN  : ¥Õ¥ì¡¼¥à¥ì¡¼¥È ²¼¤²¤ë ",       },  FN_FRATE_DOWN,  },
-  { { "VOLUME-UP   : Volume  Up",               "VOLUME-UP   : ²»ÎÌ ¾å¤²¤ë",                  },  FN_VOLUME_UP,   },
-  { { "VOLUME-DOWN : Volume  Down",             "VOLUME-DOWN : ²»ÎÌ ²¼¤²¤ë",                  },  FN_VOLUME_DOWN, },
-  { { "PAUSE       : Pause",                    "PAUSE       : °ì»şÄä»ß",                     },  FN_PAUSE,       },
-  { { "RESIZE      : Resize",                   "RESIZE      : ²èÌÌ¥µ¥¤¥ºÊÑ¹¹",               },  FN_RESIZE,      },
-  { { "NOWAIT      : No-Wait",                  "NOWAIT      : ¥¦¥¨¥¤¥È¤Ê¤·",                 },  FN_NOWAIT,      },
-  { { "SPEED-UP    : Speed Up",                 "SPEED-UP    : Â®ÅÙ ¾å¤²¤ë ",                 },  FN_SPEED_UP,    },
-  { { "SPEED-DOWN  : Speed Down",               "SPEED-DOWN  : Â®ÅÙ ²¼¤²¤ë ",                 },  FN_SPEED_DOWN,  },
-  { { "FULLSCREEN  : Full Screen Mode",         "FULLSCREEN  : ¥Õ¥ë¥¹¥¯¥ê¡¼¥óÀÚÂØ",           },  FN_FULLSCREEN,  },
-  { { "SNAPSHOT    : Save Screen Snapshot",     "SNAPSHOT    : ¥¹¥¯¥ê¡¼¥ó¥¹¥Ê¥Ã¥×¥·¥ç¥Ã¥È",   },  FN_SNAPSHOT,    },
-  { { "IMAGE-NEXT1 : Drive 1:  Next Image",     "IMAGE-NEXT1 : Drive 1:  ¼¡¥¤¥á¡¼¥¸",         },  FN_IMAGE_NEXT1, },
-  { { "IMAGE-PREV1 : Drive 1:  Prev Image",     "IMAGE-PREV1 : Drive 1:  Á°¥¤¥á¡¼¥¸",         },  FN_IMAGE_PREV1, },
-  { { "IMAGE-NEXT2 : Drive 2:  Next Image",     "IMAGE-NEXT2 : Drive 2:  ¼¡¥¤¥á¡¼¥¸",         },  FN_IMAGE_NEXT2, },
-  { { "IMAGE-PREV2 : Drive 2:  Prev Image",     "IMAGE-PREV2 : Drive 2:  Á°¥¤¥á¡¼¥¸",         },  FN_IMAGE_PREV2, },
-  { { "NUMLOCK     : Software NUM Lock",        "NUMLOCK     : ¥½¥Õ¥È¥¦¥§¥¢ NUM Lock",        },  FN_NUMLOCK,     },
-  { { "RESET       : Reset switch",             "RESET       : ¥ê¥»¥Ã¥È ¥¹¥¤¥Ã¥Á",            },  FN_RESET,       },
-  { { "KANA        : KANA key",                 "KANA        : ¥«¥Ê ¥­¡¼",                    },  FN_KANA,        },
-  { { "ROMAJI      : KANA(ROMAJI) Key",         "ROMAJI      : ¥«¥Ê(¥í¡¼¥Ş»úÆşÎÏ) ¥­¡¼",      },  FN_ROMAJI,      },
-  { { "CAPS        : CAPS Key",                 "CAPS        : CAPS ¥­¡¼",                    },  FN_CAPS,        },
-  { { "MAX-SPEED   : Max Speed",                "MAX-SPEED   : Â®ÅÙºÇÂçÀßÄêÃÍ",               },  FN_MAX_SPEED,   },
-  { { "MAX-CLOCK   : Max CPU-Clock",            "MAX-CLOCK   : CPU¥¯¥í¥Ã¥¯ºÇÂçÀßÄêÃÍ",        },  FN_MAX_CLOCK,   },
-  { { "MAX-BOOST   : Max Boost",                "MAX-BOOST   : ¥Ö¡¼¥¹¥ÈºÇÂçÀßÄêÃÍ",           },  FN_MAX_BOOST,   },
-  { { "STATUS      : Display status",           "STATUS      : ¥¹¥Æ¡¼¥¿¥¹É½¼¨¤Î¥ª¥ó¡¿¥ª¥Õ",   },  FN_STATUS,      },
-  { { "MENU        : Go Menu-Mode",             "MENU        : ¥á¥Ë¥å¡¼",                     },  FN_MENU,        },
+  { { "----------- : function or another key",  "----------- : ãƒ•ã‚¡ãƒ³ã‚¯ã‚·ãƒ§ãƒ³ã¾ãŸã¯ä»»æ„ã‚­ãƒ¼", },  FN_FUNC,        },
+  { { "FRATE-UP    : Frame Rate  Up",           "FRATE-UP    : ãƒ•ãƒ¬ãƒ¼ãƒ ãƒ¬ãƒ¼ãƒˆ ä¸Šã’ã‚‹ ",       },  FN_FRATE_UP,    },
+  { { "FRATE-DOWN  : Frame Rate  Down",         "FRATE-DOWN  : ãƒ•ãƒ¬ãƒ¼ãƒ ãƒ¬ãƒ¼ãƒˆ ä¸‹ã’ã‚‹ ",       },  FN_FRATE_DOWN,  },
+  { { "VOLUME-UP   : Volume  Up",               "VOLUME-UP   : éŸ³é‡ ä¸Šã’ã‚‹",                  },  FN_VOLUME_UP,   },
+  { { "VOLUME-DOWN : Volume  Down",             "VOLUME-DOWN : éŸ³é‡ ä¸‹ã’ã‚‹",                  },  FN_VOLUME_DOWN, },
+  { { "PAUSE       : Pause",                    "PAUSE       : ä¸€æ™‚åœæ­¢",                     },  FN_PAUSE,       },
+  { { "RESIZE      : Resize",                   "RESIZE      : ç”»é¢ã‚µã‚¤ã‚ºå¤‰æ›´",               },  FN_RESIZE,      },
+  { { "NOWAIT      : No-Wait",                  "NOWAIT      : ã‚¦ã‚¨ã‚¤ãƒˆãªã—",                 },  FN_NOWAIT,      },
+  { { "SPEED-UP    : Speed Up",                 "SPEED-UP    : é€Ÿåº¦ ä¸Šã’ã‚‹ ",                 },  FN_SPEED_UP,    },
+  { { "SPEED-DOWN  : Speed Down",               "SPEED-DOWN  : é€Ÿåº¦ ä¸‹ã’ã‚‹ ",                 },  FN_SPEED_DOWN,  },
+  { { "FULLSCREEN  : Full Screen Mode",         "FULLSCREEN  : ãƒ•ãƒ«ã‚¹ã‚¯ãƒªãƒ¼ãƒ³åˆ‡æ›¿",           },  FN_FULLSCREEN,  },
+  { { "SNAPSHOT    : Save Screen Snapshot",     "SNAPSHOT    : ã‚¹ã‚¯ãƒªãƒ¼ãƒ³ã‚¹ãƒŠãƒƒãƒ—ã‚·ãƒ§ãƒƒãƒˆ",   },  FN_SNAPSHOT,    },
+  { { "IMAGE-NEXT1 : Drive 1:  Next Image",     "IMAGE-NEXT1 : Drive 1:  æ¬¡ã‚¤ãƒ¡ãƒ¼ã‚¸",         },  FN_IMAGE_NEXT1, },
+  { { "IMAGE-PREV1 : Drive 1:  Prev Image",     "IMAGE-PREV1 : Drive 1:  å‰ã‚¤ãƒ¡ãƒ¼ã‚¸",         },  FN_IMAGE_PREV1, },
+  { { "IMAGE-NEXT2 : Drive 2:  Next Image",     "IMAGE-NEXT2 : Drive 2:  æ¬¡ã‚¤ãƒ¡ãƒ¼ã‚¸",         },  FN_IMAGE_NEXT2, },
+  { { "IMAGE-PREV2 : Drive 2:  Prev Image",     "IMAGE-PREV2 : Drive 2:  å‰ã‚¤ãƒ¡ãƒ¼ã‚¸",         },  FN_IMAGE_PREV2, },
+  { { "NUMLOCK     : Software NUM Lock",        "NUMLOCK     : ã‚½ãƒ•ãƒˆã‚¦ã‚§ã‚¢ NUM Lock",        },  FN_NUMLOCK,     },
+  { { "RESET       : Reset switch",             "RESET       : ãƒªã‚»ãƒƒãƒˆ ã‚¹ã‚¤ãƒƒãƒ",            },  FN_RESET,       },
+  { { "KANA        : KANA key",                 "KANA        : ã‚«ãƒŠ ã‚­ãƒ¼",                    },  FN_KANA,        },
+  { { "ROMAJI      : KANA(ROMAJI) Key",         "ROMAJI      : ã‚«ãƒŠ(ãƒ­ãƒ¼ãƒå­—å…¥åŠ›) ã‚­ãƒ¼",      },  FN_ROMAJI,      },
+  { { "CAPS        : CAPS Key",                 "CAPS        : CAPS ã‚­ãƒ¼",                    },  FN_CAPS,        },
+  { { "MAX-SPEED   : Max Speed",                "MAX-SPEED   : é€Ÿåº¦æœ€å¤§è¨­å®šå€¤",               },  FN_MAX_SPEED,   },
+  { { "MAX-CLOCK   : Max CPU-Clock",            "MAX-CLOCK   : CPUã‚¯ãƒ­ãƒƒã‚¯æœ€å¤§è¨­å®šå€¤",        },  FN_MAX_CLOCK,   },
+  { { "MAX-BOOST   : Max Boost",                "MAX-BOOST   : ãƒ–ãƒ¼ã‚¹ãƒˆæœ€å¤§è¨­å®šå€¤",           },  FN_MAX_BOOST,   },
+  { { "STATUS      : Display status",           "STATUS      : ã‚¹ãƒ†ãƒ¼ã‚¿ã‚¹è¡¨ç¤ºã®ã‚ªãƒ³ï¼ã‚ªãƒ•",   },  FN_STATUS,      },
+  { { "MENU        : Go Menu-Mode",             "MENU        : ãƒ¡ãƒ‹ãƒ¥ãƒ¼",                     },  FN_MENU,        },
 };
 
 
@@ -1358,33 +1358,33 @@ enum {
 };
 static const t_menulabel data_skey_set[] =
 {
-  { { "Setting",                " ÀßÄê ",               } },
-  { { "All key release & QUIT", " Á´¤Æ¥ª¥Õ¤Ë¤·¤ÆÌá¤ë ", } },
-  { { " QUIT ",                 " Ìá¤ë ",               } },
+  { { "Setting",                " è¨­å®š ",               } },
+  { { "All key release & QUIT", " å…¨ã¦ã‚ªãƒ•ã«ã—ã¦æˆ»ã‚‹ ", } },
+  { { " QUIT ",                 " æˆ»ã‚‹ ",               } },
 };
 
 
 
 static const t_menudata data_key_cursor_mode[] =
 {
-  { { " Default(CursorKey)",  " É¸½à(¥«¡¼¥½¥ë¥­¡¼)",    },  0, },
-  { { " Assign to 2,4,6,8",   " 2,4,6,8 ¤ò³ä¤êÅö¤Æ",    },  1, },
-  { { " Assign arbitrarily ", " Ç¤°Õ¤Î¥­¡¼¤ò³ä¤êÅö¤Æ ", },  2, },
+  { { " Default(CursorKey)",  " æ¨™æº–(ã‚«ãƒ¼ã‚½ãƒ«ã‚­ãƒ¼)",    },  0, },
+  { { " Assign to 2,4,6,8",   " 2,4,6,8 ã‚’å‰²ã‚Šå½“ã¦",    },  1, },
+  { { " Assign arbitrarily ", " ä»»æ„ã®ã‚­ãƒ¼ã‚’å‰²ã‚Šå½“ã¦ ", },  2, },
 };
 static const t_menudata data_key_cursor[] =
 {
   { { "             ",          "             ",     },   0, },
-  { { "                \036",   "               ¢¬", },  -1, },
+  { { "                \036",   "               â†‘", },  -1, },
   { { " ",                      " ",                 },   2, },
-  { { "\035           \034 ",   "¢«        ¢ª ",     },   3, },
-  { { "                \037",   "               ¢­", },  -1, },
+  { { "\035           \034 ",   "â†        â†’ ",     },   3, },
+  { { "                \037",   "               â†“", },  -1, },
   { { "             ",          "             ",     },   1, },
 };
 
 
 
 /*--------------------------------------------------------------
- *	¡Ö¥Ş¥¦¥¹¡× ¥¿¥Ö
+ *	ã€Œãƒã‚¦ã‚¹ã€ ã‚¿ãƒ–
  *--------------------------------------------------------------*/
 enum {
   DATA_MOUSE_MODE,
@@ -1406,153 +1406,153 @@ enum {
 };
 static const t_menulabel data_mouse[] =
 {
-  { { " Mouse / Joystick setting ", " ¥Ş¥¦¥¹¡¿¥¸¥ç¥¤¥¹¥Æ¥£¥Ã¥¯ÀÜÂ³ "  } },
-  { { " Serial-mouse ",             " ¥·¥ê¥¢¥ë¥Ş¥¦¥¹ "                } },
+  { { " Mouse / Joystick setting ", " ãƒã‚¦ã‚¹ï¼ã‚¸ãƒ§ã‚¤ã‚¹ãƒ†ã‚£ãƒƒã‚¯æ¥ç¶š "  } },
+  { { " Serial-mouse ",             " ã‚·ãƒªã‚¢ãƒ«ãƒã‚¦ã‚¹ "                } },
 
   { { " [ System Setup  (Some settings are disabled in some systems.)]               ",
-      " ¡Ú¥·¥¹¥Æ¥àÀßÄê  (ÀßÄê¤Î°ìÉô¤Ï¡¢¥·¥¹¥Æ¥à¤Ë¤è¤Ã¤Æ¤ÏÌµ¸ú¤Ç¤¹)¡Û                 ", } },
+      " ã€ã‚·ã‚¹ãƒ†ãƒ è¨­å®š  (è¨­å®šã®ä¸€éƒ¨ã¯ã€ã‚·ã‚¹ãƒ†ãƒ ã«ã‚ˆã£ã¦ã¯ç„¡åŠ¹ã§ã™)ã€‘                 ", } },
 
-  { { " Mouse ",                         " ¥Ş¥¦¥¹ÆşÎÏ ",                         } },
-  { { " Joystick ",                      " ¥¸¥ç¥¤¥¹¥Æ¥£¥Ã¥¯ÆşÎÏ ",               } },
-  { { " Joystick(2) ",                   " ¥¸¥ç¥¤¥¹¥Æ¥£¥Ã¥¯(2)ÆşÎÏ "             } },
-  { { " About ",                         " ¢¨ "                                  } },
+  { { " Mouse ",                         " ãƒã‚¦ã‚¹å…¥åŠ› ",                         } },
+  { { " Joystick ",                      " ã‚¸ãƒ§ã‚¤ã‚¹ãƒ†ã‚£ãƒƒã‚¯å…¥åŠ› ",               } },
+  { { " Joystick(2) ",                   " ã‚¸ãƒ§ã‚¤ã‚¹ãƒ†ã‚£ãƒƒã‚¯(2)å…¥åŠ› "             } },
+  { { " About ",                         " â€» "                                  } },
 
-  { { " %d Joystick(s) is found.",       "  %d ¸Ä¤Î¥¸¥ç¥¤¥¹¥Æ¥£¥Ã¥¯¤¬»ÈÍÑ¤Ç¤­¤Ş¤¹¡£" } },
+  { { " %d Joystick(s) is found.",       "  %d å€‹ã®ã‚¸ãƒ§ã‚¤ã‚¹ãƒ†ã‚£ãƒƒã‚¯ãŒä½¿ç”¨ã§ãã¾ã™ã€‚" } },
 
-  { { "  Connecting mouse-port   ",         "  ¥Ş¥¦¥¹¥İ¡¼¥È¤ËÀÜÂ³Ãæ    "         } },
-  { { "Swap mouse buttons",                 "º¸±¦¥Ü¥¿¥ó¤òÆş¤ìÂØ¤¨¤ë"             } },
-  { { "Swap joystick buttons (-joy_swap)",  "£Á£Â¥Ü¥¿¥ó¤òÆş¤ìÂØ¤¨¤ë (-joyswap)"  } },
-  { { "Swap joystick buttons",              "£Á£Â¥Ü¥¿¥ó¤òÆş¤ìÂØ¤¨¤ë"             } },
+  { { "  Connecting mouse-port   ",         "  ãƒã‚¦ã‚¹ãƒãƒ¼ãƒˆã«æ¥ç¶šä¸­    "         } },
+  { { "Swap mouse buttons",                 "å·¦å³ãƒœã‚¿ãƒ³ã‚’å…¥ã‚Œæ›¿ãˆã‚‹"             } },
+  { { "Swap joystick buttons (-joy_swap)",  "ï¼¡ï¼¢ãƒœã‚¿ãƒ³ã‚’å…¥ã‚Œæ›¿ãˆã‚‹ (-joyswap)"  } },
+  { { "Swap joystick buttons",              "ï¼¡ï¼¢ãƒœã‚¿ãƒ³ã‚’å…¥ã‚Œæ›¿ãˆã‚‹"             } },
 };
 
 
 
 static const t_menudata data_mouse_mode[] =
 {
-  { { "Not Connect               (-nomouse) ", "¤Ê¤Ë¤âÀÜÂ³¤·¤Ê¤¤                     (-nomouse) " }, MOUSE_NONE     },
-  { { "Connect Mouse             (-mouse)   ", "¥Ş¥¦¥¹¤òÀÜÂ³                         (-mouse)   " }, MOUSE_MOUSE    },
-  { { "Connect Mouse as joystick (-joymouse)", "¥Ş¥¦¥¹¤ò¥¸¥ç¥¤¥¹¥Æ¥£¥Ã¥¯¥â¡¼¥É¤ÇÀÜÂ³ (-joymouse)" }, MOUSE_JOYMOUSE },
-  { { "Connect joystick          (-joystick)", "¥¸¥ç¥¤¥¹¥Æ¥£¥Ã¥¯¤òÀÜÂ³               (-joystick)" }, MOUSE_JOYSTICK },
+  { { "Not Connect               (-nomouse) ", "ãªã«ã‚‚æ¥ç¶šã—ãªã„                     (-nomouse) " }, MOUSE_NONE     },
+  { { "Connect Mouse             (-mouse)   ", "ãƒã‚¦ã‚¹ã‚’æ¥ç¶š                         (-mouse)   " }, MOUSE_MOUSE    },
+  { { "Connect Mouse as joystick (-joymouse)", "ãƒã‚¦ã‚¹ã‚’ã‚¸ãƒ§ã‚¤ã‚¹ãƒ†ã‚£ãƒƒã‚¯ãƒ¢ãƒ¼ãƒ‰ã§æ¥ç¶š (-joymouse)" }, MOUSE_JOYMOUSE },
+  { { "Connect joystick          (-joystick)", "ã‚¸ãƒ§ã‚¤ã‚¹ãƒ†ã‚£ãƒƒã‚¯ã‚’æ¥ç¶š               (-joystick)" }, MOUSE_JOYSTICK },
 };
 
 
 
 static const t_menulabel data_mouse_serial[] =
 {
-  { { "Connect (-serialmouse)", "ÀÜÂ³ (-serialmouse)" } },
+  { { "Connect (-serialmouse)", "æ¥ç¶š (-serialmouse)" } },
 };
 
 
 
 static const t_menudata data_mouse_mouse_key_mode[] =
 {
-  { { " Not Assigned ",          " ¥­¡¼³ä¤êÅö¤Æ¤Ê¤·"       },  0 },
-  { { " Assign to 2,4,6,8,x,z ", " 2,4,6,8,x,z¤ò³ä¤êÅö¤Æ " },  1 },
-  { { " Assign arbitrarily    ", " Ç¤°Õ¤Î¥­¡¼¤ò³ä¤êÅö¤Æ"   },  2 },
+  { { " Not Assigned ",          " ã‚­ãƒ¼å‰²ã‚Šå½“ã¦ãªã—"       },  0 },
+  { { " Assign to 2,4,6,8,x,z ", " 2,4,6,8,x,zã‚’å‰²ã‚Šå½“ã¦ " },  1 },
+  { { " Assign arbitrarily    ", " ä»»æ„ã®ã‚­ãƒ¼ã‚’å‰²ã‚Šå½“ã¦"   },  2 },
 };
 static const t_menudata data_mouse_mouse[] =
 {
   { { "             ",          "             ",     },   0, },
-  { { "                \036",   "               ¢¬", },  -1, },
+  { { "                \036",   "               â†‘", },  -1, },
   { { " ",                      " ",                 },   2, },
-  { { "\035           \034 ",   "¢«        ¢ª ",     },   3, },
-  { { "                \037",   "               ¢­", },  -1, },
+  { { "\035           \034 ",   "â†        â†’ ",     },   3, },
+  { { "                \037",   "               â†“", },  -1, },
   { { "             ",          "             ",     },   1, },
   { { "",                       "",                  },  -1, },
-  { { " L ",                    " º¸ "               },   4, },
+  { { " L ",                    " å·¦ "               },   4, },
   { { "",                       "",                  },  -1, },
-  { { " R ",                    " ±¦ "               },   5, },
+  { { " R ",                    " å³ "               },   5, },
 };
 
 
 
 static const t_menudata data_mouse_joy_key_mode[] =
 {
-  { { " Not Assigned ",          " ¥­¡¼³ä¤êÅö¤Æ¤Ê¤·"       },  0 },
-  { { " Assign to 2,4,6,8,x,z ", " 2,4,6,8,x,z¤ò³ä¤êÅö¤Æ " },  1 },
-  { { " Assign arbitrarily    ", " Ç¤°Õ¤Î¥­¡¼¤ò³ä¤êÅö¤Æ"   },  2 },
+  { { " Not Assigned ",          " ã‚­ãƒ¼å‰²ã‚Šå½“ã¦ãªã—"       },  0 },
+  { { " Assign to 2,4,6,8,x,z ", " 2,4,6,8,x,zã‚’å‰²ã‚Šå½“ã¦ " },  1 },
+  { { " Assign arbitrarily    ", " ä»»æ„ã®ã‚­ãƒ¼ã‚’å‰²ã‚Šå½“ã¦"   },  2 },
 };
 static const t_menudata data_mouse_joy[] =
 {
   { { "             ",          "             ",     },   0, },
-  { { "                \036",   "               ¢¬", },  -1, },
+  { { "                \036",   "               â†‘", },  -1, },
   { { " ",                      " ",                 },   2, },
-  { { "\035           \034 ",   "¢«        ¢ª ",     },   3, },
-  { { "                \037",   "               ¢­", },  -1, },
+  { { "\035           \034 ",   "â†        â†’ ",     },   3, },
+  { { "                \037",   "               â†“", },  -1, },
   { { "             ",          "             ",     },   1, },
-  { { " A ",                    " £Á "               },   4, },
-  { { " B ",                    " £Â "               },   5, },
-  { { " C ",                    " £Ã "               },   6, },
-  { { " D ",                    " £Ä "               },   7, },
-  { { " E ",                    " £Å "               },   8, },
-  { { " F ",                    " £Æ "               },   9, },
-  { { " G ",                    " £Ç "               },  10, },
-  { { " H ",                    " £È "               },  11, },
+  { { " A ",                    " ï¼¡ "               },   4, },
+  { { " B ",                    " ï¼¢ "               },   5, },
+  { { " C ",                    " ï¼£ "               },   6, },
+  { { " D ",                    " ï¼¤ "               },   7, },
+  { { " E ",                    " ï¼¥ "               },   8, },
+  { { " F ",                    " ï¼¦ "               },   9, },
+  { { " G ",                    " ï¼§ "               },  10, },
+  { { " H ",                    " ï¼¨ "               },  11, },
 };
 static const t_menudata data_mouse_joy2_key_mode[] =
 {
-  { { " Not Assigned ",          " ¥­¡¼³ä¤êÅö¤Æ¤Ê¤·"       },  0 },
-  { { " Assign to 2,4,6,8,x,z ", " 2,4,6,8,x,z¤ò³ä¤êÅö¤Æ " },  1 },
-  { { " Assign arbitrarily    ", " Ç¤°Õ¤Î¥­¡¼¤ò³ä¤êÅö¤Æ"   },  2 },
+  { { " Not Assigned ",          " ã‚­ãƒ¼å‰²ã‚Šå½“ã¦ãªã—"       },  0 },
+  { { " Assign to 2,4,6,8,x,z ", " 2,4,6,8,x,zã‚’å‰²ã‚Šå½“ã¦ " },  1 },
+  { { " Assign arbitrarily    ", " ä»»æ„ã®ã‚­ãƒ¼ã‚’å‰²ã‚Šå½“ã¦"   },  2 },
 };
 static const t_menudata data_mouse_joy2[] =
 {
   { { "             ",          "             ",     },   0, },
-  { { "                \036",   "               ¢¬", },  -1, },
+  { { "                \036",   "               â†‘", },  -1, },
   { { " ",                      " ",                 },   2, },
-  { { "\035           \034 ",   "¢«        ¢ª ",     },   3, },
-  { { "                \037",   "               ¢­", },  -1, },
+  { { "\035           \034 ",   "â†        â†’ ",     },   3, },
+  { { "                \037",   "               â†“", },  -1, },
   { { "             ",          "             ",     },   1, },
-  { { " A ",                    " £Á "               },   4, },
-  { { " B ",                    " £Â "               },   5, },
-  { { " C ",                    " £Ã "               },   6, },
-  { { " D ",                    " £Ä "               },   7, },
-  { { " E ",                    " £Å "               },   8, },
-  { { " F ",                    " £Æ "               },   9, },
-  { { " G ",                    " £Ç "               },  10, },
-  { { " H ",                    " £È "               },  11, },
+  { { " A ",                    " ï¼¡ "               },   4, },
+  { { " B ",                    " ï¼¢ "               },   5, },
+  { { " C ",                    " ï¼£ "               },   6, },
+  { { " D ",                    " ï¼¤ "               },   7, },
+  { { " E ",                    " ï¼¥ "               },   8, },
+  { { " F ",                    " ï¼¦ "               },   9, },
+  { { " G ",                    " ï¼§ "               },  10, },
+  { { " H ",                    " ï¼¨ "               },  11, },
 };
 
 
 
 static const t_volume data_mouse_sensitivity[] =
 {
-  { { " Sensitivity [%] :",  " ¥Ş¥¦¥¹´¶ÅÙ [¡ó]¡§" }, -1, 10, 200,  1, 10},
+  { { " Sensitivity [%] :",  " ãƒã‚¦ã‚¹æ„Ÿåº¦ [ï¼…]ï¼š" }, -1, 10, 200,  1, 10},
 };
 
 
 
 static const t_menulabel data_mouse_misc_msg[] =
 {
-  { { " Mouse Cursor : ", " ¥Ş¥¦¥¹¥«¡¼¥½¥ë¤ò " } },
+  { { " Mouse Cursor : ", " ãƒã‚¦ã‚¹ã‚«ãƒ¼ã‚½ãƒ«ã‚’ " } },
 };
 static const t_menudata data_mouse_misc[] =
 {
-  { { "Always show the mouse cursor            (-show_mouse) ", "¾ï¤ËÉ½¼¨¤¹¤ë             (-show_mouse) " }, SHOW_MOUSE },
-  { { "Always Hide the mouse cursor            (-hide_mouse) ", "¾ï¤Ë±£¤¹                 (-hide_mouse) " }, HIDE_MOUSE },
-  { { "Auto-hide the mouse cutsor              (-auto_mouse) ", "¼«Æ°Åª¤Ë±£¤¹             (-auto_mouse) " }, AUTO_MOUSE },
-  { { "Confine the mouse cursor on the screend (-grab_mouse) ", "²èÌÌ¤ËÊÄ¤¸¹ş¤á¤ë¡Ê±£¤¹¡Ë (-grab_mouse) " }, -1         },
-  { { "Confine the mouse cursor when mouse clicked           ", "¥¯¥ê¥Ã¥¯¤ÇÊÄ¤¸¹ş¤á¤ë                   " }, -2         },
+  { { "Always show the mouse cursor            (-show_mouse) ", "å¸¸ã«è¡¨ç¤ºã™ã‚‹             (-show_mouse) " }, SHOW_MOUSE },
+  { { "Always Hide the mouse cursor            (-hide_mouse) ", "å¸¸ã«éš ã™                 (-hide_mouse) " }, HIDE_MOUSE },
+  { { "Auto-hide the mouse cutsor              (-auto_mouse) ", "è‡ªå‹•çš„ã«éš ã™             (-auto_mouse) " }, AUTO_MOUSE },
+  { { "Confine the mouse cursor on the screend (-grab_mouse) ", "ç”»é¢ã«é–‰ã˜è¾¼ã‚ã‚‹ï¼ˆéš ã™ï¼‰ (-grab_mouse) " }, -1         },
+  { { "Confine the mouse cursor when mouse clicked           ", "ã‚¯ãƒªãƒƒã‚¯ã§é–‰ã˜è¾¼ã‚ã‚‹                   " }, -2         },
 };
 
 
 
 static const t_menudata data_mouse_debug_hide[] =
 {
-  { { " SHOW ", " É½¼¨ ", }, SHOW_MOUSE, },
-  { { " HIDE ", " ±£¤¹ ", }, HIDE_MOUSE, },
-  { { " AUTO ", " ¼«Æ° ", }, AUTO_MOUSE, },
+  { { " SHOW ", " è¡¨ç¤º ", }, SHOW_MOUSE, },
+  { { " HIDE ", " éš ã™ ", }, HIDE_MOUSE, },
+  { { " AUTO ", " è‡ªå‹• ", }, AUTO_MOUSE, },
 };
 static const t_menudata data_mouse_debug_grab[] =
 {
-  { { " UNGRAB ", " Î¥¤¹ ", }, UNGRAB_MOUSE, },
-  { { " GRAB   ", " ÄÏ¤à ", }, GRAB_MOUSE,   },
-  { { " AUTO   ", " ¼«Æ° ", }, AUTO_MOUSE,   },
+  { { " UNGRAB ", " é›¢ã™ ", }, UNGRAB_MOUSE, },
+  { { " GRAB   ", " æ´ã‚€ ", }, GRAB_MOUSE,   },
+  { { " AUTO   ", " è‡ªå‹• ", }, AUTO_MOUSE,   },
 };
 
 
 /*--------------------------------------------------------------
- *	¡Ö¥Æ¡¼¥×¡× ¥¿¥Ö
+ *	ã€Œãƒ†ãƒ¼ãƒ—ã€ ã‚¿ãƒ–
  *--------------------------------------------------------------*/
 enum {
   DATA_TAPE_IMAGE,
@@ -1560,8 +1560,8 @@ enum {
 };
 static const t_menulabel data_tape[] =
 {
-  { { " Tape image ",       " ¥Æ¡¼¥×¥¤¥á¡¼¥¸ "         } },
-  { { " Tape Load Timing ", " ¥Æ¡¼¥×¥í¡¼¥É¤Î½èÍıÊıË¡ " } },
+  { { " Tape image ",       " ãƒ†ãƒ¼ãƒ—ã‚¤ãƒ¡ãƒ¼ã‚¸ "         } },
+  { { " Tape Load Timing ", " ãƒ†ãƒ¼ãƒ—ãƒ­ãƒ¼ãƒ‰ã®å‡¦ç†æ–¹æ³• " } },
 };
 
 
@@ -1579,35 +1579,35 @@ enum {
 };
 static const t_menulabel data_tape_load[] =
 {
-  { { " for Load :",                                           " ¥í¡¼¥ÉÍÑ¡§"                                      } },
-  { { " Change File ",                                         " ¥Õ¥¡¥¤¥ëÊÑ¹¹ "                                   } },
-  { { " Eject  ",                                              " ¼è½Ğ¤· "                                         } },
-  { { " Input (Select) a tape-load-image filename. (CMT/T88)", " ¥í¡¼¥ÉÍÑ¥Æ¡¼¥×¥¤¥á¡¼¥¸(CMT/T88)¤òÆşÎÏ¤·¤Æ²¼¤µ¤¤" } },
-  { { " Rewind ",                                              " ´¬Ìá¤· "                                         } },
+  { { " for Load :",                                           " ãƒ­ãƒ¼ãƒ‰ç”¨ï¼š"                                      } },
+  { { " Change File ",                                         " ãƒ•ã‚¡ã‚¤ãƒ«å¤‰æ›´ "                                   } },
+  { { " Eject  ",                                              " å–å‡ºã— "                                         } },
+  { { " Input (Select) a tape-load-image filename. (CMT/T88)", " ãƒ­ãƒ¼ãƒ‰ç”¨ãƒ†ãƒ¼ãƒ—ã‚¤ãƒ¡ãƒ¼ã‚¸(CMT/T88)ã‚’å…¥åŠ›ã—ã¦ä¸‹ã•ã„" } },
+  { { " Rewind ",                                              " å·»æˆ»ã— "                                         } },
 };
 static const t_menulabel data_tape_save[] =
 {
-  { { " for Save :",                                           " ¥»¡¼¥ÖÍÑ¡§"                                      } },
-  { { " Change File ",                                         " ¥Õ¥¡¥¤¥ëÊÑ¹¹ "                                   } },
-  { { " Eject  ",                                              " ¼è½Ğ¤· "                                         } },
-  { { " Input (Select) a tape-save-image filename. (CMT)",     " ¥»¡¼¥ÖÍÑ¥Æ¡¼¥×¥¤¥á¡¼¥¸(CMT)¤òÆşÎÏ¤·¤Æ²¼¤µ¤¤"     } },
+  { { " for Save :",                                           " ã‚»ãƒ¼ãƒ–ç”¨ï¼š"                                      } },
+  { { " Change File ",                                         " ãƒ•ã‚¡ã‚¤ãƒ«å¤‰æ›´ "                                   } },
+  { { " Eject  ",                                              " å–å‡ºã— "                                         } },
+  { { " Input (Select) a tape-save-image filename. (CMT)",     " ã‚»ãƒ¼ãƒ–ç”¨ãƒ†ãƒ¼ãƒ—ã‚¤ãƒ¡ãƒ¼ã‚¸(CMT)ã‚’å…¥åŠ›ã—ã¦ä¸‹ã•ã„"     } },
   { { NULL,                                                    NULL,                                              } },
-  { { " This File Already Exist. ",                            " »ØÄê¤·¤¿¥Õ¥¡¥¤¥ë¤Ï¤¹¤Ç¤ËÂ¸ºß¤·¤Ş¤¹¡£ "           } },
-  { { " Append a tape image ? ",                               " ¥Æ¡¼¥×¥¤¥á¡¼¥¸¤òÄÉµ­¤·¤Æ¤¤¤­¤Ş¤¹¤«¡© "           } },
-  { { " OK ",                                                  " ÄÉµ­¤¹¤ë "                                       } },
-  { { " CANCEL ",                                              " ¼è¾Ã "                                           } },
+  { { " This File Already Exist. ",                            " æŒ‡å®šã—ãŸãƒ•ã‚¡ã‚¤ãƒ«ã¯ã™ã§ã«å­˜åœ¨ã—ã¾ã™ã€‚ "           } },
+  { { " Append a tape image ? ",                               " ãƒ†ãƒ¼ãƒ—ã‚¤ãƒ¡ãƒ¼ã‚¸ã‚’è¿½è¨˜ã—ã¦ã„ãã¾ã™ã‹ï¼Ÿ "           } },
+  { { " OK ",                                                  " è¿½è¨˜ã™ã‚‹ "                                       } },
+  { { " CANCEL ",                                              " å–æ¶ˆ "                                           } },
 };
 
 
 static const t_menudata data_tape_intr[] =
 {
-  { { " Use Interrupt     (Choose in N88-BASIC mode) ",                 " ³ä¤ê¹ş¤ß¤ò»È¤¦     (N88-BASIC ¤Ç¤Ï¡¢É¬¤º¤³¤Á¤é¤òÁªÂò¤·¤Æ¤¯¤À¤µ¤¤) "   }, TRUE  },
-  { { " Not Use Interrupt (Choose in N-BASIC mode for LOAD speed-up) ", " ³ä¤ê¹ş¤ß¤ò»È¤ï¤Ê¤¤ (N-BASIC ¤Ï¡¢¤³¤Á¤é¤Ç¤â²Ä¡£¥í¡¼¥É¤¬Â®¤¯¤Ê¤ê¤Ş¤¹) " }, FALSE },
+  { { " Use Interrupt     (Choose in N88-BASIC mode) ",                 " å‰²ã‚Šè¾¼ã¿ã‚’ä½¿ã†     (N88-BASIC ã§ã¯ã€å¿…ãšã“ã¡ã‚‰ã‚’é¸æŠã—ã¦ãã ã•ã„) "   }, TRUE  },
+  { { " Not Use Interrupt (Choose in N-BASIC mode for LOAD speed-up) ", " å‰²ã‚Šè¾¼ã¿ã‚’ä½¿ã‚ãªã„ (N-BASIC ã¯ã€ã“ã¡ã‚‰ã§ã‚‚å¯ã€‚ãƒ­ãƒ¼ãƒ‰ãŒé€Ÿããªã‚Šã¾ã™) " }, FALSE },
 };
 
 
 /*--------------------------------------------------------------
- * ¥Õ¥¡¥¤¥ëÁàºî¥¨¥é¡¼¥À¥¤¥¢¥í¥°
+ * ãƒ•ã‚¡ã‚¤ãƒ«æ“ä½œã‚¨ãƒ©ãƒ¼ãƒ€ã‚¤ã‚¢ãƒ­ã‚°
  *--------------------------------------------------------------*/
 
 enum {
@@ -1622,25 +1622,25 @@ enum {
 };
 static const t_menulabel data_err_drive[] =
 {
-  { { " OK ",                                                     " ³ÎÇ§ "                                                       } },
-  { { "File in DRIVE %d: / can't open the file, or bad format.",  "¥É¥é¥¤¥Ö %d:¡¿¥Õ¥¡¥¤¥ë¤¬³«¤±¤Ê¤¤¤«¡¢¥Õ¥¡¥¤¥ë·Á¼°¤¬°ã¤¤¤Ş¤¹¡£" } },
-  { { "File in DRIVE %d: / can't write the file.",                "¥É¥é¥¤¥Ö %d:¡¿¤³¤Î¥Õ¥¡¥¤¥ë¤Ë¤Ï½ñ¤­¹ş¤ß¤¬¤Ç¤­¤Ş¤»¤ó¡£"         } },
-  { { "File in DRIVE %d: / maybe broken.",                        "¥É¥é¥¤¥Ö %d:¡¿¥Õ¥¡¥¤¥ë¤¬(Â¿Ê¬)²õ¤ì¤Æ¤¤¤Ş¤¹¡£"                 } },
-  { { "File in DRIVE %d: / SEEK Error.",                          "¥É¥é¥¤¥Ö %d:¡¿¥·¡¼¥¯¥¨¥é¡¼¤¬È¯À¸¤·¤Ş¤·¤¿¡£"                   } },
-  { { "File in DRIVE %d: / WRITE Error.",                         "¥É¥é¥¤¥Ö %d:¡¿½ñ¤­¹ş¤ß¥¨¥é¡¼¤¬È¯À¸¤·¤Ş¤·¤¿¡£"                 } },
-  { { "File in DRIVE %d: / strings too long.",                    "¥É¥é¥¤¥Ö %d:¡¿ÆşÎÏÊ¸»úÎó¤¬Ä¹²á¤®¤Ş¤¹¡£"                       } },
-  { { "File in DRIVE %d: / UNEXPECTED Error.",                    "¥É¥é¥¤¥Ö %d:¡¿Í½´ü¤»¤Ì¥¨¥é¡¼¤¬È¯À¸¤·¤Ş¤·¤¿¡£"                 } },   
+  { { " OK ",                                                     " ç¢ºèª "                                                       } },
+  { { "File in DRIVE %d: / can't open the file, or bad format.",  "ãƒ‰ãƒ©ã‚¤ãƒ– %d:ï¼ãƒ•ã‚¡ã‚¤ãƒ«ãŒé–‹ã‘ãªã„ã‹ã€ãƒ•ã‚¡ã‚¤ãƒ«å½¢å¼ãŒé•ã„ã¾ã™ã€‚" } },
+  { { "File in DRIVE %d: / can't write the file.",                "ãƒ‰ãƒ©ã‚¤ãƒ– %d:ï¼ã“ã®ãƒ•ã‚¡ã‚¤ãƒ«ã«ã¯æ›¸ãè¾¼ã¿ãŒã§ãã¾ã›ã‚“ã€‚"         } },
+  { { "File in DRIVE %d: / maybe broken.",                        "ãƒ‰ãƒ©ã‚¤ãƒ– %d:ï¼ãƒ•ã‚¡ã‚¤ãƒ«ãŒ(å¤šåˆ†)å£Šã‚Œã¦ã„ã¾ã™ã€‚"                 } },
+  { { "File in DRIVE %d: / SEEK Error.",                          "ãƒ‰ãƒ©ã‚¤ãƒ– %d:ï¼ã‚·ãƒ¼ã‚¯ã‚¨ãƒ©ãƒ¼ãŒç™ºç”Ÿã—ã¾ã—ãŸã€‚"                   } },
+  { { "File in DRIVE %d: / WRITE Error.",                         "ãƒ‰ãƒ©ã‚¤ãƒ– %d:ï¼æ›¸ãè¾¼ã¿ã‚¨ãƒ©ãƒ¼ãŒç™ºç”Ÿã—ã¾ã—ãŸã€‚"                 } },
+  { { "File in DRIVE %d: / strings too long.",                    "ãƒ‰ãƒ©ã‚¤ãƒ– %d:ï¼å…¥åŠ›æ–‡å­—åˆ—ãŒé•·éãã¾ã™ã€‚"                       } },
+  { { "File in DRIVE %d: / UNEXPECTED Error.",                    "ãƒ‰ãƒ©ã‚¤ãƒ– %d:ï¼äºˆæœŸã›ã¬ã‚¨ãƒ©ãƒ¼ãŒç™ºç”Ÿã—ã¾ã—ãŸã€‚"                 } },   
 };
 static const t_menulabel data_err_file[] =
 {
-  { { " OK ",                           " ³ÎÇ§ "                                         } },
-  { { "Error / can't open the file.",   "¥¨¥é¡¼¡¿¥Õ¥¡¥¤¥ë¤¬³«¤±¤Ş¤»¤ó¡£"                 } },
-  { { "Error / can't write the file.",  "¥¨¥é¡¼¡¿¤³¤Î¥Õ¥¡¥¤¥ë¤Ë¤Ï½ñ¤­¹ş¤ß¤¬¤Ç¤­¤Ş¤»¤ó¡£" } },
-  { { "Error / maybe broken.",          "¥¨¥é¡¼¡¿¥Õ¥¡¥¤¥ë¤¬(Â¿Ê¬)²õ¤ì¤Æ¤¤¤Ş¤¹¡£"         } },
-  { { "Error / SEEK Error.",            "¥¨¥é¡¼¡¿¥·¡¼¥¯¥¨¥é¡¼¤¬È¯À¸¤·¤Ş¤·¤¿¡£"           } },
-  { { "Error / WRITE Error.",           "¥¨¥é¡¼¡¿½ñ¤­¹ş¤ß¥¨¥é¡¼¤¬È¯À¸¤·¤Ş¤·¤¿¡£"         } },
-  { { "Error / strings too long.",      "¥¨¥é¡¼¡¿ÆşÎÏÊ¸»úÎó¤¬Ä¹²á¤®¤Ş¤¹¡£"               } },
-  { { "Error / UNEXPECTED Error.",      "¥¨¥é¡¼¡¿Í½´ü¤»¤Ì¥¨¥é¡¼¤¬È¯À¸¤·¤Ş¤·¤¿¡£"         } },
+  { { " OK ",                           " ç¢ºèª "                                         } },
+  { { "Error / can't open the file.",   "ã‚¨ãƒ©ãƒ¼ï¼ãƒ•ã‚¡ã‚¤ãƒ«ãŒé–‹ã‘ã¾ã›ã‚“ã€‚"                 } },
+  { { "Error / can't write the file.",  "ã‚¨ãƒ©ãƒ¼ï¼ã“ã®ãƒ•ã‚¡ã‚¤ãƒ«ã«ã¯æ›¸ãè¾¼ã¿ãŒã§ãã¾ã›ã‚“ã€‚" } },
+  { { "Error / maybe broken.",          "ã‚¨ãƒ©ãƒ¼ï¼ãƒ•ã‚¡ã‚¤ãƒ«ãŒ(å¤šåˆ†)å£Šã‚Œã¦ã„ã¾ã™ã€‚"         } },
+  { { "Error / SEEK Error.",            "ã‚¨ãƒ©ãƒ¼ï¼ã‚·ãƒ¼ã‚¯ã‚¨ãƒ©ãƒ¼ãŒç™ºç”Ÿã—ã¾ã—ãŸã€‚"           } },
+  { { "Error / WRITE Error.",           "ã‚¨ãƒ©ãƒ¼ï¼æ›¸ãè¾¼ã¿ã‚¨ãƒ©ãƒ¼ãŒç™ºç”Ÿã—ã¾ã—ãŸã€‚"         } },
+  { { "Error / strings too long.",      "ã‚¨ãƒ©ãƒ¼ï¼å…¥åŠ›æ–‡å­—åˆ—ãŒé•·éãã¾ã™ã€‚"               } },
+  { { "Error / UNEXPECTED Error.",      "ã‚¨ãƒ©ãƒ¼ï¼äºˆæœŸã›ã¬ã‚¨ãƒ©ãƒ¼ãŒç™ºç”Ÿã—ã¾ã—ãŸã€‚"         } },
 };
 
 
@@ -1650,33 +1650,33 @@ static const t_menulabel data_err_file[] =
 
 static const char *help_jp[] =
 {
-  "  ¥Ç¥£¥¹¥¯¥¤¥á¡¼¥¸¤ò»ÈÍÑ¤¹¤ë¥¢¥×¥ê¥±¡¼¥·¥ç¥ó¤ò¥¨¥ß¥å¥ì¡¼¥È¤¹¤ë¾ì¹ç¡¢",
-  "¡ØSUB-CPU¶îÆ°¡Ù¤È¡ØFDC¥¦¥§¥¤¥È¡Ù¤ÎÀßÄê¤¬Å¬ÀÚ¤Ç¤Ê¤¤¤È¡¢Àµ¾ï¤ËÆ°ºî",
-  "¤·¤Ê¤¤¤³¤È¤¬¤¢¤ê¤Ş¤¹¡£",
+  "  ãƒ‡ã‚£ã‚¹ã‚¯ã‚¤ãƒ¡ãƒ¼ã‚¸ã‚’ä½¿ç”¨ã™ã‚‹ã‚¢ãƒ—ãƒªã‚±ãƒ¼ã‚·ãƒ§ãƒ³ã‚’ã‚¨ãƒŸãƒ¥ãƒ¬ãƒ¼ãƒˆã™ã‚‹å ´åˆã€",
+  "ã€SUB-CPUé§†å‹•ã€ã¨ã€FDCã‚¦ã‚§ã‚¤ãƒˆã€ã®è¨­å®šãŒé©åˆ‡ã§ãªã„ã¨ã€æ­£å¸¸ã«å‹•ä½œ",
+  "ã—ãªã„ã“ã¨ãŒã‚ã‚Šã¾ã™ã€‚",
   "",
-  "¡ØSUB-CPU¶îÆ°¡Ù¤È¡ØFDC¥¦¥§¥¤¥È¡Ù¤ÎÀßÄê¤ÎÁÈ¹ç¤»¤Ï¡¢°Ê²¼¤Î¤È¤ª¤ê¤Ç¤¹¡£",
+  "ã€SUB-CPUé§†å‹•ã€ã¨ã€FDCã‚¦ã‚§ã‚¤ãƒˆã€ã®è¨­å®šã®çµ„åˆã›ã¯ã€ä»¥ä¸‹ã®ã¨ãŠã‚Šã§ã™ã€‚",
   "",
-  "           ÀßÄê ¡Ã SUB-CPU¶îÆ°  ¡Ã FDC¥¦¥§¥¤¥È¡Ã        ",
-  "          ¡İ¡İ¡İ¡Ü¡İ¡İ¡İ¡İ¡İ¡İ¡İ¡Ü¡İ¡İ¡İ¡İ¡İ¡İ¡Ü¡İ¡İ¡İ¡İ",
-  "            (1) ¡Ã 0  (-cpu 0)  ¡Ã    ¤Ê¤·    ¡Ã  ¹âÂ®  ",
-  "            (2) ¡Ã 1  (-cpu 1)  ¡Ã    ¤Ê¤·    ¡Ã   ¢¬   ",
-  "            (3) ¡Ã 1  (-cpu 1)  ¡Ã    ¤¢¤ê    ¡Ã        ",
-  "            (4) ¡Ã 2  (-cpu 2)  ¡Ã    ¤Ê¤·    ¡Ã   ¢­   ",
-  "            (5) ¡Ã 2  (-cpu 2)  ¡Ã    ¤¢¤ê    ¡Ã  Àµ³Î  ",
+  "           è¨­å®š ï½œ SUB-CPUé§†å‹•  ï½œ FDCã‚¦ã‚§ã‚¤ãƒˆï½œ        ",
+  "          âˆ’âˆ’âˆ’ï¼‹âˆ’âˆ’âˆ’âˆ’âˆ’âˆ’âˆ’ï¼‹âˆ’âˆ’âˆ’âˆ’âˆ’âˆ’ï¼‹âˆ’âˆ’âˆ’âˆ’",
+  "            (1) ï½œ 0  (-cpu 0)  ï½œ    ãªã—    ï½œ  é«˜é€Ÿ  ",
+  "            (2) ï½œ 1  (-cpu 1)  ï½œ    ãªã—    ï½œ   â†‘   ",
+  "            (3) ï½œ 1  (-cpu 1)  ï½œ    ã‚ã‚Š    ï½œ        ",
+  "            (4) ï½œ 2  (-cpu 2)  ï½œ    ãªã—    ï½œ   â†“   ",
+  "            (5) ï½œ 2  (-cpu 2)  ï½œ    ã‚ã‚Š    ï½œ  æ­£ç¢º  ",
   "",
-  "  ÀßÄê(1) ¡Ä¡Ä ºÇ¤â¹âÂ®¤Ç¡¢¥¢¥×¥ê¥±¡¼¥·¥ç¥ó¤ÎÂçÉôÊ¬¤¬Æ°ºî¤·¤Ş¤¹¡£",
-  "               ¥Ç¥Õ¥©¥ë¥È¤ÎÀßÄê¤Ï¤³¤ì¤Ë¤Ê¤ê¤Ş¤¹¡£",
-  "  ÀßÄê(2) ¡Ä¡Ä ¤ä¤ä¹âÂ®¤Ç¤¹¡£°ìÉô¤Î¥¢¥×¥ê¥±¡¼¥·¥ç¥ó¤Ï¤³¤ÎÀßÄê¤Ç¤Ê¤¤",
-  "               ¤ÈÆ°ºî¤·¤Ş¤»¤ó¡£",
-  "  ÀßÄê(3) ¡Ä¡Ä ¤ä¤äÄãÂ®¤Ç¤¹¡£¤Ş¤ì¤Ë¤³¤ÎÀßÄê¤Ç¤Ê¤¤¤ÈÆ°ºî¤·¤Ê¤¤¥¢¥×¥ê",
-  "               ¥±¡¼¥·¥ç¥ó¤¬¤¢¤ê¤Ş¤¹",
-  "  ÀßÄê(4)(5)¡Ä ºÇ¤âÄãÂ®¤Ç¤¹¡£¤³¤ÎÀßÄê¤Ç¤Ê¤¤¤ÈÆ°ºî¤·¤Ê¤¤¥¢¥×¥ê¥±¡¼",
-  "               ¥·¥ç¥ó¤Ï¤Û¤È¤ó¤ÉÌµ¤¤¤È»×¤¤¤Ş¤¹¡£Â¿Ê¬¡£",
+  "  è¨­å®š(1) â€¦â€¦ æœ€ã‚‚é«˜é€Ÿã§ã€ã‚¢ãƒ—ãƒªã‚±ãƒ¼ã‚·ãƒ§ãƒ³ã®å¤§éƒ¨åˆ†ãŒå‹•ä½œã—ã¾ã™ã€‚",
+  "               ãƒ‡ãƒ•ã‚©ãƒ«ãƒˆã®è¨­å®šã¯ã“ã‚Œã«ãªã‚Šã¾ã™ã€‚",
+  "  è¨­å®š(2) â€¦â€¦ ã‚„ã‚„é«˜é€Ÿã§ã™ã€‚ä¸€éƒ¨ã®ã‚¢ãƒ—ãƒªã‚±ãƒ¼ã‚·ãƒ§ãƒ³ã¯ã“ã®è¨­å®šã§ãªã„",
+  "               ã¨å‹•ä½œã—ã¾ã›ã‚“ã€‚",
+  "  è¨­å®š(3) â€¦â€¦ ã‚„ã‚„ä½é€Ÿã§ã™ã€‚ã¾ã‚Œã«ã“ã®è¨­å®šã§ãªã„ã¨å‹•ä½œã—ãªã„ã‚¢ãƒ—ãƒª",
+  "               ã‚±ãƒ¼ã‚·ãƒ§ãƒ³ãŒã‚ã‚Šã¾ã™",
+  "  è¨­å®š(4)(5)â€¦ æœ€ã‚‚ä½é€Ÿã§ã™ã€‚ã“ã®è¨­å®šã§ãªã„ã¨å‹•ä½œã—ãªã„ã‚¢ãƒ—ãƒªã‚±ãƒ¼",
+  "               ã‚·ãƒ§ãƒ³ã¯ã»ã¨ã‚“ã©ç„¡ã„ã¨æ€ã„ã¾ã™ã€‚å¤šåˆ†ã€‚",
   "",
-  "  ÀßÄê(1)¤Ç¥¢¥×¥ê¥±¡¼¥·¥ç¥ó¤¬Æ°ºî¤·¤Ê¤¤¾ì¹ç¡¢ÀßÄê(2)¡¢(3) ¡Ä ¤ÈÊÑ¤¨",
-  "¤Æ¤ß¤Æ¤¯¤À¤µ¤¤¡£ ¤Ş¤¿¡¢Æ°ºî¤¹¤ë¤±¤ì¤É¤â¥Ç¥£¥¹¥¯¤Î¥¢¥¯¥»¥¹»ş¤ËÂ®ÅÙ¤¬",
-  "Äã²¼¤¹¤ë¡¢¥µ¥¦¥ó¥É¤¬ÅÓÀÚ¤ì¤ë¡¢¤Ê¤É¤Î¾ì¹ç¤âÀßÄê¤òÊÑ¤¨¤ë¤È²şÁ±¤¹¤ë",
-  "²ÄÇ½À­¤¬¤¢¤ê¤Ş¤¹¡£",
+  "  è¨­å®š(1)ã§ã‚¢ãƒ—ãƒªã‚±ãƒ¼ã‚·ãƒ§ãƒ³ãŒå‹•ä½œã—ãªã„å ´åˆã€è¨­å®š(2)ã€(3) â€¦ ã¨å¤‰ãˆ",
+  "ã¦ã¿ã¦ãã ã•ã„ã€‚ ã¾ãŸã€å‹•ä½œã™ã‚‹ã‘ã‚Œã©ã‚‚ãƒ‡ã‚£ã‚¹ã‚¯ã®ã‚¢ã‚¯ã‚»ã‚¹æ™‚ã«é€Ÿåº¦ãŒ",
+  "ä½ä¸‹ã™ã‚‹ã€ã‚µã‚¦ãƒ³ãƒ‰ãŒé€”åˆ‡ã‚Œã‚‹ã€ãªã©ã®å ´åˆã‚‚è¨­å®šã‚’å¤‰ãˆã‚‹ã¨æ”¹å–„ã™ã‚‹",
+  "å¯èƒ½æ€§ãŒã‚ã‚Šã¾ã™ã€‚",
   0,
 };
 
@@ -1690,11 +1690,11 @@ static const char *help_en[] =
  *
  *--------------------------------------------------------------*/
 
-/* ¥­¡¼¥Ü¡¼¥ÉÇÛÎó (¿·µìÊÌ) ¤Î¥¦¥£¥¸¥Ã¥ÈÀ¸À®ÍÑ¥Ç¡¼¥¿ */
+/* ã‚­ãƒ¼ãƒœãƒ¼ãƒ‰é…åˆ— (æ–°æ—§åˆ¥) ã®ã‚¦ã‚£ã‚¸ãƒƒãƒˆç”Ÿæˆç”¨ãƒ‡ãƒ¼ã‚¿ */
 
 typedef struct{
-  char	*str;		/* ¥­¡¼¥È¥Ã¥×¤ÎÊ¸»ú or ¥Ñ¥Ç¥£¥ó¥°ÍÑ¶õÇò		*/
-  int	code;		/* ¥­¡¼¥³¡¼¥É       or  0			*/
+  char	*str;		/* ã‚­ãƒ¼ãƒˆãƒƒãƒ—ã®æ–‡å­— or ãƒ‘ãƒ‡ã‚£ãƒ³ã‚°ç”¨ç©ºç™½		*/
+  int	code;		/* ã‚­ãƒ¼ã‚³ãƒ¼ãƒ‰       or  0			*/
 } t_keymap;
 
 static const t_keymap keymap_old0[] =
@@ -1984,7 +1984,7 @@ static const t_keymap * keymap_line[2][6] =
 };
 
 
-/* ¥­¡¼ÇÛÎóÊÑ¹¹¥³¥ó¥Ü¥Ü¥Ã¥¯¥¹ÍÑ ¤Î¥¦¥£¥¸¥Ã¥ÈÀ¸À®ÍÑ¥Ç¡¼¥¿ */
+/* ã‚­ãƒ¼é…åˆ—å¤‰æ›´ã‚³ãƒ³ãƒœãƒœãƒƒã‚¯ã‚¹ç”¨ ã®ã‚¦ã‚£ã‚¸ãƒƒãƒˆç”Ÿæˆç”¨ãƒ‡ãƒ¼ã‚¿ */
 
 static const t_keymap keymap_assign[] =
 {
@@ -2104,20 +2104,20 @@ static const t_keymap keymap_assign[] =
 
 /************************************************************************/
 /*									*/
-/* ¤³¤Î QUASI88 ¥á¥Ë¥å¡¼ÍÑ Tool Kit ¤ÎAPI¤Ï¡¢¤É¤¦¤â»÷¤¿½èÍı¤Î·«¤êÊÖ¤·¤¬	*/
-/* Â¿¤¯¤Ê¤ë¤Î¤Ç¡¢»÷¤¿¤è¤¦¤Ê½èÍı¤ò¤Ş¤È¤á¤¿´Ø¿ô¤òºî¤Ã¤Æ¤ß¤¿¡£		*/
+/* ã“ã® QUASI88 ãƒ¡ãƒ‹ãƒ¥ãƒ¼ç”¨ Tool Kit ã®APIã¯ã€ã©ã†ã‚‚ä¼¼ãŸå‡¦ç†ã®ç¹°ã‚Šè¿”ã—ãŒ	*/
+/* å¤šããªã‚‹ã®ã§ã€ä¼¼ãŸã‚ˆã†ãªå‡¦ç†ã‚’ã¾ã¨ã‚ãŸé–¢æ•°ã‚’ä½œã£ã¦ã¿ãŸã€‚		*/
 /*									*/
 /************************************************************************/
 
-/* t_menulabel ¤Î index ÈÖÌÜ¤ÎÊ¸»úÎó¤ò¼èÆÀ¤¹¤ë¥Ş¥¯¥í -------------------*/
+/* t_menulabel ã® index ç•ªç›®ã®æ–‡å­—åˆ—ã‚’å–å¾—ã™ã‚‹ãƒã‚¯ãƒ­ -------------------*/
 
 #define		GET_LABEL(l, index)	(l[index].str[menu_lang])
 
 
-/* ¥Õ¥ì¡¼¥à¤òÀ¸À®¤¹¤ë --------------------------------------------------
-				box	!= NULL ¤Ê¤é¡¢¤³¤ì¤Ë PACK ¤¹¤ë¡£
-				label	¥Õ¥ì¡¼¥à¤Î¥é¥Ù¥ë
-				widget	!= NULL ¤Ê¤é¡¢¤³¤ì¤ò¾è¤»¤ë¡£
+/* ãƒ•ãƒ¬ãƒ¼ãƒ ã‚’ç”Ÿæˆã™ã‚‹ --------------------------------------------------
+				box	!= NULL ãªã‚‰ã€ã“ã‚Œã« PACK ã™ã‚‹ã€‚
+				label	ãƒ•ãƒ¬ãƒ¼ãƒ ã®ãƒ©ãƒ™ãƒ«
+				widget	!= NULL ãªã‚‰ã€ã“ã‚Œã‚’ä¹—ã›ã‚‹ã€‚
 */
 static	Q8tkWidget *PACK_FRAME(Q8tkWidget *box,
 			       const char *label, Q8tkWidget *widget)
@@ -2135,8 +2135,8 @@ static	Q8tkWidget *PACK_FRAME(Q8tkWidget *box,
 }
 
 
-/* HBOX¤òÀ¸À®¤¹¤ë ------------------------------------------------------
-				box	!= NULL ¤Ê¤é¡¢¤³¤ì¤Ë PACK ¤¹¤ë¡£
+/* HBOXã‚’ç”Ÿæˆã™ã‚‹ ------------------------------------------------------
+				box	!= NULL ãªã‚‰ã€ã“ã‚Œã« PACK ã™ã‚‹ã€‚
 */
 static	Q8tkWidget *PACK_HBOX(Q8tkWidget *box)
 {
@@ -2150,8 +2150,8 @@ static	Q8tkWidget *PACK_HBOX(Q8tkWidget *box)
 }
 
 
-/* VBOX¤òÀ¸À®¤¹¤ë ------------------------------------------------------
-				box	!= NULL ¤Ê¤é¡¢¤³¤ì¤Ë PACK ¤¹¤ë¡£
+/* VBOXã‚’ç”Ÿæˆã™ã‚‹ ------------------------------------------------------
+				box	!= NULL ãªã‚‰ã€ã“ã‚Œã« PACK ã™ã‚‹ã€‚
 */
 static	Q8tkWidget *PACK_VBOX(Q8tkWidget *box)
 {
@@ -2165,9 +2165,9 @@ static	Q8tkWidget *PACK_VBOX(Q8tkWidget *box)
 }
 
 
-/* LABEL ¤òÀ¸À®¤¹¤ë ----------------------------------------------------
-				box	!= NULL ¤Ê¤é¡¢¤³¤ì¤Ë PACK ¤¹¤ë¡£
-				label	¥é¥Ù¥ë
+/* LABEL ã‚’ç”Ÿæˆã™ã‚‹ ----------------------------------------------------
+				box	!= NULL ãªã‚‰ã€ã“ã‚Œã« PACK ã™ã‚‹ã€‚
+				label	ãƒ©ãƒ™ãƒ«
 */
 static	Q8tkWidget *PACK_LABEL(Q8tkWidget *box, const char *label)
 {
@@ -2181,8 +2181,8 @@ static	Q8tkWidget *PACK_LABEL(Q8tkWidget *box, const char *label)
 }
 
 
-/* VSEPATATOR ¤òÀ¸À®¤¹¤ë -----------------------------------------------
-				box	!= NULL ¤Ê¤é¡¢¤³¤ì¤Ë PACK ¤¹¤ë¡£
+/* VSEPATATOR ã‚’ç”Ÿæˆã™ã‚‹ -----------------------------------------------
+				box	!= NULL ãªã‚‰ã€ã“ã‚Œã« PACK ã™ã‚‹ã€‚
 */
 static	Q8tkWidget *PACK_VSEP(Q8tkWidget *box)
 {
@@ -2196,8 +2196,8 @@ static	Q8tkWidget *PACK_VSEP(Q8tkWidget *box)
 }
 
 
-/* HSEPATATOR ¤òÀ¸À®¤¹¤ë -----------------------------------------------
-				box	!= NULL ¤Ê¤é¡¢¤³¤ì¤Ë PACK ¤¹¤ë¡£
+/* HSEPATATOR ã‚’ç”Ÿæˆã™ã‚‹ -----------------------------------------------
+				box	!= NULL ãªã‚‰ã€ã“ã‚Œã« PACK ã™ã‚‹ã€‚
 */
 static	Q8tkWidget *PACK_HSEP(Q8tkWidget *box)
 {
@@ -2211,11 +2211,11 @@ static	Q8tkWidget *PACK_HSEP(Q8tkWidget *box)
 }
 
 
-/* ¥Ü¥¿¥ó¤òÀ¸À®¤¹¤ë ----------------------------------------------------
-				box	!= NULL ¤Ê¤é¡¢¤³¤ì¤Ë PACK ¤¹¤ë¡£
-				label	¥é¥Ù¥ë
-				callback "clicked" »ş¤Î¥³¡¼¥ë¥Ğ¥Ã¥¯´Ø¿ô
-				parm	¤½¤Î¥Ñ¥é¥á¡¼¥¿
+/* ãƒœã‚¿ãƒ³ã‚’ç”Ÿæˆã™ã‚‹ ----------------------------------------------------
+				box	!= NULL ãªã‚‰ã€ã“ã‚Œã« PACK ã™ã‚‹ã€‚
+				label	ãƒ©ãƒ™ãƒ«
+				callback "clicked" æ™‚ã®ã‚³ãƒ¼ãƒ«ãƒãƒƒã‚¯é–¢æ•°
+				parm	ãã®ãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿
 */
 static	Q8tkWidget *PACK_BUTTON(Q8tkWidget *box,
 				const char *label,
@@ -2233,12 +2233,12 @@ static	Q8tkWidget *PACK_BUTTON(Q8tkWidget *box,
 
 
 
-/* ¥Á¥§¥Ã¥¯¥Ü¥¿¥ó¤òÀ¸À®¤¹¤ë --------------------------------------------
-				box	!= NULL ¤Ê¤é¡¢¤³¤ì¤Ë PACK ¤¹¤ë¡£
-				label	¥é¥Ù¥ë
-				on	¿¿¤Ê¤é¡¢¥Á¥§¥Ã¥¯¾õÂÖ¤È¤¹¤ë
-				callback "clicked" »ş¤Î¥³¡¼¥ë¥Ğ¥Ã¥¯´Ø¿ô
-				parm	¤½¤Î¥Ñ¥é¥á¡¼¥¿
+/* ãƒã‚§ãƒƒã‚¯ãƒœã‚¿ãƒ³ã‚’ç”Ÿæˆã™ã‚‹ --------------------------------------------
+				box	!= NULL ãªã‚‰ã€ã“ã‚Œã« PACK ã™ã‚‹ã€‚
+				label	ãƒ©ãƒ™ãƒ«
+				on	çœŸãªã‚‰ã€ãƒã‚§ãƒƒã‚¯çŠ¶æ…‹ã¨ã™ã‚‹
+				callback "clicked" æ™‚ã®ã‚³ãƒ¼ãƒ«ãƒãƒƒã‚¯é–¢æ•°
+				parm	ãã®ãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿
 */
 static	Q8tkWidget *PACK_CHECK_BUTTON(Q8tkWidget *box,
 				      const char *label, int on,
@@ -2258,13 +2258,13 @@ static	Q8tkWidget *PACK_CHECK_BUTTON(Q8tkWidget *box,
 }
 
 
-/* ¥é¥¸¥ª¥Ü¥¿¥ó¤òÀ¸À®¤¹¤ë --------------------------------------------
-				box	!= NULL ¤Ê¤é¡¢¤³¤ì¤Ë PACK ¤¹¤ë¡£
-				button	¥°¥ë¡¼¥×¤ò·ÁÀ®¤¹¤ë¥Ü¥¿¥ó
-				label	¥é¥Ù¥ë
-				on	¿¿¤Ê¤é¡¢¥Á¥§¥Ã¥¯¾õÂÖ¤È¤¹¤ë
-				callback "clicked" »ş¤Î¥³¡¼¥ë¥Ğ¥Ã¥¯´Ø¿ô
-				parm	¤½¤Î¥Ñ¥é¥á¡¼¥¿
+/* ãƒ©ã‚¸ã‚ªãƒœã‚¿ãƒ³ã‚’ç”Ÿæˆã™ã‚‹ --------------------------------------------
+				box	!= NULL ãªã‚‰ã€ã“ã‚Œã« PACK ã™ã‚‹ã€‚
+				button	ã‚°ãƒ«ãƒ¼ãƒ—ã‚’å½¢æˆã™ã‚‹ãƒœã‚¿ãƒ³
+				label	ãƒ©ãƒ™ãƒ«
+				on	çœŸãªã‚‰ã€ãƒã‚§ãƒƒã‚¯çŠ¶æ…‹ã¨ã™ã‚‹
+				callback "clicked" æ™‚ã®ã‚³ãƒ¼ãƒ«ãƒãƒƒã‚¯é–¢æ•°
+				parm	ãã®ãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿
 */
 static	Q8tkWidget *PACK_RADIO_BUTTON(Q8tkWidget *box,
 				      Q8tkWidget *button,
@@ -2286,20 +2286,20 @@ static	Q8tkWidget *PACK_RADIO_BUTTON(Q8tkWidget *box,
 }
 
 
-/* ¥³¥ó¥Ü¥Ü¥Ã¥¯¥¹¤òÀ¸À®¤¹¤ë --------------------------------------------
-				box	!= NULL ¤Ê¤é¡¢¤³¤ì¤Ë PACK ¤¹¤ë¡£
-				p	t_menudata ·¿ÇÛÎó¤ÎÀèÆ¬¥İ¥¤¥ó¥¿¡£
-				count	¤½¤ÎÇÛÎó¤Î¿ô¡£
-					p[0] ¡Á p[count-1] ¤Ş¤Ç¤Î¥Ç¡¼¥¿¤Î
-					Ê¸»úÎó¤ò¥³¥ó¥Ü¥Ü¥Ã¥¯¥¹²½¤¹¤ë¡£
-				initval	p[].val == initval ¤Î¾ì¹ç¡¢¤½¤Î
-					Ê¸»úÎó¤ò½é´üÊ¸»úÎó¤È¤¹¤ë¡£
-				initstr	¾åµ­³ºÅö¤¬Ìµ¤¤¾ì¹ç¤Î½é´üÊ¸»úÎó
-				width	É½¼¨¥µ¥¤¥º¡£0¤Ç¼«Æ°
-				act_callback "activate"»ş¤Î¥³¡¼¥ë¥Ğ¥Ã¥¯´Ø¿ô
-				act_parm     ¤½¤Î¥Ñ¥é¥á¡¼¥¿
-				chg_callback "changed"»ş¤Î¥³¡¼¥ë¥Ğ¥Ã¥¯´Ø¿ô
-				chg_parm     ¤½¤Î¥Ñ¥é¥á¡¼¥¿
+/* ã‚³ãƒ³ãƒœãƒœãƒƒã‚¯ã‚¹ã‚’ç”Ÿæˆã™ã‚‹ --------------------------------------------
+				box	!= NULL ãªã‚‰ã€ã“ã‚Œã« PACK ã™ã‚‹ã€‚
+				p	t_menudata å‹é…åˆ—ã®å…ˆé ­ãƒã‚¤ãƒ³ã‚¿ã€‚
+				count	ãã®é…åˆ—ã®æ•°ã€‚
+					p[0] ã€œ p[count-1] ã¾ã§ã®ãƒ‡ãƒ¼ã‚¿ã®
+					æ–‡å­—åˆ—ã‚’ã‚³ãƒ³ãƒœãƒœãƒƒã‚¯ã‚¹åŒ–ã™ã‚‹ã€‚
+				initval	p[].val == initval ã®å ´åˆã€ãã®
+					æ–‡å­—åˆ—ã‚’åˆæœŸæ–‡å­—åˆ—ã¨ã™ã‚‹ã€‚
+				initstr	ä¸Šè¨˜è©²å½“ãŒç„¡ã„å ´åˆã®åˆæœŸæ–‡å­—åˆ—
+				width	è¡¨ç¤ºã‚µã‚¤ã‚ºã€‚0ã§è‡ªå‹•
+				act_callback "activate"æ™‚ã®ã‚³ãƒ¼ãƒ«ãƒãƒƒã‚¯é–¢æ•°
+				act_parm     ãã®ãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿
+				chg_callback "changed"æ™‚ã®ã‚³ãƒ¼ãƒ«ãƒãƒƒã‚¯é–¢æ•°
+				chg_parm     ãã®ãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿
 */
 static	Q8tkWidget *PACK_COMBO(Q8tkWidget *box,
 			       const t_menudata *p, int count,
@@ -2334,15 +2334,15 @@ static	Q8tkWidget *PACK_COMBO(Q8tkWidget *box,
 }
 
 
-/* ¥¨¥ó¥È¥ê¡¼¤òÀ¸À®¤¹¤ë ------------------------------------------------
-				box	!= NULL ¤Ê¤é¡¢¤³¤ì¤Ë PACK ¤¹¤ë¡£
-				length	ÆşÎÏÊ¸»úÎóÄ¹¡£0¤ÇÌµ¸Â
-				width	É½¼¨Ê¸»úÎóÄ¹¡£0¤Ç¼«Æ°
-				text	½é´üÊ¸»úÎó
-				act_callback "activate"»ş¤Î¥³¡¼¥ë¥Ğ¥Ã¥¯´Ø¿ô
-				act_parm     ¤½¤Î¥Ñ¥é¥á¡¼¥¿
-				chg_callback "changed"»ş¤Î¥³¡¼¥ë¥Ğ¥Ã¥¯´Ø¿ô
-				chg_parm     ¤½¤Î¥Ñ¥é¥á¡¼¥¿
+/* ã‚¨ãƒ³ãƒˆãƒªãƒ¼ã‚’ç”Ÿæˆã™ã‚‹ ------------------------------------------------
+				box	!= NULL ãªã‚‰ã€ã“ã‚Œã« PACK ã™ã‚‹ã€‚
+				length	å…¥åŠ›æ–‡å­—åˆ—é•·ã€‚0ã§ç„¡é™
+				width	è¡¨ç¤ºæ–‡å­—åˆ—é•·ã€‚0ã§è‡ªå‹•
+				text	åˆæœŸæ–‡å­—åˆ—
+				act_callback "activate"æ™‚ã®ã‚³ãƒ¼ãƒ«ãƒãƒƒã‚¯é–¢æ•°
+				act_parm     ãã®ãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿
+				chg_callback "changed"æ™‚ã®ã‚³ãƒ¼ãƒ«ãƒãƒƒã‚¯é–¢æ•°
+				chg_parm     ãã®ãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿
 */
 static	Q8tkWidget *PACK_ENTRY(Q8tkWidget *box,
 			       int length, int width, const char *text,
@@ -2376,16 +2376,16 @@ static	Q8tkWidget *PACK_ENTRY(Q8tkWidget *box,
 
 /*======================================================================*/
 
-/* ¥Á¥§¥Ã¥¯¥Ü¥¿¥ó¤òÊ£¿ôÀ¸À®¤¹¤ë ----------------------------------------
-				box	¤³¤ì¤Ë PACK ¤¹¤ë¡£(NULL¤Ï¶Ø»ß)
-				p	t_menudata ·¿ÇÛÎó¤ÎÀèÆ¬¥İ¥¤¥ó¥¿¡£
-				count	¤½¤ÎÇÛÎó¤Î¿ô¡£
-					p[0] ¡Á p[count-1] ¤Ş¤Ç¤Î¥Ç¡¼¥¿¤Î
-					Ê¸»úÎó¤Ç¥Á¥§¥Ã¥¯¥Ü¥¿¥ó¤òÀ¸À®¤¹¤ë¡£
-				f_initval ´Ø¿ô (*f_initval)(p[].val) ¤¬¿¿
-					  ¤Ê¤é¡¢¥Á¥§¥Ã¥¯¾õÂÖ¤È¤¹¤ë
-				callback "toggled"»ş¤Î¥³¡¼¥ë¥Ğ¥Ã¥¯´Ø¿ô
-					 ¥Ñ¥é¥á¡¼¥¿¤Ï (void*)(p[].val)
+/* ãƒã‚§ãƒƒã‚¯ãƒœã‚¿ãƒ³ã‚’è¤‡æ•°ç”Ÿæˆã™ã‚‹ ----------------------------------------
+				box	ã“ã‚Œã« PACK ã™ã‚‹ã€‚(NULLã¯ç¦æ­¢)
+				p	t_menudata å‹é…åˆ—ã®å…ˆé ­ãƒã‚¤ãƒ³ã‚¿ã€‚
+				count	ãã®é…åˆ—ã®æ•°ã€‚
+					p[0] ã€œ p[count-1] ã¾ã§ã®ãƒ‡ãƒ¼ã‚¿ã®
+					æ–‡å­—åˆ—ã§ãƒã‚§ãƒƒã‚¯ãƒœã‚¿ãƒ³ã‚’ç”Ÿæˆã™ã‚‹ã€‚
+				f_initval é–¢æ•° (*f_initval)(p[].val) ãŒçœŸ
+					  ãªã‚‰ã€ãƒã‚§ãƒƒã‚¯çŠ¶æ…‹ã¨ã™ã‚‹
+				callback "toggled"æ™‚ã®ã‚³ãƒ¼ãƒ«ãƒãƒƒã‚¯é–¢æ•°
+					 ãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿ã¯ (void*)(p[].val)
 */
 static	void	PACK_CHECK_BUTTONS(Q8tkWidget *box,
 				   const t_menudata *p, int count,
@@ -2410,16 +2410,16 @@ static	void	PACK_CHECK_BUTTONS(Q8tkWidget *box,
 }
 
 
-/* ¥é¥¸¥ª¥Ü¥¿¥ó¤òÊ£¿ôÀ¸À®¤¹¤ë ------------------------------------------
-				box	¤³¤ì¤Ë PACK ¤¹¤ë¡£(NULL¤Ï¶Ø»ß)
-				p	t_menudata ·¿ÇÛÎó¤ÎÀèÆ¬¥İ¥¤¥ó¥¿¡£
-				count	¤½¤ÎÇÛÎó¤Î¿ô¡£
-					p[0] ¡Á p[count-1] ¤Ş¤Ç¤Î¥Ç¡¼¥¿¤Î
-					Ê¸»úÎó¤Ç¥é¥¸¥ª¥Ü¥¿¥ó¤òÀ¸À®¤¹¤ë¡£
-				initval p[].val == initval ¤Ê¤é¤Ğ¡¢
-					¤½¤Î¥Ü¥¿¥ó¤òON¾õÂÖ¤È¤¹¤ë
-				callback "clicked"»ş¤Î¥³¡¼¥ë¥Ğ¥Ã¥¯´Ø¿ô
-					 ¥Ñ¥é¥á¡¼¥¿¤Ï (void*)(p[].val)
+/* ãƒ©ã‚¸ã‚ªãƒœã‚¿ãƒ³ã‚’è¤‡æ•°ç”Ÿæˆã™ã‚‹ ------------------------------------------
+				box	ã“ã‚Œã« PACK ã™ã‚‹ã€‚(NULLã¯ç¦æ­¢)
+				p	t_menudata å‹é…åˆ—ã®å…ˆé ­ãƒã‚¤ãƒ³ã‚¿ã€‚
+				count	ãã®é…åˆ—ã®æ•°ã€‚
+					p[0] ã€œ p[count-1] ã¾ã§ã®ãƒ‡ãƒ¼ã‚¿ã®
+					æ–‡å­—åˆ—ã§ãƒ©ã‚¸ã‚ªãƒœã‚¿ãƒ³ã‚’ç”Ÿæˆã™ã‚‹ã€‚
+				initval p[].val == initval ãªã‚‰ã°ã€
+					ãã®ãƒœã‚¿ãƒ³ã‚’ONçŠ¶æ…‹ã¨ã™ã‚‹
+				callback "clicked"æ™‚ã®ã‚³ãƒ¼ãƒ«ãƒãƒƒã‚¯é–¢æ•°
+					 ãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿ã¯ (void*)(p[].val)
 */
 static	Q8List	*PACK_RADIO_BUTTONS(Q8tkWidget *box,
 				    const t_menudata *p, int count,
@@ -2444,13 +2444,13 @@ static	Q8List	*PACK_RADIO_BUTTONS(Q8tkWidget *box,
 }
 
 
-/* HSCALE¤òÀ¸À®¤¹¤ë ----------------------------------------------------
-				box	!= NULL ¤Ê¤é¡¢¤³¤ì¤Ë PACK ¤¹¤ë¡£
-				p	t_volume ·¿ÇÛÎó¤ÎÀèÆ¬¥İ¥¤¥ó¥¿¡£
-					¤³¤Î¾ğÊó¤ò¤â¤È¤ËHSCALE¤òÀ¸À®¡£
-				initval ½é´üÃÍ
-				callback "value_changed"»ş¤Î¥³¡¼¥ë¥Ğ¥Ã¥¯´Ø¿ô
-				parm     ¤½¤Î¥Ñ¥é¥á¡¼¥¿
+/* HSCALEã‚’ç”Ÿæˆã™ã‚‹ ----------------------------------------------------
+				box	!= NULL ãªã‚‰ã€ã“ã‚Œã« PACK ã™ã‚‹ã€‚
+				p	t_volume å‹é…åˆ—ã®å…ˆé ­ãƒã‚¤ãƒ³ã‚¿ã€‚
+					ã“ã®æƒ…å ±ã‚’ã‚‚ã¨ã«HSCALEã‚’ç”Ÿæˆã€‚
+				initval åˆæœŸå€¤
+				callback "value_changed"æ™‚ã®ã‚³ãƒ¼ãƒ«ãƒãƒƒã‚¯é–¢æ•°
+				parm     ãã®ãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿
 */
 static	Q8tkWidget *PACK_HSCALE(Q8tkWidget *box,
 				const t_volume *p,
@@ -2480,7 +2480,7 @@ static	Q8tkWidget *PACK_HSCALE(Q8tkWidget *box,
 
 
 
-/* ¥­¡¼¥¢¥µ¥¤¥óÊÑ¹¹ÍÑ¥¦¥£¥¸¥Ã¥È¤òÀ¸À®¤¹¤ë ------------------------------ */
+/* ã‚­ãƒ¼ã‚¢ã‚µã‚¤ãƒ³å¤‰æ›´ç”¨ã‚¦ã‚£ã‚¸ãƒƒãƒˆã‚’ç”Ÿæˆã™ã‚‹ ------------------------------ */
 static	Q8tkWidget *MAKE_KEY_COMBO(Q8tkWidget *box,
 				   const t_menudata *p,
 				   int (*f_initval)(int),
@@ -2536,10 +2536,10 @@ static	Q8tkWidget *PACK_KEY_ASSIGN(Q8tkWidget *box,
 	    q8tk_box_pack_start(vbox, hbox);
 	}
 
-	PACK_LABEL(vbox, GET_LABEL(p, 0));			/* ¢¬ */
+	PACK_LABEL(vbox, GET_LABEL(p, 0));			/* â†‘ */
 	p++;
 
-	{						/* combo ¢« ¢ª combo */
+	{						/* combo â† â†’ combo */
 	    hbox = q8tk_hbox_new();
 	    {
 		MAKE_KEY_COMBO(hbox, p, f_initval, callback);
@@ -2551,7 +2551,7 @@ static	Q8tkWidget *PACK_KEY_ASSIGN(Q8tkWidget *box,
 	    q8tk_box_pack_start(vbox, hbox);
 	}
 
-	PACK_LABEL(vbox, GET_LABEL(p, 0));			/* ¢­ */
+	PACK_LABEL(vbox, GET_LABEL(p, 0));			/* â†“ */
 	p++;
 
 	{							/* combo */
@@ -2567,11 +2567,11 @@ static	Q8tkWidget *PACK_KEY_ASSIGN(Q8tkWidget *box,
     q8tk_widget_show(vbox);
 
 
-    if (count < 6) {		/* Êı¸ş¥­¡¼¤À¤±¤Ç½èÍı½ª¤ï¤ê */
+    if (count < 6) {		/* æ–¹å‘ã‚­ãƒ¼ã ã‘ã§å‡¦ç†çµ‚ã‚ã‚Š */
 
 	allbox = vbox;
 
-    } else {			/* Â¾¤Ë¤â½èÍı¤¹¤ë¥­¡¼¤¢¤ê */
+    } else {			/* ä»–ã«ã‚‚å‡¦ç†ã™ã‚‹ã‚­ãƒ¼ã‚ã‚Š */
 
 	allbox = q8tk_hbox_new();
 	q8tk_box_pack_start(allbox, vbox);
@@ -2609,35 +2609,35 @@ static	Q8tkWidget *PACK_KEY_ASSIGN(Q8tkWidget *box,
 
 /*======================================================================*/
 
-/* ¥Õ¥¡¥¤¥ë¥»¥ì¥¯¥·¥ç¥ó¤òÀ¸À®¤¹¤ë --------------------------------------
-	À¸À®¸å¡¢¥¦¥¤¥ó¥É¥¦¤ò¥°¥é¥Ö¤¹¤ë
-	CANCEL»ş¤Ï¡¢¤Ê¤Ë¤â½èÍı¤»¤º¤Ë¥°¥é¥Ö¤òÎ¥¤¹¡£
-	OK »ş¤Ï¡¢ (*ok_button)()¤ò¸Æ¤Ó½Ğ¤¹¡£¤³¤Î»ş¡¢¥Õ¥¡¥¤¥ëÌ¾¤Ï
-	get_filename ¤Ë¡¢¥ê¡¼¥É¥ª¥ó¥ê¡¼Â°À­¤Ï get_ro ¤Ë¥»¥Ã¥È¤µ¤ì¤Æ¤¤¤ë¡£
-	¤Ê¤ª¡¢¸Æ¤Ó½Ğ¤·¤¿»şÅÀ¤Ç¤Ï¤¹¤Ç¤Ë¥°¥é¥Ö¤òÎ¥¤¹¡£
-				label	¥é¥Ù¥ë
-				select_ro >=0¤Ê¤é¡¢ReadOnlyÁªÂò²Ä(1¤Ç¥Á¥§¥Ã¥¯)
-				filename  ½é´ü¥Õ¥¡¥¤¥ë(¥Ç¥£¥ì¥¯¥È¥ê)Ì¾
-				ok_button OK»ş¤Ë¸Æ¤Ó½Ğ¤¹´Ø¿ô
-				get_filename    OK»ş¤Ë¥Õ¥¡¥¤¥ëÌ¾¤ò¤³¤Î
-						¥Ğ¥Ã¥Õ¥¡¤Ë¥»¥Ã¥È
-				sz_get_filename ¤³¤Î¥Ğ¥Ã¥Õ¥¡¤Î¥µ¥¤¥º
-				get_ro	select_ro ¤¬ >=0 ¤Î»ş¡¢¥ê¡¼¥É¥ª¥ó¥ê¡¼
-					ÁªÂò¾ğÊó¤¬¤³¤³¤Ë¥»¥Ã¥È
+/* ãƒ•ã‚¡ã‚¤ãƒ«ã‚»ãƒ¬ã‚¯ã‚·ãƒ§ãƒ³ã‚’ç”Ÿæˆã™ã‚‹ --------------------------------------
+	ç”Ÿæˆå¾Œã€ã‚¦ã‚¤ãƒ³ãƒ‰ã‚¦ã‚’ã‚°ãƒ©ãƒ–ã™ã‚‹
+	CANCELæ™‚ã¯ã€ãªã«ã‚‚å‡¦ç†ã›ãšã«ã‚°ãƒ©ãƒ–ã‚’é›¢ã™ã€‚
+	OK æ™‚ã¯ã€ (*ok_button)()ã‚’å‘¼ã³å‡ºã™ã€‚ã“ã®æ™‚ã€ãƒ•ã‚¡ã‚¤ãƒ«åã¯
+	get_filename ã«ã€ãƒªãƒ¼ãƒ‰ã‚ªãƒ³ãƒªãƒ¼å±æ€§ã¯ get_ro ã«ã‚»ãƒƒãƒˆã•ã‚Œã¦ã„ã‚‹ã€‚
+	ãªãŠã€å‘¼ã³å‡ºã—ãŸæ™‚ç‚¹ã§ã¯ã™ã§ã«ã‚°ãƒ©ãƒ–ã‚’é›¢ã™ã€‚
+				label	ãƒ©ãƒ™ãƒ«
+				select_ro >=0ãªã‚‰ã€ReadOnlyé¸æŠå¯(1ã§ãƒã‚§ãƒƒã‚¯)
+				filename  åˆæœŸãƒ•ã‚¡ã‚¤ãƒ«(ãƒ‡ã‚£ãƒ¬ã‚¯ãƒˆãƒª)å
+				ok_button OKæ™‚ã«å‘¼ã³å‡ºã™é–¢æ•°
+				get_filename    OKæ™‚ã«ãƒ•ã‚¡ã‚¤ãƒ«åã‚’ã“ã®
+						ãƒãƒƒãƒ•ã‚¡ã«ã‚»ãƒƒãƒˆ
+				sz_get_filename ã“ã®ãƒãƒƒãƒ•ã‚¡ã®ã‚µã‚¤ã‚º
+				get_ro	select_ro ãŒ >=0 ã®æ™‚ã€ãƒªãƒ¼ãƒ‰ã‚ªãƒ³ãƒªãƒ¼
+					é¸æŠæƒ…å ±ãŒã“ã“ã«ã‚»ãƒƒãƒˆ
 */
 static struct{
-    void	(*ok_button)(void);	/* OK²¡²¼»ş¤Î¸Æ¤Ó½Ğ¤¹´Ø¿ô   */
-    char	*get_filename;		/* ÁªÂò¤·¤¿¥Õ¥¡¥¤¥ëÌ¾³ÊÇ¼Àè */
-    int		sz_get_filename;	/* ¤½¤Î¥Ğ¥Ã¥Õ¥¡¥µ¥¤¥º       */
-    int		*get_ro;		/* RO ¤«¤É¤¦¤«¤Î¥Õ¥é¥°      */
+    void	(*ok_button)(void);	/* OKæŠ¼ä¸‹æ™‚ã®å‘¼ã³å‡ºã™é–¢æ•°   */
+    char	*get_filename;		/* é¸æŠã—ãŸãƒ•ã‚¡ã‚¤ãƒ«åæ ¼ç´å…ˆ */
+    int		sz_get_filename;	/* ãã®ãƒãƒƒãƒ•ã‚¡ã‚µã‚¤ã‚º       */
+    int		*get_ro;		/* RO ã‹ã©ã†ã‹ã®ãƒ•ãƒ©ã‚°      */
     Q8tkWidget	*accel;
 } FSEL;
 static void cb_fsel_ok(UNUSED_WIDGET, Q8tkWidget *f);
 static void cb_fsel_cancel(UNUSED_WIDGET, Q8tkWidget *f);
 
-static void START_FILE_SELECTION(const char *label,	/* ¥¿¥¤¥È¥ë       */
-				 int select_ro,		/* ROÁªÂò¾õÂÖ     */
-				 const char *filename,	/* ½é´ü¥Õ¥¡¥¤¥ëÌ¾ */
+static void START_FILE_SELECTION(const char *label,	/* ã‚¿ã‚¤ãƒˆãƒ«       */
+				 int select_ro,		/* ROé¸æŠçŠ¶æ…‹     */
+				 const char *filename,	/* åˆæœŸãƒ•ã‚¡ã‚¤ãƒ«å */
 
 				 void (*ok_button)(void),
 				 char *get_filename,
@@ -2699,22 +2699,22 @@ static void cb_fsel_ok(UNUSED_WIDGET, Q8tkWidget *f)
 
 /*======================================================================*/
 
-/* ¥À¥¤¥¢¥í¥°¤ò¤òÀ¸À®¤¹¤ë ----------------------------------------------
+/* ãƒ€ã‚¤ã‚¢ãƒ­ã‚°ã‚’ã‚’ç”Ÿæˆã™ã‚‹ ----------------------------------------------
 
-	¥À¥¤¥¢¥í¥°¤Ï¡¢°Ê²¼¤Î¹½À®¤È¤¹¤ë
+	ãƒ€ã‚¤ã‚¢ãƒ­ã‚°ã¯ã€ä»¥ä¸‹ã®æ§‹æˆã¨ã™ã‚‹
 	+-----------------------------------+
-	|               ¸«½Ğ¤· 1            |	¸«½Ğ¤·¥é¥Ù¥ë   (1¸Ä°Ê¾å)
-	|                 ¡§                |
-	|               ¸«½Ğ¤· 2            |
-	|                 ¡§                |
-	|          [¥Á¥§¥Ã¥¯¥Ü¥¿¥ó]         |	¥Á¥§¥Ã¥¯¥Ü¥¿¥ó (1¸Ä°Ê¾å)
-	| --------------------------------- |	¥»¥Ñ¥ì¡¼¥¿     (1¸Ä°Ê¾å)
-	| [¥¨¥ó¥È¥ê] [¥Ü¥¿¥ó] ¡Ä¡Ä [¥Ü¥¿¥ó] |	¥¨¥ó¥È¥ê       (ºÇÂç1¸Ä)
-	+-----------------------------------+	¥Ü¥¿¥ó         (1¸Ä°Ê¾å)
+	|               è¦‹å‡ºã— 1            |	è¦‹å‡ºã—ãƒ©ãƒ™ãƒ«   (1å€‹ä»¥ä¸Š)
+	|                 ï¼š                |
+	|               è¦‹å‡ºã— 2            |
+	|                 ï¼š                |
+	|          [ãƒã‚§ãƒƒã‚¯ãƒœã‚¿ãƒ³]         |	ãƒã‚§ãƒƒã‚¯ãƒœã‚¿ãƒ³ (1å€‹ä»¥ä¸Š)
+	| --------------------------------- |	ã‚»ãƒ‘ãƒ¬ãƒ¼ã‚¿     (1å€‹ä»¥ä¸Š)
+	| [ã‚¨ãƒ³ãƒˆãƒª] [ãƒœã‚¿ãƒ³] â€¦â€¦ [ãƒœã‚¿ãƒ³] |	ã‚¨ãƒ³ãƒˆãƒª       (æœ€å¤§1å€‹)
+	+-----------------------------------+	ãƒœã‚¿ãƒ³         (1å€‹ä»¥ä¸Š)
 
-	¥é¥Ù¥ë¡¢¥»¥Ñ¥ì¡¼¥¿¡¢¥Ü¥¿¥ó¡¢¥¨¥ó¥È¥ê¤ÏÁ´Éô¹ç¤ï¤»¤ÆºÇÂç¤Ç¡¢
-	DIA_MAX ¸Ä¤Ş¤Ç¡£
-	ºÇ¸å¤ËÄÉ²Ã¤·¤¿¥¦¥£¥¸¥Ã¥È (¥Ü¥¿¥ó¤«¥¨¥ó¥È¥ê) ¤Ë¥Õ¥©¡¼¥«¥¹¤¬¤¯¤ë¡£
+	ãƒ©ãƒ™ãƒ«ã€ã‚»ãƒ‘ãƒ¬ãƒ¼ã‚¿ã€ãƒœã‚¿ãƒ³ã€ã‚¨ãƒ³ãƒˆãƒªã¯å…¨éƒ¨åˆã‚ã›ã¦æœ€å¤§ã§ã€
+	DIA_MAX å€‹ã¾ã§ã€‚
+	æœ€å¾Œã«è¿½åŠ ã—ãŸã‚¦ã‚£ã‚¸ãƒƒãƒˆ (ãƒœã‚¿ãƒ³ã‹ã‚¨ãƒ³ãƒˆãƒª) ã«ãƒ•ã‚©ãƒ¼ã‚«ã‚¹ãŒãã‚‹ã€‚
 */
 
 #define	DIA_MAX		(12)
@@ -2726,7 +2726,7 @@ static	Q8tkWidget	*dialog_entry;
 static	Q8tkWidget	*dialog_accel;
 
 
-/* ¥À¥¤¥¢¥í¥°ºîÀ®³«»Ï */
+/* ãƒ€ã‚¤ã‚¢ãƒ­ã‚°ä½œæˆé–‹å§‹ */
 
 static	void	dialog_create(void)
 {
@@ -2748,7 +2748,7 @@ static	void	dialog_create(void)
     dialog_main  = d;
 }
 
-/* ¥À¥¤¥¢¥í¥°¤Ë¥é¥Ù¥ë¡Ê¸«½Ğ¤·¡Ë¤òÄÉ²Ã¡£Ê£¿ô¸Ä¡¢ÄÉ²Ã¤Ç¤­¤ë */
+/* ãƒ€ã‚¤ã‚¢ãƒ­ã‚°ã«ãƒ©ãƒ™ãƒ«ï¼ˆè¦‹å‡ºã—ï¼‰ã‚’è¿½åŠ ã€‚è¤‡æ•°å€‹ã€è¿½åŠ ã§ãã‚‹ */
 
 static	void	dialog_set_title(const char *label)
 {
@@ -2763,7 +2763,7 @@ static	void	dialog_set_title(const char *label)
     dialog[ dialog_num ++ ] = l;
 }
 
-/* ¥À¥¤¥¢¥í¥°¤Ë¥Á¥§¥Ã¥¯¥Ü¥¿¥ó¤òÄÉ²Ã (°ú¿ô¡Ä¥Ü¥¿¥óÌ¾,¾õÂÖ,¥³¡¼¥ë¥Ğ¥Ã¥¯´Ø¿ô) */
+/* ãƒ€ã‚¤ã‚¢ãƒ­ã‚°ã«ãƒã‚§ãƒƒã‚¯ãƒœã‚¿ãƒ³ã‚’è¿½åŠ  (å¼•æ•°â€¦ãƒœã‚¿ãƒ³å,çŠ¶æ…‹,ã‚³ãƒ¼ãƒ«ãƒãƒƒã‚¯é–¢æ•°) */
 
 static	void	dialog_set_check_button(const char *label, int on,
 					Q8tkSignalFunc callback, void *parm)
@@ -2782,7 +2782,7 @@ static	void	dialog_set_check_button(const char *label, int on,
     dialog[ dialog_num ++ ] = b;
 }
 
-/* ¥À¥¤¥¢¥í¥°¤Ë¥»¥Ñ¥ì¡¼¥¿¤òÄÉ²Ã¡£ */
+/* ãƒ€ã‚¤ã‚¢ãƒ­ã‚°ã«ã‚»ãƒ‘ãƒ¬ãƒ¼ã‚¿ã‚’è¿½åŠ ã€‚ */
 
 static	void	dialog_set_separator(void)
 {
@@ -2796,7 +2796,7 @@ static	void	dialog_set_separator(void)
     dialog[ dialog_num ++ ] = s;
 }
 
-/* ¥À¥¤¥¢¥í¥°¤Ë¥Ü¥¿¥ó¤òÄÉ²Ã (°ú¿ô¡Ä¥Ü¥¿¥ó¤ÎÌ¾¾Î,¥³¡¼¥ë¥Ğ¥Ã¥¯´Ø¿ô) */
+/* ãƒ€ã‚¤ã‚¢ãƒ­ã‚°ã«ãƒœã‚¿ãƒ³ã‚’è¿½åŠ  (å¼•æ•°â€¦ãƒœã‚¿ãƒ³ã®åç§°,ã‚³ãƒ¼ãƒ«ãƒãƒƒã‚¯é–¢æ•°) */
 
 static	void	dialog_set_button(const char *label,
 				  Q8tkSignalFunc callback, void *parm)
@@ -2812,7 +2812,7 @@ static	void	dialog_set_button(const char *label,
     dialog[ dialog_num ++ ] = b;
 }
 
-/* ¥À¥¤¥¢¥í¥°¤Ë¥¨¥ó¥È¥ê¤òÄÉ²Ã (°ú¿ô¡Ä½é´üÊ¸»úÎó,ºÇÂçÊ¸»ú¿ô,¥³¡¼¥ë¥Ğ¥Ã¥¯´Ø¿ô) */
+/* ãƒ€ã‚¤ã‚¢ãƒ­ã‚°ã«ã‚¨ãƒ³ãƒˆãƒªã‚’è¿½åŠ  (å¼•æ•°â€¦åˆæœŸæ–‡å­—åˆ—,æœ€å¤§æ–‡å­—æ•°,ã‚³ãƒ¼ãƒ«ãƒãƒƒã‚¯é–¢æ•°) */
 
 static	void	dialog_set_entry(const char *text, int max_length,
 				 Q8tkSignalFunc callback, void *parm)
@@ -2831,14 +2831,14 @@ static	void	dialog_set_entry(const char *text, int max_length,
     dialog[ dialog_num ++ ] = e;
 }
 
-/* ¥À¥¤¥¢¥í¥°Æâ¤Î¡¢¥¨¥ó¥È¥ê¤ÎÊ¸»úÎó¤ò¤È¤ê½Ğ¤¹ */
+/* ãƒ€ã‚¤ã‚¢ãƒ­ã‚°å†…ã®ã€ã‚¨ãƒ³ãƒˆãƒªã®æ–‡å­—åˆ—ã‚’ã¨ã‚Šå‡ºã™ */
 
 static	const	char	*dialog_get_entry(void)
 {
     return q8tk_entry_get_text(dialog_entry);
 }
 
-/* Ä¾Á°¤ËÄÉ²Ã¤·¤¿¥À¥¤¥¢¥í¥°¤Î¥Ü¥¿¥ó¤Ë¡¢¥·¥ç¡¼¥È¥«¥Ã¥È¥­¡¼¤òÀßÄê */
+/* ç›´å‰ã«è¿½åŠ ã—ãŸãƒ€ã‚¤ã‚¢ãƒ­ã‚°ã®ãƒœã‚¿ãƒ³ã«ã€ã‚·ãƒ§ãƒ¼ãƒˆã‚«ãƒƒãƒˆã‚­ãƒ¼ã‚’è¨­å®š */
 
 static	void	dialog_accel_key(int key)
 {
@@ -2846,7 +2846,7 @@ static	void	dialog_accel_key(int key)
     q8tk_accel_group_add(dialog_accel, key, w, "clicked");
 }
 
-/* ¥À¥¤¥¢¥í¥°É½¼¨³«»Ï (¥°¥é¥Ö¤µ¤ì¤ë¡£¥Õ¥©¡¼¥«¥¹¤ÏºÇ¸å¤ËÄÉ²Ã¤·¤¿¥Ü¥¿¥ó¤Ø) */
+/* ãƒ€ã‚¤ã‚¢ãƒ­ã‚°è¡¨ç¤ºé–‹å§‹ (ã‚°ãƒ©ãƒ–ã•ã‚Œã‚‹ã€‚ãƒ•ã‚©ãƒ¼ã‚«ã‚¹ã¯æœ€å¾Œã«è¿½åŠ ã—ãŸãƒœã‚¿ãƒ³ã¸) */
 
 static	void	dialog_start(void)
 {
@@ -2858,7 +2858,7 @@ static	void	dialog_start(void)
     }
 }
 
-/* ¥À¥¤¥¢¥í¥°¤ò¾Ãµî (¥¦¥¤¥ó¥É¥¦¤ò¾Ãµî¤·¡¢¥°¥é¥Ö¤ò²ò½ü¤¹¤ë) */
+/* ãƒ€ã‚¤ã‚¢ãƒ­ã‚°ã‚’æ¶ˆå» (ã‚¦ã‚¤ãƒ³ãƒ‰ã‚¦ã‚’æ¶ˆå»ã—ã€ã‚°ãƒ©ãƒ–ã‚’è§£é™¤ã™ã‚‹) */
 
 static	void	dialog_destroy(void)
 {

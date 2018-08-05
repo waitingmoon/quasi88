@@ -1,6 +1,6 @@
 /************************************************************************/
 /*									*/
-/* ¥á¥â¥ê³ÎÊİ & ROM¥Õ¥¡¥¤¥ë¥í¡¼¥É					*/
+/* ãƒ¡ãƒ¢ãƒªç¢ºä¿ & ROMãƒ•ã‚¡ã‚¤ãƒ«ãƒ­ãƒ¼ãƒ‰					*/
 /*									*/
 /************************************************************************/
 
@@ -21,33 +21,33 @@
 
 
 
-int	set_version;	/* µ¯Æ°»ş¤Î¥Ğ¡¼¥¸¥ç¥ó¶¯À©ÊÑ¹¹ '0' ¡Á '9'	*/
-int	rom_version;	/* (ÊÑ¹¹Á°¤Î) BASIC ROM¥Ğ¡¼¥¸¥ç¥ó		*/
+int	set_version;	/* èµ·å‹•æ™‚ã®ãƒãƒ¼ã‚¸ãƒ§ãƒ³å¼·åˆ¶å¤‰æ›´ '0' ã€œ '9'	*/
+int	rom_version;	/* (å¤‰æ›´å‰ã®) BASIC ROMãƒãƒ¼ã‚¸ãƒ§ãƒ³		*/
 
-int	use_extram	= DEFAULT_EXTRAM;	/* ³ÈÄ¥RAM¤Î¥«¡¼¥É¿ô	*/
-int	use_jisho_rom	= DEFAULT_JISHO;	/* ¼­½ñROM¤ò»È¤¦	*/
-int	use_built_in_font = FALSE;		/* ÆâÂ¢¥Õ¥©¥ó¥È¤ò»È¤¦	*/
-int	use_pcg = FALSE;			/* PCG-8100¥µ¥İ¡¼¥È	*/
-int	font_type = 0;				/* ¥Õ¥©¥ó¥È¤Î¼ïÎà	*/
-int	font_loaded = 0;			/* ¥í¡¼¥É¤·¤¿¥Õ¥©¥ó¥È¼ï	*/
+int	use_extram	= DEFAULT_EXTRAM;	/* æ‹¡å¼µRAMã®ã‚«ãƒ¼ãƒ‰æ•°	*/
+int	use_jisho_rom	= DEFAULT_JISHO;	/* è¾æ›¸ROMã‚’ä½¿ã†	*/
+int	use_built_in_font = FALSE;		/* å†…è”µãƒ•ã‚©ãƒ³ãƒˆã‚’ä½¿ã†	*/
+int	use_pcg = FALSE;			/* PCG-8100ã‚µãƒãƒ¼ãƒˆ	*/
+int	font_type = 0;				/* ãƒ•ã‚©ãƒ³ãƒˆã®ç¨®é¡	*/
+int	font_loaded = 0;			/* ãƒ­ãƒ¼ãƒ‰ã—ãŸãƒ•ã‚©ãƒ³ãƒˆç¨®	*/
 
-int	memory_wait = FALSE;			/* ¥á¥â¥ê¥¦¥§¥¤¥È¤ÎÍ­Ìµ	*/
+int	memory_wait = FALSE;			/* ãƒ¡ãƒ¢ãƒªã‚¦ã‚§ã‚¤ãƒˆã®æœ‰ç„¡	*/
 
-char	*file_compatrom = NULL;			/* P88SR emu ¤ÎROM¤ò»È¤¦*/
+char	*file_compatrom = NULL;			/* P88SR emu ã®ROMã‚’ä½¿ã†*/
 
-int	has_kanji_rom   = FALSE;		/* ´Á»úROM¤ÎÍ­Ìµ	*/
+int	has_kanji_rom   = FALSE;		/* æ¼¢å­—ROMã®æœ‰ç„¡	*/
 
-int	linear_ext_ram = TRUE;			/* ³ÈÄ¥RAM¤òÏ¢Â³¤µ¤»¤ë	*/
+int	linear_ext_ram = TRUE;			/* æ‹¡å¼µRAMã‚’é€£ç¶šã•ã›ã‚‹	*/
 
 
 /*----------------------------------------------------------------------*/
-/* ÆâÂ¢¥Õ¥©¥ó¥È¥Ç¡¼¥¿							*/
+/* å†…è”µãƒ•ã‚©ãƒ³ãƒˆãƒ‡ãƒ¼ã‚¿							*/
 /*----------------------------------------------------------------------*/
 #include "font.h"
 
 
 /*----------------------------------------------------------------------*/
-/* ´Á»ú¥À¥ß¡¼ROM (´Á»úROM¤¬Ìµ¤¤»ş¤Î¥À¥ß¡¼)				*/
+/* æ¼¢å­—ãƒ€ãƒŸãƒ¼ROM (æ¼¢å­—ROMãŒç„¡ã„æ™‚ã®ãƒ€ãƒŸãƒ¼)				*/
 /*----------------------------------------------------------------------*/
 byte	kanji_dummy_rom[16][2] =
 {
@@ -71,7 +71,7 @@ byte	kanji_dummy_rom[16][2] =
 
 
 /*----------------------------------------------------------------------*/
-/* ROM¥Õ¥¡¥¤¥ëÌ¾							*/
+/* ROMãƒ•ã‚¡ã‚¤ãƒ«å							*/
 /*----------------------------------------------------------------------*/
 enum {
   N88_ROM,  EXT0_ROM, EXT1_ROM,  EXT2_ROM, EXT3_ROM,  N_ROM,     SUB_ROM,
@@ -96,45 +96,45 @@ static char *rom_list[ ROM_END ][5] =
 
 
 
-byte	*main_rom;			/* ¥á¥¤¥ó ROM [0x8000] (32KB)	*/
-byte	(*main_rom_ext)[0x2000];	/* ³ÈÄ¥ ROM [4][0x2000](8KB *4)	*/
+byte	*main_rom;			/* ãƒ¡ã‚¤ãƒ³ ROM [0x8000] (32KB)	*/
+byte	(*main_rom_ext)[0x2000];	/* æ‹¡å¼µ ROM [4][0x2000](8KB *4)	*/
 byte	*main_rom_n;			/* N-BASIC [0x8000]    (32KB)	*/
-byte	*main_ram;			/* ¥á¥¤¥ó RAM [0x10000](64KB)	*/
-byte	*main_high_ram;			/* ¹âÂ® RAM(¤ÎÎ¢)[0x1000] (4KB)	*/
-byte	(*kanji_rom)[65536][2];		/* ´Á»ú£Ò£Ï£Í[2][65536][2]	*/
-byte	*sub_romram;			/* ¥µ¥Ö ROM/RAM [0x8000] (32KB)	*/
+byte	*main_ram;			/* ãƒ¡ã‚¤ãƒ³ RAM [0x10000](64KB)	*/
+byte	*main_high_ram;			/* é«˜é€Ÿ RAM(ã®è£)[0x1000] (4KB)	*/
+byte	(*kanji_rom)[65536][2];		/* æ¼¢å­—ï¼²ï¼¯ï¼­[2][65536][2]	*/
+byte	*sub_romram;			/* ã‚µãƒ– ROM/RAM [0x8000] (32KB)	*/
 
-byte	(*ext_ram)[0x8000];		/* ³ÈÄ¥ RAM[4][0x8000](32KB*4¡Á)*/
-byte	(*jisho_rom)[0x4000];		/* ¼­½ñ ROM[32][0x4000](16KB*32)*/
+byte	(*ext_ram)[0x8000];		/* æ‹¡å¼µ RAM[4][0x8000](32KB*4ã€œ)*/
+byte	(*jisho_rom)[0x4000];		/* è¾æ›¸ ROM[32][0x4000](16KB*32)*/
 
 bit8	(*main_vram)[4];		/* VRAM[0x4000][4](=G/R/G/pad)	*/
-bit8	*font_rom;			/* ¥Õ¥©¥ó¥È¥¤¥á¡¼¥¸ROM[8*256*2]	*/
+bit8	*font_rom;			/* ãƒ•ã‚©ãƒ³ãƒˆã‚¤ãƒ¡ãƒ¼ã‚¸ROM[8*256*2]	*/
 
-bit8	*font_pcg;			/* ¥Õ¥©¥ó¥È¥¤¥á¡¼¥¸ROM(PCGÍÑ)	*/
-bit8	*font_mem;			/* ¥Õ¥©¥ó¥È¥¤¥á¡¼¥¸ROM(¸ÇÄê )	*/
-bit8	*font_mem2;			/* ¥Õ¥©¥ó¥È¥¤¥á¡¼¥¸ROM(¸ÇÄê2)	*/
-bit8	*font_mem3;			/* ¥Õ¥©¥ó¥È¥¤¥á¡¼¥¸ROM(¸ÇÄê3)	*/
+bit8	*font_pcg;			/* ãƒ•ã‚©ãƒ³ãƒˆã‚¤ãƒ¡ãƒ¼ã‚¸ROM(PCGç”¨)	*/
+bit8	*font_mem;			/* ãƒ•ã‚©ãƒ³ãƒˆã‚¤ãƒ¡ãƒ¼ã‚¸ROM(å›ºå®š )	*/
+bit8	*font_mem2;			/* ãƒ•ã‚©ãƒ³ãƒˆã‚¤ãƒ¡ãƒ¼ã‚¸ROM(å›ºå®š2)	*/
+bit8	*font_mem3;			/* ãƒ•ã‚©ãƒ³ãƒˆã‚¤ãƒ¡ãƒ¼ã‚¸ROM(å›ºå®š3)	*/
 
-byte	*dummy_rom;			/* ¥À¥ß¡¼ROM (32KB)		*/
-byte	*dummy_ram;			/* ¥À¥ß¡¼RAM (32KB)		*/
+byte	*dummy_rom;			/* ãƒ€ãƒŸãƒ¼ROM (32KB)		*/
+byte	*dummy_ram;			/* ãƒ€ãƒŸãƒ¼RAM (32KB)		*/
 
 
 
 
 
 /*----------------------------------------------------------------------
- * ¥á¥â¥ê¥¢¥í¥±¡¼¥È
+ * ãƒ¡ãƒ¢ãƒªã‚¢ãƒ­ã‚±ãƒ¼ãƒˆ
  *----------------------------------------------------------------------*/
 static	int	mem_alloc_result;
 
-static	void	mem_alloc_start( const char *msg )	/* ¥á¥â¥ê³ÎÊİ³«»Ï */
+static	void	mem_alloc_start( const char *msg )	/* ãƒ¡ãƒ¢ãƒªç¢ºä¿é–‹å§‹ */
 {
   if( verbose_proc ){ printf( "%s", msg ); }
 
   mem_alloc_result = TRUE;
 }
 
-static	void	*mem_alloc( size_t size )		/* ¥á¥â¥ê³ÎÊİ */
+static	void	*mem_alloc( size_t size )		/* ãƒ¡ãƒ¢ãƒªç¢ºä¿ */
 {
   void	*ptr = malloc( size );
 
@@ -144,7 +144,7 @@ static	void	*mem_alloc( size_t size )		/* ¥á¥â¥ê³ÎÊİ */
   return ptr;
 }
 
-static	int	mem_alloc_finish( void )		/* ¥á¥â¥ê³ÎÊİ´°Î»(µ¶¤Ç¼ºÇÔ) */
+static	int	mem_alloc_finish( void )		/* ãƒ¡ãƒ¢ãƒªç¢ºä¿å®Œäº†(å½ã§å¤±æ•—) */
 {
   if( verbose_proc ){ 
     if( mem_alloc_result == FALSE ){ printf( "FAILED\n" ); }
@@ -157,35 +157,35 @@ static	int	mem_alloc_finish( void )		/* ¥á¥â¥ê³ÎÊİ´°Î»(µ¶¤Ç¼ºÇÔ) */
 
 
 /*----------------------------------------------------------------------
- * ROM ¥¤¥á¡¼¥¸¥Õ¥¡¥¤¥ë¤ò¥á¥â¥ê¤Ë¥í¡¼¥É
+ * ROM ã‚¤ãƒ¡ãƒ¼ã‚¸ãƒ•ã‚¡ã‚¤ãƒ«ã‚’ãƒ¡ãƒ¢ãƒªã«ãƒ­ãƒ¼ãƒ‰
  *----------------------------------------------------------------------*/
 
 /*
- * ÄÌ¾ï¤ÎROM¥¤¥á¡¼¥¸¥í¡¼¥É
+ * é€šå¸¸ã®ROMã‚¤ãƒ¡ãƒ¼ã‚¸ãƒ­ãƒ¼ãƒ‰
  *	int load_rom( char *filelist[], byte *ptr, int size, int disp_flag )
- *		filelist ¡Ä ¥ª¡¼¥×¥ó¤¹¤ë¥Õ¥¡¥¤¥ëÌ¾°ìÍ÷¤Î¥ê¥¹¥È
- *		ptr      ¡Ä ¤³¤Î¥İ¥¤¥ó¥¿¤ÎÀè¤Ë¥í¡¼¥É¤¹¤ë
- *		size     ¡Ä ¥í¡¼¥É¤¹¤ë¥µ¥¤¥º
- *		disp_flag¡Ä verbose_proc »ş¤ËÉ½¼¨¤¹¤ë¥á¥Ã¥»¡¼¥¸·Á¼°
- *				DISP_FNAME	³«¤¤¤¿¥Õ¥¡¥¤¥ëÌ¾¤À¤±É½¼¨
+ *		filelist â€¦ ã‚ªãƒ¼ãƒ—ãƒ³ã™ã‚‹ãƒ•ã‚¡ã‚¤ãƒ«åä¸€è¦§ã®ãƒªã‚¹ãƒˆ
+ *		ptr      â€¦ ã“ã®ãƒã‚¤ãƒ³ã‚¿ã®å…ˆã«ãƒ­ãƒ¼ãƒ‰ã™ã‚‹
+ *		size     â€¦ ãƒ­ãƒ¼ãƒ‰ã™ã‚‹ã‚µã‚¤ã‚º
+ *		disp_flagâ€¦ verbose_proc æ™‚ã«è¡¨ç¤ºã™ã‚‹ãƒ¡ãƒƒã‚»ãƒ¼ã‚¸å½¢å¼
+ *				DISP_FNAME	é–‹ã„ãŸãƒ•ã‚¡ã‚¤ãƒ«åã ã‘è¡¨ç¤º
  *							"filename ..."
- *						Ìá¤êÃÍ¤ò¤ß¤Æ"OK\n"Åù¤òÉÕ²Ã¤¹¤ë
- *						¥Õ¥¡¥¤¥ë¤¬³«¤±¤Ê¤«¤Ã¤¿¤é¡¢
+ *						æˆ»ã‚Šå€¤ã‚’ã¿ã¦"OK\n"ç­‰ã‚’ä»˜åŠ ã™ã‚‹
+ *						ãƒ•ã‚¡ã‚¤ãƒ«ãŒé–‹ã‘ãªã‹ã£ãŸã‚‰ã€
  *							"filename not found"
- *						É¬Í×¤Ë±ş¤¸¤Æ "\n" ¤òÉÕ²Ã¤¹¤ë
+ *						å¿…è¦ã«å¿œã˜ã¦ "\n" ã‚’ä»˜åŠ ã™ã‚‹
  *
- *				DISP_RESULT	³«¤¤¤¿¥Õ¥¡¥¤¥ëÌ¾¤È·ë²Ì¤òÉ½¼¨
+ *				DISP_RESULT	é–‹ã„ãŸãƒ•ã‚¡ã‚¤ãƒ«åã¨çµæœã‚’è¡¨ç¤º
  *							"filename ... OK\n"
- *						¥Õ¥¡¥¤¥ë¤¬³«¤±¤Ê¤«¤Ã¤¿¤é¡¢
+ *						ãƒ•ã‚¡ã‚¤ãƒ«ãŒé–‹ã‘ãªã‹ã£ãŸã‚‰ã€
  *							"filename not found\n"
  *
- *				DISP_IF_EXIST	³«¤¤¤¿¥Õ¥¡¥¤¥ëÌ¾¤È·ë²Ì¤òÉ½¼¨
+ *				DISP_IF_EXIST	é–‹ã„ãŸãƒ•ã‚¡ã‚¤ãƒ«åã¨çµæœã‚’è¡¨ç¤º
  *							"filename ..."
- *						Ìá¤êÃÍ¤ò¤ß¤Æ"OK\n"Åù¤òÉÕ²Ã¤¹¤ë
- *						¥Õ¥¡¥¤¥ë¤¬³«¤±¤Ê¤«¤Ã¤¿¤é¡¢
- *							¤Ê¤Ë¤âÉ½¼¨¤·¤Ê¤¤¡£
+ *						æˆ»ã‚Šå€¤ã‚’ã¿ã¦"OK\n"ç­‰ã‚’ä»˜åŠ ã™ã‚‹
+ *						ãƒ•ã‚¡ã‚¤ãƒ«ãŒé–‹ã‘ãªã‹ã£ãŸã‚‰ã€
+ *							ãªã«ã‚‚è¡¨ç¤ºã—ãªã„ã€‚
  *
- *		ÌáÃÍ     ¡Ä ÆÉ¤ß¹ş¤ó¤À¥µ¥¤¥º¡£¥Õ¥¡¥¤¥ë¤¬³«¤±¤Ê¤«¤Ã¤¿¤é -1
+ *		æˆ»å€¤     â€¦ èª­ã¿è¾¼ã‚“ã ã‚µã‚¤ã‚ºã€‚ãƒ•ã‚¡ã‚¤ãƒ«ãŒé–‹ã‘ãªã‹ã£ãŸã‚‰ -1
  */
 #define		DISP_FNAME	(0)
 #define		DISP_RESULT	(1)
@@ -215,9 +215,9 @@ static	int	load_rom( char *filelist[], byte *ptr, int size, int disp )
     }
   }
 
-  if( load_size < 0 ){			/* ¥Õ¥¡¥¤¥ë¸«¤Ä¤«¤é¤º */
+  if( load_size < 0 ){			/* ãƒ•ã‚¡ã‚¤ãƒ«è¦‹ã¤ã‹ã‚‰ãš */
     memset( ptr, 0xff, size );
-  }else if( load_size < size ){		/* ¸«¤Ä¤«¤Ã¤¿¤±¤É¡¢¥µ¥¤¥º¤¬Â­¤ê¤Ê¤¤ */
+  }else if( load_size < size ){		/* è¦‹ã¤ã‹ã£ãŸã‘ã©ã€ã‚µã‚¤ã‚ºãŒè¶³ã‚Šãªã„ */
     memset( &ptr[load_size], 0xff, size-load_size );
   }
 
@@ -241,14 +241,14 @@ static	int	load_rom( char *filelist[], byte *ptr, int size, int disp )
 
 
 /*
- * ·ë¹ç·Á¼°¤ÎROM¥¤¥á¡¼¥¸¥í¡¼¥É
+ * çµåˆå½¢å¼ã®ROMã‚¤ãƒ¡ãƒ¼ã‚¸ãƒ­ãƒ¼ãƒ‰
  *	OSD_FILE *load_compat_rom_open( void )
  *	void load_compat_rom_close( OSD_FILE *fp )
- *		¥Õ¥¡¥¤¥ë¤ò³«¤¯ / ÊÄ¤¸¤ë
+ *		ãƒ•ã‚¡ã‚¤ãƒ«ã‚’é–‹ã / é–‰ã˜ã‚‹
  *	int load_compat_rom( byte *ptr, long pos, int size, OSD_FILE *fp )
- *		¥Õ¥¡¥¤¥ëfp ¤ÎÀèÆ¬ pos¥Ğ¥¤¥ÈÌÜ¤«¤é size¥Ğ¥¤¥È¤ò ptr¤Ë¥í¡¼¥É¡£
- *		ÌáÃÍ¤Ï¥í¡¼¥É¤·¤¿¥µ¥¤¥º¡£¥·¡¼¥¯¼ºÇÔ¤Ê¤é -1¡£
- *	ÅÓÃæ¤Ç1ÅÙ¤Ç¤â½èÍı¤Ë¼ºÇÔ¤·¤¿¤é¡¢ load_compat_rom_success==FALSE ¤Ë¤Ê¤ë
+ *		ãƒ•ã‚¡ã‚¤ãƒ«fp ã®å…ˆé ­ posãƒã‚¤ãƒˆç›®ã‹ã‚‰ sizeãƒã‚¤ãƒˆã‚’ ptrã«ãƒ­ãƒ¼ãƒ‰ã€‚
+ *		æˆ»å€¤ã¯ãƒ­ãƒ¼ãƒ‰ã—ãŸã‚µã‚¤ã‚ºã€‚ã‚·ãƒ¼ã‚¯å¤±æ•—ãªã‚‰ -1ã€‚
+ *	é€”ä¸­ã§1åº¦ã§ã‚‚å‡¦ç†ã«å¤±æ•—ã—ãŸã‚‰ã€ load_compat_rom_success==FALSE ã«ãªã‚‹
  */
 static	int	load_compat_rom_success;
 
@@ -302,10 +302,10 @@ static	void	load_compat_rom_close( OSD_FILE *fp )
 
 
 /****************************************************************************
- * ¥¨¥ß¥å¥ì¡¼¥·¥ç¥ó¤Ë»ÈÍÑ¤¹¤ë¥á¥â¥ê¤Î³ÎÊİ¤È¡¢ROM¥¤¥á¡¼¥¸¤Î¥í¡¼¥É
+ * ã‚¨ãƒŸãƒ¥ãƒ¬ãƒ¼ã‚·ãƒ§ãƒ³ã«ä½¿ç”¨ã™ã‚‹ãƒ¡ãƒ¢ãƒªã®ç¢ºä¿ã¨ã€ROMã‚¤ãƒ¡ãƒ¼ã‚¸ã®ãƒ­ãƒ¼ãƒ‰
  *
- *	peach¤µ¤ó¤Ë¤è¤ê¡¢M88 ¤Î ROM¥Õ¥¡¥¤¥ë¤â»È¤¨¤ë¤è¤¦¤Ë³ÈÄ¥¤µ¤ì¤Ş¤·¤¿	
- *	¢ª ¤½¤Î¸å¤ÎÂçÉı¤Ë¥½¡¼¥¹¤ò½¤Àµ¤·¤Ş¤·¤¿¡£
+ *	peachã•ã‚“ã«ã‚ˆã‚Šã€M88 ã® ROMãƒ•ã‚¡ã‚¤ãƒ«ã‚‚ä½¿ãˆã‚‹ã‚ˆã†ã«æ‹¡å¼µã•ã‚Œã¾ã—ãŸ	
+ *	â†’ ãã®å¾Œã®å¤§å¹…ã«ã‚½ãƒ¼ã‚¹ã‚’ä¿®æ­£ã—ã¾ã—ãŸã€‚
  *****************************************************************************/
 
 #define	FONT_SZ	(8*256*1)
@@ -315,7 +315,7 @@ int	memory_allocate( void )
   int	size;
 
 
-		/* É¸½à¥á¥â¥ê¤ò³ÎÊİ */
+		/* æ¨™æº–ãƒ¡ãƒ¢ãƒªã‚’ç¢ºä¿ */
 
   mem_alloc_start( "Allocating memory for standard ROM/RAM..." );
   {
@@ -342,9 +342,9 @@ int	memory_allocate( void )
 
 
 
-		/* ROM¥¤¥á¡¼¥¸¤ò¥Õ¥¡¥¤¥ë¤«¤éÆÉ¤ß¹ş¤à */
+		/* ROMã‚¤ãƒ¡ãƒ¼ã‚¸ã‚’ãƒ•ã‚¡ã‚¤ãƒ«ã‹ã‚‰èª­ã¿è¾¼ã‚€ */
 
-  if( file_compatrom == NULL ){		/* ÄÌ¾ï¤ÎROM¥¤¥á¡¼¥¸¥Õ¥¡¥¤¥ë */
+  if( file_compatrom == NULL ){		/* é€šå¸¸ã®ROMã‚¤ãƒ¡ãƒ¼ã‚¸ãƒ•ã‚¡ã‚¤ãƒ« */
 
     load_rom( rom_list[ N88_ROM ],  main_rom,        0x8000, DISP_RESULT );
     load_rom( rom_list[ EXT0_ROM ], main_rom_ext[0], 0x2000, DISP_RESULT );
@@ -367,7 +367,7 @@ int	memory_allocate( void )
       }
     }
 
-  }else{				/* ·ë¹ç·Á¼°ROM¥¤¥á¡¼¥¸¥Õ¥¡¥¤¥ë */
+  }else{				/* çµåˆå½¢å¼ROMã‚¤ãƒ¡ãƒ¼ã‚¸ãƒ•ã‚¡ã‚¤ãƒ« */
 
     OSD_FILE *fp = load_compat_rom_open();
     if( fp ){
@@ -379,10 +379,10 @@ int	memory_allocate( void )
       load_compat_rom( &main_rom_n[0x6000], 0x08000, 0x2000, fp );
       load_compat_rom( sub_romram,          0x14000, 0x2000, fp );
 
-      if( load_compat_rom_success == FALSE ){	/* ¤³¤³Ëø¤Ç¼ºÇÔ¤¬¤¢¤ì¤Ğ½ªÎ» */
+      if( load_compat_rom_success == FALSE ){	/* ã“ã“è¿„ã§å¤±æ•—ãŒã‚ã‚Œã°çµ‚äº† */
 	if( verbose_proc ){ printf( "FAILED\n"); }
       }
-      else{					/* À®¸ù¤Ê¤é N-BASIC ¥í¡¼¥É */
+      else{					/* æˆåŠŸãªã‚‰ N-BASIC ãƒ­ãƒ¼ãƒ‰ */
 	size = load_compat_rom( main_rom_n, 0x16000, 0x6000, fp );
 	if( verbose_proc ){
 	  if     ( size ==      0 ){ printf( "OK (Without N-BASIC)\n" ); }
@@ -394,13 +394,13 @@ int	memory_allocate( void )
       load_compat_rom_close( fp );
     }
   }
-					/* SUBÂ¦ ROM ¥ß¥é¡¼À¸À®¡¢RAM¥¯¥ê¥¢ */
+					/* SUBå´ ROM ãƒŸãƒ©ãƒ¼ç”Ÿæˆã€RAMã‚¯ãƒªã‚¢ */
   memcpy( &sub_romram[0x2000], &sub_romram[0x0000], 0x2000 );
   memset( &sub_romram[0x4000], 0xff, 0x4000 );
   
 
 
-		/* ´Á»úROM¥¤¥á¡¼¥¸¤ò¥Õ¥¡¥¤¥ë¤«¤éÆÉ¤ß¹ş¤à */
+		/* æ¼¢å­—ROMã‚¤ãƒ¡ãƒ¼ã‚¸ã‚’ãƒ•ã‚¡ã‚¤ãƒ«ã‹ã‚‰èª­ã¿è¾¼ã‚€ */
 
   size=load_rom( rom_list[ KNJ1_ROM ], kanji_rom[0][0], 0x20000, DISP_RESULT );
 
@@ -415,8 +415,8 @@ int	memory_allocate( void )
 
 
 
-		/* ¥Õ¥©¥ó¥ÈROM¥¤¥á¡¼¥¸¤ò¥Õ¥¡¥¤¥ë¤«¤éÆÉ¤ß¹ş¤à */
-		/*   (¥»¥ß¥°¥é¥Õ¥£¥Ã¥¯Ê¸»ú¤ÏÆâÂ¢Ê¸»ú¤ò»ÈÍÑ)  */
+		/* ãƒ•ã‚©ãƒ³ãƒˆROMã‚¤ãƒ¡ãƒ¼ã‚¸ã‚’ãƒ•ã‚¡ã‚¤ãƒ«ã‹ã‚‰èª­ã¿è¾¼ã‚€ */
+		/*   (ã‚»ãƒŸã‚°ãƒ©ãƒ•ã‚£ãƒƒã‚¯æ–‡å­—ã¯å†…è”µæ–‡å­—ã‚’ä½¿ç”¨)  */
 
   if( use_built_in_font ){
 
@@ -437,7 +437,7 @@ int	memory_allocate( void )
       }
     }
 
-    if( size != FONT_SZ ){	/* °Û¾ï»ş¤Ï¡¢´Á»úROM¤«ÆâÂ¢¥Õ¥©¥ó¥È¤ò»ÈÍÑ */
+    if( size != FONT_SZ ){	/* ç•°å¸¸æ™‚ã¯ã€æ¼¢å­—ROMã‹å†…è”µãƒ•ã‚©ãƒ³ãƒˆã‚’ä½¿ç”¨ */
       if( has_kanji_rom ){
 	memcpy( &font_mem[0], &kanji_rom[0][(1<<11)][0], 0x100*8 );
       }else{
@@ -451,7 +451,7 @@ int	memory_allocate( void )
 
 
 
-		/* Âè2¥Õ¥©¥ó¥È¥¤¥á¡¼¥¸¤ò¥Õ¥¡¥¤¥ë¤«¤éÆÉ¤ß¹ş¤à */
+		/* ç¬¬2ãƒ•ã‚©ãƒ³ãƒˆã‚¤ãƒ¡ãƒ¼ã‚¸ã‚’ãƒ•ã‚¡ã‚¤ãƒ«ã‹ã‚‰èª­ã¿è¾¼ã‚€ */
 
   if( use_built_in_font ){
 
@@ -475,7 +475,7 @@ int	memory_allocate( void )
     }else{
       if( size == FONT_SZ ){
 	;
-      }else{			/* Â¸ºß¤·¤Ê¤¤¾ì¹ç¤Ï¡¢ÆâÂ¢¥Õ¥©¥ó¥È¤ò»ÈÍÑ */
+      }else{			/* å­˜åœ¨ã—ãªã„å ´åˆã¯ã€å†…è”µãƒ•ã‚©ãƒ³ãƒˆã‚’ä½¿ç”¨ */
 	memcpy( &font_mem2[0],     &built_in_font_ANH[0],   0x100*8 );
 	font_loaded &= ~2;
       }
@@ -485,7 +485,7 @@ int	memory_allocate( void )
   }
 
 
-		/* Âè3¥Õ¥©¥ó¥È¥¤¥á¡¼¥¸¤ò¥Õ¥¡¥¤¥ë¤«¤éÆÉ¤ß¹ş¤à */
+		/* ç¬¬3ãƒ•ã‚©ãƒ³ãƒˆã‚¤ãƒ¡ãƒ¼ã‚¸ã‚’ãƒ•ã‚¡ã‚¤ãƒ«ã‹ã‚‰èª­ã¿è¾¼ã‚€ */
 
   if( use_built_in_font ){
 
@@ -509,7 +509,7 @@ int	memory_allocate( void )
       if( size == FONT_SZ ){
 	memcpy( &font_mem3[0x100*8], &built_in_font_graph[0], 0x100*8 );
 
-      }else{			/* Â¸ºß¤·¤Ê¤¤¾ì¹ç¤Ï¡¢Æ©ÌÀ¥Õ¥©¥ó¥È¤ò»ÈÍÑ */
+      }else{			/* å­˜åœ¨ã—ãªã„å ´åˆã¯ã€é€æ˜ãƒ•ã‚©ãƒ³ãƒˆã‚’ä½¿ç”¨ */
 	memset( &font_mem3[0], 0, FONT_SZ*2 );
 	font_loaded &= ~4;
       }
@@ -518,7 +518,7 @@ int	memory_allocate( void )
   }
 
 
-		/* ¥Õ¥©¥ó¥È¤ÎÊ¸»ú¥³¡¼¥É 0 ¤ÏÀäÂĞ¤Ë¶õÇò */
+		/* ãƒ•ã‚©ãƒ³ãƒˆã®æ–‡å­—ã‚³ãƒ¼ãƒ‰ 0 ã¯çµ¶å¯¾ã«ç©ºç™½ */
   memset( &font_mem[0],  0, 8 );
   memset( &font_mem2[0], 0, 8 );
   memset( &font_mem3[0], 0, 8 );
@@ -528,10 +528,10 @@ int	memory_allocate( void )
 
 
 
-		/* ROM¤Î¥Ğ¡¼¥¸¥ç¥ó¤òÊİÂ¸ */
+		/* ROMã®ãƒãƒ¼ã‚¸ãƒ§ãƒ³ã‚’ä¿å­˜ */
   rom_version = ROM_VERSION;
 
-		/* ¥ª¥×¥·¥ç¥Ê¥ë¤Ê¥á¥â¥ê¤ò³ÎÊİ */
+		/* ã‚ªãƒ—ã‚·ãƒ§ãƒŠãƒ«ãªãƒ¡ãƒ¢ãƒªã‚’ç¢ºä¿ */
 
   if( memory_allocate_additional()== FALSE ){
     return 0;
@@ -547,12 +547,12 @@ int	memory_allocate( void )
  *
  *
  *****************************************************************************/
-static	int	alloced_extram = 0;		/* ³ÎÊİ¤·¤¿³ÈÄ¥RAM¤Î¿ô	*/
+static	int	alloced_extram = 0;		/* ç¢ºä¿ã—ãŸæ‹¡å¼µRAMã®æ•°	*/
 
 int	memory_allocate_additional( void )
 {
 
-		/* ³ÈÄ¥¥á¥â¥ê¤ò³ÎÊİ */
+		/* æ‹¡å¼µãƒ¡ãƒ¢ãƒªã‚’ç¢ºä¿ */
 
   if( use_extram ){
 
@@ -564,7 +564,7 @@ int	memory_allocate_additional( void )
 	linear_ext_ram = TRUE;
     }
 
-				/* ³ÎÊİºÑ¤ß¥µ¥¤¥º¤¬¾®¤µ¤±¤ì¤Ğ¡¢³ÎÊİ¤·¤Ê¤ª¤· */
+				/* ç¢ºä¿æ¸ˆã¿ã‚µã‚¤ã‚ºãŒå°ã•ã‘ã‚Œã°ã€ç¢ºä¿ã—ãªãŠã— */
     if( ext_ram && alloced_extram < use_extram ){
       free( ext_ram );
       ext_ram = NULL;
@@ -597,8 +597,8 @@ int	memory_allocate_additional( void )
   }
 
 
-		/* ¼­½ñROMÍÑ¥á¥â¥ê¤ò³ÎÊİ */
-		/* ¼­½ñROM¥¤¥á¡¼¥¸¤ò¥Õ¥¡¥¤¥ë¤«¤éÆÉ¤ß¹ş¤à */
+		/* è¾æ›¸ROMç”¨ãƒ¡ãƒ¢ãƒªã‚’ç¢ºä¿ */
+		/* è¾æ›¸ROMã‚¤ãƒ¡ãƒ¼ã‚¸ã‚’ãƒ•ã‚¡ã‚¤ãƒ«ã‹ã‚‰èª­ã¿è¾¼ã‚€ */
 
   if( use_jisho_rom ){
 
@@ -618,7 +618,7 @@ int	memory_allocate_additional( void )
   }
 
 
-		/* ¥µ¥¦¥ó¥É¥Ü¡¼¥ÉII ADPCMÍÑRAM¤ò³ÎÊİ */
+		/* ã‚µã‚¦ãƒ³ãƒ‰ãƒœãƒ¼ãƒ‰II ADPCMç”¨RAMã‚’ç¢ºä¿ */
 
   if( sound_board==SOUND_II ){
 
@@ -647,8 +647,8 @@ int	memory_allocate_additional( void )
 
 
 /****************************************************************************
- * ¥Õ¥©¥ó¥È½é´ü²½
- *	PCG¥Õ¥©¥ó¥È¥Ç¡¼¥¿¤òÄÌ¾ï¤Î¥Õ¥©¥ó¥È¤Ç½é´ü²½
+ * ãƒ•ã‚©ãƒ³ãƒˆåˆæœŸåŒ–
+ *	PCGãƒ•ã‚©ãƒ³ãƒˆãƒ‡ãƒ¼ã‚¿ã‚’é€šå¸¸ã®ãƒ•ã‚©ãƒ³ãƒˆã§åˆæœŸåŒ–
  *****************************************************************************/
 void	memory_reset_font( void )
 {
@@ -660,7 +660,7 @@ void	memory_reset_font( void )
 
 
 /****************************************************************************
- * »ÈÍÑ¤¹¤ë¥Õ¥©¥ó¥È¤ò·èÄê
+ * ä½¿ç”¨ã™ã‚‹ãƒ•ã‚©ãƒ³ãƒˆã‚’æ±ºå®š
  *
  *****************************************************************************/
 void	memory_set_font( void )
@@ -677,8 +677,8 @@ void	memory_set_font( void )
 
 
 /****************************************************************************
- * ³ÎÊİ¤·¤¿¥á¥â¥ê¤Î²òÊü
- *	½ªÎ»¤¹¤ë¤ó¤Ê¤é²òÊü¤¹¤ëÉ¬Í×¤â¤Ê¤¤¤±¤É¡Ä
+ * ç¢ºä¿ã—ãŸãƒ¡ãƒ¢ãƒªã®è§£æ”¾
+ *	çµ‚äº†ã™ã‚‹ã‚“ãªã‚‰è§£æ”¾ã™ã‚‹å¿…è¦ã‚‚ãªã„ã‘ã©â€¦
  *****************************************************************************/
 void	memory_free( void )
 {
@@ -710,7 +710,7 @@ void	memory_free( void )
 
 
 /***********************************************************************
- * ¥¹¥Æ¡¼¥È¥í¡¼¥É¡¿¥¹¥Æ¡¼¥È¥»¡¼¥Ö
+ * ã‚¹ãƒ†ãƒ¼ãƒˆãƒ­ãƒ¼ãƒ‰ï¼ã‚¹ãƒ†ãƒ¼ãƒˆã‚»ãƒ¼ãƒ–
  ************************************************************************/
 
 #define	SID		"MEM "
@@ -747,7 +747,7 @@ int	statesave_memory( void )
 
   if( statesave_table( SID2, suspend_memory_work2 ) != STATE_OK ) return FALSE;
 
-  /* ÄÌ¾ï¥á¥â¥ê */
+  /* é€šå¸¸ãƒ¡ãƒ¢ãƒª */
 
   if( statesave_block( SID_MAIN, main_ram,           0x10000  ) != STATE_OK )
 								return FALSE;
@@ -760,7 +760,7 @@ int	statesave_memory( void )
   if( statesave_block( SID_PCG,  font_pcg,           8*256*2  ) != STATE_OK )
 								return FALSE;
 
-  /* ¥ª¥×¥·¥ç¥Ê¥ë¤Ê¥á¥â¥ê */
+  /* ã‚ªãƒ—ã‚·ãƒ§ãƒŠãƒ«ãªãƒ¡ãƒ¢ãƒª */
 
   if( sound_board==SOUND_II ){
     if( statesave_block( SID_ADPCM, sound2_adpcm,    0x40000  ) != STATE_OK )
@@ -777,16 +777,16 @@ int	stateload_memory( void )
 {
   if( stateload_table( SID, suspend_memory_work ) != STATE_OK ) return FALSE;
 
-  /* ¡Á0.6.3 ¤Ï¥¹¥Æ¡¼¥È¥»¡¼¥ÖÊİÂ¸»ş¤Ë¡¢ ROM¥Ğ¡¼¥¸¥ç¥óÃÍ¤ò¥Ğ¡¼¥¸¥ç¥ó¶¯À©ÊÑ¹¹ÃÍ
-     ¤È¤·¤Æ ÊİÂ¸¤·¤Æ¤¤¤ë¡£(¤Ä¤Ş¤ê¡¢¥ª¥×¥·¥ç¥ó -server X »ØÄê¾õÂÖ¤Ë¤Ê¤Ã¤Æ¤¤¤ë)
-     0.6.4¡Á ¤Ç¤Ï¡¢¤½¤Î¤è¤¦¤Ê¤³¤È¤Ï¹Ô¤ï¤Ê¤¤¡£(ÊÌÅÓ ROM ¥Ğ¡¼¥¸¥ç¥ó¤ò´ÉÍı)
-     ÆÃ¤Ë¸ß´¹À­¤Ë¼Â³²¤Ï¤Ê¤¤¤È»×¤¦¤¬¡Ä¡£°Ê²¼¤ò²Ã¤¨¤ì¤Ğ¤µ¤é¤Ë°ÂÁ´? */
+  /* ã€œ0.6.3 ã¯ã‚¹ãƒ†ãƒ¼ãƒˆã‚»ãƒ¼ãƒ–ä¿å­˜æ™‚ã«ã€ ROMãƒãƒ¼ã‚¸ãƒ§ãƒ³å€¤ã‚’ãƒãƒ¼ã‚¸ãƒ§ãƒ³å¼·åˆ¶å¤‰æ›´å€¤
+     ã¨ã—ã¦ ä¿å­˜ã—ã¦ã„ã‚‹ã€‚(ã¤ã¾ã‚Šã€ã‚ªãƒ—ã‚·ãƒ§ãƒ³ -server X æŒ‡å®šçŠ¶æ…‹ã«ãªã£ã¦ã„ã‚‹)
+     0.6.4ã€œ ã§ã¯ã€ãã®ã‚ˆã†ãªã“ã¨ã¯è¡Œã‚ãªã„ã€‚(åˆ¥é€” ROM ãƒãƒ¼ã‚¸ãƒ§ãƒ³ã‚’ç®¡ç†)
+     ç‰¹ã«äº’æ›æ€§ã«å®Ÿå®³ã¯ãªã„ã¨æ€ã†ãŒâ€¦ã€‚ä»¥ä¸‹ã‚’åŠ ãˆã‚Œã°ã•ã‚‰ã«å®‰å…¨? */
   /* if (set_version == rom_version) set_version = 0; */
 
 
   if( stateload_table( SID2, suspend_memory_work2 ) != STATE_OK ) {
 
-    /* µì¥Ğ¡¼¥¸¥ç¥ó¤Ê¤é¡¢¤ß¤Î¤¬¤¹ */
+    /* æ—§ãƒãƒ¼ã‚¸ãƒ§ãƒ³ãªã‚‰ã€ã¿ã®ãŒã™ */
 
     printf( "stateload : Statefile is old. (ver 0.6.0, 1, 2 or 3?)\n" );
 
@@ -794,7 +794,7 @@ int	stateload_memory( void )
   }
 
 
-  /* ÄÌ¾ï¥á¥â¥ê */
+  /* é€šå¸¸ãƒ¡ãƒ¢ãƒª */
 
   if( stateload_block( SID_MAIN, main_ram,           0x10000  ) != STATE_OK )
 								return FALSE;
@@ -807,7 +807,7 @@ int	stateload_memory( void )
   if( stateload_block( SID_PCG,  font_pcg,           8*256*2  ) != STATE_OK )
 								return FALSE;
 
-  /* ¥ª¥×¥·¥ç¥Ê¥ë¤Ê¥á¥â¥ê */
+  /* ã‚ªãƒ—ã‚·ãƒ§ãƒŠãƒ«ãªãƒ¡ãƒ¢ãƒª */
 
   if( memory_allocate_additional()== FALSE ){
     return FALSE;

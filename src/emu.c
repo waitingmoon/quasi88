@@ -1,6 +1,6 @@
 /************************************************************************/
 /*									*/
-/* ¥¨¥ß¥å¥â¡¼¥É								*/
+/* ã‚¨ãƒŸãƒ¥ãƒ¢ãƒ¼ãƒ‰								*/
 /*									*/
 /************************************************************************/
 
@@ -28,22 +28,22 @@
 
 
 
-break_t		break_point[2][NR_BP];	/* ¥Ö¥ì¡¼¥¯¥İ¥¤¥ó¥È		*/
-break_drive_t	break_point_fdc[NR_BP];	/* FDC ¥Ö¥ì¡¼¥¯¥İ¥¤¥ó¥È		*/
+break_t		break_point[2][NR_BP];	/* ãƒ–ãƒ¬ãƒ¼ã‚¯ãƒã‚¤ãƒ³ãƒˆ		*/
+break_drive_t	break_point_fdc[NR_BP];	/* FDC ãƒ–ãƒ¬ãƒ¼ã‚¯ãƒã‚¤ãƒ³ãƒˆ		*/
 
 
-int	cpu_timing	= DEFAULT_CPU;		/* SUB-CPU ¶îÆ°Êı¼°	*/
+int	cpu_timing	= DEFAULT_CPU;		/* SUB-CPU é§†å‹•æ–¹å¼	*/
 
-int	select_main_cpu = TRUE;			/* -cpu 0 ¼Â¹Ô¤¹¤ëCPU	*/
-						/* ¿¿¤Ê¤é MAIN CPU¤ò¼Â¹Ô*/
+int	select_main_cpu = TRUE;			/* -cpu 0 å®Ÿè¡Œã™ã‚‹CPU	*/
+						/* çœŸãªã‚‰ MAIN CPUã‚’å®Ÿè¡Œ*/
 
-int	dual_cpu_count	= 0;			/* -cpu 1 Æ±»ş½èÍıSTEP¿ô*/
-int	CPU_1_COUNT	= 4000;			/* ¤½¤Î¡¢½é´üÃÍ		*/
+int	dual_cpu_count	= 0;			/* -cpu 1 åŒæ™‚å‡¦ç†STEPæ•°*/
+int	CPU_1_COUNT	= 4000;			/* ãã®ã€åˆæœŸå€¤		*/
 
-int	cpu_slice_us    = 5;			/* -cpu 2 ½èÍı»şÊ¬³ä(us)*/
-						/* 10>¤ÇSILPHEED¤¬Æ°¤«¤ó*/
+int	cpu_slice_us    = 5;			/* -cpu 2 å‡¦ç†æ™‚åˆ†å‰²(us)*/
+						/* 10>ã§SILPHEEDãŒå‹•ã‹ã‚“*/
 
-int	trace_counter	= 1;			/* TRACE »ş¤Î¥«¥¦¥ó¥¿	*/
+int	trace_counter	= 1;			/* TRACE æ™‚ã®ã‚«ã‚¦ãƒ³ã‚¿	*/
 
 
 
@@ -61,7 +61,7 @@ void	set_emu_exec_mode( int mode )
 }
 
 /***********************************************************************
- * ¥¨¥ß¥å¥ì¡¼¥È½èÍı¤Î½é´ü²½´ØÏ¢
+ * ã‚¨ãƒŸãƒ¥ãƒ¬ãƒ¼ãƒˆå‡¦ç†ã®åˆæœŸåŒ–é–¢é€£
  ************************************************************************/
 
 void	emu_reset( void )
@@ -77,7 +77,7 @@ void	emu_reset( void )
 void	emu_breakpoint_init( void )
 {
   int	i, j;
-	/* ¥Ö¥ì¡¼¥¯¥İ¥¤¥ó¥È¤Î¥ï¡¼¥¯½é´ü²½ (¥â¥Ë¥¿¡¼¥â¡¼¥ÉÍÑ) */
+	/* ãƒ–ãƒ¬ãƒ¼ã‚¯ãƒã‚¤ãƒ³ãƒˆã®ãƒ¯ãƒ¼ã‚¯åˆæœŸåŒ– (ãƒ¢ãƒ‹ã‚¿ãƒ¼ãƒ¢ãƒ¼ãƒ‰ç”¨) */
   for( j=0; j<2; j++ )
     for( i=0; i<NR_BP; i++ )
       break_point[j][i].type = BP_NONE;
@@ -90,14 +90,14 @@ void	emu_breakpoint_init( void )
 
 
 /***********************************************************************
- * CPU¼Â¹Ô½èÍı (EXEC) ¤ÎÀ©¸æ
- *	-cpu <n> ¤Ë±ş¤¸¤Æ¡¢Æ°ºî¤òÊÑ¤¨¤ë¡£
+ * CPUå®Ÿè¡Œå‡¦ç† (EXEC) ã®åˆ¶å¾¡
+ *	-cpu <n> ã«å¿œã˜ã¦ã€å‹•ä½œã‚’å¤‰ãˆã‚‹ã€‚
  *
- *	STEP  »ş¤Ï¡¢1step ¤À¤±¼Â¹Ô¤¹¤ë¡£
- *	TRACE »ş¤Ï¡¢»ØÄê²ó¿ôÊ¬¡¢1step ¼Â¹Ô¤¹¤ë¡£
+ *	STEP  æ™‚ã¯ã€1step ã ã‘å®Ÿè¡Œã™ã‚‹ã€‚
+ *	TRACE æ™‚ã¯ã€æŒ‡å®šå›æ•°åˆ†ã€1step å®Ÿè¡Œã™ã‚‹ã€‚
  *
- *	¥Ö¥ì¡¼¥¯¥İ¥¤¥ó¥È»ØÄê»ş¤Ï¡¢1step¼Â¹Ô¤ÎÅÙ¤Ë PC ¤¬¥Ö¥ì¡¼¥¯¥İ¥¤¥ó¥È¤Ë
- *	Ã£¤·¤¿¤«¤É¤¦¤«¤ò³ÎÇ§¤¹¤ë¡£
+ *	ãƒ–ãƒ¬ãƒ¼ã‚¯ãƒã‚¤ãƒ³ãƒˆæŒ‡å®šæ™‚ã¯ã€1stepå®Ÿè¡Œã®åº¦ã« PC ãŒãƒ–ãƒ¬ãƒ¼ã‚¯ãƒã‚¤ãƒ³ãƒˆã«
+ *	é”ã—ãŸã‹ã©ã†ã‹ã‚’ç¢ºèªã™ã‚‹ã€‚
  *
  ************************************************************************/
 
@@ -107,7 +107,7 @@ void	emu_breakpoint_init( void )
 /*------------------------------------------------------------------------*/
 
 /*
- * ¥Ö¥ì¡¼¥¯¥İ¥¤¥ó¥È (¥¿¥¤¥× PC) ¤ÎÍ­Ìµ¤ò¥Á¥§¥Ã¥¯¤¹¤ë
+ * ãƒ–ãƒ¬ãƒ¼ã‚¯ãƒã‚¤ãƒ³ãƒˆ (ã‚¿ã‚¤ãƒ— PC) ã®æœ‰ç„¡ã‚’ãƒã‚§ãƒƒã‚¯ã™ã‚‹
  */
 
 static	int	check_break_point_PC( void )
@@ -124,15 +124,15 @@ static	int	check_break_point_PC( void )
 /*------------------------------------------------------------------------*/
 
 /*
- * CPU ¤ò 1step ¼Â¹Ô¤·¤Æ¡¢PC¤¬¥Ö¥ì¡¼¥¯¥İ¥¤¥ó¥È¤ËÃ£¤·¤¿¤«¥Á¥§¥Ã¥¯¤¹¤ë
- *	¥Ö¥ì¡¼¥¯¥İ¥¤¥ó¥È(¥¿¥¤¥×PC)Ì¤ÀßÄê¤Ê¤é¤³¤Î´Ø¿ô¤Ï»È¤ï¤º¡¢z80_emu()¤ò»È¤¦
+ * CPU ã‚’ 1step å®Ÿè¡Œã—ã¦ã€PCãŒãƒ–ãƒ¬ãƒ¼ã‚¯ãƒã‚¤ãƒ³ãƒˆã«é”ã—ãŸã‹ãƒã‚§ãƒƒã‚¯ã™ã‚‹
+ *	ãƒ–ãƒ¬ãƒ¼ã‚¯ãƒã‚¤ãƒ³ãƒˆ(ã‚¿ã‚¤ãƒ—PC)æœªè¨­å®šãªã‚‰ã“ã®é–¢æ•°ã¯ä½¿ã‚ãšã€z80_emu()ã‚’ä½¿ã†
  */
 
 static	int	z80_emu_with_breakpoint( z80arch *z80, int unused )
 {
   int i, cpu, states;
 
-  states = z80_emu( z80, 1 );		/* 1step ¤À¤±¼Â¹Ô */
+  states = z80_emu( z80, 1 );		/* 1step ã ã‘å®Ÿè¡Œ */
 
   if( z80==&z80main_cpu ) cpu = BP_MAIN;
   else                    cpu = BP_SUB;
@@ -157,8 +157,8 @@ static	int	z80_emu_with_breakpoint( z80arch *z80, int unused )
 
 /*---------------------------------------------------------------------------*/
 
-static	int	passed_step;		/* ¼Â¹Ô¤·¤¿ step¿ô */
-static	int	target_step;		/* ¤³¤Î step¿ô¤ËÃ£¤¹¤ë¤Ş¤Ç¼Â¹Ô¤¹¤ë */
+static	int	passed_step;		/* å®Ÿè¡Œã—ãŸ stepæ•° */
+static	int	target_step;		/* ã“ã® stepæ•°ã«é”ã™ã‚‹ã¾ã§å®Ÿè¡Œã™ã‚‹ */
 
 static	int	infinity, only_1step;
 static	int	(*z80_exec)( z80arch *, int );
@@ -176,55 +176,55 @@ void	emu_init(void)
 /*screen_set_dirty_all();*/
 /*screen_set_dirty_palette();*/
 
-  /* ¥¹¥Æ¡¼¥¿¥¹Éô¥¯¥ê¥¢ */
+  /* ã‚¹ãƒ†ãƒ¼ã‚¿ã‚¹éƒ¨ã‚¯ãƒªã‚¢ */
   status_message_default(0, NULL);
   status_message_default(1, NULL);
   status_message_default(2, NULL);
 
 
 
-	/* ¥Ö¥ì¡¼¥¯¥İ¥¤¥ó¥ÈÀßÄê¤ÎÍ­Ìµ¤Ç¡¢¸Æ¤Ó½Ğ¤¹´Ø¿ô¤òÊÑ¤¨¤ë */
+	/* ãƒ–ãƒ¬ãƒ¼ã‚¯ãƒã‚¤ãƒ³ãƒˆè¨­å®šã®æœ‰ç„¡ã§ã€å‘¼ã³å‡ºã™é–¢æ•°ã‚’å¤‰ãˆã‚‹ */
   if( check_break_point_PC() ) z80_exec = z80_emu_with_breakpoint;
   else                         z80_exec = z80_emu;
 
 
-	/* GO/TRACE/STEP/CHANGE ¤Ë±ş¤¸¤Æ½èÍı¤Î·«¤êÊÖ¤·²ó¿ô¤ò·èÄê */
+	/* GO/TRACE/STEP/CHANGE ã«å¿œã˜ã¦å‡¦ç†ã®ç¹°ã‚Šè¿”ã—å›æ•°ã‚’æ±ºå®š */
 
   passed_step = 0;
 
   switch( emu_mode_execute ){
   default:
   case GO:
-    target_step = 0;			/* Ìµ¸Â¤Ë¼Â¹Ô */
+    target_step = 0;			/* ç„¡é™ã«å®Ÿè¡Œ */
     infinity    = INFINITY;
     only_1step  = ONLY_1STEP;
     break;
 
   case TRACE:
-    target_step = trace_counter;	/* »ØÄê¥¹¥Æ¥Ã¥×¿ô¼Â¹Ô */
+    target_step = trace_counter;	/* æŒ‡å®šã‚¹ãƒ†ãƒƒãƒ—æ•°å®Ÿè¡Œ */
     infinity    = ONLY_1STEP;
     only_1step  = ONLY_1STEP;
     break;
 
   case STEP:
-    target_step = 1;			/* 1¥¹¥Æ¥Ã¥×¼Â¹Ô */
+    target_step = 1;			/* 1ã‚¹ãƒ†ãƒƒãƒ—å®Ÿè¡Œ */
     infinity    = ONLY_1STEP;
     only_1step  = ONLY_1STEP;
     break;
 
   case TRACE_CHANGE:
-    target_step = 0;			/* Ìµ¸Â¤Ë¼Â¹Ô */
+    target_step = 0;			/* ç„¡é™ã«å®Ÿè¡Œ */
     infinity    = ONLY_1STEP;
     only_1step  = ONLY_1STEP;
     break;
   }
 
 
-  /* ¼Â¹Ô¤¹¤ë»Ä¤ê¥¹¥Æ¥Ã¥×¿ô¡£
-	TRACE / STEP ¤Î»ş¤Ï¡¢»ØÄê¤µ¤ì¤¿¥¹¥Æ¥Ã¥×¿ô¡£
-	GO / TRACE_CHANGE ¤Ê¤é Ìµ¸Â¤Ê¤Î¤Ç¡¢ 0¡£
-		¤Ê¤ª¡¢ÅÓÃæ¤Ç¥á¥Ë¥å¡¼¤ËÁ«°Ü¤·¤¿¾ì¹ç¡¢¶¯À©Åª¤Ë 1 ¤¬¥»¥Ã¥È¤µ¤ì¤ë¡£
-		¤³¤ì¤Ë¤è¤êÌµ¸Â¤Ë½èÍı¤¹¤ë¾ì¹ç¤Ç¤â¡¢¥ë¡¼¥×¤òÈ´¤±¤ë¤è¤¦¤Ë¤Ê¤ë¡£ */
+  /* å®Ÿè¡Œã™ã‚‹æ®‹ã‚Šã‚¹ãƒ†ãƒƒãƒ—æ•°ã€‚
+	TRACE / STEP ã®æ™‚ã¯ã€æŒ‡å®šã•ã‚ŒãŸã‚¹ãƒ†ãƒƒãƒ—æ•°ã€‚
+	GO / TRACE_CHANGE ãªã‚‰ ç„¡é™ãªã®ã§ã€ 0ã€‚
+		ãªãŠã€é€”ä¸­ã§ãƒ¡ãƒ‹ãƒ¥ãƒ¼ã«é·ç§»ã—ãŸå ´åˆã€å¼·åˆ¶çš„ã« 1 ãŒã‚»ãƒƒãƒˆã•ã‚Œã‚‹ã€‚
+		ã“ã‚Œã«ã‚ˆã‚Šç„¡é™ã«å‡¦ç†ã™ã‚‹å ´åˆã§ã‚‚ã€ãƒ«ãƒ¼ãƒ—ã‚’æŠœã‘ã‚‹ã‚ˆã†ã«ãªã‚‹ã€‚ */
   emu_rest_step = target_step;
 }
 
@@ -238,21 +238,21 @@ void	emu_main(void)
   switch( emu_mode_execute ){
 
   /*------------------------------------------------------------------------*/
-  case GO:				/* ¤Ò¤¿¤¹¤é¼Â¹Ô¤¹¤ë           */
-  case TRACE:				/* »ØÄê¤·¤¿¥¹¥Æ¥Ã¥×¡¢¼Â¹Ô¤¹¤ë */
-  case STEP:				/* 1¥¹¥Æ¥Ã¥×¤À¤±¡¢¼Â¹Ô¤¹¤ë    */
+  case GO:				/* ã²ãŸã™ã‚‰å®Ÿè¡Œã™ã‚‹           */
+  case TRACE:				/* æŒ‡å®šã—ãŸã‚¹ãƒ†ãƒƒãƒ—ã€å®Ÿè¡Œã™ã‚‹ */
+  case STEP:				/* 1ã‚¹ãƒ†ãƒƒãƒ—ã ã‘ã€å®Ÿè¡Œã™ã‚‹    */
 
     for(;;){
 
       switch( cpu_timing ){
 
-      case 0:		/* select_main_cpu ¤Ç»ØÄê¤µ¤ì¤¿¤Û¤¦¤ÎCPU¤òÌµ¸Â¼Â¹Ô */
+      case 0:		/* select_main_cpu ã§æŒ‡å®šã•ã‚ŒãŸã»ã†ã®CPUã‚’ç„¡é™å®Ÿè¡Œ */
 	if( select_main_cpu ) (z80_exec)( &z80main_cpu, infinity );
 	else                  (z80_exec)( &z80sub_cpu,  infinity );
 	break;
 
-      case 1:		/* dual_cpu_count==0 ¤Ê¤é¥á¥¤¥óCPU¤òÌµ¸Â¼Â¹Ô¡¢*/
-			/*               !=0 ¤Ê¤é¥á¥¤¥ó¥µ¥Ö¤ò¸ò¸ß¼Â¹Ô */
+      case 1:		/* dual_cpu_count==0 ãªã‚‰ãƒ¡ã‚¤ãƒ³CPUã‚’ç„¡é™å®Ÿè¡Œã€*/
+			/*               !=0 ãªã‚‰ãƒ¡ã‚¤ãƒ³ã‚µãƒ–ã‚’äº¤äº’å®Ÿè¡Œ */
 	if( dual_cpu_count==0 ) (z80_exec)( &z80main_cpu, infinity   );
 	else{
 	  (z80_exec)( &z80main_cpu, only_1step );
@@ -261,7 +261,7 @@ void	emu_main(void)
 	}
 	break;
 
-      case 2:		/* ¥á¥¤¥óCPU¡¢¥µ¥ÖCPU¤ò¸ò¸ß¤Ë 5us ¤º¤Ä¼Â¹Ô */
+      case 2:		/* ãƒ¡ã‚¤ãƒ³CPUã€ã‚µãƒ–CPUã‚’äº¤äº’ã« 5us ãšã¤å®Ÿè¡Œ */
 	if( main_state < 1*JACKUP  &&  sub_state < 1*JACKUP ){
 	  main_state += (int) ((cpu_clock_mhz * cpu_slice_us) * JACKUP);
 	  sub_state  += (int) ((3.9936        * cpu_slice_us) * JACKUP);
@@ -277,7 +277,7 @@ void	emu_main(void)
 	break;
       }
 
-      /* TRACE/STEP¼Â¹Ô»ş¡¢µ¬Äê¥¹¥Æ¥Ã¥×¼Â¹Ô´°Î»¤·¤¿¤é¡¢¥â¥Ë¥¿¡¼¤ËÁ«°Ü¤¹¤ë */
+      /* TRACE/STEPå®Ÿè¡Œæ™‚ã€è¦å®šã‚¹ãƒ†ãƒƒãƒ—å®Ÿè¡Œå®Œäº†ã—ãŸã‚‰ã€ãƒ¢ãƒ‹ã‚¿ãƒ¼ã«é·ç§»ã™ã‚‹ */
       if( emu_rest_step ){
 	passed_step ++;
 	if( -- emu_rest_step <= 0 ) {
@@ -285,46 +285,46 @@ void	emu_main(void)
 	}
       }
 
-      /* ¥µ¥¦¥ó¥É½ĞÎÏ¥¿¥¤¥ß¥ó¥°¤Ç¤¢¤ì¤Ğ¡¢½èÍı */
+      /* ã‚µã‚¦ãƒ³ãƒ‰å‡ºåŠ›ã‚¿ã‚¤ãƒŸãƒ³ã‚°ã§ã‚ã‚Œã°ã€å‡¦ç† */
       if (quasi88_event_flags & EVENT_AUDIO_UPDATE) {
 	quasi88_event_flags &= ~EVENT_AUDIO_UPDATE;
 
 	profiler_lapse( PROF_LAPSE_SND );
 
-	xmame_sound_update();			/* ¥µ¥¦¥ó¥É½ĞÎÏ */
+	xmame_sound_update();			/* ã‚µã‚¦ãƒ³ãƒ‰å‡ºåŠ› */
 
 	profiler_lapse( PROF_LAPSE_AUDIO );
 
-	xmame_update_video_and_audio();		/* ¥µ¥¦¥ó¥É½ĞÎÏ ¤½¤Î2 */
+	xmame_update_video_and_audio();		/* ã‚µã‚¦ãƒ³ãƒ‰å‡ºåŠ› ãã®2 */
 
 	profiler_lapse( PROF_LAPSE_INPUT );
 
-	event_update();				/* ¥¤¥Ù¥ó¥È½èÍı		*/
+	event_update();				/* ã‚¤ãƒ™ãƒ³ãƒˆå‡¦ç†		*/
 	keyboard_update();
 
 	profiler_lapse( PROF_LAPSE_CPU2 );
       }
 
-      /* ¥Ó¥Ç¥ª½ĞÎÏ¥¿¥¤¥ß¥ó¥°¤Ç¤¢¤ì¤Ğ¡¢CPU½èÍı¤Ï°ìÃ¶Ãæ»ß¡£¾å°Ì¤ËÈ´¤±¤ë */
+      /* ãƒ“ãƒ‡ã‚ªå‡ºåŠ›ã‚¿ã‚¤ãƒŸãƒ³ã‚°ã§ã‚ã‚Œã°ã€CPUå‡¦ç†ã¯ä¸€æ—¦ä¸­æ­¢ã€‚ä¸Šä½ã«æŠœã‘ã‚‹ */
       if (quasi88_event_flags & EVENT_FRAME_UPDATE) {
 	return;
       }
 
-      /* ¥â¥Ë¥¿¡¼Á«°Ü»ş¤ä½ªÎ»»ş¤Ï¡¢ CPU½èÍı¤Ï°ìÃ¶Ãæ»ß¡£¾å°Ì¤ËÈ´¤±¤ë */
+      /* ãƒ¢ãƒ‹ã‚¿ãƒ¼é·ç§»æ™‚ã‚„çµ‚äº†æ™‚ã¯ã€ CPUå‡¦ç†ã¯ä¸€æ—¦ä¸­æ­¢ã€‚ä¸Šä½ã«æŠœã‘ã‚‹ */
       if (quasi88_event_flags & (EVENT_DEBUG | EVENT_QUIT)) {
 	return;
       }
 
-      /* ¥â¡¼¥ÉÀÚÂØ¤¬È¯À¸¤·¤Æ¤â¡¢¾å°Ì¤Ë¤ÏÈ´¤±¤Ê¤¤¡£¥Ó¥Ç¥ª½ĞÎÏ¤Ş¤ÇÂÔ¤Ä */
-      /* (È´¤±¤ë¤È¡¢ ¥¨¥ß¥å ¢ª ÉÁ²è ¢ª ¥¦¥§¥¤¥È ¤ÎÎ®¤ì¤¬Êø¤ì¤ë¤Î¤Ç¡Ä) */
+      /* ãƒ¢ãƒ¼ãƒ‰åˆ‡æ›¿ãŒç™ºç”Ÿã—ã¦ã‚‚ã€ä¸Šä½ã«ã¯æŠœã‘ãªã„ã€‚ãƒ“ãƒ‡ã‚ªå‡ºåŠ›ã¾ã§å¾…ã¤ */
+      /* (æŠœã‘ã‚‹ã¨ã€ ã‚¨ãƒŸãƒ¥ â†’ æç”» â†’ ã‚¦ã‚§ã‚¤ãƒˆ ã®æµã‚ŒãŒå´©ã‚Œã‚‹ã®ã§â€¦) */
     }
     break;
 
   /*------------------------------------------------------------------------*/
 
-	/* ¤³¤Ã¤Á¤Î¥Ö¥ì¡¼¥¯½èÍı¤Ï¤¦¤Ş¤¯Æ°¤«¤Ê¤¤¤«¤â¡¦¡¦¡¦ (Ì¤¸¡¾Ú) */
+	/* ã“ã£ã¡ã®ãƒ–ãƒ¬ãƒ¼ã‚¯å‡¦ç†ã¯ã†ã¾ãå‹•ã‹ãªã„ã‹ã‚‚ãƒ»ãƒ»ãƒ» (æœªæ¤œè¨¼) */
 
-  case TRACE_CHANGE:			/* CPU¤¬ÀÚ¤êÂØ¤ï¤ë¤Ş¤Ç½èÍı¤ò¤¹¤ë */
+  case TRACE_CHANGE:			/* CPUãŒåˆ‡ã‚Šæ›¿ã‚ã‚‹ã¾ã§å‡¦ç†ã‚’ã™ã‚‹ */
     if( cpu_timing >= 1 ){
       printf( "command 'trace change' can use when -cpu 0\n");
       quasi88_monitor();
@@ -345,11 +345,11 @@ void	emu_main(void)
       if (quasi88_event_flags & EVENT_AUDIO_UPDATE) {
 	quasi88_event_flags &= ~EVENT_AUDIO_UPDATE;
 	profiler_lapse( PROF_LAPSE_SND );
-	xmame_sound_update();			/* ¥µ¥¦¥ó¥É½ĞÎÏ */
+	xmame_sound_update();			/* ã‚µã‚¦ãƒ³ãƒ‰å‡ºåŠ› */
 	profiler_lapse( PROF_LAPSE_AUDIO );
-	xmame_update_video_and_audio();		/* ¥µ¥¦¥ó¥É½ĞÎÏ ¤½¤Î2 */
+	xmame_update_video_and_audio();		/* ã‚µã‚¦ãƒ³ãƒ‰å‡ºåŠ› ãã®2 */
 	profiler_lapse( PROF_LAPSE_INPUT );
-	event_update();				/* ¥¤¥Ù¥ó¥È½èÍı		*/
+	event_update();				/* ã‚¤ãƒ™ãƒ³ãƒˆå‡¦ç†		*/
 	keyboard_update();
       }
 
@@ -382,7 +382,7 @@ void	emu_main(void)
 
 
 /***********************************************************************
- * ¥¹¥Æ¡¼¥È¥í¡¼¥É¡¿¥¹¥Æ¡¼¥È¥»¡¼¥Ö
+ * ã‚¹ãƒ†ãƒ¼ãƒˆãƒ­ãƒ¼ãƒ‰ï¼ã‚¹ãƒ†ãƒ¼ãƒˆã‚»ãƒ¼ãƒ–
  ************************************************************************/
 
 #define	SID	"EMU "

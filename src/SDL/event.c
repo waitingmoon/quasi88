@@ -1,7 +1,7 @@
 /***********************************************************************
- * ���٥�Ƚ��� (�����ƥ��¸)
+ * イベント処理 (システム依存)
  *
- *	�ܺ٤ϡ� event.h ����
+ *	詳細は、 event.h 参照
  ************************************************************************/
 
 #include <SDL.h>
@@ -28,20 +28,20 @@
 static	int	display_fps_init(void);	/* test */
 static	void	display_fps(void);	/* test */
 
-int	use_cmdkey = 1;			/* Command�����ǥ�˥塼������     */
+int	use_cmdkey = 1;			/* Commandキーでメニューへ遷移     */
 
-int	keyboard_type = 1;		/* �����ܡ��ɤμ���                */
-char	*file_keyboard = NULL;		/* ��������ե�����̾		   */
+int	keyboard_type = 1;		/* キーボードの種類                */
+char	*file_keyboard = NULL;		/* キー設定ファイル名		   */
 
-int	use_joydevice = TRUE;		/* ���祤���ƥ��å��ǥХ����򳫤�? */
+int	use_joydevice = TRUE;		/* ジョイスティックデバイスを開く? */
 
-	int	use_unicode = FALSE;	/* UNICODE��Ȥ���106�����ܡ��ɤǤ� */
-static	int	now_unicode = FALSE;	/* ���Τ˥�����������褦���������� */
-					/* ��꡼���θ��Τ����ݤʤΤ���α   */
+	int	use_unicode = FALSE;	/* UNICODEを使えば106キーボードでも */
+static	int	now_unicode = FALSE;	/* 正確にキーが拾えるようだが、キー */
+					/* リリースの検知が面倒なので保留   */
 
-#define	JOY_MAX   	KEY88_PAD_MAX		/* ���祤���ƥ��å����(2��) */
+#define	JOY_MAX   	KEY88_PAD_MAX		/* ジョイスティック上限(2個) */
 
-#define	BUTTON_MAX	KEY88_PAD_BUTTON_MAX	/* �ܥ�����(8��)	     */
+#define	BUTTON_MAX	KEY88_PAD_BUTTON_MAX	/* ボタン上限(8個)	     */
 
 #define	AXIS_U		0x01
 #define	AXIS_D		0x02
@@ -50,139 +50,139 @@ static	int	now_unicode = FALSE;	/* ���Τ˥�����������褦���������� */
 
 typedef struct {
 
-    SDL_Joystick *dev;		/* �����ץ󤷤����祤���ƥ��å��ι�¤�� */
-    int		  num;		/* QUASI88 �ǤΥ��祤���ƥ��å��ֹ� 0�� */
+    SDL_Joystick *dev;		/* オープンしたジョイスティックの構造体 */
+    int		  num;		/* QUASI88 でのジョイスティック番号 0〜 */
 
-    int		  axis;		/* �����ܥ��󲡲�����			*/
-    int		  nr_button;	/* ͭ���ʥܥ���ο�			*/
+    int		  axis;		/* 方向ボタン押下状態			*/
+    int		  nr_button;	/* 有効なボタンの数			*/
 
 } T_JOY_INFO;
 
 static T_JOY_INFO joy_info[ JOY_MAX ];
 
-static	int	joystick_num;		/* �����ץ󤷤����祤���ƥ��å��ο� */
+static	int	joystick_num;		/* オープンしたジョイスティックの数 */
 
 
-static	const char *debug_sdlkeysym(int code); /* �ǥХå��� */
+static	const char *debug_sdlkeysym(int code); /* デバッグ用 */
 /*==========================================================================
- * ��������ˤĤ���
+ * キー配列について
  *
- *  ���̥���(ʸ������) �ϡ�
- *	106 �����ܡ��ɤξ�硢PC-8801 ��Ʊ���ʤΤ�����ʤ���
- *	101 �����ܡ��ɤξ�硢�������֤��ۤʤ뤷��������­��ʤ���
- *	�Ȥꤢ�������ʲ��Τ褦�����֤��Ƥߤ롣
- *		` �� \�� = �� ^�� [ ] �Ϥ��Τޤޡ� \ �� @��' �� :����CTRL �� _
+ *  一般キー(文字キー) は、
+ *	106 キーボードの場合、PC-8801 と同じなので問題なし。
+ *	101 キーボードの場合、一部配置が異なるし、キーが足りない。
+ *	とりあえず、以下のように配置してみる。
+ *		` → \、 = → ^、 [ ] はそのまま、 \ → @、' → :、右CTRL → _
  *
- *  �ü쥭��(��ǽ����) �ϡ�
- *	�ۥ���¦�Υ�������Ȼ���ʷ�ϵ��ε�ǽ��PC-8801�Υ����˳�����Ƥ褦��
- *	Pause �� STOP�� PrintScreen �� COPY �ʤɡ��Ŀ�Ū�ʼ�ѤǷ��롣
+ *  特殊キー(機能キー) は、
+ *	ホスト側のキー刻印と似た雰囲気の機能を、PC-8801のキーに割り当てよう。
+ *	Pause は STOP、 PrintScreen は COPY など。個人的な主観で決める。
  *
- *  �ƥ󥭡��ϡ�
- *	PC-8801��106�����ǥ���������㴳�ۤʤ뤬�����ΤޤޤΥ��������Ȥ���
- *	�Ȥʤ�ȡ� = �� , ��̵���� mac �ʤ餢�뤬��
+ *  テンキーは、
+ *	PC-8801と106キーでキー刻印が若干異なるが、そのままのキー刻印を使う。
+ *	となると、 = と , が無い。 mac ならあるが。
  *
- *  �ǲ��ʤΥ��������֤ϡ�Ŭ���˳�꿶�롣 (���å��Υ����ˤϳ�꿶��ʤ�)
+ *  最下段のキーの配置は、適当に割り振る。 (カッコのキーには割り振らない)
  *
- *	PC-8801        ���� GRPH ����  ���ڡ��� �Ѵ�  PC    ����
- *	101����   Ctrl      Alt        ���ڡ���             Alt          Ctrl
- *	104����   Ctrl Win  Alt        ���ڡ���             Alt  Win App Ctrl
- *	109����   Ctrl Win  Alt ̵�Ѵ� ���ڡ��� �Ѵ� (�Ҥ�) Alt  Win App Ctrl
- *	mac ?     Ctrl      Opt (Cmd)  ���ڡ���      (cmd) (Opt)        (Ctrl)
+ *	PC-8801        かな GRPH 決定  スペース 変換  PC    全角
+ *	101キー   Ctrl      Alt        スペース             Alt          Ctrl
+ *	104キー   Ctrl Win  Alt        スペース             Alt  Win App Ctrl
+ *	109キー   Ctrl Win  Alt 無変換 スペース 変換 (ひら) Alt  Win App Ctrl
+ *	mac ?     Ctrl      Opt (Cmd)  スペース      (cmd) (Opt)        (Ctrl)
  *
- * SDL�Υ������ϤˤĤ��Ƥο�¬ (Windows & 106�����ξ��)
- *	���Ķ��ѿ� SDL_VIDEODRIVER �� windib �� directx �Ȥǵ�ư���ۤʤ롣
- *	����SHIFT�פ򲡤��ʤ��� ��1�� �򲡤��Ƥ⡢keysym �� ��1�� �Τޤޡ�
- *	  �Ĥޤꡢ ��!�� �����Ϥ���ʤ��ߤ�����
- *	  ��ʸ�� ��A�� �����Ϥ���ʤ��� keysym �� ��a�� �Ȥʤ롣
- *	����������� 101 ���١����ˤʤäƤ��롣
- *	  ��^�� �򲡤��Ƥ� keysym �� ��=�� �ˤʤ롣
- *	�������Ĥ��Υ����ǡ� keycode ����ʣ���Ƥ���
- *	  windib  ���ȡ��������륭���ȥƥ󥭡��ʤɡ���������
- *	  directx �ʤ顢��ʣ��̵�� ?
- *	�������Ĥ��Υ����ǡ� keysym ����ʣ���Ƥ���
- *	  windib  ���ȡ��� �� ]  (�Ȥ�� �� �ˤʤ�)
- *	  directx �ʤ顢��ʣ��̵�� ?
- *	�������Ĥ��Υ����ǡ���������ܥ뤬̤���
- *	  ̵�Ѵ����Ѵ����������ʤҤ餬�� ��̤���
- *	  windib  ���ȡ��� ��̤���
- *	  directx ���ȡ����������Ⱦ��/���� ��̤���
- *	�������Ĥ��Υ����ǡ�������Υ�������θ��Τ��԰���(?)
- *	  windib  ���� Ⱦ��/���ѡ��������ʤҤ餬�ʡ�PrintScreen
- *	  directx ���� ALT
- *	���������å����񤢤�(?)
- *	  NumLock�ϥ��å��Ǥ��롣
- *	  windib  ���� SHIFT + CapsLock �����å��ġ�
- *	  directx ���� CapsLock���������ʤҤ餬�ʡ�Ⱦ��/���Ѥ����å��ġ�
- *	��NumLock��Υƥ󥭡����Ϥ��񤢤�(?)
- *	  windib  ���� NumLock��� SHIFT + �ƥ󥭡��ǡ�SHIFT�����Ū�˥���
- *	  NumLock���Ƥʤ��������ʤ���
- *	  windib  ���� ��������Ϥʤ���
+ * SDLのキー入力についての推測 (Windows & 106キーの場合)
+ *	○環境変数 SDL_VIDEODRIVER が windib と directx とで挙動が異なる。
+ *	○「SHIFT」を押しながら 「1」 を押しても、keysym は 「1」 のまま。
+ *	  つまり、 「!」 は入力されないみたい。
+ *	  大文字 「A」 も入力されない。 keysym は 「a」 となる。
+ *	○キー配列は 101 がベースになっている。
+ *	  「^」 を押しても keysym は 「=」 になる。
+ *	○いくつかのキーで、 keycode が重複している
+ *	  windib  だと、カーソルキーとテンキーなど、たくさん。
+ *	  directx なら、重複は無い ?
+ *	○いくつかのキーで、 keysym が重複している
+ *	  windib  だと、￥ と ]  (ともに ￥ になる)
+ *	  directx なら、重複は無い ?
+ *	○いくつかのキーで、キーシンボルが未定義
+ *	  無変換、変換、カタカナひらがな が未定義
+ *	  windib  だと、＼ が未定義
+ *	  directx だと、＾￥＠：、半角/全角 が未定義
+ *	○いくつかのキーで、キーを離した時の検知が不安定(?)
+ *	  windib  だと 半角/全角、カタカナひらがな、PrintScreen
+ *	  directx だと ALT
+ *	○キーロックに難あり(?)
+ *	  NumLockはロックできる。
+ *	  windib  だと SHIFT + CapsLock がロック可。
+ *	  directx だと CapsLock、カタカナひらがな、半角/全角がロック可。
+ *	○NumLock中のテンキー入力に難あり(?)
+ *	  windib  だと NumLock中に SHIFT + テンキーで、SHIFTが一時的にオフ
+ *	  NumLockしてなければ問題なし。
+ *	  windib  だと この問題はない。
  *
- *	����˥塼�⡼�ɤǤϡ�UNICODE ��ͭ���ˤ��롣
- *	  ��������С���SHIFT��+��1�� �� ��!�� ��ǧ���Ǥ��뤷����SHIFT��+��2��
- *	  �� ��"�פˤʤ롣��������  directx ���ȡ����ϤǤ��ʤ�ʸ�������뤾��
+ *	○メニューモードでは、UNICODE を有効にする。
+ *	  こうすれば、「SHIFT」+「1」 を 「!」 と認識できるし、「SHIFT」+「2」
+ *	  は 「"」になる。しかし、  directx だと、入力できない文字があるぞ。
  *
- *	���Ȥ����ǡ����ܸ�Windows�Ǥ�101�����ܡ��ɤȡ��Ѹ�Windows�Ǥ�
- *	  101�����ܡ��ɤäơ�Ʊ����ư�ʤ��������������
- *	  directx �λ��Υ��������ɳ�����Ƥ����餫���Լ����ʤΤ�����
+ *	○ところで、日本語Windowsでの101キーボードと、英語Windowsでの
+ *	  101キーボードって、同じ挙動なんだろうか・・・
+ *	  directx の時のキーコード割り当てが明らかに不自然なのだが。
  *===========================================================================*/
 
-/* ���եȥ�����NumLock �򥪥󤷤��ݤΡ������Х���ǥ����ѹ��ơ��֥� */
+/* ソフトウェアNumLock をオンした際の、キーバインディング変更テーブル */
 
 typedef struct {
     int		type;		/* KEYCODE_INVALID / SYM / SCAN		*/
-    int		code;		/* ��������ܥ롢�ʤ�����������󥳡���	*/
-    int		new_key88;	/* NumLock ON ���� QUASI88����������	*/
-    int		org_key88;	/* NumLock OFF���� QUASI88����������	*/
+    int		code;		/* キーシンボル、ないし、スキャンコード	*/
+    int		new_key88;	/* NumLock ON 時の QUASI88キーコード	*/
+    int		org_key88;	/* NumLock OFF時の QUASI88キーコード	*/
 } T_BINDING;
 
 
-/* �����Х���ǥ��󥰤�ǥե����(�����)�����ѹ�����ݤΡ��ơ��֥� */
+/* キーバインディングをデフォルト(初期値)から変更する際の、テーブル */
 
 typedef struct {
     int		type;		/* KEYCODE_INVALID / SYM / SCAN		*/
-    int		code;		/* ��������ܥ롢�ʤ�����������󥳡���	*/
-    int		key88;		/* �ѹ����� QUASI88����������           */
+    int		code;		/* キーシンボル、ないし、スキャンコード	*/
+    int		key88;		/* 変更する QUASI88キーコード           */
 } T_REMAPPING;
 
 
 
 /*----------------------------------------------------------------------
- * SDL �� keysym �� QUASI88 �� ���������ɤ��Ѵ�����ơ��֥�
+ * SDL の keysym を QUASI88 の キーコードに変換するテーブル
  *
- *	��������ܥ� SDLK_xxx �������줿�顢 
- *	keysym2key88[ SDLK_xxx ] �������줿�Ȥ��롣
+ *	キーシンボル SDLK_xxx が押されたら、 
+ *	keysym2key88[ SDLK_xxx ] が押されたとする。
  *
- *	keysym2key88[] �ˤϡ� KEY88_xxx �򥻥åȤ��Ƥ�����
- *	����ͤ� keysym2key88_default[] ��Ʊ��
+ *	keysym2key88[] には、 KEY88_xxx をセットしておく。
+ *	初期値は keysym2key88_default[] と同じ
  *----------------------------------------------------------------------*/
 static int keysym2key88[ SDLK_LAST ];
 
 
 
 /*----------------------------------------------------------------------
- * SDL �� scancode �� QUASI88 �� ���������ɤ��Ѵ�����ơ��֥�
+ * SDL の scancode を QUASI88 の キーコードに変換するテーブル
  *
- *	������󥳡��� code �������줿�顢
- *	keycode2key88[ code ] �������줿�Ȥ��롣
+ *	スキャンコード code が押されたら、
+ *	keycode2key88[ code ] が押されたとする。
  *
- *	keycode2key88[] �ˤϡ� KEY88_xxx �ޤ��� -1 �򥻥åȤ��Ƥ�����
- *	����� keysym2key88[] ��ͥ�褵��롣(������ -1 �ξ���̵��)
- *	����ͤ� ���� -1���Ѵ���ǽ�ʥ�����󥳡��ɤ� 0��255�ޤǤ����¡�
+ *	keycode2key88[] には、 KEY88_xxx または -1 をセットしておく。
+ *	これは keysym2key88[] に優先される。(ただし -1 の場合は無効)
+ *	初期値は 全て -1、変換可能なスキャンコードは 0〜255までに制限。
  *----------------------------------------------------------------------*/
 static int scancode2key88[ 256 ];
 
  
 
 /*----------------------------------------------------------------------
- * ���եȥ����� NumLock ������� �����������Ѵ�����
+ * ソフトウェア NumLock オン時の キーコード変換情報
  *
- *	binding[].code (SDL �� keysym �ʤ��� keycode) �������줿�顢
- *	binding[].new_key88 (KEY88_xxx) �������줿���Ȥˤ��롣
+ *	binding[].code (SDL の keysym ないし keycode) が押されたら、
+ *	binding[].new_key88 (KEY88_xxx) が押されたことにする。
  *
- *	���եȥ����� NumLock ������ϡ����ξ���ˤ������äơ�
- *	keysym2key88[] �� keycode2key88[] ��񤭴����롣
- *	�ѹ��Ǥ��륭���θĿ��ϡ�64�Ĥޤ� (�����������Ф���������)
+ *	ソフトウェア NumLock オン時は、この情報にしたがって、
+ *	keysym2key88[] 、 keycode2key88[] を書き換える。
+ *	変更できるキーの個数は、64個まで (これだけあればいいだろう)
  *----------------------------------------------------------------------*/
 static T_BINDING binding[ 64 ];
 
@@ -191,7 +191,7 @@ static T_BINDING binding[ 64 ];
 
 
 /*----------------------------------------------------------------------
- * SDLK_xxx �� KEY88_xxx �Ѵ��ơ��֥� (�ǥե����)
+ * SDLK_xxx → KEY88_xxx 変換テーブル (デフォルト)
  *----------------------------------------------------------------------*/
 
 static const int keysym2key88_default[ SDLK_LAST ] =
@@ -394,10 +394,10 @@ static const int keysym2key88_default[ SDLK_LAST ] =
 
 
 /*----------------------------------------------------------------------
- * keysym2key88[]   �ν���ͤϡ�keysym2key88_default[] ��Ʊ����
- * scancode2key88[] �ν���ͤϡ����� -1 (̤����) �Ǥ��뤬��
- * �����ܡ��ɤμ���˱����ơ�keysym2key88[] �� scancode2key88[] �ΰ�����
- * �ѹ����뤳�Ȥˤ��롣�ʲ��ϡ������ѹ��ξ���
+ * keysym2key88[]   の初期値は、keysym2key88_default[] と同じ、
+ * scancode2key88[] の初期値は、全て -1 (未使用) であるが、
+ * キーボードの種類に応じて、keysym2key88[] と scancode2key88[] の一部を
+ * 変更することにする。以下は、その変更の情報。
  *----------------------------------------------------------------------*/
 
 static const T_REMAPPING remapping_x11_106[] =
@@ -406,12 +406,12 @@ static const T_REMAPPING remapping_x11_106[] =
     {	KEYCODE_SYM,  SDLK_RALT,	KEY88_ZENKAKU,	    },
 /*  {	KEYCODE_SYM,  SDLK_RCTRL,	KEY88_UNDERSCORE,   },*/
     {	KEYCODE_SYM,  SDLK_MENU,	KEY88_SYS_MENU,     },
-    {	KEYCODE_SCAN,     49,		KEY88_ZENKAKU,	    },   /* Ⱦ������ */
+    {	KEYCODE_SCAN,     49,		KEY88_ZENKAKU,	    },   /* 半角全角 */
     {	KEYCODE_SCAN,    133,		KEY88_YEN,	    },   /* \ |      */
-    {	KEYCODE_SCAN,    123,		KEY88_UNDERSCORE,   },   /* \ _ ��   */
+    {	KEYCODE_SCAN,    123,		KEY88_UNDERSCORE,   },   /* \ _ ロ   */
     {	KEYCODE_SCAN,    131,		KEY88_KETTEI,	    },
     {	KEYCODE_SCAN,    129,		KEY88_HENKAN,	    },
-    {	KEYCODE_SCAN,    120,		KEY88_KANA,	    },   /* �����Ҥ� */
+    {	KEYCODE_SCAN,    120,		KEY88_KANA,	    },   /* カタひら */
     {	KEYCODE_INVALID, 0,		0,		    },
 };
 
@@ -430,21 +430,21 @@ static const T_REMAPPING remapping_x11_101[] =
 
 static const T_REMAPPING remapping_windib_106[] =
 {
-    {	KEYCODE_SYM,  SDLK_BACKQUOTE,	0,		    },   /* Ⱦ������ */
+    {	KEYCODE_SYM,  SDLK_BACKQUOTE,	0,		    },   /* 半角全角 */
     {	KEYCODE_SYM,  SDLK_EQUALS,	KEY88_CARET,	    },   /* ^        */
     {	KEYCODE_SYM,  SDLK_LEFTBRACKET,	KEY88_AT,	    },   /* @        */
     {	KEYCODE_SYM,  SDLK_RIGHTBRACKET,KEY88_BRACKETLEFT,  },   /* [        */
     {	KEYCODE_SYM,  SDLK_QUOTE,	KEY88_COLON,	    },   /* :        */
-    {	KEYCODE_SYM,  SDLK_LSUPER,	KEY88_KANA,	    },   /* ��Window */
-    {	KEYCODE_SYM,  SDLK_RALT,	KEY88_ZENKAKU,	    },   /* ��Alt    */
-/*  {	KEYCODE_SYM,  SDLK_RCTRL,	KEY88_UNDERSCORE,   },*/ /* ��Ctrl   */
+    {	KEYCODE_SYM,  SDLK_LSUPER,	KEY88_KANA,	    },   /* 左Window */
+    {	KEYCODE_SYM,  SDLK_RALT,	KEY88_ZENKAKU,	    },   /* 右Alt    */
+/*  {	KEYCODE_SYM,  SDLK_RCTRL,	KEY88_UNDERSCORE,   },*/ /* 右Ctrl   */
     {	KEYCODE_SYM,  SDLK_MENU,	KEY88_SYS_MENU,     },   /* Menu     */
     {	KEYCODE_SCAN,    125,		KEY88_YEN,	    },   /* \ |      */
     {	KEYCODE_SCAN,     43,		KEY88_BRACKETRIGHT, },   /* ] }      */
-    {	KEYCODE_SCAN,    115,		KEY88_UNDERSCORE,   },   /* \ _ ��   */
-    {	KEYCODE_SCAN,    123,		KEY88_KETTEI,	    },   /* ̵�Ѵ�   */
-    {	KEYCODE_SCAN,    121,		KEY88_HENKAN,	    },   /* �Ѵ�     */
-/*  {	KEYCODE_SCAN,    112,		0,		    },*/ /* �����Ҥ� */
+    {	KEYCODE_SCAN,    115,		KEY88_UNDERSCORE,   },   /* \ _ ロ   */
+    {	KEYCODE_SCAN,    123,		KEY88_KETTEI,	    },   /* 無変換   */
+    {	KEYCODE_SCAN,    121,		KEY88_HENKAN,	    },   /* 変換     */
+/*  {	KEYCODE_SCAN,    112,		0,		    },*/ /* カタひら */
     {	KEYCODE_INVALID, 0,		0,		    },
 };
 
@@ -454,28 +454,28 @@ static const T_REMAPPING remapping_windib_101[] =
     {	KEYCODE_SYM,  SDLK_EQUALS,	KEY88_CARET,	    },   /* =        */
     {	KEYCODE_SYM,  SDLK_BACKSLASH,	KEY88_AT,	    },   /* \        */
     {	KEYCODE_SYM,  SDLK_QUOTE,	KEY88_COLON,	    },   /* '        */
-    {	KEYCODE_SYM,  SDLK_LSUPER,	KEY88_KANA,	    },   /* ��Window */
-    {	KEYCODE_SYM,  SDLK_RALT,	KEY88_ZENKAKU,	    },   /* ��Alt    */
-    {	KEYCODE_SYM,  SDLK_RCTRL,	KEY88_UNDERSCORE,   },   /* ��Ctrl   */
+    {	KEYCODE_SYM,  SDLK_LSUPER,	KEY88_KANA,	    },   /* 左Window */
+    {	KEYCODE_SYM,  SDLK_RALT,	KEY88_ZENKAKU,	    },   /* 右Alt    */
+    {	KEYCODE_SYM,  SDLK_RCTRL,	KEY88_UNDERSCORE,   },   /* 右Ctrl   */
     {	KEYCODE_SYM,  SDLK_MENU,	KEY88_SYS_MENU,     },   /* Menu     */
     {	KEYCODE_INVALID, 0,		0,		    },
 };
 
 static const T_REMAPPING remapping_directx_106[] =
 {
-    {	KEYCODE_SYM,  SDLK_BACKSLASH,	KEY88_UNDERSCORE,   },   /* \ _ ��   */
-    {	KEYCODE_SYM,  SDLK_LMETA,	KEY88_KANA,	    },   /* ��Window */
-    {	KEYCODE_SYM,  SDLK_RALT,	KEY88_ZENKAKU,	    },   /* ��Alt    */
-/*  {	KEYCODE_SYM,  SDLK_RCTRL,	KEY88_UNDERSCORE,   },*/ /* ��Ctrl   */
+    {	KEYCODE_SYM,  SDLK_BACKSLASH,	KEY88_UNDERSCORE,   },   /* \ _ ロ   */
+    {	KEYCODE_SYM,  SDLK_LMETA,	KEY88_KANA,	    },   /* 左Window */
+    {	KEYCODE_SYM,  SDLK_RALT,	KEY88_ZENKAKU,	    },   /* 右Alt    */
+/*  {	KEYCODE_SYM,  SDLK_RCTRL,	KEY88_UNDERSCORE,   },*/ /* 右Ctrl   */
     {	KEYCODE_SYM,  SDLK_MENU,	KEY88_SYS_MENU,     },   /* Menu     */
-/*  {	KEYCODE_SCAN,    148,		0,		    },*/ /* Ⱦ������ */
+/*  {	KEYCODE_SCAN,    148,		0,		    },*/ /* 半角全角 */
     {	KEYCODE_SCAN,    144,		KEY88_CARET,	    },   /* ^        */
     {	KEYCODE_SCAN,    125,		KEY88_YEN,	    },   /* \        */
     {	KEYCODE_SCAN,    145,		KEY88_AT,	    },   /* @        */
     {	KEYCODE_SCAN,    146,		KEY88_COLON,	    },   /* :        */
-    {	KEYCODE_SCAN,    123,		KEY88_KETTEI,	    },   /* ̵�Ѵ�   */
-    {	KEYCODE_SCAN,    121,		KEY88_HENKAN,	    },   /* �Ѵ�     */
-    {	KEYCODE_SCAN,    112,		KEY88_KANA,	    },   /* �����Ҥ� */
+    {	KEYCODE_SCAN,    123,		KEY88_KETTEI,	    },   /* 無変換   */
+    {	KEYCODE_SCAN,    121,		KEY88_HENKAN,	    },   /* 変換     */
+    {	KEYCODE_SCAN,    112,		KEY88_KANA,	    },   /* カタひら */
     {	KEYCODE_INVALID, 0,		0,		    },
 };
 
@@ -485,9 +485,9 @@ static const T_REMAPPING remapping_directx_101[] =
     {	KEYCODE_SYM,  SDLK_EQUALS,	KEY88_CARET,	    },   /* =        */
     {	KEYCODE_SYM,  SDLK_BACKSLASH,	KEY88_AT,	    },   /* \        */
     {	KEYCODE_SYM,  SDLK_QUOTE,	KEY88_COLON,	    },   /* '        */
-    {	KEYCODE_SYM,  SDLK_LMETA,	KEY88_KANA,	    },   /* ��Window */
-    {	KEYCODE_SYM,  SDLK_RALT,	KEY88_ZENKAKU,	    },   /* ��Alt    */
-    {	KEYCODE_SYM,  SDLK_RCTRL,	KEY88_UNDERSCORE,   },   /* ��Ctrl   */
+    {	KEYCODE_SYM,  SDLK_LMETA,	KEY88_KANA,	    },   /* 左Window */
+    {	KEYCODE_SYM,  SDLK_RALT,	KEY88_ZENKAKU,	    },   /* 右Alt    */
+    {	KEYCODE_SYM,  SDLK_RCTRL,	KEY88_UNDERSCORE,   },   /* 右Ctrl   */
     {	KEYCODE_SYM,  SDLK_MENU,	KEY88_SYS_MENU,     },   /* Menu     */
     {	KEYCODE_SCAN,    148,		KEY88_YEN,	    },
     {	KEYCODE_SCAN,    144,		KEY88_CARET,	    },
@@ -502,8 +502,8 @@ static const T_REMAPPING remapping_toolbox_106[] =
     {	KEYCODE_SYM,  SDLK_LMETA,	KEY88_SYS_MENU,	    },
     {	KEYCODE_SYM,  SDLK_RMETA,	KEY88_SYS_MENU,	    },
     {	KEYCODE_SCAN,    95,		KEY88_KP_COMMA,	    },
-/*  {	KEYCODE_SCAN,    102,		0,		    },*/ /* �ѿ�     */
-/*  {	KEYCODE_SCAN,    104,		0,		    },*/ /* ����     */
+/*  {	KEYCODE_SCAN,    102,		0,		    },*/ /* 英数     */
+/*  {	KEYCODE_SCAN,    104,		0,		    },*/ /* カナ     */
     {	KEYCODE_INVALID, 0,		0,		    },
 };
 
@@ -526,7 +526,7 @@ static const T_REMAPPING remapping_dummy[] =
 
 
 /*----------------------------------------------------------------------
- * ���եȥ����� NumLock ������� �����������Ѵ����� (�ǥե����)
+ * ソフトウェア NumLock オン時の キーコード変換情報 (デフォルト)
  *----------------------------------------------------------------------*/
 
 static const T_BINDING binding_106[] =
@@ -608,9 +608,9 @@ static const T_BINDING binding_directx[] =
 
 
 /******************************************************************************
- * ���٥�ȥϥ�ɥ��
+ * イベントハンドリング
  *
- *	1/60��˸ƤӽФ���롣
+ *	1/60毎に呼び出される。
  *****************************************************************************/
 static	int	joystick_init(void);
 static	void	joystick_exit(void);
@@ -619,7 +619,7 @@ static	int	analyze_keyconf_file(void);
 static	char	video_driver[32];
 
 /*
- * ����� ��ư����1������ƤФ��
+ * これは 起動時に1回だけ呼ばれる
  */
 void	event_init(void)
 {
@@ -627,7 +627,7 @@ void	event_init(void)
     const T_BINDING   *bin;
     int i;
 
-    /* ���祤���ƥ��å������ */
+    /* ジョイスティック初期化 */
 
     if (use_joydevice) {
 	if (verbose_proc) printf("Initializing Joystick System ... ");
@@ -639,7 +639,7 @@ void	event_init(void)
     }
 
 
-    /* �����ޥåԥ󥰽���� */
+    /* キーマッピング初期化 */
 
     if (SDL_VideoDriverName(video_driver, sizeof(video_driver)) == NULL) {
 	memset(video_driver, 0, sizeof(video_driver));
@@ -655,7 +655,7 @@ void	event_init(void)
 
     switch (keyboard_type) {
 
-    case 0:					/* �ǥե���ȥ����ܡ��� */
+    case 0:					/* デフォルトキーボード */
 	if (analyze_keyconf_file()) {
 	    ;
 	} else {
@@ -667,8 +667,8 @@ void	event_init(void)
 	break;
 
 
-    case 1:					/* 106���ܸ쥭���ܡ��� */
-    case 2:					/* 101�Ѹ쥭���ܡ��� ? */
+    case 1:					/* 106日本語キーボード */
+    case 2:					/* 101英語キーボード ? */
 	memcpy(keysym2key88,
 	       keysym2key88_default, sizeof(keysym2key88_default));
 
@@ -740,7 +740,7 @@ void	event_init(void)
 
 
 
-    /* ���եȥ�����NumLock ���Υ��������ؤ��ν��� */
+    /* ソフトウェアNumLock 時のキー差し替えの準備 */
 
     for (i=0; i<COUNTOF(binding); i++) {
 
@@ -769,7 +769,7 @@ void	event_init(void)
 
 
 /*
- * �� 1/60 ��˸ƤФ��
+ * 約 1/60 毎に呼ばれる
  */
 void	event_update(void)
 {
@@ -778,7 +778,7 @@ void	event_update(void)
     int    key88, x, y;
 
 
-    SDL_PumpEvents();		/* ���٥�Ȥ��߾夲�� */
+    SDL_PumpEvents();		/* イベントを汲み上げる */
 
     while (SDL_PeepEvents(&E, 1, SDL_GETEVENT,
 			  SDL_EVENTMASK(SDL_KEYDOWN)        | 
@@ -801,9 +801,9 @@ void	event_update(void)
 
 	    keysym  = E.key.keysym.sym;
 
-	    if (now_unicode == FALSE) {	/* ����ASCII�� */
+	    if (now_unicode == FALSE) {	/* キーASCII時 */
 
-		/* scancode2key88[] ������Ѥʤ顢���Υ��������ɤ�ͥ�褹�� */
+		/* scancode2key88[] が定義済なら、そのキーコードを優先する */
 		if (E.key.keysym.scancode < COUNTOF(scancode2key88) &&
 		    scancode2key88[ E.key.keysym.scancode ] >= 0) {
 
@@ -813,14 +813,14 @@ void	event_update(void)
 		    key88 = keysym2key88[ keysym ];
 		}
 
-	    } else {			/* ����UNICODE�� (��˥塼�ʤ�) */
+	    } else {			/* キーUNICODE時 (メニューなど) */
 
 		if (E.key.keysym.unicode <= 0xff &&
 		    isprint(E.key.keysym.unicode)) {
 		    keysym = E.key.keysym.unicode;
 		}
 		if (SDLK_SPACE <= keysym && keysym < SDLK_DELETE) {
-		    /* ASCII�����ɤ��ϰ���Ǥϡ�SDLK_xx �� KEY88_xx ������ */
+		    /* ASCIIコードの範囲内では、SDLK_xx と KEY88_xx は等価 */
 		    key88 = keysym;
 		} else {
 		    key88 = keysym2key88[ keysym ];
@@ -836,8 +836,8 @@ void	event_update(void)
 	    break;
 
 	case SDL_MOUSEMOTION:	/*------------------------------------------*/
-	    if (sdl_mouse_rel_move) {	/* �ޥ�����������ɥ���ü���Ϥ��Ƥ� */
-					/* ����Ū��ư���򸡽ФǤ�����     */
+	    if (sdl_mouse_rel_move) {	/* マウスがウインドウの端に届いても */
+					/* 相対的な動きを検出できる場合     */
 		x = E.motion.xrel;
 		y = E.motion.yrel;
 
@@ -854,8 +854,8 @@ void	event_update(void)
 
 	case SDL_MOUSEBUTTONDOWN:/*------------------------------------------*/
 	case SDL_MOUSEBUTTONUP:
-	    /* �ޥ�����ư���٥�Ȥ�Ʊ���˽�������ɬ�פ�����ʤ顢
-	       quasi88_mouse_moved_abs/rel �ؿ��򤳤��ǸƤӽФ��Ƥ��� */
+	    /* マウス移動イベントも同時に処理する必要があるなら、
+	       quasi88_mouse_moved_abs/rel 関数をここで呼び出しておく */
 
 	    switch (E.button.button) {
 	    case SDL_BUTTON_LEFT:	key88 = KEY88_MOUSE_L;		break;
@@ -880,7 +880,7 @@ void	event_update(void)
 		T_JOY_INFO *joy = &joy_info[E.jbutton.which];
 		int offset = (joy->num) * KEY88_PAD_OFFSET;
 
-		if (E.jaxis.axis == 0) {	/* �������� */
+		if (E.jaxis.axis == 0) {	/* 左右方向 */
 
 		    now = joy->axis & ~(AXIS_L|AXIS_R);
 
@@ -895,7 +895,7 @@ void	event_update(void)
 			quasi88_pad(KEY88_PAD1_RIGHT + offset, (now & AXIS_R));
 		    }
 
-		} else {			/* �岼���� */
+		} else {			/* 上下方向 */
 
 		    now = joy->axis & ~(AXIS_U|AXIS_D);
 
@@ -937,8 +937,8 @@ void	event_update(void)
 	    break;
 
 	case SDL_ACTIVEEVENT:	/*------------------------------------------*/
-	    /* -focus ���ץ�����ǽ���������ʤ顢 
-	       quasi88_focus_in / quasi88_focus_out ��Ŭ���ƤӽФ�ɬ�פ����� */
+	    /* -focus オプションを機能させたいなら、 
+	       quasi88_focus_in / quasi88_focus_out を適宜呼び出す必要がある */
 
 	    if (E.active.state & SDL_APPINPUTFOCUS) {
 		if (E.active.gain) {
@@ -965,7 +965,7 @@ void	event_update(void)
 
 
 /*
- * ����� ��λ����1������ƤФ��
+ * これは 終了時に1回だけ呼ばれる
  */
 void	event_exit(void)
 {
@@ -975,9 +975,9 @@ void	event_exit(void)
 
 
 /***********************************************************************
- * ���ߤΥޥ�����ɸ�����ؿ�
+ * 現在のマウス座標取得関数
  *
- *	���ߤΥޥ��������к�ɸ�� *x, *y �˥��å�
+ *	現在のマウスの絶対座標を *x, *y にセット
  ************************************************************************/
 
 void	event_get_mouse_pos(int *x, int *y)
@@ -995,7 +995,7 @@ void	event_get_mouse_pos(int *x, int *y)
 
 
 /******************************************************************************
- * ���եȥ����� NumLock ͭ����̵��
+ * ソフトウェア NumLock 有効／無効
  *
  *****************************************************************************/
 
@@ -1033,27 +1033,27 @@ void	event_numlock_off(void){ numlock_setup(FALSE); }
 
 
 /******************************************************************************
- * ���ߥ�졼�ȡ���˥塼���ݡ�������˥����⡼�� �� ���ϻ��ν���
+ * エミュレート／メニュー／ポーズ／モニターモード の 開始時の処理
  *
  *****************************************************************************/
 
 void	event_switch(void)
 {
-    /* ��¸�Υ��٥�Ȥ򤹤٤��˴� */
-    /* �ʤ�Ƥ��Ȥϡ����ʤ� ? */
+    /* 既存のイベントをすべて破棄 */
+    /* なんてことは、しない ? */
 
     if (quasi88_is_exec()) {
 
 	if (use_unicode) {
 
-	    /* ���������� UNICODE ���Ѵ���ǽ�Ȥ���
-	       (�������Ť��餷���Τǻ�����Τ�) */
+	    /* キー押下を UNICODE に変換可能とする
+	       (処理が重いらしいので指定時のみ) */
 	    SDL_EnableUNICODE( 1 );
 	    now_unicode = TRUE;
 
 	} else {
 
-	    /* ���������� ASCII �����ɤ��Ѵ���ǽ�Ȥ��� */
+	    /* キー押下を ASCII コードに変換可能とする */
 	    SDL_EnableUNICODE( 0 );
 	    now_unicode = FALSE;
 	}
@@ -1069,7 +1069,7 @@ void	event_switch(void)
 
 
 /******************************************************************************
- * ���祤���ƥ��å�
+ * ジョイスティック
  *****************************************************************************/
 
 static	int	joystick_init(void)
@@ -1077,7 +1077,7 @@ static	int	joystick_init(void)
     SDL_Joystick *dev;
     int i, max, nr_button;
 
-    /* �������� */
+    /* ワーク初期化 */
     joystick_num = 0;
 
     memset(joy_info, 0, sizeof(joy_info));
@@ -1085,22 +1085,22 @@ static	int	joystick_init(void)
 	joy_info[i].dev = NULL;
     }
 
-    /* ���祤���ƥ��å����֥����ƥ����� */
+    /* ジョイスティックサブシステム初期化 */
     if (! SDL_WasInit(SDL_INIT_JOYSTICK)) {
 	if (SDL_InitSubSystem(SDL_INIT_JOYSTICK)) {
 	    return 0;
 	}
     }
 
-    /* ���祤���ƥ��å��ο���Ĵ�٤ơ��ǥХ��������ץ� */
+    /* ジョイスティックの数を調べて、デバイスオープン */
     max = SDL_NumJoysticks();
-    max = MIN(max, JOY_MAX);		/* ����ο�������ͭ�� */
+    max = MIN(max, JOY_MAX);		/* ワークの数だけ、有効 */
 
     for (i=0; i<max; i++) {
-	dev = SDL_JoystickOpen(i);	/* i���ܤΥ��祤���ƥ��å��򥪡��ץ� */
+	dev = SDL_JoystickOpen(i);	/* i番目のジョイスティックをオープン */
 
 	if (dev) {
-	    /* �ܥ���ο���Ĵ�٤� */
+	    /* ボタンの数を調べる */
 	    nr_button = SDL_JoystickNumButtons(dev);
 	    nr_button = MIN(nr_button, BUTTON_MAX);
 
@@ -1110,11 +1110,11 @@ static	int	joystick_init(void)
 	}
     }
 
-    if (joystick_num > 0) {			/* 1�İʾ奪���ץ�Ǥ�����  */
-	SDL_JoystickEventState(SDL_ENABLE);	/* ���٥�Ƚ�����ͭ���ˤ��� */
+    if (joystick_num > 0) {			/* 1個以上オープンできたら  */
+	SDL_JoystickEventState(SDL_ENABLE);	/* イベント処理を有効にする */
     }
 
-    return joystick_num;			/* ���祤���ƥ��å��ο����֤� */
+    return joystick_num;			/* ジョイスティックの数を返す */
 }
 
 
@@ -1149,11 +1149,11 @@ int	event_get_joystick_num(void)
 
 
 /****************************************************************************
- * ��������ե�������ɤ߹���ǡ����ꤹ�롣
- *	����ե����뤬̵����е�������н������ƿ����֤�
+ * キー設定ファイルを読み込んで、設定する。
+ *	設定ファイルが無ければ偽、あれば処理して真を返す
  *****************************************************************************/
 
-/* SDL �� keysym ��ʸ����� int �ͤ��Ѵ�����ơ��֥� */
+/* SDL の keysym の文字列を int 値に変換するテーブル */
 
 static const T_SYMBOL_TABLE sdlkeysym_list[] =
 {
@@ -1389,7 +1389,7 @@ static const T_SYMBOL_TABLE sdlkeysym_list[] =
     {	"SDLK_EURO",		SDLK_EURO		}, /*	= 321,	*/
     {	"SDLK_UNDO",		SDLK_UNDO		}, /*	= 322,	*/
 };
-/* �ǥХå��� */
+/* デバッグ用 */
 static	const char *debug_sdlkeysym(int code)
 {
     int i;
@@ -1400,7 +1400,7 @@ static	const char *debug_sdlkeysym(int code)
     return "invalid";
 }
 
-/* ��������ե�����Ρ����̥���������å����륳����Хå��ؿ� */
+/* キー設定ファイルの、識別タグをチェックするコールバック関数 */
 
 static const char *identify_callback(const char *parm1,
 				     const char *parm2,
@@ -1409,14 +1409,14 @@ static const char *identify_callback(const char *parm1,
     if (my_strcmp(parm1, "[SDL]") == 0) {
 	if (parm2 == NULL ||
 	    my_strcmp(parm2, video_driver) == 0) {
-	    return NULL;				/* ͭ�� */
+	    return NULL;				/* 有効 */
 	}
     }
 
-    return "";						/* ̵�� */
+    return "";						/* 無効 */
 }
 
-/* ��������ե�����Ρ������������륳����Хå��ؿ� */
+/* キー設定ファイルの、設定を処理するコールバック関数 */
 
 static const char *setting_callback(int type,
 				    int code,
@@ -1427,7 +1427,7 @@ static const char *setting_callback(int type,
 
     if (type == KEYCODE_SCAN) {
 	if (code >= COUNTOF(scancode2key88)) {
-	    return "scancode too large";	/* ̵�� */
+	    return "scancode too large";	/* 無効 */
 	}
 	scancode2key88[ code ] = key88;
     } else {
@@ -1436,7 +1436,7 @@ static const char *setting_callback(int type,
 
     if (numlock_key88 >= 0) {
 	if (binding_cnt >= COUNTOF(binding)) {
-	    return "too many NumLock-code";	/* ̵�� */
+	    return "too many NumLock-code";	/* 無効 */
 	}
 	binding[ binding_cnt ].type      = type;
 	binding[ binding_cnt ].code      = code;
@@ -1444,20 +1444,20 @@ static const char *setting_callback(int type,
 	binding_cnt ++;
     }
 
-    return NULL;				/* ͭ�� */
+    return NULL;				/* 有効 */
 }
 
-/* ��������ե�����ν����ؿ� */
+/* キー設定ファイルの処理関数 */
 
 static	int	analyze_keyconf_file(void)
 {
     return
-	config_read_keyconf_file(file_keyboard,		  /* ��������ե�����*/
-				 identify_callback,	  /* ���̥����� �ؿ� */
-				 sdlkeysym_list,	  /* �Ѵ��ơ��֥�    */
-				 COUNTOF(sdlkeysym_list), /* �ơ��֥륵����  */
-				 TRUE,			  /* �羮ʸ��̵��    */
-				 setting_callback);	  /* ����� �ؿ�     */
+	config_read_keyconf_file(file_keyboard,		  /* キー設定ファイル*/
+				 identify_callback,	  /* 識別タグ行 関数 */
+				 sdlkeysym_list,	  /* 変換テーブル    */
+				 COUNTOF(sdlkeysym_list), /* テーブルサイズ  */
+				 TRUE,			  /* 大小文字無視    */
+				 setting_callback);	  /* 設定行 関数     */
 }
 
 
@@ -1468,7 +1468,7 @@ static	int	analyze_keyconf_file(void)
 
 /* test */
 
-#define	FPS_INTRVAL		(1000)		/* 1000ms���ɽ������ */
+#define	FPS_INTRVAL		(1000)		/* 1000ms毎に表示する */
 static	Uint32	display_fps_callback(Uint32 interval, void *dummy);
 
 static	int	display_fps_init(void)
@@ -1489,15 +1489,15 @@ static	Uint32	display_fps_callback(Uint32 interval, void *dummy)
 {
 #if 0
 
-    /* ������Хå��ؿ����������饦����ɥ������ȥ���ѹ�����Τϴ����� ?
-       �֥�����Хå��ؿ���ǤϤɤ�ʴؿ���ƤӽФ��٤��Ǥʤ��פȤʤäƤ��� */
+    /* コールバック関数の内部からウインドウタイトルを変更するのは危険か ?
+       「コールバック関数内ではどんな関数も呼び出すべきでない」となっている */
 
     display_fps();
 
 #else
 
-    /* SDL_PushEvent �����ϸƤӽФ��Ƥ�����ȤʤäƤ���Τǡ�
-       �桼�����٥�Ȥǽ������Ƥߤ褦 */
+    /* SDL_PushEvent だけは呼び出しても安全となっているので、
+       ユーザイベントで処理してみよう */
 
     SDL_Event user_event;
 
@@ -1505,7 +1505,7 @@ static	Uint32	display_fps_callback(Uint32 interval, void *dummy)
     user_event.user.code  = 1;
     user_event.user.data1 = NULL;
     user_event.user.data2 = NULL;
-    SDL_PushEvent(&user_event);		/* ���顼��̵�� */
+    SDL_PushEvent(&user_event);		/* エラーは無視 */
 #endif
 
     return FPS_INTRVAL;

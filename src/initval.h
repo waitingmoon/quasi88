@@ -3,7 +3,7 @@
 
 
 /*----------------------------------------------------------------------*/
-/* ���									*/
+/* 定数									*/
 /*----------------------------------------------------------------------*/
 #define	CONST_4MHZ_CLOCK	(3.9936)
 #define	CONST_8MHZ_CLOCK	(CONST_4MHZ_CLOCK*2.0)
@@ -11,7 +11,7 @@
 
 
 /*----------------------------------------------------------------------*/
-/* ��ư���ν��������							*/
+/* 起動時の初期設定値							*/
 /*----------------------------------------------------------------------*/
 
 enum BasicMode { BASIC_AUTO=-1, BASIC_N,    BASIC_V1S,  BASIC_V1H,  BASIC_V2 };
@@ -25,18 +25,18 @@ enum BaudRate  { BAUDRATE_75,   BAUDRATE_150,   BAUDRATE_300,  BAUDRATE_600,
 		 BAUDRATE_19200 };
 
 
-/* DEFAULT_BASIC    BASIC �⡼��       -1:��ư / 0:N / 1:V1S / 2:V1H / 3:V2  */
-/* DEFAULT_CLOCK    CPU�����å�        -1:��ư / 0:8MHz / 1:4MHz             */
-/* DEFAULT_BOOT     ��ư�ǥХ���       -1:��ư / 0:DISK / 1:ROM              */
-/* DEFAULT_EXTRAM   ��ĥRAM             0:�ʤ� / 1��4:����(�����ɿ�)         */
-/* DEFAULT_JISHO    ����ROM             0:�ʤ� / 1:����                      */
-/* DEFAULT_SOUND    ������ɥܡ���      0:��� / 1:������ɥܡ���II���      */
-/* DEFAULT_DIPSW    �ǥ��åץ����å�   16bit�ͤ����                         */
-/* DEFAULT_BAUDRATE �ܡ��졼��         BADU_RATE_75 �� BADU_RATE_19200����� */
+/* DEFAULT_BASIC    BASIC モード       -1:自動 / 0:N / 1:V1S / 2:V1H / 3:V2  */
+/* DEFAULT_CLOCK    CPUクロック        -1:自動 / 0:8MHz / 1:4MHz             */
+/* DEFAULT_BOOT     起動デバイス       -1:自動 / 0:DISK / 1:ROM              */
+/* DEFAULT_EXTRAM   拡張RAM             0:なし / 1〜4:あり(カード数)         */
+/* DEFAULT_JISHO    辞書ROM             0:なし / 1:あり                      */
+/* DEFAULT_SOUND    サウンドボード      0:搭載 / 1:サウンドボードII搭載      */
+/* DEFAULT_DIPSW    ディップスイッチ   16bit値を指定                         */
+/* DEFAULT_BAUDRATE ボーレート         BADU_RATE_75 〜 BADU_RATE_19200を指定 */
 
-/* DEFAULT_VERBOSE         -verbose   �ν���� */
-/* DEFAULT_FRAMESKIP       -frameskip �ν���� */
-/* DEFAULT_CPU             -cpu       �ν���� */
+/* DEFAULT_VERBOSE         -verbose   の初期値 */
+/* DEFAULT_FRAMESKIP       -frameskip の初期値 */
+/* DEFAULT_CPU             -cpu       の初期値 */
 
 
 #define	DEFAULT_BASIC		( BASIC_AUTO )
@@ -54,10 +54,10 @@ enum BaudRate  { BAUDRATE_75,   BAUDRATE_150,   BAUDRATE_300,  BAUDRATE_600,
 
 
 /*----------------------------------------------------------------------*/
-/* DEFAULT_CPU_CLOCK_MHZ	�ᥤ�� CPU�Υ����å�     double�� [MHz] */
-/* DEFAULT_SOUND_CLOCK_MHZ	������ɥ��åפΥ����å� double�� [MHz] */
-/* DEFAULT_VSYNC_FREQ_HZ	VSYNC �����ߤμ���     int��    [Hz]  */
-/* DEFAULT_WAIT_FREQ		��������Ĵ���Ѽ��ȿ�     int��    [Hz]  */
+/* DEFAULT_CPU_CLOCK_MHZ	メイン CPUのクロック     double値 [MHz] */
+/* DEFAULT_SOUND_CLOCK_MHZ	サウンドチップのクロック double値 [MHz] */
+/* DEFAULT_VSYNC_FREQ_HZ	VSYNC 割り込みの周期     int値    [Hz]  */
+/* DEFAULT_WAIT_FREQ		ウエイト調整用周波数     int値    [Hz]  */
 
 #define	DEFAULT_CPU_CLOCK_MHZ		CONST_4MHZ_CLOCK
 #define	DEFAULT_SOUND_CLOCK_MHZ		CONST_4MHZ_CLOCK
@@ -66,8 +66,8 @@ enum BaudRate  { BAUDRATE_75,   BAUDRATE_150,   BAUDRATE_300,  BAUDRATE_600,
 
 
 /*----------------------------------------------------------------------*/
-/* �ɥ饤�֤ο� ����� �ե�������Υ��᡼���κ����			*/
-/*	�ɥ饤�֤ο� �� 2�ʳ����ͤ�̤�б���������Ѥ��ʤ��褦�ˡ���	*/
+/* ドライブの数 および ファイル内のイメージの最大数			*/
+/*	ドライブの数 は 2以外の値は未対応。設定を変えないように！！	*/
 /*----------------------------------------------------------------------*/
 enum {
   DRIVE_1,

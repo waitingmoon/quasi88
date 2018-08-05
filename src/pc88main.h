@@ -5,25 +5,25 @@
 #include "file-op.h"
 
 
-#if 0	/* ¢ª file-op.h */
-extern char file_tape[2][QUASI88_MAX_FILENAME];	/* ¥Æ¡¼¥×Æş½ĞÎÏ¤Î¥Õ¥¡¥¤¥ëÌ¾ */
-extern char file_prn[QUASI88_MAX_FILENAME];	/* ¥Ñ¥é¥ì¥ë½ĞÎÏ¤Î¥Õ¥¡¥¤¥ëÌ¾ */
-extern char file_sin[QUASI88_MAX_FILENAME];	/* ¥·¥ê¥¢¥ë½ĞÎÏ¤Î¥Õ¥¡¥¤¥ëÌ¾ */
-extern char file_sout[QUASI88_MAX_FILENAME];	/* ¥·¥ê¥¢¥ëÆşÎÏ¤Î¥Õ¥¡¥¤¥ëÌ¾ */
+#if 0	/* â†’ file-op.h */
+extern char file_tape[2][QUASI88_MAX_FILENAME];	/* ãƒ†ãƒ¼ãƒ—å…¥å‡ºåŠ›ã®ãƒ•ã‚¡ã‚¤ãƒ«å */
+extern char file_prn[QUASI88_MAX_FILENAME];	/* ãƒ‘ãƒ©ãƒ¬ãƒ«å‡ºåŠ›ã®ãƒ•ã‚¡ã‚¤ãƒ«å */
+extern char file_sin[QUASI88_MAX_FILENAME];	/* ã‚·ãƒªã‚¢ãƒ«å‡ºåŠ›ã®ãƒ•ã‚¡ã‚¤ãƒ«å */
+extern char file_sout[QUASI88_MAX_FILENAME];	/* ã‚·ãƒªã‚¢ãƒ«å…¥åŠ›ã®ãƒ•ã‚¡ã‚¤ãƒ«å */
 #endif
 
-	/**** ¥Ö¡¼¥È¾õÂÖ (I/O¤ËÈ¿±Ç) ****/
+	/**** ãƒ–ãƒ¼ãƒˆçŠ¶æ…‹ (I/Oã«åæ˜ ) ****/
 
-extern	int	boot_basic;			/* µ¯Æ°»ş¤Î BASIC¥â¡¼¥É	*/
-extern	int	boot_dipsw;			/* µ¯Æ°»ş¤Î¥Ç¥£¥Ã¥×ÀßÄê	*/
-extern	int	boot_from_rom;			/* µ¯Æ°¥Ç¥Ğ¥¤¥¹¤ÎÀßÄê	*/
-extern	int	boot_clock_4mhz;		/* µ¯Æ°»ş¤Î CPU¥¯¥í¥Ã¥¯	*/
+extern	int	boot_basic;			/* èµ·å‹•æ™‚ã® BASICãƒ¢ãƒ¼ãƒ‰	*/
+extern	int	boot_dipsw;			/* èµ·å‹•æ™‚ã®ãƒ‡ã‚£ãƒƒãƒ—è¨­å®š	*/
+extern	int	boot_from_rom;			/* èµ·å‹•ãƒ‡ãƒã‚¤ã‚¹ã®è¨­å®š	*/
+extern	int	boot_clock_4mhz;		/* èµ·å‹•æ™‚ã® CPUã‚¯ãƒ­ãƒƒã‚¯	*/
 
-extern	int	monitor_15k;			/* 15k ¥â¥Ë¥¿¡¼ 1:Yes 0:No  */
+extern	int	monitor_15k;			/* 15k ãƒ¢ãƒ‹ã‚¿ãƒ¼ 1:Yes 0:No  */
 
-extern	int	high_mode;			/* ¹âÂ®¥â¡¼¥É 1:Yes 0:No     */
+extern	int	high_mode;			/* é«˜é€Ÿãƒ¢ãƒ¼ãƒ‰ 1:Yes 0:No     */
 
-	/**** ¥Ç¥£¥Ã¥×¥¹¥¤¥Ã¥Á ****/
+	/**** ãƒ‡ã‚£ãƒƒãƒ—ã‚¹ã‚¤ãƒƒãƒ ****/
 
 #define SW_1_MASK	(0x3e)
 #define	SW_2_MASK	(0x3f)
@@ -33,26 +33,26 @@ extern	int	high_mode;			/* ¹âÂ®¥â¡¼¥É 1:Yes 0:No     */
 #define	SW_ROMBOOT	(0x08)			/* 1: ROM  / 0: DISK	*/
 #define	SW_4MHZ		(0x80)			/* 1: 4MHz / 0: 8MHz	*/
 
-	/**** £É¡¿£Ï¥İ¡¼¥È ****/
+	/**** ï¼©ï¼ï¼¯ãƒãƒ¼ãƒˆ ****/
 
-/*extern byte	dipsw_1;			 * IN[30] ¥Ç¥£¥Ã¥×¥¹¥¤¥Ã¥Á 1 */
-/*extern byte	dipsw_2;			 * IN[31] ¥Ç¥£¥Ã¥×¥¹¥¤¥Ã¥Á 2 */
-/*extern byte	ctrl_boot;			 * IN[40] ¥Ç¥£¥¹¥¯¥Ö¡¼¥È¾ğÊó */
-/*extern byte	cpu_clock;			 * IN[6E] CPU ¥¯¥í¥Ã¥¯       */
-extern	int	memory_bank;			/* OUT[5C-5F] IN[5C] ¥Ğ¥ó¥¯  */
+/*extern byte	dipsw_1;			 * IN[30] ãƒ‡ã‚£ãƒƒãƒ—ã‚¹ã‚¤ãƒƒãƒ 1 */
+/*extern byte	dipsw_2;			 * IN[31] ãƒ‡ã‚£ãƒƒãƒ—ã‚¹ã‚¤ãƒƒãƒ 2 */
+/*extern byte	ctrl_boot;			 * IN[40] ãƒ‡ã‚£ã‚¹ã‚¯ãƒ–ãƒ¼ãƒˆæƒ…å ± */
+/*extern byte	cpu_clock;			 * IN[6E] CPU ã‚¯ãƒ­ãƒƒã‚¯       */
+extern	int	memory_bank;			/* OUT[5C-5F] IN[5C] ãƒãƒ³ã‚¯  */
 
-extern	byte	misc_ctrl;			/* I/O[32] ³Æ¼ïCtrl       */
+extern	byte	misc_ctrl;			/* I/O[32] å„ç¨®Ctrl       */
 extern	byte	ALU1_ctrl;			/* OUT[34] ALU Ctrl 1     */
 extern	byte	ALU2_ctrl;			/* OUT[35] ALU Ctrl 2     */
-extern	byte	ctrl_signal;			/* OUT[40] ¥³¥ó¥È¥í¡¼¥ë¿®¹æ*/
-extern	byte	baudrate_sw;			/* I/O[6F] ¥Ü¡¼¥ì¡¼¥È     */
-extern	word	window_offset;			/* I/O[70] WINDOW ¥ª¥Õ¥»¥Ã¥È*/
-extern	byte	ext_rom_bank;			/* I/O[71] ³ÈÄ¥ROM BANK   */
-extern	byte	ext_ram_ctrl;			/* I/O[E2] ³ÈÄ¥RAMÀ©¸æ	  */
-extern	byte	ext_ram_bank;			/* I/O[E3] ³ÈÄ¥RAM¥»¥ì¥¯¥È*/
+extern	byte	ctrl_signal;			/* OUT[40] ã‚³ãƒ³ãƒˆãƒ­ãƒ¼ãƒ«ä¿¡å·*/
+extern	byte	baudrate_sw;			/* I/O[6F] ãƒœãƒ¼ãƒ¬ãƒ¼ãƒˆ     */
+extern	word	window_offset;			/* I/O[70] WINDOW ã‚ªãƒ•ã‚»ãƒƒãƒˆ*/
+extern	byte	ext_rom_bank;			/* I/O[71] æ‹¡å¼µROM BANK   */
+extern	byte	ext_ram_ctrl;			/* I/O[E2] æ‹¡å¼µRAMåˆ¶å¾¡	  */
+extern	byte	ext_ram_bank;			/* I/O[E3] æ‹¡å¼µRAMã‚»ãƒ¬ã‚¯ãƒˆ*/
 
-extern	byte	jisho_rom_bank;			/* OUT[F0] ¼­½ñROM¥»¥ì¥¯¥È*/
-extern	byte	jisho_rom_ctrl;			/* OUT[F1] ¼­½ñROM¥Ğ¥ó¥¯  */
+extern	byte	jisho_rom_bank;			/* OUT[F0] è¾æ›¸ROMã‚»ãƒ¬ã‚¯ãƒˆ*/
+extern	byte	jisho_rom_ctrl;			/* OUT[F1] è¾æ›¸ROMãƒãƒ³ã‚¯  */
 
 
 #define	MISC_CTRL_EBANK		(0x03)		/* EROM BANK 00..11        */
@@ -62,63 +62,63 @@ extern	byte	jisho_rom_ctrl;			/* OUT[F1] ¼­½ñROM¥Ğ¥ó¥¯  */
 #define	MISC_CTRL_EVRAM		(0x40)		/* VRAM     EXTEND/STANDARD*/
 #define INTERRUPT_MASK_SOUND	(0x80)		/* SND INT  Disable/Enable */
 
-#define	ALU1_CTRL_BLUE		(0x11)		/* ALU½èÍıÂĞ¾İ¥×¥ì¡¼¥ó B   */
+#define	ALU1_CTRL_BLUE		(0x11)		/* ALUå‡¦ç†å¯¾è±¡ãƒ—ãƒ¬ãƒ¼ãƒ³ B   */
 #define	ALU1_CTRL_RED		(0x22)		/*                     R   */
 #define	ALU1_CTRL_GREEN		(0x44)		/*                     G   */
 
-#define	ALU2_CTRL_DATA		(0x07)		/* ALU¿§Èæ³Ó¥Ç¡¼¥¿    0..7 */
-#define	ALU2_CTRL_MODE		(0x30)		/* ALU½èÍı¥â¡¼¥É  00B..11B */
-#define	ALU2_CTRL_VACCESS	(0x80)		/* ¥á¥â¥ê¥¢¥¯¥»¥¹ VRAM/MAIN*/
+#define	ALU2_CTRL_DATA		(0x07)		/* ALUè‰²æ¯”è¼ƒãƒ‡ãƒ¼ã‚¿    0..7 */
+#define	ALU2_CTRL_MODE		(0x30)		/* ALUå‡¦ç†ãƒ¢ãƒ¼ãƒ‰  00B..11B */
+#define	ALU2_CTRL_VACCESS	(0x80)		/* ãƒ¡ãƒ¢ãƒªã‚¢ã‚¯ã‚»ã‚¹ VRAM/MAIN*/
 
-#define	MEMORY_BANK_MAIN	(3)		/* ¥Ğ¥ó¥¯»ØÄê        MAIN  */
+#define	MEMORY_BANK_MAIN	(3)		/* ãƒãƒ³ã‚¯æŒ‡å®š        MAIN  */
 #define	MEMORY_BANK_GRAM0	(0)		/*		       B   */
 #define	MEMORY_BANK_GRAM1	(1)		/*		       R   */
 #define	MEMORY_BANK_GRAM2	(2)		/*		       G   */
 
 #define	CPU_CLOCK_4HMZ		(0x80)		/* CPU CLOCK 4MHz / 8MHz   */
 
-#define	EXT_ROM_NOT		(0x01)		/* ³ÈÄ¥ ROM Èó¥»¥ì¥¯¥È	   */
+#define	EXT_ROM_NOT		(0x01)		/* æ‹¡å¼µ ROM éã‚»ãƒ¬ã‚¯ãƒˆ	   */
 
-#define INTERRUPT_MASK_RTC	(0x01)		/* 1/600 ³ä¤ê¹ş¤ß µö²Ä     */
-#define INTERRUPT_MASK_VSYNC	(0x02)		/* VSYNC ³ä¤ê¹ş¤ß µö²Ä     */
-#define INTERRUPT_MASK_SIO	(0x04)		/* COM   ³ä¤ê¹ş¤ß µö²Ä     */
+#define INTERRUPT_MASK_RTC	(0x01)		/* 1/600 å‰²ã‚Šè¾¼ã¿ è¨±å¯     */
+#define INTERRUPT_MASK_VSYNC	(0x02)		/* VSYNC å‰²ã‚Šè¾¼ã¿ è¨±å¯     */
+#define INTERRUPT_MASK_SIO	(0x04)		/* COM   å‰²ã‚Šè¾¼ã¿ è¨±å¯     */
 
-#define	JISHO_NOT_SELECT	(0x01)		/* ¼­½ñROM¥»¥ì¥¯¥È	   */
-#define	JISHO_BANK		(0x1f)		/* ¼­½ñROM¥Ğ¥ó¥¯	   */
-
-
-	/**** ¥«¥ì¥ó¥À¡¼ ****/
-
-extern	int	calendar_stop;			/* »ş·×Ää»ß¥Õ¥é¥°	*/
+#define	JISHO_NOT_SELECT	(0x01)		/* è¾æ›¸ROMã‚»ãƒ¬ã‚¯ãƒˆ	   */
+#define	JISHO_BANK		(0x1f)		/* è¾æ›¸ROMãƒãƒ³ã‚¯	   */
 
 
-	/**** ¥·¥ê¥¢¥ë¡¢¥Ñ¥é¥ì¥ë ****/
+	/**** ã‚«ãƒ¬ãƒ³ãƒ€ãƒ¼ ****/
 
-extern	int	cmt_speed;	/* ¥Æ¡¼¥×Â®ÅÙ 0¤Ç¼«Æ°   */
-extern	int	cmt_intr;	/* ³ä¹ş¤Ç¥Æ¡¼¥×½èÍı¤¹¤ë */
-extern	int	cmt_wait;	/* ¿¿¤Ç¡¢¥Æ¡¼¥×ÆÉ¹ş¥¦¥§¥¤¥È¤¢¤ê(T88¤Î¤ß) */
+extern	int	calendar_stop;			/* æ™‚è¨ˆåœæ­¢ãƒ•ãƒ©ã‚°	*/
 
 
-	/**** ¹âÂ® BASIC ¥â¡¼¥É ****/
+	/**** ã‚·ãƒªã‚¢ãƒ«ã€ãƒ‘ãƒ©ãƒ¬ãƒ« ****/
+
+extern	int	cmt_speed;	/* ãƒ†ãƒ¼ãƒ—é€Ÿåº¦ 0ã§è‡ªå‹•   */
+extern	int	cmt_intr;	/* å‰²è¾¼ã§ãƒ†ãƒ¼ãƒ—å‡¦ç†ã™ã‚‹ */
+extern	int	cmt_wait;	/* çœŸã§ã€ãƒ†ãƒ¼ãƒ—èª­è¾¼ã‚¦ã‚§ã‚¤ãƒˆã‚ã‚Š(T88ã®ã¿) */
+
+
+	/**** é«˜é€Ÿ BASIC ãƒ¢ãƒ¼ãƒ‰ ****/
 
 #define EndofBasicAddr 0xffff
-#define HS_BASIC_COUNT 50000000	/* ³ä¤ê¹ş¤ß¤Ê¤·¤Ç²ó¤¹¥¹¥Æ¡¼¥È¿ô */
+#define HS_BASIC_COUNT 50000000	/* å‰²ã‚Šè¾¼ã¿ãªã—ã§å›ã™ã‚¹ãƒ†ãƒ¼ãƒˆæ•° */
 
 extern word highspeed_routine[];
 
 extern int highspeed_flag;
-extern int highspeed_mode;	/* ¹âÂ® BASIC ½èÍı ¤¹¤ë¤Ê¤é ¿¿      */
+extern int highspeed_mode;	/* é«˜é€Ÿ BASIC å‡¦ç† ã™ã‚‹ãªã‚‰ çœŸ      */
 
 
-	/**** ¥·¥ê¥¢¥ë¥Ş¥¦¥¹ ****/
+	/**** ã‚·ãƒªã‚¢ãƒ«ãƒã‚¦ã‚¹ ****/
 
-extern int use_siomouse;	/* ¿¿¤Ç¡¢¥·¥ê¥¢¥ë¥Ş¥¦¥¹¤¢¤ê	*/
-
-
+extern int use_siomouse;	/* çœŸã§ã€ã‚·ãƒªã‚¢ãƒ«ãƒã‚¦ã‚¹ã‚ã‚Š	*/
 
 
 
-	/**** ´Ø¿ô ****/
+
+
+	/**** é–¢æ•° ****/
 
 void	pc88main_init( int init );
 void	pc88main_term( void );

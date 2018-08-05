@@ -5,42 +5,42 @@
 #include "keyboard.h"
 
 /*--------------------------------------------------------------
- * ¥á¥Ë¥å¡¼É½¼¨ÍÑ¤Î²èÌÌ
+ * ãƒ¡ãƒ‹ãƒ¥ãƒ¼è¡¨ç¤ºç”¨ã®ç”»é¢
  *--------------------------------------------------------------*/
 
 #define	Q8GR_SCREEN_X	(80)
 #define	Q8GR_SCREEN_Y	(25)
 
 
-enum {			/* ¹½Â¤ÂÎ T_Q8GR_SCREEN ¤Î¥á¥ó¥Ğ font_type ¤ÎÃÍ */
+enum {			/* æ§‹é€ ä½“ T_Q8GR_SCREEN ã®ãƒ¡ãƒ³ãƒ font_type ã®å€¤ */
     FONT_UNUSED = 0,
     FONT_1_BYTE,
     FONT_ANK    = FONT_1_BYTE,	/* ASCII (Alphabet, Number, Kana etc)	*/
-    FONT_QUART,			/* 1/4³ÑÊ¸»ú (ANK)			*/
-    FONT_HALF,			/* È¾³ÑÊ¸»ú  (±Ñ¿ô»ú¡¢ÊÒ²¾Ì¾¡¢Ê¿²¾Ì¾)	*/
-    FONT_LOGO,			/* ¥á¥Ë¥å¡¼ÍÑ¥í¥´			*/
+    FONT_QUART,			/* 1/4è§’æ–‡å­— (ANK)			*/
+    FONT_HALF,			/* åŠè§’æ–‡å­—  (è‹±æ•°å­—ã€ç‰‡ä»®åã€å¹³ä»®å)	*/
+    FONT_LOGO,			/* ãƒ¡ãƒ‹ãƒ¥ãƒ¼ç”¨ãƒ­ã‚´			*/
     FONT_2_BYTE,
-    FONT_KNJ1L  = FONT_2_BYTE,	/* ´Á»ú Âè°ì¿å½à (º¸È¾Ê¬)		*/
-    FONT_KNJ1R,			/* ´Á»ú Âè°ì¿å½à (±¦È¾Ê¬)		*/
-    FONT_KNJ2L,			/* ´Á»ú ÂèÆó¿å½à (º¸È¾Ê¬)		*/
-    FONT_KNJ2R,			/* ´Á»ú ÂèÆó¿å½à (±¦È¾Ê¬)		*/
-    FONT_KNJXL,			/* ´Á»ú ¥À¥ß¡¼   (º¸È¾Ê¬)		*/
-    FONT_KNJXR,			/* ´Á»ú ¥À¥ß¡¼   (±¦È¾Ê¬)		*/
+    FONT_KNJ1L  = FONT_2_BYTE,	/* æ¼¢å­— ç¬¬ä¸€æ°´æº– (å·¦åŠåˆ†)		*/
+    FONT_KNJ1R,			/* æ¼¢å­— ç¬¬ä¸€æ°´æº– (å³åŠåˆ†)		*/
+    FONT_KNJ2L,			/* æ¼¢å­— ç¬¬äºŒæ°´æº– (å·¦åŠåˆ†)		*/
+    FONT_KNJ2R,			/* æ¼¢å­— ç¬¬äºŒæ°´æº– (å³åŠåˆ†)		*/
+    FONT_KNJXL,			/* æ¼¢å­— ãƒ€ãƒŸãƒ¼   (å·¦åŠåˆ†)		*/
+    FONT_KNJXR,			/* æ¼¢å­— ãƒ€ãƒŸãƒ¼   (å³åŠåˆ†)		*/
 
-				/* ºÇÂç¤Ç16¼ïÎà(4bit)¤Ş¤Ç³ÈÄ¥²ÄÇ½	*/
+				/* æœ€å¤§ã§16ç¨®é¡(4bit)ã¾ã§æ‹¡å¼µå¯èƒ½	*/
 };
 
 
 typedef	struct {
-    Uint background:	4;	/* ÇØ·Ê¥Ñ¥ì¥Ã¥È¥³¡¼¥É (0¡Á15)		*/
-    Uint foreground:	4;	/* É½¼¨¥Ñ¥ì¥Ã¥È¥³¡¼¥É (0¡Á15)		*/
+    Uint background:	4;	/* èƒŒæ™¯ãƒ‘ãƒ¬ãƒƒãƒˆã‚³ãƒ¼ãƒ‰ (0ã€œ15)		*/
+    Uint foreground:	4;	/* è¡¨ç¤ºãƒ‘ãƒ¬ãƒƒãƒˆã‚³ãƒ¼ãƒ‰ (0ã€œ15)		*/
     Uint rsv:		1;
-    Uint mouse:		1;	/* ¥Ş¥¦¥¹¥İ¥¤¥ó¥¿	¤Ê¤·=0 ¤¢¤ê=1	*/
-    Uint reverse:	1;	/* È¿Å¾É½¼¨		ÄÌ¾ï=0 È¿Å¾=1	*/
-    Uint underline:	1;	/* ¥¢¥ó¥À¡¼¥é¥¤¥ó	¤Ê¤·=0 ¤¢¤ê=1	*/
-    Uint font_type:	4;	/* ¥Õ¥©¥ó¥È¥¿¥¤¥× (²¼»²¾È)		*/
-    Uint addr:		16;	/* ´Á»úROM ¥¢¥É¥ì¥¹			*/
-} T_Q8GR_SCREEN;   /* ·×32bit == unsigned int ¤È·è¤á¤Ä¤± (;_;)		*/
+    Uint mouse:		1;	/* ãƒã‚¦ã‚¹ãƒã‚¤ãƒ³ã‚¿	ãªã—=0 ã‚ã‚Š=1	*/
+    Uint reverse:	1;	/* åè»¢è¡¨ç¤º		é€šå¸¸=0 åè»¢=1	*/
+    Uint underline:	1;	/* ã‚¢ãƒ³ãƒ€ãƒ¼ãƒ©ã‚¤ãƒ³	ãªã—=0 ã‚ã‚Š=1	*/
+    Uint font_type:	4;	/* ãƒ•ã‚©ãƒ³ãƒˆã‚¿ã‚¤ãƒ— (ä¸‹å‚ç…§)		*/
+    Uint addr:		16;	/* æ¼¢å­—ROM ã‚¢ãƒ‰ãƒ¬ã‚¹			*/
+} T_Q8GR_SCREEN;   /* è¨ˆ32bit == unsigned int ã¨æ±ºã‚ã¤ã‘ (;_;)		*/
 
 
 extern	int		menu_screen_current;
@@ -48,7 +48,7 @@ extern	T_Q8GR_SCREEN	menu_screen[2][ Q8GR_SCREEN_Y ][ Q8GR_SCREEN_X ];
 
 
 /*--------------------------------------------------------------
- * ¥á¥Ë¥å¡¼¤Ë¤ÆÉ½¼¨¤¹¤ë¥¿¥¤¥È¥ë¥í¥´ (¥Ç¡¼¥¿¤Ï¡¢8x16¥É¥Ã¥ÈÃ±°Ì)
+ * ãƒ¡ãƒ‹ãƒ¥ãƒ¼ã«ã¦è¡¨ç¤ºã™ã‚‹ã‚¿ã‚¤ãƒˆãƒ«ãƒ­ã‚´ (ãƒ‡ãƒ¼ã‚¿ã¯ã€8x16ãƒ‰ãƒƒãƒˆå˜ä½)
  *--------------------------------------------------------------*/
 
 #define	Q8GR_LOGO_W	(24)
@@ -58,7 +58,7 @@ extern	byte	q8gr_logo[ Q8GR_LOGO_W * Q8GR_LOGO_H * 16 ];
 
 
 /*--------------------------------------------------------------
- * ¥á¥Ë¥å¡¼²èÌÌ¤Î¥Ñ¥ì¥Ã¥È¥³¡¼¥É
+ * ãƒ¡ãƒ‹ãƒ¥ãƒ¼ç”»é¢ã®ãƒ‘ãƒ¬ãƒƒãƒˆã‚³ãƒ¼ãƒ‰
  *--------------------------------------------------------------*/
 
 #define	Q8GR_PALETTE_FOREGROUND	(0)
@@ -80,7 +80,7 @@ extern	byte	q8gr_logo[ Q8GR_LOGO_W * Q8GR_LOGO_H * 16 ];
 
 
 /*--------------------------------------------------------------
- * ¥á¥Ë¥å¡¼¤Ç»ÈÍÑ¤¹¤ë¥­¡¼¥³¡¼¥É (Q8TK ÀìÍÑ¤ÎÆÃ¼ì¥­¡¼)
+ * ãƒ¡ãƒ‹ãƒ¥ãƒ¼ã§ä½¿ç”¨ã™ã‚‹ã‚­ãƒ¼ã‚³ãƒ¼ãƒ‰ (Q8TK å°‚ç”¨ã®ç‰¹æ®Šã‚­ãƒ¼)
  *--------------------------------------------------------------*/
 
 #define	Q8TK_KEY_BS		KEY88_BS
@@ -123,33 +123,33 @@ extern	byte	q8gr_logo[ Q8GR_LOGO_W * Q8GR_LOGO_H * 16 ];
 
 
 /*--------------------------------------------------------------
- * ¥¦¥£¥¸¥Ã¥È¤Î¹½Â¤ÂÎ
+ * ã‚¦ã‚£ã‚¸ãƒƒãƒˆã®æ§‹é€ ä½“
  *--------------------------------------------------------------*/
 
 /*--------------------------------------
- * ¥¢¥¸¥ã¥¹¥È¥á¥ó¥È
+ * ã‚¢ã‚¸ãƒ£ã‚¹ãƒˆãƒ¡ãƒ³ãƒˆ
  *--------------------------------------*/
 
 typedef	struct	_Q8Adjust	Q8Adjust;
 struct	_Q8Adjust {
-    int		value;		/* ¸½ºßÃÍ */
-    int		lower;		/* ºÇ¾®ÃÍ */
-    int		upper;		/* ºÇÂçÃÍ */
-    int		step_increment;	/* ÁıÊ¬(¾®) */
-    int		page_increment;	/*     (Âç) */
-    int		max_length;	/* ¥Ğ¡¼¥µ¥¤¥º(Ìğ°õ½ü)¡¢0¤Ç¼«Æ° */
-    int		x, y;		/* É½¼¨»ş : ºÂÉ¸           */
-    int		length;		/*	  : ¥¹¥±¡¼¥ë¥µ¥¤¥º */
-    int		pos;		/*        : ¥¹¥é¥¤¥À¡¼°ÌÃÖ */
-    int		horizontal;	/*        : TRUE¤Ç¿åÊ¿ÇÛÃÖ */
-    int		arrow;		/*        : TRUE¤ÇÌğ°õ¤¢¤ê */
-    float	scale;		/*        : É½¼¨ÇÜÎ¨	   */
+    int		value;		/* ç¾åœ¨å€¤ */
+    int		lower;		/* æœ€å°å€¤ */
+    int		upper;		/* æœ€å¤§å€¤ */
+    int		step_increment;	/* å¢—åˆ†(å°) */
+    int		page_increment;	/*     (å¤§) */
+    int		max_length;	/* ãƒãƒ¼ã‚µã‚¤ã‚º(çŸ¢å°é™¤)ã€0ã§è‡ªå‹• */
+    int		x, y;		/* è¡¨ç¤ºæ™‚ : åº§æ¨™           */
+    int		length;		/*	  : ã‚¹ã‚±ãƒ¼ãƒ«ã‚µã‚¤ã‚º */
+    int		pos;		/*        : ã‚¹ãƒ©ã‚¤ãƒ€ãƒ¼ä½ç½® */
+    int		horizontal;	/*        : TRUEã§æ°´å¹³é…ç½® */
+    int		arrow;		/*        : TRUEã§çŸ¢å°ã‚ã‚Š */
+    float	scale;		/*        : è¡¨ç¤ºå€ç‡	   */
 
-    int		listbox_changed;/* LISTBOX¤ÎÊÑ¹¹»şÎã³°½èÍı */
+    int		listbox_changed;/* LISTBOXã®å¤‰æ›´æ™‚ä¾‹å¤–å‡¦ç† */
 };
 
 /*--------------------------------------
- * ¥¦¥£¥¸¥Ã¥È¶¦ÄÌ
+ * ã‚¦ã‚£ã‚¸ãƒƒãƒˆå…±é€š
  *--------------------------------------*/
 
 typedef	struct	_Q8tkWidget	Q8tkWidget;
@@ -159,42 +159,42 @@ typedef void (*Q8tkSignalFunc)	();
 
 struct	_Q8tkWidget {
 
-    int		type;		/* ¥¦¥£¥¸¥Ã¥È¤Î¼ïÎà	Q8TK_TYPE_	*/
-    int		attr;		/* ¥³¥ó¥Æ¥ÊÂ°À­		Q8TK_ATTR_	*/
-    int		visible;	/* É½¼¨¤ÎÍ­Ìµ				*/
-    int		sensitive;	/* Í­¸ú¡¦Ìµ¸ú				*/
+    int		type;		/* ã‚¦ã‚£ã‚¸ãƒƒãƒˆã®ç¨®é¡	Q8TK_TYPE_	*/
+    int		attr;		/* ã‚³ãƒ³ãƒ†ãƒŠå±æ€§		Q8TK_ATTR_	*/
+    int		visible;	/* è¡¨ç¤ºã®æœ‰ç„¡				*/
+    int		sensitive;	/* æœ‰åŠ¹ãƒ»ç„¡åŠ¹				*/
 
-    int		placement_x;	/* É½¼¨°ÌÃÖ(Å·ÃÏº¸±¦Ãæ)	Q8TK_PLACEMENT_	*/
+    int		placement_x;	/* è¡¨ç¤ºä½ç½®(å¤©åœ°å·¦å³ä¸­)	Q8TK_PLACEMENT_	*/
     int		placement_y;
 
-    int		x, y, sx, sy;	/* É½¼¨ºÂÉ¸¡¢É½¼¨¥µ¥¤¥º			*/
+    int		x, y, sx, sy;	/* è¡¨ç¤ºåº§æ¨™ã€è¡¨ç¤ºã‚µã‚¤ã‚º			*/
 
-    Q8tkWidget	*parent;	/* ¥¦¥£¥¸¥Ã¥ÈÏ¢·ë¹½Â¤			*/
-    Q8tkWidget	*child;		/*	(É½¼¨¤Î»ş¤Ë¤³¤Î¥ê¥ó¥¯¤ò¤¿¤É¤ë)	*/
+    Q8tkWidget	*parent;	/* ã‚¦ã‚£ã‚¸ãƒƒãƒˆé€£çµæ§‹é€ 			*/
+    Q8tkWidget	*child;		/*	(è¡¨ç¤ºã®æ™‚ã«ã“ã®ãƒªãƒ³ã‚¯ã‚’ãŸã©ã‚‹)	*/
     Q8tkWidget	*prev;
     Q8tkWidget	*next;
 
-    char	key_up_used;	/* ¥«¡¼¥½¥ë¥­¡¼¤ÎÆ°ºî¤¬			*/
-    char	key_down_used;	/*		Í½Ìó¤µ¤ì¤Æ¤¤¤ë¾ì¹ç¡¢¿¿	*/
+    char	key_up_used;	/* ã‚«ãƒ¼ã‚½ãƒ«ã‚­ãƒ¼ã®å‹•ä½œãŒ			*/
+    char	key_down_used;	/*		äºˆç´„ã•ã‚Œã¦ã„ã‚‹å ´åˆã€çœŸ	*/
     char	key_left_used;
     char	key_right_used;
 
-    char	*name;		/* malloc¤µ¤ì¤¿ÎÎ°è¤Î¤Ø¥İ¥¤¥ó¥¿		*/
-				/*     ¡¦¥é¥Ù¥ë¤ÎÊ¸»úÎó			*/
-				/*     ¡¦¥Õ¥ì¡¼¥à¤ÎÊ¸»úÎó		*/
-				/*     ¡¦¥Î¡¼¥È¥Ú¡¼¥¸¤ÎÊ¸»úÎó		*/
-				/*     ¡¦¥¨¥ó¥È¥ê¤ÎÊ¸»úÎó		*/
-				/*     ¡¦¥ê¥¹¥È¥¢¥¤¥Æ¥à¤Î¾ğÊó(Ê¸»úÎó)	*/
+    char	*name;		/* mallocã•ã‚ŒãŸé ˜åŸŸã®ã¸ãƒã‚¤ãƒ³ã‚¿		*/
+				/*     ãƒ»ãƒ©ãƒ™ãƒ«ã®æ–‡å­—åˆ—			*/
+				/*     ãƒ»ãƒ•ãƒ¬ãƒ¼ãƒ ã®æ–‡å­—åˆ—		*/
+				/*     ãƒ»ãƒãƒ¼ãƒˆãƒšãƒ¼ã‚¸ã®æ–‡å­—åˆ—		*/
+				/*     ãƒ»ã‚¨ãƒ³ãƒˆãƒªã®æ–‡å­—åˆ—		*/
+				/*     ãƒ»ãƒªã‚¹ãƒˆã‚¢ã‚¤ãƒ†ãƒ ã®æƒ…å ±(æ–‡å­—åˆ—)	*/
 
-    int		code;		/* name ¤ÎÊ¸»ú¥³¡¼¥É			*/
+    int		code;		/* name ã®æ–‡å­—ã‚³ãƒ¼ãƒ‰			*/
 
-    int		with_label;	/* XXX_new_with_label()	¤Ë¤Æ		*/
-				/* ¥é¥Ù¥ë¤ò¼«Æ°À¸À®¤·¤¿¾ì¹ç¡¢¿¿		*/
+    int		with_label;	/* XXX_new_with_label()	ã«ã¦		*/
+				/* ãƒ©ãƒ™ãƒ«ã‚’è‡ªå‹•ç”Ÿæˆã—ãŸå ´åˆã€çœŸ		*/
 
 
-    union {			/* ¥¦¥£¥¸¥Ã¥ÈÊÌ¥ï¡¼¥¯			*/
+    union {			/* ã‚¦ã‚£ã‚¸ãƒƒãƒˆåˆ¥ãƒ¯ãƒ¼ã‚¯			*/
 
-	struct {			/* ---- ¥¦¥¤¥ó¥É¥¦ ---- */
+	struct {			/* ---- ã‚¦ã‚¤ãƒ³ãƒ‰ã‚¦ ---- */
 	    int		no_frame;
 	    int		shadow_type;
 	    int		set_position;
@@ -204,24 +204,24 @@ struct	_Q8tkWidget {
 	    Q8tkWidget	*accel;
 	} window;
 
-	struct {			/* ---- ¥Õ¥ì¡¼¥à ---- */
+	struct {			/* ---- ãƒ•ãƒ¬ãƒ¼ãƒ  ---- */
 	    int		shadow_type;
 	} frame;
 
-	struct {			/* ---- ¥é¥Ù¥ë ---- */
+	struct {			/* ---- ãƒ©ãƒ™ãƒ« ---- */
 	    int		foreground;
 	    int		background;
 	    int		reverse;
 	} label;
 
-	struct {			/* ---- ³Æ¼ï¥Ü¥¿¥ó ---- */
+	struct {			/* ---- å„ç¨®ãƒœã‚¿ãƒ³ ---- */
 	    int	active;
 	    Q8List	*list;
 	} button;
 
-	struct {			/* ---- ¥Î¡¼¥È¥Ö¥Ã¥¯ ---- */
-	    Q8tkWidget	*page;			/* ¸½ºßÁªÂòÃæ¤Î PAGE	*/
-	    struct notebook_draw {		/* ÉÁ²è»ş¤Î¥ï¡¼¥¯	*/
+	struct {			/* ---- ãƒãƒ¼ãƒˆãƒ–ãƒƒã‚¯ ---- */
+	    Q8tkWidget	*page;			/* ç¾åœ¨é¸æŠä¸­ã® PAGE	*/
+	    struct notebook_draw {		/* æç”»æ™‚ã®ãƒ¯ãƒ¼ã‚¯	*/
 		int	drawing;
 		int	x, y;
 		int	x0, x1;
@@ -230,36 +230,36 @@ struct	_Q8tkWidget {
 	    int		lost_focus;
 	} notebook;
 
-	struct {			/* ---- ¥³¥ó¥Ü ---- */
-	    Q8tkWidget	*entry;			/* ÇÛ²¼¤Ë¤¢¤ë¥¨¥ó¥È¥ê	*/
-	    Q8List	*list;			/* LIST ITEM ¤Î¥ê¥¹¥È	*/
-	    int		nr_items;		/* LIST ITEM ¤Î¿ô	*/
-	    int		length;			/* LIST ITEM ºÇÂçÊ¸»úÄ¹	*/
-	    int		width;			/* É½¼¨¥Ğ¥¤¥È¿ô		*/
-	    Q8tkWidget	*popup_window;		/* POPUP¤Î¥¦¥¤¥ó¥É¥¦	*/
-	    Q8tkWidget	*popup_scrolled_window;	/* POPUP¤Î    ¡·	*/
-	    Q8tkWidget	*popup_list;		/* POPUP¤Î¥ê¥¹¥È	*/
-	    Q8tkWidget	*popup_accel_group;	/* POPUP¤ÎESC¥­¡¼	*/
-	    Q8tkWidget	*popup_fake;		/* POPUP¤Î¥À¥ß¡¼¥­¡¼	*/
+	struct {			/* ---- ã‚³ãƒ³ãƒœ ---- */
+	    Q8tkWidget	*entry;			/* é…ä¸‹ã«ã‚ã‚‹ã‚¨ãƒ³ãƒˆãƒª	*/
+	    Q8List	*list;			/* LIST ITEM ã®ãƒªã‚¹ãƒˆ	*/
+	    int		nr_items;		/* LIST ITEM ã®æ•°	*/
+	    int		length;			/* LIST ITEM æœ€å¤§æ–‡å­—é•·	*/
+	    int		width;			/* è¡¨ç¤ºãƒã‚¤ãƒˆæ•°		*/
+	    Q8tkWidget	*popup_window;		/* POPUPã®ã‚¦ã‚¤ãƒ³ãƒ‰ã‚¦	*/
+	    Q8tkWidget	*popup_scrolled_window;	/* POPUPã®    ã€ƒ	*/
+	    Q8tkWidget	*popup_list;		/* POPUPã®ãƒªã‚¹ãƒˆ	*/
+	    Q8tkWidget	*popup_accel_group;	/* POPUPã®ESCã‚­ãƒ¼	*/
+	    Q8tkWidget	*popup_fake;		/* POPUPã®ãƒ€ãƒŸãƒ¼ã‚­ãƒ¼	*/
 	} combo;
 
-	struct {			/* ---- ¥ê¥¹¥È¥Ü¥Ã¥¯¥¹ ---- */
+	struct {			/* ---- ãƒªã‚¹ãƒˆãƒœãƒƒã‚¯ã‚¹ ---- */
 	    Q8tkWidget	*selected;
 	    Q8tkWidget	*active;
 	    int		width;
 	    int		scrollin_top;
 	    int		scrollin_left;
-	} listbox;	/* SELECTION TYPE ¤Ï BROWSE ¤Î¤ß */
+	} listbox;	/* SELECTION TYPE ã¯ BROWSE ã®ã¿ */
 
-	Q8Adjust	adj;		/* ---- ¥¢¥¸¥ã¥¹¥È¥á¥ó¥È ---- */
+	Q8Adjust	adj;		/* ---- ã‚¢ã‚¸ãƒ£ã‚¹ãƒˆãƒ¡ãƒ³ãƒˆ ---- */
 
-	struct {			/* ---- ¥¹¥±¡¼¥ë ---- */
+	struct {			/* ---- ã‚¹ã‚±ãƒ¼ãƒ« ---- */
 	    Q8tkWidget	*adj;
 	    int		draw_value;
 	    int		value_pos;
 	} scale;
 
-	struct {			/* ---- ¥¹¥¯¥í¡¼¥ë¥É¥¦¥¤¥ó¥É¥¦ ---- */
+	struct {			/* ---- ã‚¹ã‚¯ãƒ­ãƒ¼ãƒ«ãƒ‰ã‚¦ã‚¤ãƒ³ãƒ‰ã‚¦ ---- */
 	    Q8tkWidget	*hadj;
 	    Q8tkWidget	*vadj;
 	    int		hpolicy;
@@ -273,27 +273,27 @@ struct	_Q8tkWidget {
 	    int		vadj_value;
 	} scrolled;
 
-	struct {			/* ---- ¥¨¥ó¥È¥ê¡¼ ---- */
-	    int		max_length;		/* ÆşÎÏ²ÄÇ½¾å¸Â 0¤ÇÌµ¸Â	*/
-	    int		malloc_length;		/* malloc¤·¤¿¥µ¥¤¥º	*/
-	    int		cursor_pos;		/* ¥«¡¼¥½¥ë¥Ğ¥¤¥È°ÌÃÖ	*/
-	    int		disp_pos;		/* É½¼¨³«»Ï¥Ğ¥¤¥È°ÌÃÖ	*/
-	    int		width;			/* É½¼¨¤¹¤ë¥µ¥¤¥º	*/
-	    int		editable;		/* ¥¨¥ó¥È¥êÊÔ½¸²ÄÈİ	*/
-	    Q8tkWidget	*combo;			/* ¾å°Ì¤Î¥³¥ó¥Ü¥Ü¥Ã¥¯¥¹	*/
+	struct {			/* ---- ã‚¨ãƒ³ãƒˆãƒªãƒ¼ ---- */
+	    int		max_length;		/* å…¥åŠ›å¯èƒ½ä¸Šé™ 0ã§ç„¡é™	*/
+	    int		malloc_length;		/* mallocã—ãŸã‚µã‚¤ã‚º	*/
+	    int		cursor_pos;		/* ã‚«ãƒ¼ã‚½ãƒ«ãƒã‚¤ãƒˆä½ç½®	*/
+	    int		disp_pos;		/* è¡¨ç¤ºé–‹å§‹ãƒã‚¤ãƒˆä½ç½®	*/
+	    int		width;			/* è¡¨ç¤ºã™ã‚‹ã‚µã‚¤ã‚º	*/
+	    int		editable;		/* ã‚¨ãƒ³ãƒˆãƒªç·¨é›†å¯å¦	*/
+	    Q8tkWidget	*combo;			/* ä¸Šä½ã®ã‚³ãƒ³ãƒœãƒœãƒƒã‚¯ã‚¹	*/
 	} entry;
 
-	struct {			/* ---- ¥¢¥¯¥»¥é¥ì¡¼¥¿¡¼¥­¡¼ ---- */
+	struct {			/* ---- ã‚¢ã‚¯ã‚»ãƒ©ãƒ¬ãƒ¼ã‚¿ãƒ¼ã‚­ãƒ¼ ---- */
 	    Q8tkWidget	*widget;
 	    int		key;
 	} accel;
 
-	struct {			/* ---- ¥À¥¤¥¢¥í¥° ---- */
+	struct {			/* ---- ãƒ€ã‚¤ã‚¢ãƒ­ã‚° ---- */
 	    Q8tkWidget	*vbox;
 	    Q8tkWidget	*action_area;
 	} dialog;
 
-	struct {			/* ---- ¥Õ¥¡¥¤¥ë¥»¥ì¥¯¥·¥ç¥ó ---- */
+	struct {			/* ---- ãƒ•ã‚¡ã‚¤ãƒ«ã‚»ãƒ¬ã‚¯ã‚·ãƒ§ãƒ³ ---- */
 	    Q8tkWidget	*file_list;
 	    Q8tkWidget	*selection_entry;
 	    Q8tkWidget	*ro_button;
@@ -309,20 +309,20 @@ struct	_Q8tkWidget {
 	    int		width;
 	} fselect;
 
-	struct {			/* --- ¤½¤ÎÂ¾¡¦¡¦¡¦ --- */
+	struct {			/* --- ãã®ä»–ãƒ»ãƒ»ãƒ» --- */
 	    int		data[4];
 	} any;
 
     } stat;
 
-				/* ¥¤¥Ù¥ó¥È½èÍı´Ø¿ô */
+				/* ã‚¤ãƒ™ãƒ³ãƒˆå‡¦ç†é–¢æ•° */
 
     void	(*event_button_on)(Q8tkWidget *);
     void	(*event_key_on)   (Q8tkWidget *, int);
     void	(*event_dragging) (Q8tkWidget *);
     void	(*event_drag_off) (Q8tkWidget *);
 
-				/* ¥¤¥Ù¥ó¥È½èÍı¥æ¡¼¥¶´Ø¿ô */
+				/* ã‚¤ãƒ™ãƒ³ãƒˆå‡¦ç†ãƒ¦ãƒ¼ã‚¶é–¢æ•° */
 
     void	(*user_event_0)(Q8tkWidget *, void *);
     void	*user_event_0_parm;
@@ -332,41 +332,41 @@ struct	_Q8tkWidget {
 };
 
 enum {				/* (Q8tkWidget*)->type	*/
-    Q8TK_TYPE_WINDOW,		/* ¥¦¥¤¥ó¥É¥¦		*/
-    Q8TK_TYPE_BUTTON,		/* ¥Ü¥¿¥ó		*/
-    Q8TK_TYPE_TOGGLE_BUTTON,	/* ¥È¥°¥ë¥Ü¥¿¥ó		*/
-    Q8TK_TYPE_CHECK_BUTTON,	/* ¥Á¥§¥Ã¥¯¥Ü¥¿¥ó	*/
-    Q8TK_TYPE_RADIO_BUTTON,	/* ¥é¥¸¥ª¥Ü¥¿¥ó		*/
-    Q8TK_TYPE_FRAME,		/* ¥Õ¥ì¡¼¥à		*/
-    Q8TK_TYPE_LABEL,		/* ¥é¥Ù¥ë		*/
-    Q8TK_TYPE_LOGO,		/* ¥í¥´			*/
-    Q8TK_TYPE_NOTEBOOK,		/* ¥Î¡¼¥È¥Ö¥Ã¥¯		*/
-    Q8TK_TYPE_NOTEPAGE,		/* ¥Î¡¼¥È¥Ö¥Ã¥¯¤Î¥Ú¡¼¥¸	*/
-    Q8TK_TYPE_VBOX,		/* ½Ä¥Ü¥Ã¥¯¥¹		*/
-    Q8TK_TYPE_HBOX,		/* ²£¥Ü¥Ã¥¯¥¹		*/
-    Q8TK_TYPE_VSEPARATOR,	/* ½Ä¶èÀÚ¤êÀş		*/
-    Q8TK_TYPE_HSEPARATOR,	/* ²£¶èÀÚ¤êÀş		*/
-    Q8TK_TYPE_COMBO,		/* ¥³¥ó¥Ü¥Ü¥Ã¥¯¥¹	*/
-    Q8TK_TYPE_LISTBOX,		/* ¥ê¥¹¥È		*/
-    Q8TK_TYPE_LIST_ITEM,	/* ¥ê¥¹¥È¥¢¥¤¥Æ¥à	*/
-    Q8TK_TYPE_ADJUSTMENT,	/*   ¥¢¥¸¥ã¥¹¥È¥á¥ó¥È	*/
-    Q8TK_TYPE_HSCALE,		/* ²£¥¹¥±¡¼¥ë		*/
-    Q8TK_TYPE_VSCALE,		/* ½Ä¥¹¥±¡¼¥ë		*/
-    Q8TK_TYPE_SCROLLED_WINDOW,	/* ¥¹¥¯¥í¡¼¥ë¥¦¥¤¥ó¥É¥¦	*/
-    Q8TK_TYPE_ENTRY,		/* ¥¨¥ó¥È¥ê¡¼		*/
+    Q8TK_TYPE_WINDOW,		/* ã‚¦ã‚¤ãƒ³ãƒ‰ã‚¦		*/
+    Q8TK_TYPE_BUTTON,		/* ãƒœã‚¿ãƒ³		*/
+    Q8TK_TYPE_TOGGLE_BUTTON,	/* ãƒˆã‚°ãƒ«ãƒœã‚¿ãƒ³		*/
+    Q8TK_TYPE_CHECK_BUTTON,	/* ãƒã‚§ãƒƒã‚¯ãƒœã‚¿ãƒ³	*/
+    Q8TK_TYPE_RADIO_BUTTON,	/* ãƒ©ã‚¸ã‚ªãƒœã‚¿ãƒ³		*/
+    Q8TK_TYPE_FRAME,		/* ãƒ•ãƒ¬ãƒ¼ãƒ 		*/
+    Q8TK_TYPE_LABEL,		/* ãƒ©ãƒ™ãƒ«		*/
+    Q8TK_TYPE_LOGO,		/* ãƒ­ã‚´			*/
+    Q8TK_TYPE_NOTEBOOK,		/* ãƒãƒ¼ãƒˆãƒ–ãƒƒã‚¯		*/
+    Q8TK_TYPE_NOTEPAGE,		/* ãƒãƒ¼ãƒˆãƒ–ãƒƒã‚¯ã®ãƒšãƒ¼ã‚¸	*/
+    Q8TK_TYPE_VBOX,		/* ç¸¦ãƒœãƒƒã‚¯ã‚¹		*/
+    Q8TK_TYPE_HBOX,		/* æ¨ªãƒœãƒƒã‚¯ã‚¹		*/
+    Q8TK_TYPE_VSEPARATOR,	/* ç¸¦åŒºåˆ‡ã‚Šç·š		*/
+    Q8TK_TYPE_HSEPARATOR,	/* æ¨ªåŒºåˆ‡ã‚Šç·š		*/
+    Q8TK_TYPE_COMBO,		/* ã‚³ãƒ³ãƒœãƒœãƒƒã‚¯ã‚¹	*/
+    Q8TK_TYPE_LISTBOX,		/* ãƒªã‚¹ãƒˆ		*/
+    Q8TK_TYPE_LIST_ITEM,	/* ãƒªã‚¹ãƒˆã‚¢ã‚¤ãƒ†ãƒ 	*/
+    Q8TK_TYPE_ADJUSTMENT,	/*   ã‚¢ã‚¸ãƒ£ã‚¹ãƒˆãƒ¡ãƒ³ãƒˆ	*/
+    Q8TK_TYPE_HSCALE,		/* æ¨ªã‚¹ã‚±ãƒ¼ãƒ«		*/
+    Q8TK_TYPE_VSCALE,		/* ç¸¦ã‚¹ã‚±ãƒ¼ãƒ«		*/
+    Q8TK_TYPE_SCROLLED_WINDOW,	/* ã‚¹ã‚¯ãƒ­ãƒ¼ãƒ«ã‚¦ã‚¤ãƒ³ãƒ‰ã‚¦	*/
+    Q8TK_TYPE_ENTRY,		/* ã‚¨ãƒ³ãƒˆãƒªãƒ¼		*/
 
-    Q8TK_TYPE_ACCEL_GROUP,	/* ¥¢¥¯¥»¥é¥ì¡¼¥¿¥­¡¼	*/
-    Q8TK_TYPE_ACCEL_KEY,	/* ¡·			*/
+    Q8TK_TYPE_ACCEL_GROUP,	/* ã‚¢ã‚¯ã‚»ãƒ©ãƒ¬ãƒ¼ã‚¿ã‚­ãƒ¼	*/
+    Q8TK_TYPE_ACCEL_KEY,	/* ã€ƒ			*/
 
-    Q8TK_TYPE_DIALOG,		/* ¥À¥¤¥¢¥í¥°		*/
-    Q8TK_TYPE_FILE_SELECTION,	/* ¥Õ¥¡¥¤¥ë¥»¥ì¥¯¥·¥ç¥ó	*/
+    Q8TK_TYPE_DIALOG,		/* ãƒ€ã‚¤ã‚¢ãƒ­ã‚°		*/
+    Q8TK_TYPE_FILE_SELECTION,	/* ãƒ•ã‚¡ã‚¤ãƒ«ã‚»ãƒ¬ã‚¯ã‚·ãƒ§ãƒ³	*/
 
     Q8TK_TYPE_END
 };
 enum {				/* (Q8tkWidget*)->attr	*/
-    Q8TK_ATTR_CONTAINER       = (1<<0),		/* ¥³¥ó¥Æ¥Ê		*/
-    Q8TK_ATTR_LABEL_CONTAINER = (1<<1),		/* ¥³¥ó¥Æ¥Ê(LABELÀìÍÑ)	*/
-    Q8TK_ATTR_MENU_CONTAINER  = (1<<2),		/* ¥³¥ó¥Æ¥Ê(MENUÀìÍÑ)	*/
+    Q8TK_ATTR_CONTAINER       = (1<<0),		/* ã‚³ãƒ³ãƒ†ãƒŠ		*/
+    Q8TK_ATTR_LABEL_CONTAINER = (1<<1),		/* ã‚³ãƒ³ãƒ†ãƒŠ(LABELå°‚ç”¨)	*/
+    Q8TK_ATTR_MENU_CONTAINER  = (1<<2),		/* ã‚³ãƒ³ãƒ†ãƒŠ(MENUå°‚ç”¨)	*/
     Q8TK_ATTR_END
 };
 enum {				/* (Q8tkWidget*)->placement_x	*/
@@ -383,13 +383,13 @@ enum {				/* (Q8tkWidget*)->placement_y	*/
 };
 
 
-enum {				/* window_new() ¤Î°ú¿ô	*/
-    Q8TK_WINDOW_TOPLEVEL,			/* ¥È¥Ã¥×¤Î¥¦¥¤¥ó¥É¥¦	*/
+enum {				/* window_new() ã®å¼•æ•°	*/
+    Q8TK_WINDOW_TOPLEVEL,			/* ãƒˆãƒƒãƒ—ã®ã‚¦ã‚¤ãƒ³ãƒ‰ã‚¦	*/
     Q8TK_WINDOW_DIALOG,
     Q8TK_WINDOW_POPUP,
     Q8TK_WINDOW_END
 };
-enum {				/* ¥Õ¥ì¡¼¥à¤Î¥¿¥¤¥× */
+enum {				/* ãƒ•ãƒ¬ãƒ¼ãƒ ã®ã‚¿ã‚¤ãƒ— */
     Q8TK_SHADOW_NONE,
     Q8TK_SHADOW_IN,
     Q8TK_SHADOW_OUT,
@@ -397,7 +397,7 @@ enum {				/* ¥Õ¥ì¡¼¥à¤Î¥¿¥¤¥× */
     Q8TK_SHADOW_ETCHED_OUT,
     Q8TK_SHADOW_END
 };
-enum {				/* ¥¹¥¯¥í¡¼¥ë¥¦¥¤¥ó¥É¥¦¤ÎÂ°À­ */
+enum {				/* ã‚¹ã‚¯ãƒ­ãƒ¼ãƒ«ã‚¦ã‚¤ãƒ³ãƒ‰ã‚¦ã®å±æ€§ */
     Q8TK_POLICY_ALWAYS,
     Q8TK_POLICY_AUTOMATIC,
     Q8TK_POLICY_NEVER,
@@ -405,7 +405,7 @@ enum {				/* ¥¹¥¯¥í¡¼¥ë¥¦¥¤¥ó¥É¥¦¤ÎÂ°À­ */
 };
 
 
-enum {				/* ÈÆÍÑ°ÌÃÖ»ØÄê */
+enum {				/* æ±ç”¨ä½ç½®æŒ‡å®š */
     Q8TK_POS_LEFT,
     Q8TK_POS_RIGHT,
     Q8TK_POS_TOP,
@@ -414,7 +414,7 @@ enum {				/* ÈÆÍÑ°ÌÃÖ»ØÄê */
 };
 
 
-enum {				/* É½¼¨²ÄÇ½¤Ê´Á»ú¥³¡¼¥É */
+enum {				/* è¡¨ç¤ºå¯èƒ½ãªæ¼¢å­—ã‚³ãƒ¼ãƒ‰ */
     Q8TK_KANJI_ANK,
     Q8TK_KANJI_EUC,
     Q8TK_KANJI_SJIS,
@@ -424,7 +424,7 @@ enum {				/* É½¼¨²ÄÇ½¤Ê´Á»ú¥³¡¼¥É */
 
 
 /*--------------------------------------------------------------
- * ¥ê¥¹¥È¹½Â¤
+ * ãƒªã‚¹ãƒˆæ§‹é€ 
  *--------------------------------------------------------------*/
 struct _Q8List {
     void	*data;
@@ -443,7 +443,7 @@ Q8List		*q8_list_find(Q8List *list, void *data);
 
 
 /*--------------------------------------------------------------
- * API¤Ê¤É
+ * APIãªã©
  *--------------------------------------------------------------*/
 
 #define	Q8TKMAX(a, b)		((a)>(b)?(a):(b))
@@ -464,8 +464,8 @@ void	q8tk_grab_remove(Q8tkWidget *widget);
 Q8tkWidget	*q8tk_window_new(int window_type);
 
 
-/* TOGGLE/CHECK/RADIO BUTTON ¤Î active ¤ò¸«¤ë¤Ë¤Ï¡¢É¬¤º²¼¤Î¥Ş¥¯¥í¤òÄÌ¤¹	*/
-/* Îã¡Ë									*/
+/* TOGGLE/CHECK/RADIO BUTTON ã® active ã‚’è¦‹ã‚‹ã«ã¯ã€å¿…ãšä¸‹ã®ãƒã‚¯ãƒ­ã‚’é€šã™	*/
+/* ä¾‹ï¼‰									*/
 /*     Q8tkWidget *toggle = q8tk_tobble_button_new();			*/
 /*     if (Q8TK_TOBBLE_BUTTON(toggle)->active) {			*/
 /*        :								*/
@@ -539,8 +539,8 @@ Q8tkWidget	*q8tk_vseparator_new(void);
 Q8tkWidget	*q8tk_hseparator_new(void);
 
 
-/* ADJUSTMENT ¤Î value ¤Ê¤É¤ò¸«¤ë¤Ë¤Ï¡¢É¬¤º²¼¤Î¥Ş¥¯¥í¤òÄÌ¤¹		*/
-/* Îã¡Ë									*/
+/* ADJUSTMENT ã® value ãªã©ã‚’è¦‹ã‚‹ã«ã¯ã€å¿…ãšä¸‹ã®ãƒã‚¯ãƒ­ã‚’é€šã™		*/
+/* ä¾‹ï¼‰									*/
 /*     Q8tkWidget *adj = q8tk_adjustment_new();				*/
 /*     val = Q8TK_ADJUSTMENT(adj)->value;				*/
 
@@ -584,8 +584,8 @@ void		q8tk_accel_group_add(Q8tkWidget *accel_group, int accel_key,
 				     Q8tkWidget *widget, const char *signal);
 
 
-/* DIALOG ¤Î vhox, action_area ¤ò¸«¤ë¤Ë¤Ï¡¢É¬¤º²¼¤Î¥Ş¥¯¥í¤òÄÌ¤¹		*/
-/* Îã¡Ë									*/
+/* DIALOG ã® vhox, action_area ã‚’è¦‹ã‚‹ã«ã¯ã€å¿…ãšä¸‹ã®ãƒã‚¯ãƒ­ã‚’é€šã™		*/
+/* ä¾‹ï¼‰									*/
 /*     Q8tkWidget *dialog = q8tk_dialog_new();				*/
 /*     q8tk_box_pack_start(Q8TK_DIALOGE(dialog)->vbox, button);		*/
 
@@ -593,8 +593,8 @@ void		q8tk_accel_group_add(Q8tkWidget *accel_group, int accel_key,
 Q8tkWidget	*q8tk_dialog_new(void);
 
 
-/* FILE SELECTION ¤Î ok_button ¤Ê¤É¤ò¸«¤ë¤Ë¤Ï¡¢É¬¤º²¼¤Î¥Ş¥¯¥í¤òÄÌ¤¹	*/
-/* Îã¡Ë									*/
+/* FILE SELECTION ã® ok_button ãªã©ã‚’è¦‹ã‚‹ã«ã¯ã€å¿…ãšä¸‹ã®ãƒã‚¯ãƒ­ã‚’é€šã™	*/
+/* ä¾‹ï¼‰									*/
 /*     Q8tkWidget *fselect = q8tk_file_selection_new("LOAD", FALSE);	*/
 /*     q8tk_signal_connect(Q8TK_FILE_SELECTION(fselect)->ok_button,	*/
 /*			    func, fselect);				*/
@@ -602,7 +602,7 @@ Q8tkWidget	*q8tk_dialog_new(void);
 #define	Q8TK_FILE_SELECTION(w)	(&((w)->stat.window.work->stat.fselect))
 
 
-/* FILE_SELECTION ¤Ç°·¤¨¤ë¥Ñ¥¹¹ş¤ß¤Î¥Õ¥¡¥¤¥ëÌ¾¥Ğ¥¤¥È¿ô (NUL´Ş¤à)	*/
+/* FILE_SELECTION ã§æ‰±ãˆã‚‹ãƒ‘ã‚¹è¾¼ã¿ã®ãƒ•ã‚¡ã‚¤ãƒ«åãƒã‚¤ãƒˆæ•° (NULå«ã‚€)	*/
 
 #define	Q8TK_MAX_FILENAME	(QUASI88_MAX_FILENAME)
 /* #define	Q8TK_MAX_FILENAME	(OSD_MAX_FILENAME) */
@@ -641,7 +641,7 @@ void	q8tk_widget_destroy(Q8tkWidget *widget);
 void	q8tk_widget_set_focus(Q8tkWidget *widget);
 
 
-/* ¢­ ÊÖ¤êÃÍ¤Ï¡¢Ìµ¸ú (É¬¤º 0) */
+/* â†“ è¿”ã‚Šå€¤ã¯ã€ç„¡åŠ¹ (å¿…ãš 0) */
 int	q8tk_signal_connect(Q8tkWidget *widget, const char *name,
 			    Q8tkSignalFunc func, void *func_data);
 void	q8tk_signal_handlers_destroy(Q8tkWidget *widget);

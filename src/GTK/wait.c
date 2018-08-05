@@ -1,7 +1,7 @@
 /***********************************************************************
- * ��������Ĵ������ (�����ƥ��¸)
+ * ウエイト調整処理 (システム依存)
  *
- *	�ܺ٤ϡ� wait.h ����
+ *	詳細は、 wait.h 参照
  ************************************************************************/
 #include <gtk/gtk.h>
 
@@ -14,17 +14,17 @@
 /*---------------------------------------------------------------------------*/
 static	GTimer *timer_id = NULL;
 
-static	int	wait_do_sleep;			/* idle���� sleep ����       */
+static	int	wait_do_sleep;			/* idle時間 sleep する       */
 
-static	int	wait_counter = 0;		/* Ϣ³������֥����С�������*/
-static	int	wait_count_max = 10;		/* ����ʾ�Ϣ³�����С�������
-						   ��ö,����Ĵ������������ */
+static	int	wait_counter = 0;		/* 連続何回時間オーバーしたか*/
+static	int	wait_count_max = 10;		/* これ以上連続オーバーしたら
+						   一旦,時刻調整を初期化する */
 
-/* �������Ȥ˻��Ѥ�����֤�����ɽ���ϡ� usñ�̤Ȥ��롣 (ms�������٤��㤤�Τ�) 
+/* ウェイトに使用する時間の内部表現は、 us単位とする。 (msだと精度が低いので) 
 
-   GTK �λ�������ؿ� g_timer_elapsed() �ϡ���ư���������֤���
-   ��������� us ���Ѵ����ƻ��Ѥ��뤳�Ȥˤ��롣
-   long ������ 71ʬ�Ƿ夢�դ줷�Ƥ��ޤ��Τǡ�����ɽ���� long long ���ˤ��褦 */
+   GTK の時刻取得関数 g_timer_elapsed() は、浮動小数型を返す。
+   これを整数 us に変換して使用することにする。
+   long 型だと 71分で桁あふれしてしまうので、内部表現は long long 型にしよう */
 
 #ifdef G_HAVE_GINT64
 typedef	gint64		T_WAIT_TICK;
@@ -32,12 +32,12 @@ typedef	gint64		T_WAIT_TICK;
 typedef	gint32		T_WAIT_TICK;
 #endif
 
-static	T_WAIT_TICK	next_time;		/* ���ե졼��λ��� */
-static	T_WAIT_TICK	delta_time;		/* 1 �ե졼��λ��� */
+static	T_WAIT_TICK	next_time;		/* 次フレームの時刻 */
+static	T_WAIT_TICK	delta_time;		/* 1 フレームの時間 */
 
 
 
-/* ---- ���߻����������� (usecñ��) ---- */
+/* ---- 現在時刻を取得する (usec単位) ---- */
 
 #define	GET_TICK() ((T_WAIT_TICK)(g_timer_elapsed(timer_id, NULL) * 1000000.0))
 
@@ -46,7 +46,7 @@ static	T_WAIT_TICK	delta_time;		/* 1 �ե졼��λ��� */
 
 
 /****************************************************************************
- * ��������Ĵ�������ν��������λ
+ * ウェイト調整処理の初期化／終了
  *****************************************************************************/
 int	wait_vsync_init(void)
 {
@@ -68,26 +68,26 @@ void	wait_vsync_exit(void)
 
 
 /****************************************************************************
- * ��������Ĵ������������
+ * ウェイト調整処理の設定
  *****************************************************************************/
 void	wait_vsync_setup(long vsync_cycle_us, int do_sleep)
 {
     g_timer_start(timer_id);
-    /* stop���ʤ��Ƥ⡢start����ȡ������ޡ��ϥꥻ�å� & ���������褦�� */
+    /* stopしなくても、startすると、タイマーはリセット & ゴーされるようだ */
 
     wait_counter = 0;
 
 
-    delta_time = (T_WAIT_TICK) vsync_cycle_us;		/* 1�ե졼����� */
-    next_time  = GET_TICK() + delta_time;		/* ���ե졼����� */
+    delta_time = (T_WAIT_TICK) vsync_cycle_us;		/* 1フレーム時間 */
+    next_time  = GET_TICK() + delta_time;		/* 次フレーム時刻 */
 
-    wait_do_sleep = do_sleep;				/* Sleep ̵ͭ */
+    wait_do_sleep = do_sleep;				/* Sleep 有無 */
 }
 
 
 
 /****************************************************************************
- * ��������Ĵ�������μ¹�
+ * ウェイト調整処理の実行
  *****************************************************************************/
 int	wait_vsync_update(void)
 {
@@ -97,38 +97,38 @@ int	wait_vsync_update(void)
 
     diff_ms = (next_time - GET_TICK()) / 1000;
 
-    if (diff_ms > 0) {			/* �٤�Ƥʤ�(���֤�;�äƤ���)�ʤ� */
-					/* diff_ms �ߥ��á��������Ȥ���     */
+    if (diff_ms > 0) {			/* 遅れてない(時間が余っている)なら */
+					/* diff_ms ミリ秒、ウェイトする     */
 
-	if (wait_do_sleep) {		/* ���֤����ޤ� sleep ������ */
+	if (wait_do_sleep) {		/* 時間が来るまで sleep する場合 */
 
-#if 0	    /* ��ˡ (1) */
-	    g_usleep(diff_ms * 1000);		/* ���꡼�� */
-#else	    /* ��ˡ (2) */
-	    while (GET_TICK() <= next_time)	/* �ӥ����������� */
+#if 0	    /* 方法 (1) */
+	    g_usleep(diff_ms * 1000);		/* スリープ */
+#else	    /* 方法 (2) */
+	    while (GET_TICK() <= next_time)	/* ビジーウェイト */
 		;
 #endif
 
-	} else {			/* ���֤����ޤ�Tick��ƻ뤹���� */
+	} else {			/* 時間が来るまでTickを監視する場合 */
 
 	    while (GET_TICK() <= next_time)
-		;				/* �ӥ����������� */
+		;				/* ビジーウェイト */
 	}
 
 	on_time = TRUE;
     }
 
 
-    /* ���ե졼�����򻻽� */
+    /* 次フレーム時刻を算出 */
     next_time += delta_time;
 
 
-    if (on_time) {			/* ������˽����Ǥ��� */
+    if (on_time) {			/* 時間内に処理できた */
 	wait_counter = 0;
-    } else {				/* ������˽����Ǥ��Ƥ��ʤ� */
+    } else {				/* 時間内に処理できていない */
 	wait_counter ++;
-	if (wait_counter >= wait_count_max) {	/* �٤줬�Ҥɤ����� */
-	    wait_vsync_setup(delta_time,	/* �������Ȥ�����   */
+	if (wait_counter >= wait_count_max) {	/* 遅れがひどい場合は */
+	    wait_vsync_setup(delta_time,	/* ウェイトを初期化   */
 			     wait_do_sleep);
 	}
     }

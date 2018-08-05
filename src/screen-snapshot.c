@@ -1,6 +1,6 @@
 /************************************************************************/
 /*									*/
-/* ≤ËÃÃ§Œ…Ωº®		≤ËÃÃ•π• •√•◊•∑•Á•√•»				*/
+/* ÁîªÈù¢„ÅÆË°®Á§∫		ÁîªÈù¢„Çπ„Éä„ÉÉ„Éó„Ç∑„Éß„ÉÉ„Éà				*/
 /*									*/
 /************************************************************************/
 
@@ -33,11 +33,11 @@ extern	char			screen_snapshot[];
 #define TYPE		char
 
 /*----------------------------------------------------------------------
- *			°¸ 200•È•§•Û			…∏Ω‡
+ *			‚óè 200„É©„Ç§„É≥			Ê®ôÊ∫ñ
  *----------------------------------------------------------------------*/
 #define NORMAL
 
-#define COLOR						/* •´•È°º640x200 */
+#define COLOR						/* „Ç´„É©„Éº640x200 */
 #define		TEXT_WIDTH	80
 #define		TEXT_HEIGHT		25
 #define		VRAM2SCREEN_ALL			snapshot_C80x25_normal
@@ -56,7 +56,7 @@ extern	char			screen_snapshot[];
 #include					"screen-vram-full.h"
 #undef	COLOR
 
-#define MONO						/* «Úπı	 640x200 */
+#define MONO						/* ÁôΩÈªí	 640x200 */
 #define		TEXT_WIDTH	80
 #define		TEXT_HEIGHT		25
 #define		VRAM2SCREEN_ALL			snapshot_M80x25_normal
@@ -75,7 +75,7 @@ extern	char			screen_snapshot[];
 #include					"screen-vram-full.h"
 #undef	MONO
 
-#define UNDISP						/* »Û…Ωº®640x200 */
+#define UNDISP						/* ÈùûË°®Á§∫640x200 */
 #define		TEXT_WIDTH	80
 #define		TEXT_HEIGHT		25
 #define		VRAM2SCREEN_ALL			snapshot_U80x25_normal
@@ -96,11 +96,11 @@ extern	char			screen_snapshot[];
 
 #undef	NORMAL
 /*----------------------------------------------------------------------
- *			°¸ 200•È•§•Û			•È•§•Û•π•≠•√•◊
+ *			‚óè 200„É©„Ç§„É≥			„É©„Ç§„É≥„Çπ„Ç≠„ÉÉ„Éó
  *----------------------------------------------------------------------*/
 #define SKIPLINE
 
-#define COLOR						/* •´•È°º640x200 */
+#define COLOR						/* „Ç´„É©„Éº640x200 */
 #define		TEXT_WIDTH	80
 #define		TEXT_HEIGHT		25
 #define		VRAM2SCREEN_ALL			snapshot_C80x25_skipln
@@ -119,7 +119,7 @@ extern	char			screen_snapshot[];
 #include					"screen-vram-full.h"
 #undef	COLOR
 
-#define MONO						/* «Úπı	 640x200 */
+#define MONO						/* ÁôΩÈªí	 640x200 */
 #define		TEXT_WIDTH	80
 #define		TEXT_HEIGHT		25
 #define		VRAM2SCREEN_ALL			snapshot_M80x25_skipln
@@ -138,7 +138,7 @@ extern	char			screen_snapshot[];
 #include					"screen-vram-full.h"
 #undef	MONO
 
-#define UNDISP						/* »Û…Ωº®640x200 */
+#define UNDISP						/* ÈùûË°®Á§∫640x200 */
 #define		TEXT_WIDTH	80
 #define		TEXT_HEIGHT		25
 #define		VRAM2SCREEN_ALL			snapshot_U80x25_skipln
@@ -159,11 +159,11 @@ extern	char			screen_snapshot[];
 
 #undef	SKIPLINE
 /*----------------------------------------------------------------------
- *			°¸ 200•È•§•Û			•§•Û•ø°º•Ï°º•π
+ *			‚óè 200„É©„Ç§„É≥			„Ç§„É≥„Çø„Éº„É¨„Éº„Çπ
  *----------------------------------------------------------------------*/
 #define INTERLACE
 
-#define COLOR						/* •´•È°º640x200 */
+#define COLOR						/* „Ç´„É©„Éº640x200 */
 #define		TEXT_WIDTH	80
 #define		TEXT_HEIGHT		25
 #define		VRAM2SCREEN_ALL			snapshot_C80x25_itlace
@@ -182,7 +182,7 @@ extern	char			screen_snapshot[];
 #include					"screen-vram-full.h"
 #undef	COLOR
 
-#define MONO						/* «Úπı	 640x200 */
+#define MONO						/* ÁôΩÈªí	 640x200 */
 #define		TEXT_WIDTH	80
 #define		TEXT_HEIGHT		25
 #define		VRAM2SCREEN_ALL			snapshot_M80x25_itlace
@@ -201,7 +201,7 @@ extern	char			screen_snapshot[];
 #include					"screen-vram-full.h"
 #undef	MONO
 
-#define UNDISP						/* »Û…Ωº®640x200 */
+#define UNDISP						/* ÈùûË°®Á§∫640x200 */
 #define		TEXT_WIDTH	80
 #define		TEXT_HEIGHT		25
 #define		VRAM2SCREEN_ALL			snapshot_U80x25_itlace
@@ -222,9 +222,9 @@ extern	char			screen_snapshot[];
 
 #undef	INTERLACE
 /*----------------------------------------------------------------------
- *			°¸ 400•È•§•Û			…∏Ω‡
+ *			‚óè 400„É©„Ç§„É≥			Ê®ôÊ∫ñ
  *----------------------------------------------------------------------*/
-#define HIRESO						/* «Úπı	 640x400 */
+#define HIRESO						/* ÁôΩÈªí	 640x400 */
 
 #define		TEXT_WIDTH	80
 #define		TEXT_HEIGHT		25
@@ -246,7 +246,7 @@ extern	char			screen_snapshot[];
 #undef	HIRESO
 
 /*===========================================================================
- * ≤ËÃÃæ√µÓ
+ * ÁîªÈù¢Ê∂àÂéª
  *===========================================================================*/
 
 #define		SCREEN_BUF_INIT			snapshot_clear
@@ -267,7 +267,7 @@ extern	char			screen_snapshot[];
 
 
 /* ========================================================================= */
-/* ≈˘«‹•µ•§•∫ - …∏Ω‡ */
+/* Á≠âÂÄç„Çµ„Ç§„Ç∫ - Ê®ôÊ∫ñ */
 
 int  (*snapshot_list_normal[4][4][2])(void) =
 {
@@ -297,7 +297,7 @@ int  (*snapshot_list_normal[4][4][2])(void) =
     },
 };
 
-/* ≈˘«‹•µ•§•∫ - •π•≠•√•◊•È•§•Û */
+/* Á≠âÂÄç„Çµ„Ç§„Ç∫ - „Çπ„Ç≠„ÉÉ„Éó„É©„Ç§„É≥ */
 
 int  (*snapshot_list_skipln[4][4][2])(void) =
 {
@@ -327,7 +327,7 @@ int  (*snapshot_list_skipln[4][4][2])(void) =
     },
 };
 
-/* ≈˘«‹•µ•§•∫ - •§•Û•ø°º•Ï°º•π */
+/* Á≠âÂÄç„Çµ„Ç§„Ç∫ - „Ç§„É≥„Çø„Éº„É¨„Éº„Çπ */
 
 int  (*snapshot_list_itlace[4][4][2])(void) =
 {

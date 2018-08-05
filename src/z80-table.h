@@ -1,19 +1,19 @@
 /************************************************************************/
 /*									*/
-/* �ե饰�����ơ��ȿ���DAA�Υơ��֥�					*/
+/* フラグ、ステート数、DAAのテーブル					*/
 /*									*/
-/*	SZ_table[n]  �� �黻��̤� n �λ��Ρ�Z��S �ե饰�ξ���		*/
-/*	SZP_table[n] �� �黻��̤� n �λ��Ρ�P/V��Z��S �ե饰�ξ���	*/
+/*	SZ_table[n]  … 演算結果が n の時の、Z、S フラグの状態		*/
+/*	SZP_table[n] … 演算結果が n の時の、P/V、Z、S フラグの状態	*/
 /*									*/
-/* ̿��˱����ơ��ɤΥơ��֥뤫��ե饰���������Ф�����Ȥ�ʬ���롣	*/
+/* 命令に応じて、どのテーブルからフラグ情報を引き出すかを使い分ける。	*/
 /*									*/
-/*	state_table[n]       �� �̾�̿��Υ��ơ��ȿ�			*/
-/*	state_CB_table[n]    �� CB XX ̿��Υ��ơ��ȿ�			*/
-/*	state_ED_table[n]    �� ED XX ̿��Υ��ơ��ȿ�			*/
-/*	state_XX_table[n]    �� DD/FD XX ̿��Υ��ơ��ȿ�		*/
-/*	state_XXCB_table[n] �� DD/FD CB XX XX ̿��Υ��ơ��ȿ�		*/
+/*	state_table[n]       … 通常命令のステート数			*/
+/*	state_CB_table[n]    … CB XX 命令のステート数			*/
+/*	state_ED_table[n]    … ED XX 命令のステート数			*/
+/*	state_XX_table[n]    … DD/FD XX 命令のステート数		*/
+/*	state_XXCB_table[n] … DD/FD CB XX XX 命令のステート数		*/
 /*									*/
-/*	DAA_table[] �� DAA ̿��κݤˡ�AF�쥸�������������		*/
+/*	DAA_table[] … DAA 命令の際に、AFレジスタに入れる値		*/
 /*									*/
 /************************************************************************/
 
@@ -83,10 +83,10 @@ static byte SZP_table[256] =
 #undef Z
 };
 
-/* ���Х����� (JR,  JR C/Z/NC/NZ,  DJNZ)               �ϡ�ʬ�����ˡ�+5 */
-/* ������̿��   (CALL, CALL C/Z/P/PE/NC/NZ/M/PO )        �ϡ�ʬ�����ˡ�+7 */
-/* �꥿����̿�� (RET, RET C/Z/P/PE/NC/NZ/M/PO,  RETI/N ) �ϡ�ʬ�����ˡ�+6 */
-/* �֥��å�̿�� (LD*R, CP*R, IN*R, OT*R)             �ϡ������֤����ˡ�+5 */
+/* 相対ジャンプ (JR,  JR C/Z/NC/NZ,  DJNZ)               は、分岐時に、+5 */
+/* コール命令   (CALL, CALL C/Z/P/PE/NC/NZ/M/PO )        は、分岐時に、+7 */
+/* リターン命令 (RET, RET C/Z/P/PE/NC/NZ/M/PO,  RETI/N ) は、分岐時に、+6 */
+/* ブロック命令 (LD*R, CP*R, IN*R, OT*R)             は、繰り返し時に、+5 */
 
 static int state_table[256] =
 {

@@ -2,62 +2,62 @@
 #define SOUND_H_INCLUDED
 
 
-extern	int	sound_board;			/* ¥µ¥¦¥ó¥É¥Ü¡¼¥É	*/
+extern	int	sound_board;			/* ã‚µã‚¦ãƒ³ãƒ‰ãƒœãƒ¼ãƒ‰	*/
 
-#define	SD_PORT_44_45	(0x01)			/* ¥İ¡¼¥È 44H¡Á45H »ÈÍÑ	*/
-#define	SD_PORT_46_47	(0x02)			/* ¥İ¡¼¥È 46H¡Á47H »ÈÍÑ	*/
-#define	SD_PORT_A8_AD	(0x04)			/* ¥İ¡¼¥È A8H¡ÁADH »ÈÍÑ	*/
-extern	int	sound_port;			/* ¥µ¥¦¥ó¥É¥İ¡¼¥È¤Î¼ïÊÌ	*/
+#define	SD_PORT_44_45	(0x01)			/* ãƒãƒ¼ãƒˆ 44Hã€œ45H ä½¿ç”¨	*/
+#define	SD_PORT_46_47	(0x02)			/* ãƒãƒ¼ãƒˆ 46Hã€œ47H ä½¿ç”¨	*/
+#define	SD_PORT_A8_AD	(0x04)			/* ãƒãƒ¼ãƒˆ A8Hã€œADH ä½¿ç”¨	*/
+extern	int	sound_port;			/* ã‚µã‚¦ãƒ³ãƒ‰ãƒãƒ¼ãƒˆã®ç¨®åˆ¥	*/
 
-extern	int	intr_sound_enable;		/*         ³ä¹ş¥Ş¥¹¥¯²»¸» */
-
-
+extern	int	intr_sound_enable;		/*         å‰²è¾¼ãƒã‚¹ã‚¯éŸ³æº */
 
 
-extern	int	sound_ENABLE_A;			/* ¥µ¥¦¥ó¥É¥¿¥¤¥Ş¡¼µö²Ä¾õ¶· */
+
+
+extern	int	sound_ENABLE_A;			/* ã‚µã‚¦ãƒ³ãƒ‰ã‚¿ã‚¤ãƒãƒ¼è¨±å¯çŠ¶æ³ */
 extern	int	sound_ENABLE_B;
-extern	int	sound_LOAD_A;			/* ¥µ¥¦¥ó¥É¥¿¥¤¥Ş¡¼ºîÆ°¾õ¶· */
+extern	int	sound_LOAD_A;			/* ã‚µã‚¦ãƒ³ãƒ‰ã‚¿ã‚¤ãƒãƒ¼ä½œå‹•çŠ¶æ³ */
 extern	int	sound_LOAD_B;
-extern	int	sound_FLAG_A;			/* FLAG ¤Î¾õÂÖ		*/
+extern	int	sound_FLAG_A;			/* FLAG ã®çŠ¶æ…‹		*/
 extern	int	sound_FLAG_B;
 
-extern	int	sound_TIMER_A;			/* ¥µ¥¦¥ó¥É¥¿¥¤¥Ş¡¼³ä¹ş´Ö³Ö */
+extern	int	sound_TIMER_A;			/* ã‚µã‚¦ãƒ³ãƒ‰ã‚¿ã‚¤ãƒãƒ¼å‰²è¾¼é–“éš” */
 extern	int	sound_TIMER_B;
 
-extern	int	sound_prescaler;		/* 1/¥×¥ê¥¹¥±¡¼¥é¡¼ (2,3,6) */
+extern	int	sound_prescaler;		/* 1/ãƒ—ãƒªã‚¹ã‚±ãƒ¼ãƒ©ãƒ¼ (2,3,6) */
 
 extern	byte	sound_reg[0x100];
 extern	int	sound_reg_select;
 
 
-extern	int	sound2_MSK_TA;		/* TIMER A ³ä¤ê¹ş¤ß¥Ş¥¹¥¯	*/
-extern	int	sound2_MSK_TB;		/* TIMER B ³ä¤ê¹ş¤ß¥Ş¥¹¥¯	*/
-extern	int	sound2_MSK_EOS;		/* EOS     ³ä¤ê¹ş¤ß¥Ş¥¹¥¯	*/ 
-extern	int	sound2_MSK_BRDY;	/* BRDY    ³ä¤ê¹ş¤ß¥Ş¥¹¥¯	*/ 
-extern	int	sound2_MSK_ZERO;	/* ZERO    ³ä¤ê¹ş¤ß¥Ş¥¹¥¯	*/ 
+extern	int	sound2_MSK_TA;		/* TIMER A å‰²ã‚Šè¾¼ã¿ãƒã‚¹ã‚¯	*/
+extern	int	sound2_MSK_TB;		/* TIMER B å‰²ã‚Šè¾¼ã¿ãƒã‚¹ã‚¯	*/
+extern	int	sound2_MSK_EOS;		/* EOS     å‰²ã‚Šè¾¼ã¿ãƒã‚¹ã‚¯	*/ 
+extern	int	sound2_MSK_BRDY;	/* BRDY    å‰²ã‚Šè¾¼ã¿ãƒã‚¹ã‚¯	*/ 
+extern	int	sound2_MSK_ZERO;	/* ZERO    å‰²ã‚Šè¾¼ã¿ãƒã‚¹ã‚¯	*/ 
 
-extern	int	sound2_EN_TA;		/* TIMER A ³ä¤ê¹ş¤ßµö²Ä		*/
-extern	int	sound2_EN_TB;		/* TIMER B ³ä¤ê¹ş¤ßµö²Ä		*/
-extern	int	sound2_EN_EOS;		/* EOS     ³ä¤ê¹ş¤ßµö²Ä		*/
-extern	int	sound2_EN_BRDY;		/* BDRY    ³ä¤ê¹ş¤ßµö²Ä		*/
-extern	int	sound2_EN_ZERO;		/* ZERO    ³ä¤ê¹ş¤ßµö²Ä		*/
+extern	int	sound2_EN_TA;		/* TIMER A å‰²ã‚Šè¾¼ã¿è¨±å¯		*/
+extern	int	sound2_EN_TB;		/* TIMER B å‰²ã‚Šè¾¼ã¿è¨±å¯		*/
+extern	int	sound2_EN_EOS;		/* EOS     å‰²ã‚Šè¾¼ã¿è¨±å¯		*/
+extern	int	sound2_EN_BRDY;		/* BDRY    å‰²ã‚Šè¾¼ã¿è¨±å¯		*/
+extern	int	sound2_EN_ZERO;		/* ZERO    å‰²ã‚Šè¾¼ã¿è¨±å¯		*/
 
-extern	int	sound2_FLAG_EOS;	/* FLAG EOS  ¤Î¾õÂÖ		*/
-extern	int	sound2_FLAG_BRDY;	/* FLAG BRDY ¤Î¾õÂÖ		*/
-extern	int	sound2_FLAG_ZERO;	/* FLAG ZERO ¤Î¾õÂÖ		*/
-extern	int	sound2_FLAG_PCMBSY;	/* FLAG PCMBSY ¤Î¾õÂÖ		*/
+extern	int	sound2_FLAG_EOS;	/* FLAG EOS  ã®çŠ¶æ…‹		*/
+extern	int	sound2_FLAG_BRDY;	/* FLAG BRDY ã®çŠ¶æ…‹		*/
+extern	int	sound2_FLAG_ZERO;	/* FLAG ZERO ã®çŠ¶æ…‹		*/
+extern	int	sound2_FLAG_PCMBSY;	/* FLAG PCMBSY ã®çŠ¶æ…‹		*/
 
 extern	byte	sound2_reg[0x100];
 extern	int	sound2_reg_select;
-extern	byte	*sound2_adpcm;			/* ADPCMÍÑ DRAM (256KB)	*/
+extern	byte	*sound2_adpcm;			/* ADPCMç”¨ DRAM (256KB)	*/
 
-extern	int	sound2_repeat;			/* ADPCM ¥ê¥Ô¡¼¥È¥×¥ì¥¤	*/
-extern	int	sound2_intr_base;		/* ADPCM ³ä¤ê¹ş¤ß¥ì¡¼¥È	*/
-extern	int	sound2_notice_EOS;		/* EOS¥Á¥§¥Ã¥¯¤ÎÍ×ÉÔÍ×	*/
+extern	int	sound2_repeat;			/* ADPCM ãƒªãƒ”ãƒ¼ãƒˆãƒ—ãƒ¬ã‚¤	*/
+extern	int	sound2_intr_base;		/* ADPCM å‰²ã‚Šè¾¼ã¿ãƒ¬ãƒ¼ãƒˆ	*/
+extern	int	sound2_notice_EOS;		/* EOSãƒã‚§ãƒƒã‚¯ã®è¦ä¸è¦	*/
 
 
 
-extern	int	use_cmdsing;			/* ¿¿¤Ç¡¢CMD SINGÍ­¸ú	*/
+extern	int	use_cmdsing;			/* çœŸã§ã€CMD SINGæœ‰åŠ¹	*/
 
 
 

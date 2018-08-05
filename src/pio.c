@@ -1,6 +1,6 @@
 /************************************************************************/
 /*									*/
-/* PIO �� ����								*/
+/* PIO の 処理								*/
 /*									*/
 /************************************************************************/
 
@@ -16,43 +16,43 @@
 
 
 /*
-  PIO���������ȡ�����CPU�ζ�ư
-	  PC88 �ϡ�����¦�� �ᥤ��CPU���ǥ������ɥ饤��¦�� ����CPU �ȡ�
-	2�Ĥ�CPU����äƤ��롣�ǥ��������������򤹤���ϡ��ᥤ��CPU ��
-	����CPU �� PIO��ͳ�ǥ��ޥ�ɤ��������������������� ����CPU ��
-	�ºݤ˽�����Ԥäơ���̤�ᥤ��CPU ����������褦�ˤʤäƤ��롣
-	�Ĥޤꡢ����CPU�ϥǥ�����������ʳ��λ��֤����ơ��ᥤ��CPU 
-	����Υ��ޥ�ɤμ����Ԥ��Ȥ������Ȥˤʤ롣
-	  �ʾ�Τ��Ȥ�ꡢ����CPU�������ߥ�졼�Ȥ���Τ�̵�̤ʤΤǡ�
-	ɬ�פʻ��Τߥ��ߥ�졼�Ȥ��뤳�Ȥˤ��롣
+  PIOアクセスと、サブCPUの駆動
+	  PC88 は、本体側に メインCPU、ディスクドライブ側に サブCPU と、
+	2個のCPUを持っている。ディスクアクセスをする場合は、メインCPU が
+	サブCPU に PIO経由でコマンドを送信し、それを受信した サブCPU が
+	実際に処理を行って、結果をメインCPU に送信するようになっている。
+	つまり、サブCPUはディスク処理中以外の時間は全て、メインCPU 
+	からのコマンドの受信待ちということになる。
+	  以上のことより、サブCPUを常時エミュレートするのは無駄なので、
+	必要な時のみエミュレートすることにする。
 
-	  �̾�ᥤ�󡦥���CPU�Ȥ��̿����ˤϡ�PIO �� C�ݡ��Ȥ�꡼�ɤ��롣
-	�����ǡ��ᥤ��CPU �� C�ݡ��Ȥ�꡼�ɤ������ʹߤϡ�����CPU �Τߤ�
-	��ư����������CPU �� C�ݡ��Ȥ�꡼�ɤ������ʹߤϡ��ᥤ��CPU �Τߤ�
-	��ư������褦�ˤ��롣
-		(-cpu 0 ���ץ�������ꤷ�����Ͼ嵭��ư��򤹤�)
+	  通常、メイン・サブCPUとも通信時には、PIO の Cポートをリードする。
+	そこで、メインCPU が Cポートをリードした時以降は、サブCPU のみを
+	駆動させ、サブCPU が Cポートをリードした時以降は、メインCPU のみを
+	駆動させるようにする。
+		(-cpu 0 オプションを指定した時は上記の動作をする)
 
-	  ����������ˤ� C�ݡ��Ȥ�𤵤��ˡ��̿���Ԥ����ץꥱ��������
-	¸�ߤ��롣(2�Ĥ�CPU�ν���®�٤�Ʊ���˰�¸���Ƥ���)�������к��Ȥ��ơ�
-	A/B/C �ݡ��ȤΤ����줫�˥ᥤ��CPU����������������������������
-	(ɸ��Ǥ� 4000���ƥå�)������CPU��Ʊ���˶�ư�����롣
-		(-cpu 1 ���ץ�������ꤷ�����Ͼ嵭��ư��򤹤�)
+	  しかし、中には Cポートを介さずに、通信を行うアプリケーションも
+	存在する。(2個のCPUの処理速度の同期に依存している)。この対策として、
+	A/B/C ポートのいずれかにメインCPUがアクセスした時点から一定期間
+	(標準では 4000ステップ)、サブCPUも同時に駆動させる。
+		(-cpu 1 オプションを指定した時は上記の動作をする)
 
-	  ����Ǥ�ޤ�ư���ʤ����ץꥱ������󤬤���Τǡ������к��Ȥ��ơ�
-	�ᥤ��CPU �ȥ���CPU ������Ʊ���˶�ư�����롣
-		(-cpu 2 ���ץ�������ꤷ�����Ͼ嵭��ư��򤹤�)
+	  それでもまだ動かないアプリケーションがあるので、この対策として、
+	メインCPU とサブCPU を常時、同時に駆動させる。
+		(-cpu 2 オプションを指定した時は上記の動作をする)
 */
 
 /*---------------------------------------------------------------------------*/
-/* ����									     */
+/* 処理									     */
 /*					A  ######## --\/-- ######## A	     */
-/*	���饤�Ȥϼ�ʬ�Υ����	B  ######## --/\-- ######## B	     */
-/*	  �Ф��ƹԤʤ���		CH ####     --\/-- ####	    CH	     */
-/*	���꡼�ɤ����Υ��		CL     #### --/\--     #### CL	     */
-/*	  ����Ԥʤ���							     */
-/*	  ��ʬ�Υ����READ����ʤ顢					     */
-/*	  ��ʬ�Υ�����ɤࡣ						     */
-/*	���ݡ���C�Υ꡼�ɥ饤�Ȼ����㳰������Ԥʤ���			     */
+/*	・ライトは自分のワークに	B  ######## --/\-- ######## B	     */
+/*	  対して行なう。		CH ####     --\/-- ####	    CH	     */
+/*	・リードは相手のワーク		CL     #### --/\--     #### CL	     */
+/*	  から行なう。							     */
+/*	  自分のワークがREAD設定なら、					     */
+/*	  自分のワークを読む。						     */
+/*	○ポートCのリードライト時は例外処理を行なう。			     */
 /*---------------------------------------------------------------------------*/
 
 
@@ -65,8 +65,8 @@ static	z80arch	*z80[2] = { &z80main_cpu, &z80sub_cpu };
 
 
 /*----------------------------------------------------------------------*/
-/* PIO �����								*/
-/*	PA / PCL ���� �� PB / PCH ����					*/
+/* PIO 初期化								*/
+/*	PA / PCL 受信 ／ PB / PCH 送信					*/
 /*----------------------------------------------------------------------*/
 void	pio_init( void )
 {
@@ -95,7 +95,7 @@ void	pio_init( void )
 }
 
 
-/* verbose ������Υ�å�����ɽ���ޥ���					*/
+/* verbose 指定時のメッセージ表示マクロ					*/
 
 #define	pio_mesAB( s )							\
 	if( verbose_pio )						\
@@ -108,41 +108,41 @@ void	pio_init( void )
 		 (side==PIO_SIDE_M)?"M":"S" )
 
 /*----------------------------------------------------------------------*/
-/* PIO A or B ����꡼��						*/
-/*	�꡼�ɤκݤΥǡ����ϡ�����¦���դΥݡ��Ȥ����ɤ߽Ф���	*/
-/*		���Υݡ��Ȥ����꤬  READ �ʤ饨�顼ɽ��		*/
-/*		��ʬ�Υݡ��Ȥ����꤬ WRITE �ʤ饨�顼ɽ��		*/
-/*		Ϣ³�꡼�ɤκݤϡ������󥿤򥫥���ȥ����󤹤롣	*/
-/*			�����󥿤� 0 �ʤ�����ơ�Ϣ³�꡼�ɤ��롣	*/
-/*			�����󥿤� 1 �ʾ�ʤ顢CPU �����ؤ��롣		*/
+/* PIO A or B からリード						*/
+/*	リードの際のデータは、相手の側／逆のポートから読み出す。	*/
+/*		相手のポートの設定が  READ ならエラー表示		*/
+/*		自分のポートの設定が WRITE ならエラー表示		*/
+/*		連続リードの際は、カウンタをカウントダウンする。	*/
+/*			カウンタが 0 なら諦めて、連続リードする。	*/
+/*			カウンタが 1 以上なら、CPU を切替える。		*/
 /*----------------------------------------------------------------------*/
 byte	pio_read_AB( int side, int port )
 {
-		/* �ݡ���°���԰��� */
+		/* ポート属性不一致 */
 
-  if( pio_AB[ side^1 ][ port^1 ].type == PIO_READ  ){	/* ���ݡ��Ȥ� READ */
+  if( pio_AB[ side^1 ][ port^1 ].type == PIO_READ  ){	/* 相手ポートが READ */
     pio_mesAB( "PIO AB READ PORT Mismatch" );
   }
-  if( pio_AB[ side   ][ port   ].type == PIO_WRITE ){	/* ��ʬ�ݡ��Ȥ� WRITE*/
+  if( pio_AB[ side   ][ port   ].type == PIO_WRITE ){	/* 自分ポートが WRITE*/
     pio_mesAB( "PIO Read from WRITE-PORT" );
     return (pio_AB[ side ][ port ].data);
   }
-		/* �ɤߤ��� */
+		/* 読みだし */
 
-  if( pio_AB[ side^1 ][ port^1 ].exist == PIO_EXIST ){	/* -- �ǽ���ɤߤ��� */
+  if( pio_AB[ side^1 ][ port^1 ].exist == PIO_EXIST ){	/* -- 最初の読みだし */
 
     pio_AB[ side^1 ][ port^1 ].exist   = PIO_EMPTY;
 
-  }else{						/* -- Ϣ³���ɤߤ��� */
+  }else{						/* -- 連続の読みだし */
 
     switch( cpu_timing ){
-    case 1:						/*     1:����CPU��ư */
+    case 1:						/*     1:サブCPU起動 */
       if( side==PIO_SIDE_M ){
 	dual_cpu_count = CPU_1_COUNT;
 	CPU_BREAKOFF();
       } /*No Break*/
-    case 0:						/*     0:���Τޤ��ɤ�*/
-    case 2:						/*     2:���Τޤ��ɤ�*/
+    case 0:						/*     0:そのまま読む*/
+    case 2:						/*     2:そのまま読む*/
       pio_mesAB( "PIO Read continuously" );
       break;
     }
@@ -153,41 +153,41 @@ byte	pio_read_AB( int side, int port )
 
 
 /*----------------------------------------------------------------------*/
-/* PIO A or B �˥饤��							*/
-/*	�饤�Ȥϡ���ʬ��¦����ʬ�Υݡ��Ȥ��Ф��ƹԤʤ���		*/
-/*		���Υݡ��Ȥ����꤬ WRITE �ʤ饨�顼ɽ��		*/
-/*		��ʬ�Υݡ��Ȥ����꤬  READ �ʤ饨�顼ɽ��		*/
-/*		Ϣ³�饤�Ȥκݤϡ������󥿤򥫥���ȥ����󤹤롣	*/
-/*			�����󥿤� 0 �ʤ�����ơ�Ϣ³�饤�Ȥ��롣	*/
-/*			�����󥿤� 1 �ʾ�ʤ顢CPU �����ؤ��롣		*/
+/* PIO A or B にライト							*/
+/*	ライトは、自分の側／自分のポートに対して行なう。		*/
+/*		相手のポートの設定が WRITE ならエラー表示		*/
+/*		自分のポートの設定が  READ ならエラー表示		*/
+/*		連続ライトの際は、カウンタをカウントダウンする。	*/
+/*			カウンタが 0 なら諦めて、連続ライトする。	*/
+/*			カウンタが 1 以上なら、CPU を切替える。		*/
 /*----------------------------------------------------------------------*/
 void	pio_write_AB( int side, int port, byte data )
 {
-		/* �ݡ���°���԰��� */
+		/* ポート属性不一致 */
 
-  if( pio_AB[ side^1 ][ port^1 ].type == PIO_WRITE ){	/* ���Υݡ��� WRITE*/
+  if( pio_AB[ side^1 ][ port^1 ].type == PIO_WRITE ){	/* 相手のポート WRITE*/
     pio_mesAB( "PIO AB Write PORT Mismatch" );
   }
-  if( pio_AB[ side   ][ port   ].type == PIO_READ ){	/* ��ʬ�Υݡ��� READ */
+  if( pio_AB[ side   ][ port   ].type == PIO_READ ){	/* 自分のポート READ */
     pio_mesAB( "PIO Write to READ-PORT" );
   }
-		/* �񤭹��� */
+		/* 書き込み */
 
-  if( pio_AB[ side ][ port ].exist == PIO_EMPTY ){	/* -- �ǽ�ν񤭹��� */
+  if( pio_AB[ side ][ port ].exist == PIO_EMPTY ){	/* -- 最初の書き込み */
 
     pio_AB[ side ][ port ].exist   = PIO_EXIST;
     pio_AB[ side ][ port ].data    = data;
 
-  }else{						/* -- Ϣ³�ν񤭹��� */
+  }else{						/* -- 連続の書き込み */
 
     switch( cpu_timing ){
-    case 1:						/*     1:����CPU��ư */
+    case 1:						/*     1:サブCPU起動 */
       if( side==PIO_SIDE_M ){
 	dual_cpu_count = CPU_1_COUNT;
 	CPU_BREAKOFF();
       } /*No Break*/
-    case 0:						/*     0:���Τޤ޽�*/
-    case 2:						/*     2:���Τޤ޽�*/
+    case 0:						/*     0:そのまま書く*/
+    case 2:						/*     2:そのまま書く*/
       pio_mesAB( "PIO Write continuously" );
       pio_AB[ side ][ port ].data    = data;
       break;
@@ -205,17 +205,17 @@ void	pio_write_AB( int side, int port, byte data )
 
 
 /*----------------------------------------------------------------------*/
-/* PIO C ����꡼��							*/
-/*	�꡼�ɤκݤΥǡ����ϡ�����¦���դΥݡ��Ȥ����ɤ߽Ф���	*/
-/*		���Υݡ��Ȥ����꤬  READ �ʤ饨�顼ɽ��		*/
-/*		��ʬ�Υݡ��Ȥ����꤬ WRITE �ʤ饨�顼ɽ��		*/
-/*		�꡼�ɤκݤˡ�CPU�����ؤ�Ƚ��������			*/
+/* PIO C からリード							*/
+/*	リードの際のデータは、相手の側／逆のポートから読み出す。	*/
+/*		相手のポートの設定が  READ ならエラー表示		*/
+/*		自分のポートの設定が WRITE ならエラー表示		*/
+/*		リードの際に、CPUを切替え判定を入れる			*/
 /*----------------------------------------------------------------------*/
 byte	pio_read_C( int side )
 {
   byte	data;
 
-		/* �ݡ���°���԰��� */
+		/* ポート属性不一致 */
   if( pio_C[ side^1 ][ PIO_PORT_CH ].type == PIO_READ  &&
       pio_C[ side^1 ][ PIO_PORT_CL ].type == PIO_READ  ){
     pio_mesC( "PIO C READ PORT Mismatch" );
@@ -224,7 +224,7 @@ byte	pio_read_C( int side )
       pio_C[ side   ][ PIO_PORT_CL ].type == PIO_WRITE ){
     pio_mesC( "PIO C Read from WRITE-PORT" );
   }
-		/* �꡼�� */
+		/* リード */
 
   if( pio_C[ side ][ PIO_PORT_CH ].type == PIO_READ ){
     data  = pio_C[ side^1 ][ PIO_PORT_CL ].data << 4;
@@ -239,20 +239,20 @@ byte	pio_read_C( int side )
   }
 
   pio_C[ side ][ PIO_PORT_CL ].cont_f ^= 1;
-  if( pio_C[ side ][ PIO_PORT_CL ].cont_f == 0 ){	/* -- Ϣ³���ɤߤ��� */
+  if( pio_C[ side ][ PIO_PORT_CL ].cont_f == 0 ){	/* -- 連続の読みだし */
 
     switch( cpu_timing ){
-    case 0:						/*     0:CPU�����ؤ�*/
+    case 0:						/*     0:CPUを切替え*/
       select_main_cpu ^= 1;
       CPU_BREAKOFF();        /* PC-=2 */
       break;
-    case 1:						/*     1:����CPU��ư */
+    case 1:						/*     1:サブCPU起動 */
       if( side==PIO_SIDE_M ){
 	dual_cpu_count = CPU_1_COUNT;
 	CPU_BREAKOFF();
       }
       break;
-    case 2:						/*     2:�ʤˤ⤷�ʤ�*/
+    case 2:						/*     2:なにもしない*/
       break;
     }
 
@@ -263,11 +263,11 @@ byte	pio_read_C( int side )
 
 
 /*----------------------------------------------------------------------*/
-/* PIO C �˥饤��							*/
-/*	�饤�Ȥϡ���ʬ��¦����ʬ�Υݡ��Ȥ��Ф��ƹԤʤ���		*/
-/*		���Υݡ��Ȥ����꤬ WRITE �ʤ饨�顼ɽ��		*/
-/*		��ʬ�Υݡ��Ȥ����꤬  READ �ʤ饨�顼ɽ��		*/
-/*		�饤�Ȥκݤˡ�CPU�����ؤ�Ƚ��������			*/
+/* PIO C にライト							*/
+/*	ライトは、自分の側／自分のポートに対して行なう。		*/
+/*		相手のポートの設定が WRITE ならエラー表示		*/
+/*		自分のポートの設定が  READ ならエラー表示		*/
+/*		ライトの際に、CPUを切替え判定を入れる			*/
 /*----------------------------------------------------------------------*/
 void	pio_write_C( int side, byte data )
 {
@@ -277,24 +277,24 @@ void	pio_write_C( int side, byte data )
   else              port = PIO_PORT_CL;
   data &= 0x07;
 
-		/* �ݡ���°���԰��� */
+		/* ポート属性不一致 */
 
-  if( pio_C[ side^1 ][ port^1 ].type == PIO_WRITE ){	/* ���Υݡ��� WRITE*/
+  if( pio_C[ side^1 ][ port^1 ].type == PIO_WRITE ){	/* 相手のポート WRITE*/
     pio_mesC( "PIO C Write PORT Mismatch" );
   }
-  if( pio_C[ side   ][ port   ].type == PIO_READ ){	/* ��ʬ�Υݡ��� READ */
+  if( pio_C[ side   ][ port   ].type == PIO_READ ){	/* 自分のポート READ */
     pio_mesC( "PIO C Write to READ-PORT" );
   }
-		/* �饤�� */
+		/* ライト */
 
   if( data & 0x01 ) pio_C[ side ][ port ].data |=  ( 1 << (data>>1) );
   else              pio_C[ side ][ port ].data &= ~( 1 << (data>>1) );
 
   switch( cpu_timing ){
-  case 0:						/*     0:���Τޤ޽�*/
-  case 2:						/*     2:���Τޤ޽�*/
+  case 0:						/*     0:そのまま書く*/
+  case 2:						/*     2:そのまま書く*/
     break;
-  case 1:						/*     1:����CPU��ư */
+  case 1:						/*     1:サブCPU起動 */
     if( side==PIO_SIDE_M ){
       dual_cpu_count = CPU_1_COUNT;
       CPU_BREAKOFF();
@@ -306,11 +306,11 @@ void	pio_write_C( int side, byte data )
 
 
 /*--------------------------------------------------------------*/
-/* ľ�� Port C �˽񤭹���					*/
+/* 直接 Port C に書き込む					*/
 /*--------------------------------------------------------------*/
 void	pio_write_C_direct( int side, byte data )
 {
-		/* �ݡ���°���԰��� */
+		/* ポート属性不一致 */
   if( pio_C[ side^1 ][ PIO_PORT_CH ].type == PIO_WRITE &&
       pio_C[ side^1 ][ PIO_PORT_CL ].type == PIO_WRITE ){
     pio_mesC( "PIO C WRITE PORT Mismatch" );
@@ -319,16 +319,16 @@ void	pio_write_C_direct( int side, byte data )
       pio_C[ side   ][ PIO_PORT_CL ].type == PIO_READ  ){
     pio_mesC( "PIO C Write to READ-PORT" );
   }
-		/* �饤�� */
+		/* ライト */
 
   pio_C[ side ][ PIO_PORT_CH ].data = data >> 4;
   pio_C[ side ][ PIO_PORT_CL ].data = data & 0x0f;
 
   switch( cpu_timing ){
-  case 0:						/*     0:���Τޤ޽�*/
-  case 2:						/*     2:���Τޤ޽�*/
+  case 0:						/*     0:そのまま書く*/
+  case 2:						/*     2:そのまま書く*/
     break;
-  case 1:						/*     1:����CPU��ư */
+  case 1:						/*     1:サブCPU起動 */
     if( side==PIO_SIDE_M ){
       dual_cpu_count = CPU_1_COUNT;
       CPU_BREAKOFF();
@@ -345,9 +345,9 @@ void	pio_write_C_direct( int side, byte data )
 
 
 /*----------------------------------------------------------------------*/
-/* PIO ����								*/
-/*	PA / PB / PCH / PCL ������������ꡣ				*/
-/*	�⡼�ɤ����� (�⡼�ɤ� 0 �˸��ꡣ�ܺ�����)			*/
+/* PIO 設定								*/
+/*	PA / PB / PCH / PCL の送受信を指定。				*/
+/*	モードを設定 (モードは 0 に限定。詳細不明)			*/
 /*----------------------------------------------------------------------*/
 void	pio_set_mode( int side, byte data )
 {
@@ -409,7 +409,7 @@ void	pio_set_mode( int side, byte data )
 
 
 /***********************************************************************
- * ���ơ��ȥ����ɡ����ơ��ȥ�����
+ * ステートロード／ステートセーブ
  ************************************************************************/
 
 #define	SID	"PIO "

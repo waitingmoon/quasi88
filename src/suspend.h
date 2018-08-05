@@ -5,21 +5,21 @@
 #include "file-op.h"
 
 
-#if 0	/* ¢ª file-op.h */
-extern char file_state[QUASI88_MAX_FILENAME];	/* ¥¹¥Æ¡¼¥È¥Õ¥¡¥¤¥ëÌ¾   */
+#if 0	/* â†’ file-op.h */
+extern char file_state[QUASI88_MAX_FILENAME];	/* ã‚¹ãƒ†ãƒ¼ãƒˆãƒ•ã‚¡ã‚¤ãƒ«å   */
 #endif
 
-extern	int	resume_flag;			/* µ¯Æ°»ş¤Î¥ì¥¸¥å¡¼¥à	*/
-extern	int	resume_force;			/* ¶¯À©¥ì¥¸¥å¡¼¥à	*/
-extern	int	resume_file;			/* ¥Õ¥¡¥¤¥ëÌ¾»ØÄê¤¢¤ê	*/
+extern	int	resume_flag;			/* èµ·å‹•æ™‚ã®ãƒ¬ã‚¸ãƒ¥ãƒ¼ãƒ 	*/
+extern	int	resume_force;			/* å¼·åˆ¶ãƒ¬ã‚¸ãƒ¥ãƒ¼ãƒ 	*/
+extern	int	resume_file;			/* ãƒ•ã‚¡ã‚¤ãƒ«åæŒ‡å®šã‚ã‚Š	*/
 
 
 
-/* ¥¹¥Æ¡¼¥È¥Õ¥¡¥¤¥ë¤Î¥Ø¥Ã¥ÀÆâÍÆ */
+/* ã‚¹ãƒ†ãƒ¼ãƒˆãƒ•ã‚¡ã‚¤ãƒ«ã®ãƒ˜ãƒƒãƒ€å†…å®¹ */
 
-#define	STATE_ID	"QUASI88"		/* ¼±ÊÌ»Ò */
-#define	STATE_VER	"0.6.0"			/* ¥Õ¥¡¥¤¥ë¥Ğ¡¼¥¸¥ç¥ó */
-#define	STATE_REV	"1"			/* ÊÑ¹¹¥Ğ¡¼¥¸¥ç¥ó */
+#define	STATE_ID	"QUASI88"		/* è­˜åˆ¥å­ */
+#define	STATE_VER	"0.6.0"			/* ãƒ•ã‚¡ã‚¤ãƒ«ãƒãƒ¼ã‚¸ãƒ§ãƒ³ */
+#define	STATE_REV	"1"			/* å¤‰æ›´ãƒãƒ¼ã‚¸ãƒ§ãƒ³ */
 
 
 
@@ -87,10 +87,10 @@ int	stateload_check_file_exist(void);
 
 int	statefile_revision( void );
 
-#define	STATE_OK	(0)		/* ¥í¡¼¥É/¥»¡¼¥ÖÀµ¾ï½ªÎ» */
-#define	STATE_ERR	(-1)		/* ¥í¡¼¥É/¥»¡¼¥Ö°Û¾ï½ªÎ» */
-#define	STATE_ERR_ID	(-2)		/* ¥í¡¼¥É»ş ID¸«¤Ä¤«¤é¤º */
-#define	STATE_ERR_SIZE	(-3)		/* ¥í¡¼¥É»ş ¥µ¥¤¥ºÉÔÀ°¹ç */
+#define	STATE_OK	(0)		/* ãƒ­ãƒ¼ãƒ‰/ã‚»ãƒ¼ãƒ–æ­£å¸¸çµ‚äº† */
+#define	STATE_ERR	(-1)		/* ãƒ­ãƒ¼ãƒ‰/ã‚»ãƒ¼ãƒ–ç•°å¸¸çµ‚äº† */
+#define	STATE_ERR_ID	(-2)		/* ãƒ­ãƒ¼ãƒ‰æ™‚ IDè¦‹ã¤ã‹ã‚‰ãš */
+#define	STATE_ERR_SIZE	(-3)		/* ãƒ­ãƒ¼ãƒ‰æ™‚ ã‚µã‚¤ã‚ºä¸æ•´åˆ */
 int	statesave_block( const char id[4], void *top, int size );
 int	stateload_block( const char id[4], void *top, int size );
 

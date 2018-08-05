@@ -2,19 +2,19 @@
 #
 # Makefile for quasi88/UNIX (FreeBSD, Linux, Mac OS X and so on...)
 #
-#	ɬ����GNU make ��ɬ�פǤ���
+#	必ず、GNU make が必要です。
 #
-#			    ���� Makefile �κ����ˤ����äƤ� XMAME �� 
-#			    makefile.unix��src/unix/unix.mak �򻲹ͤˤ��ޤ�����
-#			    ����ѥ����Ϣ������ˤĤ��Ƥϡ��嵭�Υե������
-#			    ���ܤ���Ƥ��륳���Ȥ���Ω�Ĥ��⤷��ޤ���
+#			    この Makefile の作成にあたっては XMAME の 
+#			    makefile.unix、src/unix/unix.mak を参考にしました。
+#			    コンパイル関連の設定については、上記のファイルに
+#			    記載されているコメントが役立つかもしれません。
 ###############################################################################
 
-# X11�ǡ�SDL�ǤΤ����줫�����ꤷ�ޤ�
-#	X11�Ǥξ��ϡ���X11_VERSION�װʳ��ιԤ򥳥��ȥ����Ȥ��Ƥ���������
-#	SDL�Ǥξ��ϡ���SDL_VERSION�װʳ��ιԤ򥳥��ȥ����Ȥ��Ƥ���������
-#	GTK�Ǥξ��ϡ���GTK_VERSION�װʳ��ιԤ򥳥��ȥ����Ȥ��Ƥ���������
-#	( GTK�Ǥϼ¸���Ǥ���GTK�Ǥǥ�����ɤ��Ĥ餹�ˤϡ�SDL ��ɬ�פǤ� )
+# X11版、SDL版のいずれかを設定します
+#	X11版の場合は、「X11_VERSION」以外の行をコメントアウトしてください。
+#	SDL版の場合は、「SDL_VERSION」以外の行をコメントアウトしてください。
+#	GTK版の場合は、「GTK_VERSION」以外の行をコメントアウトしてください。
+#	( GTK版は実験中です。GTK版でサウンドを鳴らすには、SDL が必要です )
 
 X11_VERSION	= 1
 # SDL_VERSION	= 1
@@ -22,90 +22,90 @@ X11_VERSION	= 1
 
 
 #######################################################################
-# ��������
+# 基本設定
 #######################################################################
 
 
-# ROM�ѥǥ��쥯�ȥ�����ꤷ�ޤ�
-#	BASIC �� ROM���᡼�� �򸡺�����ǥ��쥯�ȥ�Ǥ���
-#	���ץ����Ǥλ���⡢�Ķ��ѿ��������̵�����ˡ����������ꤷ��
-#	�ǥ��쥯�ȥ꤬���Ѥ���ޤ���
-#	 ~/ �ϡ�QUASI88�ε�ư���˥ۡ���ǥ��쥯�ȥ��$HOME�ˤ�Ÿ������ޤ���
+# ROM用ディレクトリを設定します
+#	BASIC の ROMイメージ を検索するディレクトリです。
+#	オプションでの指定も、環境変数の設定も無い場合に、ここで設定した
+#	ディレクトリが使用されます。
+#	 ~/ は、QUASI88の起動時にホームディレクトリ（$HOME）に展開されます。
 
 ROMDIR	= ~/quasi88/rom/
 
 
-# DISK�ѥǥ��쥯�ȥ�����ꤷ�ޤ�
-#	��ư���ˡ������ǻ��ꤷ�����᡼���ե�����򳫤��ݤˡ�
-#	���Υե�����򸡺�����ǥ��쥯�ȥ�Ǥ���
-#	���ץ����Ǥλ���⡢�Ķ��ѿ��������̵�����ˡ����������ꤷ��
-#	�ǥ��쥯�ȥ꤬���Ѥ���ޤ���
-#	 ~/ �ϡ�QUASI88�ε�ư���˥ۡ���ǥ��쥯�ȥ��$HOME�ˤ�Ÿ������ޤ���
+# DISK用ディレクトリを設定します
+#	起動時に、引数で指定したイメージファイルを開く際に、
+#	そのファイルを検索するディレクトリです。
+#	オプションでの指定も、環境変数の設定も無い場合に、ここで設定した
+#	ディレクトリが使用されます。
+#	 ~/ は、QUASI88の起動時にホームディレクトリ（$HOME）に展開されます。
 
 DISKDIR	= ~/quasi88/disk/
 
 
-# TAPE�ѥǥ��쥯�ȥ�����ꤷ�ޤ�
-#	TAPE �Υ��᡼�����֤��ǥ��쥯�ȥ�Ǥ���
-#	���ץ����Ǥλ���⡢�Ķ��ѿ��������̵�����ˡ����������ꤷ��
-#	�ǥ��쥯�ȥ꤬���Ѥ���ޤ���
-#	 ~/ �ϡ�QUASI88�ε�ư���˥ۡ���ǥ��쥯�ȥ��$HOME�ˤ�Ÿ������ޤ���
+# TAPE用ディレクトリを設定します
+#	TAPE のイメージを置くディレクトリです。
+#	オプションでの指定も、環境変数の設定も無い場合に、ここで設定した
+#	ディレクトリが使用されます。
+#	 ~/ は、QUASI88の起動時にホームディレクトリ（$HOME）に展開されます。
 
 TAPEDIR	= ~/quasi88/tape/
 
 
 # (X11)
-# ��ȥ륨��ǥ�����ξ��λ���
-#	�ӥå�����ǥ�����ޥ���ξ��ϡ������ȥ����Ȥ��ޤ��礦��
-#	    �㤨�С�IRIX, AIX��Mac OS X(PowerPC) �ʤɤϡ������ȥ����Ȥ��ޤ���
-#		    Intel �Ϥ� CPU��Ȥä� OS �ʤɤϡ����Τޤޤˤ��Ƥ����ޤ���
+# リトルエンディアンの場合の指定
+#	ビッグエンディアンマシンの場合は、コメントアウトしましょう。
+#	    例えば、IRIX, AIX、Mac OS X(PowerPC) などは、コメントアウトします。
+#		    Intel 系の CPUを使った OS などは、このままにしておきます。
 
 X11_LSB_FIRST	= 1
 
 
 # (X11)
-# MIT-SHM ��Ȥ����ɤ����λ���
-#	MIT-SHM �򥵥ݡ��Ȥ��Ƥʤ����ϡ������ȥ����Ȥ��ޤ��礦��
+# MIT-SHM を使うかどうかの指定
+#	MIT-SHM をサポートしてない場合は、コメントアウトしましょう。
 
 X11_MITSHM	= 1
 
 
 
 # (X11)
-# long long ���򥵥ݡ��Ȥ��Ƥ��ʤ�����ѥ����Ȥ���硢�ʲ��򥳥��ȥ�����
-# ���Ƥ��������� (����Υ���ѥ���ϥ��ݡ��Ȥ��Ƥ��롦�����ϥ�)
+# long long 型をサポートしていないコンパイラを使う場合、以下をコメントアウト
+# してください。 (大抵のコンパイラはサポートしている・・・ハズ)
 
 X11_HAVE_LONG_LONG = 1
 
 
 
 # (X11)
-# �ؿ� gettimeofday() ��������Ƥ��ʤ������ƥ�ξ�硢�ʲ��򥳥��ȥ�����
-# ���Ƥ��������� (����Υ����ƥ�ϼ������Ƥ��롦�����ϥ�)
+# 関数 gettimeofday() を実装していないシステムの場合、以下をコメントアウト
+# してください。 (大抵のシステムは実装している・・・ハズ)
 
 X11_HAVE_GETTIMEOFDAY = 1
 
 
 
 # (X11)
-# ���祤���ƥ��å����Ѥ�̵ͭ
-#	�ʲ��Τ����줫�ΰ�ĤΤߡ������Ȥ򳰤����Ȥ�����ޤ���
+# ジョイスティック使用の有無
+#	以下のいずれかの一つのみ、コメントを外すことが出来ます。
 #
-#	 ��X11_JOYSTICK = joy_nothing�פιԤΥ����ȥ����Ȥ򳰤��ȡ�
-#	���祤���ƥ��å��ϥ��ݡ��Ȥ���ޤ���
+#	 「X11_JOYSTICK = joy_nothing」の行のコメントアウトを外すと、
+#	ジョイスティックはサポートされません。
 #
-#	 ��X11_JOYSTICK = joy_sdl�פιԤΥ����ȥ����Ȥ򳰤��ȡ�
-#	SDL�饤�֥��ˤ�른�祤���ƥ��å���ǽ���Ȥ߹��ޤ�ޤ���
-#	( Linux �� FreeBSD��ư���ǧ�Ѥߡ��ºݤ˥��祤���ƥ��å����Ȥ��뤫
-#	  �ɤ����ϡ�SDL�饤�֥��˰�¸���ޤ���)
+#	 「X11_JOYSTICK = joy_sdl」の行のコメントアウトを外すと、
+#	SDLライブラリによるジョイスティック機能が組み込まれます。
+#	( Linux と FreeBSDで動作確認済み。実際にジョイスティックが使えるか
+#	  どうかは、SDLライブラリに依存します。)
 #
-#	 ��X11_JOYSTICK = joy_linux_usb�פιԤΥ����ȥ����Ȥ򳰤��ȡ�
-#	Linux �ˤ� USB joystick �����ѤǤ��ޤ���
-#	( �Ķ��ˤ�äƤϡ����ѤǤ��ʤ����⤷��ޤ��� )
+#	 「X11_JOYSTICK = joy_linux_usb」の行のコメントアウトを外すと、
+#	Linux にて USB joystick が使用できます。
+#	( 環境によっては、使用できないかもしれません )
 #
-#	 ��X11_JOYSTICK = joy_bsd_usb�פιԤΥ����ȥ����Ȥ򳰤��ȡ�
-#	FreeBSD �ˤ� USB joystick �����ѤǤ��ޤ���
-#	( �Ķ��ˤ�äƤϡ�����ѥ��뤹��Ǥ��ʤ����⤷��ޤ��� )
+#	 「X11_JOYSTICK = joy_bsd_usb」の行のコメントアウトを外すと、
+#	FreeBSD にて USB joystick が使用できます。
+#	( 環境によっては、コンパイルすらできないかもしれません )
 
 X11_JOYSTICK	= joy_nothing
 # X11_JOYSTICK	= joy_sdl
@@ -114,28 +114,28 @@ X11_JOYSTICK	= joy_nothing
 
 
 
-# QUASI88 �Ǥϥ�˥塼�⡼�ɤˤƥ����꡼�󥹥ʥåץ���å� (���̥���ץ���)
-# ����¸����ǽ�Ǥ��������λ���ͽ����ꤷ��Ǥ�դΥ��ޥ�ɤ�¹Ԥ��뤳�Ȥ�
-# �Ǥ��ޤ���
-# ���Υ��ޥ�ɼ¹Ե�ǽ��̵���ˤ��������ϡ��ʲ��򥳥��ȥ����Ȥ��Ʋ�������
+# QUASI88 ではメニューモードにてスクリーンスナップショット (画面キャプチャ)
+# の保存が可能ですが、この時に予め指定した任意のコマンドを実行することが
+# できます。
+# このコマンド実行機能を無効にしたい場合は、以下をコメントアウトして下さい。
 
 USE_SSS_CMD	= 1
 
 
 
-# �ʲ��ϡ���˥����⡼�� (�ǥХå��ѤΥ⡼��) �ε�ǽ����Ǥ���
-# �̾�ϥ�˥����⡼�ɤϻ��Ѥ��ʤ��Ȼפ���Τǡ��ä��ѹ���ɬ�פϤ���ޤ���
+# 以下は、モニターモード (デバッグ用のモード) の機能設定です。
+# 通常はモニターモードは使用しないと思われるので、特に変更の必要はありません。
 #
-#	  MONITOR �ιԤ������ȥ����Ȥ���Ƥ�����ϡ���˥����⡼�ɤ�
-#	���ѤǤ��ޤ���
+#	  MONITOR の行がコメントアウトされている場合は、モニターモードは
+#	使用できません。
 #
-#	  ��˥����⡼�ɤˤơ�GNU Readline ����Ѥ����硢
-#	READLINE �ԤΥ����ȥ����Ȥ򳰤��ޤ���
+#	  モニターモードにて、GNU Readline を使用する場合、
+#	READLINE 行のコメントアウトを外します。
 #
-#	  ��˥����⡼�ɤǤ������Ԥ����� Ctrl-D �򲡤��� QUASI88 �϶�����λ
-#	���Ƥ��ޤ��ޤ�����IRIX/AIX �Ǥϡ�IGNORE_C_D �ιԤΥ����ȥ����Ȥ�
-#	�����ȡ�Ctrl-D �򲡤��Ƥ⽪λ���ʤ��ʤ�ޤ���
-#	( IRIX/AIX �ʳ��Ǥϡ�ɬ�������ȥ����Ȥ��Ƥ����Ƥ���������)
+#	  モニターモードでの入力待ち時に Ctrl-D を押すと QUASI88 は強制終了
+#	してしまいますが、IRIX/AIX では、IGNORE_C_D の行のコメントアウトを
+#	外すと、Ctrl-D を押しても終了しなくなります。
+#	( IRIX/AIX 以外では、必ずコメントアウトしておいてください。)
 #
 
 # USE_MONITOR		= 1
@@ -146,46 +146,46 @@ USE_SSS_CMD	= 1
 
 
 
-# PC-8801�Υ����ܡ��ɥХ��򥨥ߥ�졼�Ȥ��������ϡ�
-# �ʲ��Υ����ȥ����Ȥ򳰤��Ʋ�������
+# PC-8801のキーボードバグをエミュレートしたい場合は、
+# 以下のコメントアウトを外して下さい。
 
 # USE_KEYBOARD_BUG	= 1
 
 
 
 # (X11)
-# XFree86-DGA ������Ǥ�����̣�Τ������Ϥɤ���������
-#	XFree86-DGA��ͭ���ˤ���ˤϡ�root���¤�ɬ�פʤΤǡ������ղ�������
+# XFree86-DGA の設定です。興味のある方はどうぞ・・・
+#	XFree86-DGAを有効にするには、root権限が必要なので、ご注意下さい。
 
 # X11_DGA		= 1
 
 
 
 # (X11)
-# XVideo ������Ǥ�����̣�Τ������Ϥɤ���������
-#	�ޤ��¸���Ǥ��� ���ޤ�ư���ʤ����⤷��ޤ���
+# XVideo の設定です。興味のある方はどうぞ・・・
+#	まだ実験中です！ うまく動かないかもしれません。
 
 # X11_XV		= 1
 
 
 
 #######################################################################
-# ������ɴ�Ϣ������
+# サウンド関連の設定
 #######################################################################
 
-# MAME/XMAME �١����Υ�����ɽ��Ϥ��Ȥ߹��ޤʤ���硢�ʲ��ιԤ�
-# �����ȥ����Ȥ��Ʋ�������
+# MAME/XMAME ベースのサウンド出力を組み込まない場合、以下の行を
+# コメントアウトして下さい。
 
 USE_SOUND		= 1
 
 
 
 # (X11)
-# OS �λ���
-#	�ɤ줫��Ĥ���ꤷ�Ƥ���������
-#	generic �����֤ȡ�������ɤʤ��ˤʤ�ޤ���
-#	�� �� ¾�����֤ȡ�������ɤ���ˤʤ���⤢��ޤ���
-#	ư���ǧ�����Ƥ���Τϡ�FreeBSD �� Linux �ΤߤǤ�
+# OS の指定
+#	どれか一つを指定してください。
+#	generic を選ぶと、サウンドなしになります。
+#	そ の 他を選ぶと、サウンドありになる場合もあります。
+#	動作確認が取れているのは、FreeBSD と Linux のみです
 
 #---------------------- FreeBSD
 ARCH = freebsd
@@ -217,9 +217,9 @@ ARCH = freebsd
 
 
 # (X11)
-# ������ɥǥХ����λ���
-#	�ɲä������ǥХ���������С������ȥ����Ȥ򳰤��ޤ���
-#	�������ư���ǧ����Ƥ��ޤ���
+# サウンドデバイスの指定
+#	追加したいデバイスがあれば、コメントアウトを外します。
+#	いずれも動作確認されていません。
 
 # SOUND_ESOUND		= 1
 # SOUND_ALSA		= 1
@@ -230,111 +230,111 @@ ARCH = freebsd
 
 
 
-# QUASI88 ver 0.6.3 �����ˤƻ��Ѥ��Ƥ������Ť��С������� MAME/XMAME ��
-# ������ɽ��Ϥ���Ѥ��������ϡ��ʲ��Υ����ȥ����Ȥ򳰤��Ʋ�������
-#	ư���ɬ�פʥ꥽���������ʤ�Ȥʤ�ޤ���
+# QUASI88 ver 0.6.3 以前にて使用していた、古いバージョンの MAME/XMAME の
+# サウンド出力を使用したい場合は、以下のコメントアウトを外して下さい。
+#	動作に必要なリソースが少なめとなります。
 
 # USE_OLD_MAME_SOUND	= 1
 
 
 
 #######################################################################
-# fmgen (FM Sound Generator) ������
+# fmgen (FM Sound Generator) の設定
 #######################################################################
 
-# cisc���Ρ�fmgen (FM Sound Generator) ���Ȥ߹��ޤʤ���硢�ʲ��ιԤ�
-# �����ȥ����Ȥ��Ʋ�������
+# cisc氏作の、fmgen (FM Sound Generator) を組み込まない場合、以下の行を
+# コメントアウトして下さい。
 
 USE_FMGEN	= 1
 
 
-# ���ա�
-#	FM Sound Generator �� C++ �ˤ���������Ƥ��ޤ���
-#	C++ �Υ���ѥ���������ʲ��ǹԤʤäƲ�������
+# 注意！
+#	FM Sound Generator は C++ により実装されています。
+#	C++ のコンパイラの設定を以下で行なって下さい。
 # 
-# 	���ꤹ�٤����ܤϡ�CXX��CXXFLAGS��CXXLIBS ����� LD ������Ǥ���
+# 	設定すべき項目は、CXX、CXXFLAGS、CXXLIBS および LD の定義です。
 # 
 
 
 
 #######################################################################
-# SDL�饤�֥�������
+# SDLライブラリの設定
 #######################################################################
 
 # (X11/SDL/GTK)
-# �ʲ��ξ�硢SDL�饤�֥�꤬���Ѥ���ޤ���
-#	��SDL_VERSION �����򤷤����
-#	��GTK_VERSION �����򤷡���USE_SOUND = 1�פ���ꤷ�����
-#	�����祤���ƥ��å�������� ��X11_JOYSTICK = joy_sdl�פ���ꤷ�����
-#	��������ɤ�����ǡ���SOUND_SDL = 1�פ���ꤷ�����
-# �����Ǥϡ�sdl-config ��¹Ԥ��륳�ޥ�ɤ���ꤷ�Ƥ���������
-#	�̾��OS �ξ�硢sdl-config   �Τޤޤ�����פʤϤ��Ǥ���
-#	FreeBSD  �ξ�硢sdl12-config �ʤɤ˥�͡��व��Ƥ��뤳�Ȥ�����ޤ�
+# 以下の場合、SDLライブラリが使用されます。
+#	・SDL_VERSION を選択した場合
+#	・GTK_VERSION を選択し、「USE_SOUND = 1」を指定した場合
+#	・ジョイスティックの設定で 「X11_JOYSTICK = joy_sdl」を指定した場合
+#	・サウンドの設定で、「SOUND_SDL = 1」を指定した場合
+# ここでは、sdl-config を実行するコマンドを指定してください。
+#	通常のOS の場合、sdl-config   のままで大丈夫なはずです。
+#	FreeBSD  の場合、sdl12-config などにリネームされていることがあります
 
 SDL_CONFIG	= sdl-config
 
 
 
 #######################################################################
-# GTK�饤�֥�������
+# GTKライブラリの設定
 #######################################################################
 
 # (GTK)
-# GTK_VERSION �����򤷤����Τߡ��ʲ������꤬ɬ�פǤ���
+# GTK_VERSION を選択した場合のみ、以下の設定が必要です。
 
 GTK_CONFIG	= gtk-config
 
 
 
 #######################################################################
-# ����ѥ����Ϣ������
+# コンパイル関連の設定
 #######################################################################
 
-# ����ѥ���λ���
+# コンパイラの指定
 
 CC	= gcc
 
 
-# ɬ�פ˱����ơ�����ѥ��륪�ץ���� (��Ŭ���ʤ�) ����ꤷ�Ƥ�������
-#	gcc �ʤ顢 -fomit-frame-pointer �� -fstrength-reduce �� -ffast-math ��
-#	-funroll-loops �� -fstrict-aliasing �������֤κ�Ŭ�����ץ����Ǥ���
+# 必要に応じて、コンパイルオプション (最適化など) を指定してください
+#	gcc なら、 -fomit-frame-pointer 、 -fstrength-reduce 、 -ffast-math 、
+#	-funroll-loops 、 -fstrict-aliasing 等が定番の最適化オプションです。
 #
-#	����ѥ���ˤ�äƤϡ�char �� signed char �Ȥߤʤ����꤬ɬ�פʾ�礬
-#	����ޤ���PowerPC �Ϥ� gcc �ʤɤ������Ǥ��������ξ�硢-fsigned-char 
-#	����ꤷ�ޤ���
+#	コンパイラによっては、char を signed char とみなす指定が必要な場合が
+#	あります。PowerPC 系の gcc などがそうですが、この場合、-fsigned-char 
+#	を指定します。
 
 CFLAGS = -O2
 
-# �㤨�� gcc & PowerPC �ξ�硢�ʲ��Υ����ȥ����Ȥ򳰤��ޤ���
+# 例えば gcc & PowerPC の場合、以下のコメントアウトを外します。
 # CFLAGS += -fsigned-char
 
-# �㤨�� gcc �Ǻ�Ŭ���򤷤�����硢�ʲ��Υ����ȥ����Ȥ򳰤��ޤ���
+# 例えば gcc で最適化をしたい場合、以下のコメントアウトを外します。
 # CFLAGS += -fomit-frame-pointer -fstrength-reduce -funroll-loops -ffast-math
 
 
 
-# ����ѥ���ˤ�äƤϡ�����饤��ؿ���Ȥ����Ȥ�����ޤ���
-#	�ʲ����顢Ŭ�ڤʤ�Τ��Ĥ������ꤷ�Ƥ���������
-#-------------------------------------------------- �ɤ�ʥ���ѥ���Ǥ�OK
+# コンパイラによっては、インライン関数を使うことが出来ます。
+#	以下から、適切なものを一つだけ指定してください。
+#-------------------------------------------------- どんなコンパイラでもOK
 # USEINLINE	= '-DINLINE=static'
-#-------------------------------------------------- GCC �ξ��
+#-------------------------------------------------- GCC の場合
 USEINLINE	= '-DINLINE=static __inline__'
-#-------------------------------------------------- Intel C++ ����ѥ���ξ��
+#-------------------------------------------------- Intel C++ コンパイラの場合
 # USEINLINE	= '-DINLINE=static inline'
 #--------------------------------------------------
 
 
-# X11 ��Ϣ�Υǥ��쥯�ȥ�ȥ饤�֥������
+# X11 関連のディレクトリとライブラリを指定
 
-# �����Υ����ƥ� (?)
+# 一部のシステム (?)
 # X11INC  	= -I/usr/include/X11
 # X11LIB  	= -L/usr/lib/X11
 
-# XFree86 �ξ�� (?)
+# XFree86 の場合 (?)
 # X11INC  	= -I/usr/X11R6/include
 # X11LIB  	= -L/usr/X11R6/lib
 
-# X.Org �ξ��
+# X.Org の場合
 X11INC  	= -I/usr/local/include
 X11LIB  	= -L/usr/local/lib
 
@@ -342,29 +342,29 @@ X11LIB  	= -L/usr/local/lib
 
 
 
-# C++ ����ѥ��������
+# C++ コンパイラの設定
 #
-#	�������꤬ɬ�פʤΤϡ� fmgen ���Ȥ߹�����ΤߤǤ���
-#	gcc �Ϥ���Τ� g++ ��̵����硢��CXX = gcc�פȤ��ƤߤƤ���������
+#	この設定が必要なのは、 fmgen を組み込む場合のみです。
+#	gcc はあるのに g++ が無い場合、「CXX = gcc」としてみてください。
 
 CXX	 = g++
 CXXFLAGS = $(CFLAGS)
 CXXLIBS	 = -lstdc++
 
 
-# ��󥫤�����
-#	C++ ����ѥ����Ȥ���硢�Ķ��ˤ�äƤ� $(CXX) �Ȥ���ɬ�פ�
-#	���뤫�⤷��ޤ���
+# リンカの設定
+#	C++ コンパイラを使う場合、環境によっては $(CXX) とする必要が
+#	あるかもしれません。
 
 LD	= $(CC) -Wl,-s
 # LD	= $(CXX) -Wl,-s
 
 
 #######################################################################
-# ���󥹥ȡ��������
+# インストールの設定
 #######################################################################
 
-# ���󥹥ȡ�����ǥ��쥯�ȥ������
+# インストール先ディレクトリの設定
 #
 
 BINDIR = /usr/local/bin
@@ -373,31 +373,31 @@ BINDIR = /usr/local/bin
 
 ###############################################################################
 #
-# �Խ������Ĥ��줵�ޤǤ�����
-# ����ʹߤϡ��ѹ����פΤϤ��Ǥ���¿ʬ������
+# 編集、おつかれさまでした。
+# これ以降は、変更不要のはずです。多分・・・
 #
 ###############################################################################
 
-######## �¸����줳��
+######## 実験あれこれ
 
-# �����ȥ����Ȥ���ȡ����� bpp �� X�Ķ��ˤ�����ư����ǽ�ˤʤ�¸�
+# コメントアウトすると、その bpp の X環境において動作不能になる実験
 
 X11_SUPPORT_8BPP	= 1
 X11_SUPPORT_16BPP	= 1
 X11_SUPPORT_32BPP	= 1
 
-# �����ȥ����Ȥ���ȡ��ܥ������Ǥ�ɽ�����Ǥ��ʤ��ʤ�¸�
+# コメントアウトすると、倍サイズでの表示ができなくなる実験
 
 SUPPORT_DOUBLE		= 1
 
-# �����ȥ����Ȥ���ȡ�utf-8 �Υ��ݡ��Ȥ��ʤ��ʤ�¸�
+# コメントアウトすると、utf-8 のサポートがなくなる実験
 
 SUPPORT_UTF8		= 1
 
-# ���ߡ�����ѥ���μ¸�
-#	X11_VERSION, SDL_VERSION, GTK_VERSION �Τ������������ʤ���硢
-#	src/MINI �ʲ��Υ�������Ȥäơ����ߡ��Υ���ѥ��뤬�¹Ԥ���롣
-#	�������̵���ˤ��뤫�� 'ARCH = generic' ����ꤷ�Ƥ������ȡ�
+# ダミーコンパイルの実験
+#	X11_VERSION, SDL_VERSION, GTK_VERSION のいずれも定義しない場合、
+#	src/MINI 以下のソースを使って、ダミーのコンパイルが実行される。
+#	サウンド無しにするか、 'ARCH = generic' を指定しておくこと。
 
 
 
@@ -405,23 +405,23 @@ SUPPORT_UTF8		= 1
 #
 #######################################################################
 
-# ���󥯥롼�ɥǥ��쥯�ȥ�
+# インクルードディレクトリ
 
 CFLAGS += -Isrc
 
 
 #
-# �С�������������
+# バージョン毎の設定
 #
 
 ifdef	X11_VERSION
 
-# X11 �С������Ǥ�����
+# X11 バージョンでの設定
 
 CFLAGS += -Isrc/FUNIX -Isrc/X11 $(X11INC) 
 LIBS   += $(X11LIB) -lX11 -lXext
 
-# X11�С�������ɽ���ޤ��
+# X11バージョンの表示まわり
 
 ifdef	X11_MITSHM
 CFLAGS += -DMITSHM 
@@ -447,7 +447,7 @@ ifdef	X11_SUPPORT_32BPP
 CFLAGS += -DSUPPORT_32BPP
 endif
 
-# X11�С������ǤΥ��祤���ƥ��å�����
+# X11バージョンでのジョイスティック設定
 
 ifeq ($(X11_JOYSTICK),joy_sdl)
 
@@ -483,7 +483,7 @@ endif
 endif
 endif
 
-# X11�С������Ǥλ�¿������
+# X11バージョンでの雑多な設定
 
 ifdef	X11_LSB_FIRST
 CFLAGS += -DLSB_FIRST
@@ -509,7 +509,7 @@ CFLAGS += -DQUASI88_X11
 else
 ifdef	SDL_VERSION
 
-# SDL�С������Ǥ�����
+# SDLバージョンでの設定
 
 CFLAGS += -Isrc/FUNIX -Isrc/SDL `$(SDL_CONFIG) --cflags`
 LIBS   +=                       `$(SDL_CONFIG) --libs`
@@ -519,7 +519,7 @@ CFLAGS += -DQUASI88_SDL
 else
 ifdef	GTK_VERSION
 
-# GTK�С������Ǥ�����
+# GTKバージョンでの設定
 
 CFLAGS += -Isrc/FUNIX -Isrc/GTK `$(GTK_CONFIG) --cflags`
 LIBS   +=                       `$(GTK_CONFIG) --libs`
@@ -528,7 +528,7 @@ CFLAGS += -DQUASI88_GTK
 
 else
 
-# MINI�С������Ǥ�����
+# MINIバージョンでの設定
 
 CFLAGS +=  -Isrc/FDUMMY -Isrc/MINI
 
@@ -540,7 +540,7 @@ endif
 
 
 
-# ��˥����⡼��ͭ����������
+# モニターモード有効時の設定
 
 
 ifdef	USE_MONITOR
@@ -562,7 +562,7 @@ endif
 endif
 
 
-# ����¾
+# その他
 
 ifdef	SUPPORT_DOUBLE
 CFLAGS += -DSUPPORT_DOUBLE
@@ -585,20 +585,20 @@ endif
 
 
 #######################################################################
-# ������ɤ�ͭ���ˤʤäƤ�����γƼ����
-#	�����Ǥϡ�
+# サウンドが有効になっている場合の各種定義
+#	ここでは、
 #		SOUND_OBJS
 #		SOUND_LIBS
 #		SOUND_CFLAGS
-#	���������롣
+#	が定義される。
 #######################################################################
 ifdef	USE_SOUND
 
 #
-# �������ͭ�����Ρ��ɲå��֥������� ( OS��¸�� + ������ )
+# サウンド有効時の、追加オブジェクト ( OS依存部 + 共用部 )
 #
 
-#### �ǥ��쥯�ȥ�
+#### ディレクトリ
 
 ifdef	USE_OLD_MAME_SOUND
 SNDDRV_DIR	= snddrv-old
@@ -618,7 +618,7 @@ DSP_DIR		= $(SNDDRV_DIR)/src/unix/sysdep/dsp-drivers
 MIXER_DIR	= $(SNDDRV_DIR)/src/unix/sysdep/mixer-drivers
 
 
-#### ���֥�������
+#### オブジェクト
 
 SOUND_OBJS_BASE	= $(SD_Q88_DIR)/mame-quasi88.o	\
 		  $(SD_Q88_DIR)/beepintf.o	\
@@ -663,7 +663,7 @@ SOUND_OBJS.generic =
 #SOUND_OBJS.aix     = $(DSP_DIR)/aix.o
 
 
-#### C�ե饰
+#### Cフラグ
 
 CFLAGS           += -DUSE_SOUND
 
@@ -672,12 +672,12 @@ SOUND_CFLAGS      = -DPI=M_PI -I$(SRCDIR)/$(SNDDRV_DIR) -I$(SRCDIR)/$(SD_Q88_DIR
 SOUND_CFLAGS_UNIX = -I$(SRCDIR)/$(SD_X11_DIR) -I$(SRCDIR)/$(UNIX_DIR) -I$(SRCDIR)/$(SYSDEP_DIR) -I$(SRCDIR)/$(DSP_DIR) -I$(SRCDIR)/$(MIXER_DIR)
 
 
-#### �С�������������
+#### バージョン毎の設定
 
 ifdef	X11_VERSION
 
 #
-# X11 �С������ǤΥ����������
+# X11 バージョンでのサウンド設定
 #
 
 SOUND_OBJS	= $(SOUND_OBJS_BASE)		\
@@ -687,8 +687,8 @@ SOUND_OBJS	= $(SOUND_OBJS_BASE)		\
 
 
 #
-# �������ͭ�����Υ���ѥ��륪�ץ����
-#	-DHAVE_SNPRINTF, -DHAVE_VSNPRINTF �����פΤϤ���
+# サウンド有効時のコンパイルオプション
+#	-DHAVE_SNPRINTF, -DHAVE_VSNPRINTF は不要のはず…
 
 CFLAGS.linux      = -DSYSDEP_DSP_OSS -DSYSDEP_MIXER_OSS -DHAVE_SNPRINTF -DHAVE_VSNPRINTF
 CFLAGS.freebsd    = -DSYSDEP_DSP_OSS -DSYSDEP_MIXER_OSS -DHAVE_SNPRINTF -DHAVE_VSNPRINTF
@@ -709,8 +709,8 @@ SOUND_CFLAGS	+= -D__ARCH_$(ARCH) $(CFLAGS.$(ARCH)) $(SOUND_CFLAGS_UNIX)
 
 
 #
-# �������ͭ�����Υ饤�֥�����
-#	�ط�̵���Τ�ޤޤ�Ƥ������ġġ�
+# サウンド有効時のライブラリ指定
+#	関係無いのも含まれていそう………
 
 LIBS.solaris       = -lnsl -lsocket
 LIBS.irix          = -laudio
@@ -727,7 +727,7 @@ SOUND_LIBS	= -lm $(LIBS.$(ARCH))
 
 
 #
-# �ɲå�����ɥǥХ���������Ρ��ɲ�����
+# 追加サウンドデバイス指定時の、追加設定
 #
 
 ifdef SOUND_ESOUND
@@ -771,7 +771,7 @@ else
 ifdef	SDL_VERSION
 
 #
-# SDL �С������ǤΥ����������
+# SDL バージョンでのサウンド設定
 #
 
 SOUND_OBJS	= $(SOUND_OBJS_BASE)		\
@@ -784,8 +784,8 @@ else
 ifdef	GTK_VERSION
 
 #
-# GTK �С������ǤΥ����������
-#	SDL �ˤ��Ĥ餹���Ȥˤ���
+# GTK バージョンでのサウンド設定
+#	SDL にて鳴らすことにする
 
 SOUND_OBJS	= $(SOUND_OBJS_BASE)		\
 		  $(SD_SDL_DIR)/audio.o		\
@@ -794,7 +794,7 @@ SOUND_CFLAGS	+= -I$(SRCDIR)/$(SD_SDL_DIR) -DSYSDEP_DSP_SDL `$(SDL_CONFIG) --cfla
 SOUND_LIBS	+= `$(SDL_CONFIG) --libs`
 
 
-#	OSS���Ĥ餽���Ȥ��������Υ������餱�Ǥ��ޤ��Ĥ�ʤ��ġ�
+#	OSSで鳴らそうとしたが、ノイズだらけでうまく鳴らない……
 
 #SOUND_OBJS	= $(SOUND_OBJS_BASE)		\
 #		  $(SD_X11_DIR)/audio.o		\
@@ -806,8 +806,8 @@ SOUND_LIBS	+= `$(SDL_CONFIG) --libs`
 else
 
 #
-# MINI �С������ǤΥ����������
-#	����ѥ��븡�ڤΤߡ����ϽФʤ�
+# MINI バージョンでのサウンド設定
+#	コンパイル検証のみ。音は出ない
 
 SOUND_OBJS	= $(SOUND_OBJS_BASE)	\
 		  MINI/audio.o
@@ -821,7 +821,7 @@ endif
 
 
 
-#### fmgen �����������
+#### fmgen 指定時の設定
 
 ifdef	USE_FMGEN
 
@@ -978,7 +978,7 @@ debug:
 
 
 #
-# ���󥹥ȡ���˴ؤ�������
+# インストールに関する設定
 #
 
 INSTALL_TARGET = install-nosuid
@@ -1007,9 +1007,9 @@ install-suid:
 
 
 #
-# �ե�����ΰ�¸�ط��ι���
+# ファイルの依存関係の更新
 #
-#	make depend �򤹤�С� Makefile.depend ������(����)����ޤ���
+#	make depend をすれば、 Makefile.depend が生成(更新)されます。
 #
 
 SOURCES		= $(subst $(OBJDIR)/, src/, $(OBJECTS) )

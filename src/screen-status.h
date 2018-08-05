@@ -9,12 +9,12 @@ void		STATUS2SCREEN(int kind, byte pixmap[], int w, int h)
 
     if (dst == NULL) return;
 
-    if (kind == 0) {				/* º¸Â·¤¨ */
+    if (kind == 0) {				/* å·¦æƒãˆ */
 	top   = 0;
 	start = 0;
 	end   = MIN( w, status_sx[ kind ] );
     }
-    else if (kind == 1) {			/* Ãæ±ûÂ·¤¨ */
+    else if (kind == 1) {			/* ä¸­å¤®æƒãˆ */
 	if (w <= status_sx[ kind ]) {
 	    top	  = 0;
 	    start = (status_sx[ kind ] - w) / 2;
@@ -25,7 +25,7 @@ void		STATUS2SCREEN(int kind, byte pixmap[], int w, int h)
 	    end	  = status_sx[ kind ];
 	}
     }
-    else {					/* ±¦Â·¤¨ */
+    else {					/* å³æƒãˆ */
 	if (w <= status_sx[ kind ]) {
 	    top	  = 0;
 	    start = status_sx[ kind ] - w;

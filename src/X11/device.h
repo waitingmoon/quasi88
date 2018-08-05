@@ -7,20 +7,20 @@
 
 
 /*
- *	src/X11/ °Ê²¼¤Ç¤Î¥°¥í¡¼¥Ğ¥ëÊÑ¿ô
+ *	src/X11/ ä»¥ä¸‹ã§ã®ã‚°ãƒ­ãƒ¼ãƒãƒ«å¤‰æ•°
  */
 extern	Display	*x11_display;
 extern	Window	x11_window;
 extern	Atom	x11_atom_kill_type;
 extern	Atom	x11_atom_kill_data;
 
-extern	int	x11_width;		/* ¥¦¥¤¥ó¥É¥¦(Á´²èÌÌ)¤Î¥µ¥¤¥º	*/
+extern	int	x11_width;		/* ã‚¦ã‚¤ãƒ³ãƒ‰ã‚¦(å…¨ç”»é¢)ã®ã‚µã‚¤ã‚º	*/
 extern	int	x11_height;
 
-extern	int	x11_mouse_rel_move;	/* ¥Ş¥¦¥¹ÁêÂĞ°ÜÆ°ÎÌ¸¡ÃÎ¤µ¤»¤ë¤«	*/
-extern	int	x11_get_focus;		/* ¸½ºß¡¢¥Õ¥©¡¼¥«¥¹¤¢¤ê¤«¤É¤¦¤«	*/
+extern	int	x11_mouse_rel_move;	/* ãƒã‚¦ã‚¹ç›¸å¯¾ç§»å‹•é‡æ¤œçŸ¥ã•ã›ã‚‹ã‹	*/
+extern	int	x11_get_focus;		/* ç¾åœ¨ã€ãƒ•ã‚©ãƒ¼ã‚«ã‚¹ã‚ã‚Šã‹ã©ã†ã‹	*/
 
-extern	int	x11_scaling;		/* ¥Ş¥¦¥¹ºÂÉ¸¤Î¥¹¥±¡¼¥ê¥ó¥°Í­Ìµ	*/
+extern	int	x11_scaling;		/* ãƒã‚¦ã‚¹åº§æ¨™ã®ã‚¹ã‚±ãƒ¼ãƒªãƒ³ã‚°æœ‰ç„¡	*/
 extern	int	x11_scale_x_num;
 extern	int	x11_scale_x_den;
 extern	int	x11_scale_y_num;
@@ -29,23 +29,23 @@ extern	int	x11_scale_y_den;
 
 
 /*
- *	src/X11/ °Ê²¼¤Ç¤Î¥°¥í¡¼¥Ğ¥ëÊÑ¿ô (¥ª¥×¥·¥ç¥óÀßÄê²ÄÇ½¤ÊÊÑ¿ô)
+ *	src/X11/ ä»¥ä¸‹ã§ã®ã‚°ãƒ­ãƒ¼ãƒãƒ«å¤‰æ•° (ã‚ªãƒ—ã‚·ãƒ§ãƒ³è¨­å®šå¯èƒ½ãªå¤‰æ•°)
  */
-extern	int	colormap_type;		/* ¥«¥é¡¼¥Ş¥Ã¥×¤Î¥¿¥¤¥×	0/1/2	*/
-extern	int	use_xsync;		/* XSync ¤ò»ÈÍÑ¤¹¤ë¤«¤É¤¦¤«	*/
-extern	int	use_xv;			/* Xv ¤ò»ÈÍÑ¤¹¤ë¤«¤É¤¦¤«	*/
+extern	int	colormap_type;		/* ã‚«ãƒ©ãƒ¼ãƒãƒƒãƒ—ã®ã‚¿ã‚¤ãƒ—	0/1/2	*/
+extern	int	use_xsync;		/* XSync ã‚’ä½¿ç”¨ã™ã‚‹ã‹ã©ã†ã‹	*/
+extern	int	use_xv;			/* Xv ã‚’ä½¿ç”¨ã™ã‚‹ã‹ã©ã†ã‹	*/
 #ifdef MITSHM
-extern	int	use_SHM;		/* MIT-SHM ¤ò»ÈÍÑ¤¹¤ë¤«¤É¤¦¤«	*/
+extern	int	use_SHM;		/* MIT-SHM ã‚’ä½¿ç”¨ã™ã‚‹ã‹ã©ã†ã‹	*/
 #endif
 
-extern	int	keyboard_type;		/* ¥­¡¼¥Ü¡¼¥É¤Î¼ïÎà                */
-extern	char	*file_keyboard;		/* ¥­¡¼ÀßÄê¥Õ¥¡¥¤¥ëÌ¾		   */
-extern	int	use_xdnd;		/* XDnD ¤ËÂĞ±ş¤¹¤ë¤«¤É¤¦¤«	   */
-extern	int	use_joydevice;		/* ¥¸¥ç¥¤¥¹¥Æ¥£¥Ã¥¯¥Ç¥Ğ¥¤¥¹¤ò³«¤¯? */
+extern	int	keyboard_type;		/* ã‚­ãƒ¼ãƒœãƒ¼ãƒ‰ã®ç¨®é¡                */
+extern	char	*file_keyboard;		/* ã‚­ãƒ¼è¨­å®šãƒ•ã‚¡ã‚¤ãƒ«å		   */
+extern	int	use_xdnd;		/* XDnD ã«å¯¾å¿œã™ã‚‹ã‹ã©ã†ã‹	   */
+extern	int	use_joydevice;		/* ã‚¸ãƒ§ã‚¤ã‚¹ãƒ†ã‚£ãƒƒã‚¯ãƒ‡ãƒã‚¤ã‚¹ã‚’é–‹ã? */
 
-extern	int	wait_sleep_min_us;	/* »Ä¤ê idle»ş´Ö¤¬¤³¤Î us°Ê²¼¤Î
-					   ¾ì¹ç¤Ï¡¢ sleep ¤»¤º¤ËÂÔ¤Ä¡£
-					   (MAX 1ÉÃ = 1,000,000us) */
+extern	int	wait_sleep_min_us;	/* æ®‹ã‚Š idleæ™‚é–“ãŒã“ã® usä»¥ä¸‹ã®
+					   å ´åˆã¯ã€ sleep ã›ãšã«å¾…ã¤ã€‚
+					   (MAX 1ç§’ = 1,000,000us) */
 
 extern	int	show_fps;		/* test */
 

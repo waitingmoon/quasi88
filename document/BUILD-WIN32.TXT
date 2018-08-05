@@ -1,144 +1,144 @@
 
-	   QUASI88 �Υ���ѥ�����ˡ  for Win32 + Visual C++
+	   QUASI88 のコンパイル方法  for Win32 + Visual C++
 
 -------------------------------------------------------------------------------
 
-�������Ǥ� Windows �Ķ��ο͸����ˡ�QUASI88 �� Visual C++ ��Ȥäƥӥ�ɤ���
-  ��ˡ���������ޤ���
+●ここでは Windows 環境の人向けに、QUASI88 を Visual C++ を使ってビルドする
+  方法を説明します。
 
-  Visual C++ �ΥС������ϡ� 2008 Express Edition �����ꤷ�Ƥ��ޤ���
-
-
-��������
-
-	1) QUASI88�Υ�������Ÿ�� (unzip) ���Ƥ���������
-	   �������ե���������äƤ��� src �Ȥ����ե����������ӡ�
-	   Visual C++�Ѥκ�ȥե���� visualc �ʤɤ�Ÿ������ޤ���
+  Visual C++ のバージョンは、 2008 Express Edition を想定しています。
 
 
-��SDL�С������� QUASI88 �Υӥ����ˡ
+●前準備
 
-	2) SDL �� �����֥����� http://www.libsdl.org/ ��ꡢ 
-	   Development Libraries �����������ɤ��Ƥ����ޤ���
+	1) QUASI88のソースを、展開 (unzip) してください。
+	   ソースファイルの入っている src というフォルダ、および、
+	   Visual C++用の作業フォルダ visualc などが展開されます。
 
-	   2013/01/01���ߡ�SDL�ΥС������� 1.2.15 �Ǥ���
-	   Win32 Visual C++ �Ѥϡ��ʲ��� URL �������Ǥ��ޤ���
+
+●SDLバージョンの QUASI88 のビルド方法
+
+	2) SDL の ウェブサイト http://www.libsdl.org/ より、 
+	   Development Libraries をダウンロードしておきます。
+
+	   2013/01/01現在、SDLのバージョンは 1.2.15 です。
+	   Win32 Visual C++ 用は、以下の URL より入手できます。
 
 		http://www.libsdl.org/release/SDL-devel-1.2.15-VC.zip
 
-	   �����Ÿ������ȡ� SDL-1.2.15 �Ȥ���̾���Υե�������Ǥ���
-	   �Τǡ����Υե������̾���� sdl-devel ���ѹ����Ƥ���������
+	   これを展開すると、 SDL-1.2.15 という名前のフォルダができる
+	   ので、このフォルダの名前を、 sdl-devel に変更してください。
 		 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-	   �ѹ������顢 sdl-devel �Υե������ޤ뤴�ȡ� 1) �ˤ�Ÿ������
-	   �ե��������˥��ԡ����Ƥ���������
+	   変更したら、 sdl-devel のフォルダをまるごと、 1) にて展開した
+	   フォルダの中にコピーしてください。
 
 
-	3) visualc �ե�����˰�ư���ޤ��������ǡ�VC++ �Υե����� QUASI88.sln
-	   (�ޤ��� QUASI88.dsw) ����֥륯��å�����ȡ�VC++ ����ư���ޤ���
+	3) visualc フォルダに移動します。ここで、VC++ のファイル QUASI88.sln
+	   (または QUASI88.dsw) をダブルクリックすると、VC++ が起動します。
 
-	   ���λ��ˡ����Ѵ����Ƥ��Υץ��������Ȥ򳫤��ޤ������פȤ����褦��
-	   ������������ɽ�����줿���ϡ��֤Ϥ��פ����򤷤Ƥ���������
+	   この時に、「変換してこのプロジェクトを開きますか？」というような
+	   ダイアログが表示された場合は、「はい」を選択してください。
 
-	   �ץ��������� QUASI88_sdl ��ӥ�ɤ��ơ��¹ԥե��������������
-	   �������������Υץ��������Ȥˤϡ���Release�ס�Monitor�ס�Debug�פ�
-	   ������ι������ޤޤ�ޤ��������ΰ㤤�ϰʲ����̤�Ǥ���
+	   プロジェクト QUASI88_sdl をビルドして、実行ファイルを生成して
+	   ください。このプロジェクトには、「Release」「Monitor」「Debug」の
+	   三種類の構成が含まれます。これらの違いは以下の通りです。
 
-	   ��Release �� ������ɥ����ץꥱ�������Ȥ��Ƽ¹ԥե����뤬����
-			����ޤ���QUASI88�Υ�˥��⡼�ɤϻ��ѤǤ��ޤ���
-			�¹ԥե������ visualc\sdl\Release\QUASI88.exe �Ǥ���
+	   ・Release … ウインドウアプリケーションとして実行ファイルが生成
+			されます。QUASI88のモニタモードは使用できません。
+			実行ファイルは visualc\sdl\Release\QUASI88.exe です。
 
-	   ��Monitor �� ���󥽡��륢�ץꥱ�������Ȥ��Ƽ¹ԥե����뤬����
-			����ޤ���QUASI88�Υ�˥��⡼�ɤ����Ѳ�ǽ�Ǥ���
-			�¹ԥե������ visualc\sdl\Monitor\QUASI88mon.exe �Ǥ�
+	   ・Monitor … コンソールアプリケーションとして実行ファイルが生成
+			されます。QUASI88のモニタモードが使用可能です。
+			実行ファイルは visualc\sdl\Monitor\QUASI88mon.exe です
 
-	   ��Debug   �� �ǥХå��ѤǤ���
+	   ・Debug   … デバッグ用です。
 
-	   �ʤ����������줿�¹ԥե�����ˤϡ�MAME/XMAME�١����Υ�����ɽ���
-	   �� fmgen ���Ȥ߹��ޤ�Ƥ��ޤ���
-
-
-	4) QUASI88 �μ¹Ԥˤϡ� SDL.dll ��ɬ�פǤ���
-
-	   QUASI88 ��¹Ԥ������ˡ�SDL.dll �����Ĥ���ޤ���פȤ����褦��
-	   ������������ɽ���������ϡ� SDL.dll �� visualc �ե������
-	   ���뤤�ϡ��¹ԥե������Ʊ���ե�����˥��ԡ����Ƥ����Ƥ���������
-
-	   �ʤ��� SDL.dll �ϡ� 2) ��Ÿ������ SDL�γ�ȯ�Ը����饤�֥��Ρ�
-	   lib �ե�����˴ޤޤ�Ƥ��ޤ���
-	   SDL�� �����֥����Ȥ���������ǽ�Ǥ���
+	   なお、生成された実行ファイルには、MAME/XMAMEベースのサウンド出力
+	   と fmgen が組み込まれています。
 
 
-��Win32�С������� QUASI88 �Υӥ����ˡ
+	4) QUASI88 の実行には、 SDL.dll が必要です。
 
-	6) visualc �ե�����˰�ư���ޤ��������ǡ�VC++ �Υե����� QUASI88.sln
-	   (�ޤ��� QUASI88.dsw) ����֥륯��å�����ȡ�VC++ ����ư���ޤ���
+	   QUASI88 を実行した時に「SDL.dll が見つかりません」というような
+	   ダイアログが表示される場合は、 SDL.dll を、 visualc フォルダ、
+	   あるいは、実行ファイルと同じフォルダにコピーしておいてください。
 
-	   ���λ��ˡ����Ѵ����Ƥ��Υץ��������Ȥ򳫤��ޤ������פȤ����褦��
-	   ������������ɽ�����줿���ϡ��֤Ϥ��פ����򤷤Ƥ���������
-
-	   �ץ��������� QUASI88_win32 ��ӥ�ɤ��ơ��¹ԥե��������������
-	   ������������Release�׹����ξ�硢�¹ԥե������
-	   visualc\win32\Release\QUASI88win32.exe �Ǥ���
-
-	   �ʤ����������줿�¹ԥե�����ˤϡ�MAME/XMAME�١����Υ�����ɽ���
-	   �� fmgen ���Ȥ߹��ޤ�Ƥ��ޤ���
+	   なお、 SDL.dll は、 2) で展開した SDLの開発者向けライブラリの、
+	   lib フォルダに含まれています。
+	   SDLの ウェブサイトからも入手可能です。
 
 
-��Visual C++ 6.0 ��Ȥäƥӥ�ɤ���ˤ�
+●Win32バージョンの QUASI88 のビルド方法
 
-	Visual C++ 6.0 ��Ȥä���硢�嵭����ˡ�Ǥ� SDL�С������� QUASI88
-	�ϡ��ӥ�ɽ���ޤ���
-	�ɤ���顢SDL 1.2.15 �� Development Libraries �ϡ����ΤޤޤǤ�
-	Visual C++ 6.0 �ǻ��ѤǤ��ʤ��褦�Ǥ���
+	6) visualc フォルダに移動します。ここで、VC++ のファイル QUASI88.sln
+	   (または QUASI88.dsw) をダブルクリックすると、VC++ が起動します。
 
-	�ʲ��Τ����줫����ˡ���н褷�Ƥ���������
+	   この時に、「変換してこのプロジェクトを開きますか？」というような
+	   ダイアログが表示された場合は、「はい」を選択してください。
 
-	i)  SDL�饤�֥��򥽡���������ľ����ˡ
+	   プロジェクト QUASI88_win32 をビルドして、実行ファイルを生成して
+	   ください。「Release」構成の場合、実行ファイルは
+	   visualc\win32\Release\QUASI88win32.exe です。
 
-	    SDL �Υ����֥����Ȥ��  Source Code �����������ɤ���
-	    Visual C++ 6.0 �ˤơ� SDL �饤�֥���ӥ�ɤ��ޤ���
-	    ( �ӥ����ˡ�ϡ�����������ɤ����ե�����˵��ܤ���Ƥ��ޤ� )
-
-	    ���褢���ä��ե����� SDL.lib �� SDLmain.lib �ϡ�
-	    sdl-devel\lib\x86 �ե������Υե�����Ⱥ����ؤ��Ƥ����ޤ���
-
-	ii) �Ť��С������� SDL ����Ѥ�����ˡ
-
-	    �Ť��С������� SDL Development Libraries �ϡ� SDL �Υ����Ȥ��
-	    �����ǽ�ʤ褦�Ǥ��� �� http://www.libsdl.org/release/
-
-	    ���ξ�硢sdl-devel\lib �ե�����β��� x86 �ե���������
-	    ���������� SDL.lib �� SDLmain.lib ���ư�����Ƥ����ޤ���
+	   なお、生成された実行ファイルには、MAME/XMAMEベースのサウンド出力
+	   と fmgen が組み込まれています。
 
 
-�����ջ���
+●Visual C++ 6.0 を使ってビルドするには
 
-	QUASI88 �β��ѡ������ۤʤɤ˴ؤ��Ƥϡ���Ȥ�Ȥ� QUASI88 ��
-	��������ջ���˲ä��ưʲ����äƤ���������
+	Visual C++ 6.0 を使った場合、上記の方法では SDLバージョンの QUASI88
+	は、ビルド出来ません。
+	どうやら、SDL 1.2.15 の Development Libraries は、そのままでは
+	Visual C++ 6.0 で使用できないようです。
 
-	SDL�С������� QUASI88 �ξ���
+	以下のいずれかの方法で対処してください。
 
-		QUASI88 �μ¹Ԥˤϡ� SDL.dll ��ɬ�פǤ���
-		SDL.dll �򥻥åȤˤ������ۤ�����ϡ� SDL ����°��
-		README-SDL.txt �򤤤ä�������ۤ��Ƥ���������
-		(SDL�Υɥ�����Ȥˡ������񤤤Ƥ���Τǡ�����)
-		SDL �Υ饤���󥹤ˤ⽾�äƤ���������
+	i)  SDLライブラリをソースから作り直す方法
 
-	SDL�С������Win32�С������Ȥ�ˡ�
+	    SDL のウェブサイトより  Source Code をダウンロードし、
+	    Visual C++ 6.0 にて、 SDL ライブラリをビルドします。
+	    ( ビルド方法は、ダウンロードしたファイルに記載されています )
 
-		MAME/XMAME�١����Υ�����ɽ��Ϥ��Ȥ߹������硢
-		MAME/XMAME �Υ饤���󥹤˽���ɬ�פ�����ޤ���
+	    出来あがったファイル SDL.lib と SDLmain.lib は、
+	    sdl-devel\lib\x86 フォルダ内のファイルと差し替えておきます。
 
-		fmgen���Ȥ߹������硢
-		fmgen �Υ饤���󥹤˽���ɬ�פ�����ޤ���
+	ii) 古いバージョンの SDL を使用する方法
 
-		�¹ԥե������Ʊ���ե�����ˡ��ʲ��ζ��Υե�������������
-		�����ȥ٥����Ǥ��������Υե�����ϡ�����Τʤ����֤� 
-		QUASI88 ��¹Ԥ������γƼﻲ�ȥե�����ˤʤ�ޤ���
+	    古いバージョンの SDL Development Libraries は、 SDL のサイトより
+	    入手可能なようです。 → http://www.libsdl.org/release/
 
-			INI   �ե����
-			ROM   �ե����
-			DISK  �ե����
-			TAPE  �ե����
-			SNAP  �ե����
-			STATE �ե����
+	    この場合、sdl-devel\lib フォルダの下に x86 フォルダを作成
+	    し、そこに SDL.lib と SDLmain.lib を移動させておきます。
+
+
+●注意事項
+
+	QUASI88 の改変・再配布などに関しては、もともとの QUASI88 の
+	著作権・免責事項に加えて以下を守ってください。
+
+	SDLバージョンの QUASI88 の場合…
+
+		QUASI88 の実行には、 SDL.dll が必要です。
+		SDL.dll をセットにして配布する場合は、 SDL に付属の
+		README-SDL.txt をいっしょに配布してください。
+		(SDLのドキュメントに、そう書いてあるので・・・)
+		SDL のライセンスにも従ってください。
+
+	SDLバージョン・Win32バージョンともに…
+
+		MAME/XMAMEベースのサウンド出力を組み込んだ場合、
+		MAME/XMAME のライセンスに従う必要があります。
+
+		fmgenを組み込んだ場合、
+		fmgen のライセンスに従う必要があります。
+
+		実行ファイルと同じフォルダに、以下の空のフォルダを作成して
+		おくとベターです。これらのフォルダは、設定のない状態で 
+		QUASI88 を実行した時の各種参照フォルダになります。
+
+			INI   フォルダ
+			ROM   フォルダ
+			DISK  フォルダ
+			TAPE  フォルダ
+			SNAP  フォルダ
+			STATE フォルダ

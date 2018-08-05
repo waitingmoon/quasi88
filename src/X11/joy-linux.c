@@ -1,15 +1,15 @@
 /************************************************************************/
-/* LINUX-USBÍÑ ¥¸¥ç¥¤¥¹¥Æ¥£¥Ã¥¯ÆşÎÏ½èÍı					*/
+/* LINUX-USBç”¨ ã‚¸ãƒ§ã‚¤ã‚¹ãƒ†ã‚£ãƒƒã‚¯å…¥åŠ›å‡¦ç†					*/
 /*									*/
-/*	¤³¤Î¥Õ¥¡¥¤¥ë¤Ï¡¢ joystick.c ¤«¤é¥¤¥ó¥¯¥ë¡¼¥É¤µ¤ì¤Ş¤¹		*/
+/*	ã“ã®ãƒ•ã‚¡ã‚¤ãƒ«ã¯ã€ joystick.c ã‹ã‚‰ã‚¤ãƒ³ã‚¯ãƒ«ãƒ¼ãƒ‰ã•ã‚Œã¾ã™		*/
 /*									*/
 /************************************************************************/
 #if	defined(JOY_LINUX_USB)
 
 /*
-  °Ê²¼¤Î¥³¡¼¥É¤Ï¡¢°úÃÏ¤µ¤ó [eiichi@licorp.co.jp] ¤Ë¤è¤êÄó¶¡¤µ¤ì¤Ş¤·¤¿¡£
+  ä»¥ä¸‹ã®ã‚³ãƒ¼ãƒ‰ã¯ã€å¼•åœ°ã•ã‚“ [eiichi@licorp.co.jp] ã«ã‚ˆã‚Šæä¾›ã•ã‚Œã¾ã—ãŸã€‚
 
-	¥á¥¤¥óÂ¦¤Î½èÍı¤Ë¹ç¤ï¤»¤Æ¡¢ÊÑ¿ôÌ¾¡¦´Ø¿ôÌ¾¤Ê¤É¤ò½¤Àµ¤·¤Æ¤¤¤Ş¤¹¡£
+	ãƒ¡ã‚¤ãƒ³å´ã®å‡¦ç†ã«åˆã‚ã›ã¦ã€å¤‰æ•°åãƒ»é–¢æ•°åãªã©ã‚’ä¿®æ­£ã—ã¦ã„ã¾ã™ã€‚
 */
 
 
@@ -23,16 +23,16 @@
 #include "joystick.h"
 #include "event.h"
 
-int	enable_joystick = FALSE;	/* ¥¸¥ç¥¤¥¹¥Æ¥£¥Ã¥¯¤Î»ÈÍÑ²ÄÈİ */
+int	enable_joystick = FALSE;	/* ã‚¸ãƒ§ã‚¤ã‚¹ãƒ†ã‚£ãƒƒã‚¯ã®ä½¿ç”¨å¯å¦ */
 
 
 
 #ifdef NAKAMIZO
 unsigned char joy_code[][2][4] = {
-    {{0x01, 0x80, 0x02, 0x01}, {0xef, 0x53, 0x02, 0x01}},    /* ¾å */
-    {{0xff, 0x7f, 0x02, 0x01}, {0xef, 0x53, 0x02, 0x01}},    /* ²¼ */
-    {{0xff, 0x7f, 0x02, 0x00}, {0xef, 0x53, 0x02, 0x00}},    /* ±¦ */
-    {{0x01, 0x80, 0x02, 0x00}, {0xef, 0x53, 0x02, 0x00}},    /* º¸ */
+    {{0x01, 0x80, 0x02, 0x01}, {0xef, 0x53, 0x02, 0x01}},    /* ä¸Š */
+    {{0xff, 0x7f, 0x02, 0x01}, {0xef, 0x53, 0x02, 0x01}},    /* ä¸‹ */
+    {{0xff, 0x7f, 0x02, 0x00}, {0xef, 0x53, 0x02, 0x00}},    /* å³ */
+    {{0x01, 0x80, 0x02, 0x00}, {0xef, 0x53, 0x02, 0x00}},    /* å·¦ */
     {{0x01, 0x00, 0x01, 0x0b}, {0x00, 0x00, 0x01, 0x0b}},    /* start */
     {{0x01, 0x00, 0x01, 0x0a}, {0x00, 0x00, 0x01, 0x0a}},    /* select */
     {{0x01, 0x00, 0x01, 0x00}, {0x00, 0x00, 0x01, 0x00}},    /* A */
@@ -49,10 +49,10 @@ unsigned char joy_code[][2][4] = {
 #endif /* NAKAMIZO */
 
 unsigned char joy_code[][2][4] = {
-    {{0x01, 0x80, 0x02, 0x01}, {0x00, 0x00, 0x02, 0x01}},    /* ¾å */
-    {{0xff, 0x7f, 0x02, 0x01}, {0x00, 0x00, 0x02, 0x01}},    /* ²¼ */
-    {{0xff, 0x7f, 0x02, 0x00}, {0x00, 0x00, 0x02, 0x00}},    /* ±¦ */
-    {{0x01, 0x80, 0x02, 0x00}, {0x00, 0x00, 0x02, 0x00}},    /* º¸ */
+    {{0x01, 0x80, 0x02, 0x01}, {0x00, 0x00, 0x02, 0x01}},    /* ä¸Š */
+    {{0xff, 0x7f, 0x02, 0x01}, {0x00, 0x00, 0x02, 0x01}},    /* ä¸‹ */
+    {{0xff, 0x7f, 0x02, 0x00}, {0x00, 0x00, 0x02, 0x00}},    /* å³ */
+    {{0x01, 0x80, 0x02, 0x00}, {0x00, 0x00, 0x02, 0x00}},    /* å·¦ */
     {{0x01, 0x00, 0x01, 0x0b}, {0x00, 0x00, 0x01, 0x0b}},    /* start */
     {{0x01, 0x00, 0x01, 0x0a}, {0x00, 0x00, 0x01, 0x0a}},    /* select */
     {{0x01, 0x00, 0x01, 0x00}, {0x00, 0x00, 0x01, 0x00}},    /* A */
@@ -89,8 +89,8 @@ typedef struct {
     int is_press;
 } JOY_BUTTON;
 
-static	JOY_BUTTON joy_button[10];      /* ÊÑ²½¤Î¤¢¤Ã¤¿ Joystick ¤Î¥Ü¥¿¥ó */
-static	FILE*   joystick_device;        /* Joystick ¥Ç¥Ğ¥¤¥¹ */
+static	JOY_BUTTON joy_button[10];      /* å¤‰åŒ–ã®ã‚ã£ãŸ Joystick ã®ãƒœã‚¿ãƒ³ */
+static	FILE*   joystick_device;        /* Joystick ãƒ‡ãƒã‚¤ã‚¹ */
 
 void joystick_init(void)
 {
@@ -134,8 +134,8 @@ void joystick_exit(void)
 
 
 
-static int press_up_down = 0;           /* ¥³¥ó¥È¥í¡¼¥é¾å²¼¥Ü¥¿¥ó²¡²¼¾õÂÖ */
-static int press_right_left = 0;        /* ¥³¥ó¥È¥í¡¼¥éº¸±¦¥Ü¥¿¥ó²¡²¼¾õÂÖ */
+static int press_up_down = 0;           /* ã‚³ãƒ³ãƒˆãƒ­ãƒ¼ãƒ©ä¸Šä¸‹ãƒœã‚¿ãƒ³æŠ¼ä¸‹çŠ¶æ…‹ */
+static int press_right_left = 0;        /* ã‚³ãƒ³ãƒˆãƒ­ãƒ¼ãƒ©å·¦å³ãƒœã‚¿ãƒ³æŠ¼ä¸‹çŠ¶æ…‹ */
 
 void joystick_update(void)
 {
@@ -213,7 +213,7 @@ void joystick_update(void)
 	  }
 	}
 
-	/* ¾å²¼¥Ü¥¿¥ó */
+	/* ä¸Šä¸‹ãƒœã‚¿ãƒ³ */
 	quasi88_pad( KEY88_PAD1_UP,    FALSE );
 	quasi88_pad( KEY88_PAD1_DOWN,  FALSE );
 	if (press_up_down == 1) {
@@ -222,7 +222,7 @@ void joystick_update(void)
 	  quasi88_pad( KEY88_PAD1_DOWN,  TRUE );
 	}
 
-	/* º¸±¦¥Ü¥¿¥ó */
+	/* å·¦å³ãƒœã‚¿ãƒ³ */
 	quasi88_pad( KEY88_PAD1_RIGHT, FALSE );
 	quasi88_pad( KEY88_PAD1_LEFT,  FALSE );
 	if (press_right_left == 1) {

@@ -2,36 +2,36 @@
 #define INTR_H_INCLUDED
 
 
-extern	int	intr_level;			/* OUT[E4] ³ä¤ê¹ş¤ß¥ì¥Ù¥ë */
-extern	int	intr_priority;			/* OUT[E4] ³ä¤ê¹ş¤ßÍ¥ÀèÅÙ */
-extern	int	intr_sio_enable;		/* OUT[E6] ³ä¹ş¥Ş¥¹¥¯ SIO */ 
-extern	int	intr_vsync_enable;		/* OUT[E6] ³ä¹ş¥Ş¥¹¥¯VSYNC*/ 
-extern	int	intr_rtc_enable;		/* OUT[E6] ³ä¹ş¥Ş¥¹¥¯ RTC */ 
+extern	int	intr_level;			/* OUT[E4] å‰²ã‚Šè¾¼ã¿ãƒ¬ãƒ™ãƒ« */
+extern	int	intr_priority;			/* OUT[E4] å‰²ã‚Šè¾¼ã¿å„ªå…ˆåº¦ */
+extern	int	intr_sio_enable;		/* OUT[E6] å‰²è¾¼ãƒã‚¹ã‚¯ SIO */ 
+extern	int	intr_vsync_enable;		/* OUT[E6] å‰²è¾¼ãƒã‚¹ã‚¯VSYNC*/ 
+extern	int	intr_rtc_enable;		/* OUT[E6] å‰²è¾¼ãƒã‚¹ã‚¯ RTC */ 
 
 
 
-extern	double	cpu_clock_mhz;		/* ¥á¥¤¥ó CPU¤Î¥¯¥í¥Ã¥¯     [MHz] */
-extern	double	sound_clock_mhz;	/* ¥µ¥¦¥ó¥É¥Á¥Ã¥×¤Î¥¯¥í¥Ã¥¯ [MHz] */
-extern	double	vsync_freq_hz;		/* VSYNC ³ä¤ê¹ş¤ß¤Î¼ş´ü	    [Hz]  */
+extern	double	cpu_clock_mhz;		/* ãƒ¡ã‚¤ãƒ³ CPUã®ã‚¯ãƒ­ãƒƒã‚¯     [MHz] */
+extern	double	sound_clock_mhz;	/* ã‚µã‚¦ãƒ³ãƒ‰ãƒãƒƒãƒ—ã®ã‚¯ãƒ­ãƒƒã‚¯ [MHz] */
+extern	double	vsync_freq_hz;		/* VSYNC å‰²ã‚Šè¾¼ã¿ã®å‘¨æœŸ	    [Hz]  */
 
 
-extern	int	state_of_cpu;			/*¥á¥¤¥óCPU¤¬½èÍı¤·¤¿Ì¿Îá¿ô */
-extern	int	state_of_vsync;			/* VSYNC¼ş´ü¤Î¥¹¥Æ¡¼¥È¿ô   */
+extern	int	state_of_cpu;			/*ãƒ¡ã‚¤ãƒ³CPUãŒå‡¦ç†ã—ãŸå‘½ä»¤æ•° */
+extern	int	state_of_vsync;			/* VSYNCå‘¨æœŸã®ã‚¹ãƒ†ãƒ¼ãƒˆæ•°   */
 
-extern	int	wait_rate;			/* ¥¦¥¨¥¤¥ÈÄ´À° ÈæÎ¨    [%]  */
-extern	int	wait_by_sleep;			/* ¥¦¥¨¥¤¥ÈÄ´À°»ş sleep ¤¹¤ë */
+extern	int	wait_rate;			/* ã‚¦ã‚¨ã‚¤ãƒˆèª¿æ•´ æ¯”ç‡    [%]  */
+extern	int	wait_by_sleep;			/* ã‚¦ã‚¨ã‚¤ãƒˆèª¿æ•´æ™‚ sleep ã™ã‚‹ */
 
-extern	int	no_wait;			/* ¥¦¥¨¥¤¥È¤Ê¤·		*/
+extern	int	no_wait;			/* ã‚¦ã‚¨ã‚¤ãƒˆãªã—		*/
 
-extern	int	boost;				/* ¥Ö¡¼¥¹¥È		*/
+extern	int	boost;				/* ãƒ–ãƒ¼ã‚¹ãƒˆ		*/
 extern	int	boost_cnt;			/* 			*/
 
 
 
 
-extern	int	ctrl_vrtc;			/* 1:¿âÄ¾µ¢ÀşÃæ  0: É½¼¨Ãæ */
+extern	int	ctrl_vrtc;			/* 1:å‚ç›´å¸°ç·šä¸­  0: è¡¨ç¤ºä¸­ */
 
-extern	int	VSYNC_flag;			/* ³Æ¼ï³ä¤ê¹ş¤ß¿®¹æ¥Õ¥é¥° */
+extern	int	VSYNC_flag;			/* å„ç¨®å‰²ã‚Šè¾¼ã¿ä¿¡å·ãƒ•ãƒ©ã‚° */
 extern	int	RTC_flag;
 extern	int	SOUND_flag;
 extern	int	RS232C_flag;

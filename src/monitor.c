@@ -1,6 +1,6 @@
 /************************************************************************/
 /*									*/
-/* ¥â¥Ë¥¿¡¼¥â¡¼¥É							*/
+/* ãƒ¢ãƒ‹ã‚¿ãƒ¼ãƒ¢ãƒ¼ãƒ‰							*/
 /*									*/
 /************************************************************************/
 
@@ -56,17 +56,17 @@
 
 
 /************************************************************************/
-/* SIGINTÈ¯À¸»ş (Ctrl-C) ¡¢¥â¥Ë¥¿¡¼¥â¡¼¥É¤ØÁ«°Ü¤¹¤ë¤è¤¦¤ËÀßÄê		*/
-/*	µ¯Æ°»ş¤Ë -debug ¥ª¥×¥·¥ç¥ó»ØÄê»ş¤Î¤ß¡£Ì¤»ØÄê»ş¤Ï½ªÎ»¤¹¤ë¡£	*/
+/* SIGINTç™ºç”Ÿæ™‚ (Ctrl-C) ã€ãƒ¢ãƒ‹ã‚¿ãƒ¼ãƒ¢ãƒ¼ãƒ‰ã¸é·ç§»ã™ã‚‹ã‚ˆã†ã«è¨­å®š		*/
+/*	èµ·å‹•æ™‚ã« -debug ã‚ªãƒ—ã‚·ãƒ§ãƒ³æŒ‡å®šæ™‚ã®ã¿ã€‚æœªæŒ‡å®šæ™‚ã¯çµ‚äº†ã™ã‚‹ã€‚	*/
 /************************************************************************/
 
-int	debug_mode	= FALSE;		/* ¥Ç¥Ğ¥Ã¥°µ¡Ç½(¥â¥Ë¥¿¡¼)  */
+int	debug_mode	= FALSE;		/* ãƒ‡ãƒãƒƒã‚°æ©Ÿèƒ½(ãƒ¢ãƒ‹ã‚¿ãƒ¼)  */
 
-char	alt_char	= 'X';			/* ÂåÂØÊ¸»ú */
+char	alt_char	= 'X';			/* ä»£æ›¿æ–‡å­— */
 
 
 
-/* ¥â¥Ë¥¿¡¼¥â¡¼¥É°Ê³°¤Î»ş¤Ë SIGINT(Ctrl-C)¤ò¼õ¤±¼è¤Ã¤¿¤é¥â¥Ë¥¿¡¼¥â¡¼¥É¤Ë°Ü¹Ô */
+/* ãƒ¢ãƒ‹ã‚¿ãƒ¼ãƒ¢ãƒ¼ãƒ‰ä»¥å¤–ã®æ™‚ã« SIGINT(Ctrl-C)ã‚’å—ã‘å–ã£ãŸã‚‰ãƒ¢ãƒ‹ã‚¿ãƒ¼ãƒ¢ãƒ¼ãƒ‰ã«ç§»è¡Œ */
 
 static	void	sigint_handler(int dummy)
 {
@@ -74,7 +74,7 @@ static	void	sigint_handler(int dummy)
     signal(SIGINT, sigint_handler);
 }
 
-/* SIGTERM ¤ò¼õ¤±¤È¤Ã¤¿¤é¡¢½ªÎ»¤¹¤ë */
+/* SIGTERM ã‚’å—ã‘ã¨ã£ãŸã‚‰ã€çµ‚äº†ã™ã‚‹ */
 
 static	void	sigterm_handler(int dummy)
 {
@@ -83,7 +83,7 @@ static	void	sigterm_handler(int dummy)
     z80sub_cpu.icount = 0;
 }
 
-/*-------- ³ä¤ê¹ş¤ßÀßÄê -------- */
+/*-------- å‰²ã‚Šè¾¼ã¿è¨­å®š -------- */
 
 void	set_signal(void)
 {
@@ -167,7 +167,7 @@ enum MonitorJob
 
 
 /****************************************************************/
-/* ¥Ø¥ë¥×¥á¥Ã¥»¡¼¥¸É½¼¨´Ø¿ô					*/
+/* ãƒ˜ãƒ«ãƒ—ãƒ¡ãƒƒã‚»ãƒ¼ã‚¸è¡¨ç¤ºé–¢æ•°					*/
 /****************************************************************/
 static	void	help_help(void)
 {
@@ -762,7 +762,7 @@ static	void	help_misc(void)
 
 
 /****************************************************************/
-/* Ì¿Îá¤Î¼ïÎàÈ½Äê¥Æ¡¼¥Ö¥ë					*/
+/* å‘½ä»¤ã®ç¨®é¡åˆ¤å®šãƒ†ãƒ¼ãƒ–ãƒ«					*/
 /****************************************************************/
 static struct {
     int		job;
@@ -825,19 +825,19 @@ static struct {
 
 
 /****************************************************************/
-/* °ú¿ô¤Î¼ïÎàÈ½Äê¥Æ¡¼¥Ö¥ë					*/
+/* å¼•æ•°ã®ç¨®é¡åˆ¤å®šãƒ†ãƒ¼ãƒ–ãƒ«					*/
 /****************************************************************/
 
 enum ArgvType {
   ARGV_END     = 0x0000000,
   ARGV_STR     = 0x0000001,		/* strings			*/
-  ARGV_PORT    = 0x0000002,		/* 0¡Á0xff			*/
-  ARGV_ADDR    = 0x0000004,		/* 0¡Á0xffff			*/
-  ARGV_NUM     = 0x0000008,		/* 0¡Á0x7fffffff		*/
-  ARGV_INT     = 0x0000010,		/* -0x7fffffff¡Á0x7fffffff	*/
-  ARGV_DRV     = 0x0000020,		/* 1¡Á2				*/
-  ARGV_IMG     = 0x0000040,		/* 1¡ÁMAX_NR_IMAGE		*/
-  ARGV_SIZE    = 0x0000080,		/* #1¡Á#0x7fffffff		*/
+  ARGV_PORT    = 0x0000002,		/* 0ã€œ0xff			*/
+  ARGV_ADDR    = 0x0000004,		/* 0ã€œ0xffff			*/
+  ARGV_NUM     = 0x0000008,		/* 0ã€œ0x7fffffff		*/
+  ARGV_INT     = 0x0000010,		/* -0x7fffffffã€œ0x7fffffff	*/
+  ARGV_DRV     = 0x0000020,		/* 1ã€œ2				*/
+  ARGV_IMG     = 0x0000040,		/* 1ã€œMAX_NR_IMAGE		*/
+  ARGV_SIZE    = 0x0000080,		/* #1ã€œ#0x7fffffff		*/
   ARGV_CPU     = 0x0000100,		/* CpuName			*/
   ARGV_BANK    = 0x0000200,		/* MemoryName			*/
   ARGV_REG     = 0x0000400,		/* RegisterName			*/
@@ -1214,7 +1214,7 @@ static struct {
 
 
 /*--------------------------------------------------------------*/
-/* ¥á¥â¥ê READ/WRITE ´Ø¿ô					*/
+/* ãƒ¡ãƒ¢ãƒª READ/WRITE é–¢æ•°					*/
 /*--------------------------------------------------------------*/
 static	byte	peek_memory( int bank, word addr )
 {
@@ -1345,15 +1345,15 @@ static	void	poke_memory( int bank, word addr, byte data )
 
 
 /*==============================================================*/
-/* °ú¿ô½èÍı							*/
+/* å¼•æ•°å‡¦ç†							*/
 /*==============================================================*/
 
 /*
- * buf[] ¤ÎÊ¸»úÎó¤«¤é¡¢Ã±¸ì¤ò¼è¤ê½Ğ¤¹¡£¶èÀÚ¤ê¤Ï¡¢SPC ¤È TAB¡£
- * ¼è¤ê½Ğ¤·¤¿³ÆÃ±¸ì¤ÎÀèÆ¬¥¢¥É¥ì¥¹¤¬¡¢*d_argv[] ¤Ë³ÊÇ¼¤µ¤ì¤ë¡£
- * Ã±¸ì¤ÏºÇÂç MAX_ARGS ¸Ä¼è¤ê½Ğ¤¹¡£Ã±¸ì¤Î¿ô¤Ï¡¢d_argc ¤Ë¥»¥Ã¥È¡£
- * Ã±¸ì¤Î¿ô¤¬ MAX_ARGS ¤è¤ê¤âÂ¿¤¤»ş¤Ï¡¢d_argc ¤Ë MAX_ARGS+1 ¤ò¥»¥Ã¥È¡¢
- * ¤³¤Î»ş¡¢MAX_ARGS ¸Ä¤Ş¤Ç¤Ï¡¢*d_argv[] ¤¬³ÊÇ¼¤µ¤ì¤Æ¤¤¤ë¡£
+ * buf[] ã®æ–‡å­—åˆ—ã‹ã‚‰ã€å˜èªã‚’å–ã‚Šå‡ºã™ã€‚åŒºåˆ‡ã‚Šã¯ã€SPC ã¨ TABã€‚
+ * å–ã‚Šå‡ºã—ãŸå„å˜èªã®å…ˆé ­ã‚¢ãƒ‰ãƒ¬ã‚¹ãŒã€*d_argv[] ã«æ ¼ç´ã•ã‚Œã‚‹ã€‚
+ * å˜èªã¯æœ€å¤§ MAX_ARGS å€‹å–ã‚Šå‡ºã™ã€‚å˜èªã®æ•°ã¯ã€d_argc ã«ã‚»ãƒƒãƒˆã€‚
+ * å˜èªã®æ•°ãŒ MAX_ARGS ã‚ˆã‚Šã‚‚å¤šã„æ™‚ã¯ã€d_argc ã« MAX_ARGS+1 ã‚’ã‚»ãƒƒãƒˆã€
+ * ã“ã®æ™‚ã€MAX_ARGS å€‹ã¾ã§ã¯ã€*d_argv[] ãŒæ ¼ç´ã•ã‚Œã¦ã„ã‚‹ã€‚
  */
 
 #define MAX_ARGS	(8)
@@ -1395,27 +1395,27 @@ static	void	getarg(void)
 
 
 /*
- * getarg() ¤Ë¤è¤ê¡¢main()¤Î°ú¿ô¤ÈÆ±¤¸¤è¤¦¤Ê·Á¼°¤Ç¡¢int d_argc, char *d_argv[]
- * ¤¬ÀßÄê¤µ¤ì¤ë¤¬¡¢¤³¤ì¤ò¤â¤¦¾¯¤·´ÊÃ±¤Ë½èÍı¤·¤¿¤¤¤Î¤Ç¡¢shift() ´Ø¿ô¤òÍÑ°Õ¤·¤¿¡£
+ * getarg() ã«ã‚ˆã‚Šã€main()ã®å¼•æ•°ã¨åŒã˜ã‚ˆã†ãªå½¢å¼ã§ã€int d_argc, char *d_argv[]
+ * ãŒè¨­å®šã•ã‚Œã‚‹ãŒã€ã“ã‚Œã‚’ã‚‚ã†å°‘ã—ç°¡å˜ã«å‡¦ç†ã—ãŸã„ã®ã§ã€shift() é–¢æ•°ã‚’ç”¨æ„ã—ãŸã€‚
  *
- * shift() ´Ø¿ô¤ò¸Æ¤Ö¤È¡¢°ìÈÖºÇ½é¤Î°ú¿ô¤¬²òÀÏ¤µ¤ì¡¢¤½¤Î·ë²Ì¤¬ argv ¥ï¡¼¥¯¤Ë
- * ³ÊÇ¼¤µ¤ì¤ë¡£¤³¤Î¸å¤Ç¡¢argv.type ¤ò¥Á¥§¥Ã¥¯¤¹¤ì¤Ğ¡¢¤½¤Î°ú¿ô¤Î¼ïÎà¤¬¡¢
- * argv.val ¤ò¥Á¥§¥Ã¥¯¤¹¤ì¤Ğ¡¢¤½¤Î°ú¿ô¤ÎÃÍ¤¬¤ï¤«¤ë¡£
+ * shift() é–¢æ•°ã‚’å‘¼ã¶ã¨ã€ä¸€ç•ªæœ€åˆã®å¼•æ•°ãŒè§£æã•ã‚Œã€ãã®çµæœãŒ argv ãƒ¯ãƒ¼ã‚¯ã«
+ * æ ¼ç´ã•ã‚Œã‚‹ã€‚ã“ã®å¾Œã§ã€argv.type ã‚’ãƒã‚§ãƒƒã‚¯ã™ã‚Œã°ã€ãã®å¼•æ•°ã®ç¨®é¡ãŒã€
+ * argv.val ã‚’ãƒã‚§ãƒƒã‚¯ã™ã‚Œã°ã€ãã®å¼•æ•°ã®å€¤ãŒã‚ã‹ã‚‹ã€‚
  *
- * shift() ´Ø¿ô¤Ë¤è¤ê¡¢°ú¿ô¤¬¸«¤«¤±¾å°ì¤Ä¤º¤ÄÁ°¤Ë¤º¤ì¤Æ¤¤¤¯¡£
- * ¤æ¤¨¤Ë¡¢shift() ´Ø¿ô¤òÏ¢Â³¤·¤Æ¸Æ¤Ù¤Ğ¡¢¾ï¤Ë¼¡¤Î°ú¿ô¤¬²òÀÏ¤µ¤ì¤ë¡£
+ * shift() é–¢æ•°ã«ã‚ˆã‚Šã€å¼•æ•°ãŒè¦‹ã‹ã‘ä¸Šä¸€ã¤ãšã¤å‰ã«ãšã‚Œã¦ã„ãã€‚
+ * ã‚†ãˆã«ã€shift() é–¢æ•°ã‚’é€£ç¶šã—ã¦å‘¼ã¹ã°ã€å¸¸ã«æ¬¡ã®å¼•æ•°ãŒè§£æã•ã‚Œã‚‹ã€‚
  *
  *   shift();
- *   if( argv.type == XXX ){ ½èÍı() };
+ *   if( argv.type == XXX ){ å‡¦ç†() };
  *   shift();
- *   if( argv.type == YYY ){ ½èÍı() };
+ *   if( argv.type == YYY ){ å‡¦ç†() };
  *   ...
  */
 
 static struct {
-    int		type;			/* °ú¿ô¤Î¼ïÎà	ARGV_xxx	   */
-    int		val;			/* °ú¿ô¤ÎÃÍ	ARG_xxx ¤Ş¤¿¤Ï¡¢¿ô */
-    char	*str;			/* °ú¿ô¤ÎÊ¸»úÎó	d_argv[xxx]¤ÈÆ±¤¸  */
+    int		type;			/* å¼•æ•°ã®ç¨®é¡	ARGV_xxx	   */
+    int		val;			/* å¼•æ•°ã®å€¤	ARG_xxx ã¾ãŸã¯ã€æ•° */
+    char	*str;			/* å¼•æ•°ã®æ–‡å­—åˆ—	d_argv[xxx]ã¨åŒã˜  */
 } argv;
 
 
@@ -1425,12 +1425,12 @@ static	void	shift(void)
     char *p, *chk;
 
 
-    if (argv_counter > MAX_ARGS ||		/* ¤³¤ì°Ê¾å°ú¿ô¤¬Ìµ¤¤ */
+    if (argv_counter > MAX_ARGS ||		/* ã“ã‚Œä»¥ä¸Šå¼•æ•°ãŒç„¡ã„ */
 	argv_counter >= d_argc) {
 
 	argv.type = ARGV_END;
 
-    } else {					/* ¤Ş¤À°ú¿ô¤¬¤¢¤ë¤Î¤Ç²òÀÏ */
+    } else {					/* ã¾ã å¼•æ•°ãŒã‚ã‚‹ã®ã§è§£æ */
 
 	p = d_argv[ argv_counter ];
 	if (*p == '#') { size = TRUE; p++; }
@@ -1439,12 +1439,12 @@ static	void	shift(void)
 	argv.val  = strtol(p, &chk, 0);
 	argv.str  = d_argv[ argv_counter ];
 
-	if (p != chk && *chk == '\0') {			/* ¿ôÃÍ¤Î¾ì¹ç */
+	if (p != chk && *chk == '\0') {			/* æ•°å€¤ã®å ´åˆ */
 
-	    if (size) {						/* #¤Ç»Ï¤Ş¤ë */
+	    if (size) {						/* #ã§å§‹ã¾ã‚‹ */
 		if (argv.val <= 0) argv.type = ARGV_STR;
 		else               argv.type = ARGV_SIZE;
-	    } else {						/*¿ô¤Ç»Ï¤Ş¤ë */
+	    } else {						/*æ•°ã§å§‹ã¾ã‚‹ */
 		argv.type |= ARGV_INT;
 		if (argv.val >= 0)      argv.type |= ARGV_NUM;
 		if (argv.val <= 0xff)   argv.type |= ARGV_PORT;
@@ -1453,11 +1453,11 @@ static	void	shift(void)
 		if (BETWEEN(1, argv.val, MAX_NR_IMAGE)) argv.type |= ARGV_IMG;
 	    }
 
-	} else {					/* Ê¸»úÎó¤Î¾ì¹ç */
+	} else {					/* æ–‡å­—åˆ—ã®å ´åˆ */
 
-	    if (size) {						/* #¤Ç»Ï¤Ş¤ë */
+	    if (size) {						/* #ã§å§‹ã¾ã‚‹ */
 		argv.type = ARGV_STR;
-	    } else {						/*»ú¤Ç»Ï¤Ş¤ë */
+	    } else {						/*å­—ã§å§‹ã¾ã‚‹ */
 		for (i=0; i<COUNTOF(monitor_argv); i++) {
 		    if (my_strcmp(p, monitor_argv[i].str) == 0) {
 			argv.type |= monitor_argv[i].type;
@@ -1475,16 +1475,16 @@ static	void	shift(void)
 }
 
 
-/* shift() ¤·¤¿·ë²Ì¡¢°ú¿ô¤¬ÀßÄê¤µ¤ì¤¿¤«¤É¤¦¤«¤ò¥Á¥§¥Ã¥¯ */
+/* shift() ã—ãŸçµæœã€å¼•æ•°ãŒè¨­å®šã•ã‚ŒãŸã‹ã©ã†ã‹ã‚’ãƒã‚§ãƒƒã‚¯ */
 
 #define	exist_argv()	(argv.type)
 
-/* shift() ¤·¤¿·ë²Ì¡¢½èÍı¤µ¤ì¤¿°ú¿ô¤Î¼ïÎà¤ò¥Á¥§¥Ã¥¯ */
+/* shift() ã—ãŸçµæœã€å‡¦ç†ã•ã‚ŒãŸå¼•æ•°ã®ç¨®é¡ã‚’ãƒã‚§ãƒƒã‚¯ */
 
 #define	argv_is(x)	(argv.type & (x))
 
 
-/* °ú¿ô¤ÎÃÍ (ARG_xxx) ¤«¤é¡¢°ú¿ô¤ÎÊ¸»úÎó (ÂçÊ¸»ú) ¤òÆÀ¤ë */
+/* å¼•æ•°ã®å€¤ (ARG_xxx) ã‹ã‚‰ã€å¼•æ•°ã®æ–‡å­—åˆ— (å¤§æ–‡å­—) ã‚’å¾—ã‚‹ */
 
 static	char	*argv2str(int argv_val)
 {
@@ -1500,7 +1500,7 @@ static	char	*argv2str(int argv_val)
 
 
 /*==============================================================*/
-/* ¥¨¥é¡¼´ØÏ¢							*/
+/* ã‚¨ãƒ©ãƒ¼é–¢é€£							*/
 /*==============================================================*/
 #define error()							\
 	do {							\
@@ -1512,7 +1512,7 @@ static	char	*argv2str(int argv_val)
 
 
 /*==============================================================*/
-/* ¥Æ¥­¥¹¥È¥¹¥¯¥ê¡¼¥ó´ØÏ¢			by peach	*/
+/* ãƒ†ã‚­ã‚¹ãƒˆã‚¹ã‚¯ãƒªãƒ¼ãƒ³é–¢é€£			by peach	*/
 /*==============================================================*/
 #define PUT_JIS_IN(fp)	fprintf(fp, "%c%c%c", 0x1b, 0x28, 0x49);
 #define PUT_JIS_OUT(fp)	fprintf(fp, "%c%c%c", 0x1b, 0x28, 0x42);
@@ -1546,7 +1546,7 @@ void	print_hankaku(FILE *fp, Uchar *str, char ach)
 {
     Uchar *ptr;
 
-    /* É¸½à½ĞÎÏ¤¸¤ã¤Ê¤¤¤Ê¤é¤½¤Î¤Ş¤Ş */
+    /* æ¨™æº–å‡ºåŠ›ã˜ã‚ƒãªã„ãªã‚‰ãã®ã¾ã¾ */
     if (fp != stdout) {
 	fprintf(fp, "%s", str);
 	return;
@@ -1576,7 +1576,7 @@ void	print_hankaku(FILE *fp, Uchar *str, char ach)
 	    }
 	} else if (isprint(*ptr)) {
 	    fputc(*ptr, fp);
-	} else {		/* É½¼¨ÉÔÇ½ */
+	} else {		/* è¡¨ç¤ºä¸èƒ½ */
 	    fputc(ach, fp);
 	    /*fprintf(fp, "0x%x", *ptr);*/
 	}
@@ -1587,12 +1587,12 @@ void	print_hankaku(FILE *fp, Uchar *str, char ach)
 
 
 /****************************************************************/
-/* Ì¿ÎáÊÌ½èÍı							*/
+/* å‘½ä»¤åˆ¥å‡¦ç†							*/
 /****************************************************************/
 
 /*--------------------------------------------------------------*/
 /* help [<cmd>]							*/
-/*	¥Ø¥ë¥×¤òÉ½¼¨¤¹¤ë					*/
+/*	ãƒ˜ãƒ«ãƒ—ã‚’è¡¨ç¤ºã™ã‚‹					*/
 /*--------------------------------------------------------------*/
 static	void	monitor_help(void)
 {
@@ -1607,7 +1607,7 @@ static	void	monitor_help(void)
 
 
 
-    if (cmd == NULL) {			/* °ú¿ô¤Ê¤·¡£Á´¥Ø¥ë¥×É½¼¨ */
+    if (cmd == NULL) {			/* å¼•æ•°ãªã—ã€‚å…¨ãƒ˜ãƒ«ãƒ—è¡¨ç¤º */
 
 	printf("help\n");
 	for (i=0; i<COUNTOF(monitor_cmd); i++) {
@@ -1616,7 +1616,7 @@ static	void	monitor_help(void)
 	}
 	printf("     Note: type \"help <command-name>\" for more details.\n");
 
-    } else {				/* °ú¿ô¤Î¥³¥Ş¥ó¥É¤Î¥Ø¥ë¥×É½¼¨ */
+    } else {				/* å¼•æ•°ã®ã‚³ãƒãƒ³ãƒ‰ã®ãƒ˜ãƒ«ãƒ—è¡¨ç¤º */
 
 	for (i=0; i<COUNTOF(monitor_cmd); i++) {
 	    if (strcmp(cmd, monitor_cmd[i].cmd) == 0) break;
@@ -1632,7 +1632,7 @@ static	void	monitor_help(void)
 /*--------------------------------------------------------------*/
 /* dump [<bank>] <start-addr> [<end-addr>]			*/
 /* dump [<bank>] <start-addr> [#<size>]				*/
-/*	¥á¥â¥ê¥À¥ó¥×¤òÉ½¼¨¤¹¤ë					*/
+/*	ãƒ¡ãƒ¢ãƒªãƒ€ãƒ³ãƒ—ã‚’è¡¨ç¤ºã™ã‚‹					*/
 /*--------------------------------------------------------------*/
 static	int	save_dump_addr = -1;
 static	int	save_dump_bank = ARG_MAIN;
@@ -1671,8 +1671,8 @@ static	void	monitor_dump( void )
 
 	/*================*/
 
-  save_dump_addr = start + size;		/* Ëè²ó¥À¥ó¥×¤·¤¿¥¢¥É¥ì¥¹¤ò */
-  save_dump_bank = bank;			/* ³Ğ¤¨¤Æ¤ª¤¯ (Ï¢Â³¥À¥ó¥×ÍÑ)*/
+  save_dump_addr = start + size;		/* æ¯å›ãƒ€ãƒ³ãƒ—ã—ãŸã‚¢ãƒ‰ãƒ¬ã‚¹ã‚’ */
+  save_dump_bank = bank;			/* è¦šãˆã¦ãŠã (é€£ç¶šãƒ€ãƒ³ãƒ—ç”¨)*/
 
   size = ( size+15 ) /16;
 
@@ -1699,8 +1699,8 @@ static	void	monitor_dump( void )
 /*----------------------------------------------------------------------*/
 /* dumpext [<bank>] [#<board>] <start-addr> [<end-addr>]		*/
 /* dumpext [<bank>] [#<board>] <start-addr> [#<size>]			*/
-/*	³ÈÄ¥RAM¤Î¥á¥â¥ê¥À¥ó¥×¤òÉ½¼¨¤¹¤ë					*/
-/*				¤³¤Îµ¡Ç½¤Ï peach»á¤Ë¤è¤ê¼ÂÁõ¤µ¤ì¤Ş¤·¤¿	*/
+/*	æ‹¡å¼µRAMã®ãƒ¡ãƒ¢ãƒªãƒ€ãƒ³ãƒ—ã‚’è¡¨ç¤ºã™ã‚‹					*/
+/*				ã“ã®æ©Ÿèƒ½ã¯ peachæ°ã«ã‚ˆã‚Šå®Ÿè£…ã•ã‚Œã¾ã—ãŸ	*/
 /*----------------------------------------------------------------------*/
 static	int	save_dumpext_addr = -1;
 static	int	save_dumpext_bank = ARG_EXT0;
@@ -1750,8 +1750,8 @@ static	void	monitor_dumpext( void )
 
 	/*================*/
 
-  save_dumpext_addr  = start + size;		/* Ëè²ó¥À¥ó¥×¤·¤¿¥¢¥É¥ì¥¹¤ò */
-  save_dumpext_bank  = bank;			/* ³Ğ¤¨¤Æ¤ª¤¯ (Ï¢Â³¥À¥ó¥×ÍÑ)*/
+  save_dumpext_addr  = start + size;		/* æ¯å›ãƒ€ãƒ³ãƒ—ã—ãŸã‚¢ãƒ‰ãƒ¬ã‚¹ã‚’ */
+  save_dumpext_bank  = bank;			/* è¦šãˆã¦ãŠã (é€£ç¶šãƒ€ãƒ³ãƒ—ç”¨)*/
   save_dumpext_board = board;
 
   size = ( size+15 ) /16;
@@ -1782,7 +1782,7 @@ static	void	monitor_dumpext( void )
 /*--------------------------------------------------------------*/
 /* fill [<bank>] <start-addr> <end-addr> <value>		*/
 /* fill [<bank>] <start-addr> #<size>	 <value>		*/
-/*	¥á¥â¥ê¤òËä¤á¤ë						*/
+/*	ãƒ¡ãƒ¢ãƒªã‚’åŸ‹ã‚ã‚‹						*/
 /*--------------------------------------------------------------*/
 static	void	monitor_fill( void )
 {
@@ -1828,7 +1828,7 @@ static	void	monitor_fill( void )
 /*--------------------------------------------------------------*/
 /* move [<bank>] <src-addr> <end-addr> [<bank>] <dist-addr>	*/
 /* move [<bank>] <src-addr> #size      [<bank>] <dist-addr>	*/
-/*	¥á¥â¥êÅ¾Á÷						*/
+/*	ãƒ¡ãƒ¢ãƒªè»¢é€						*/
 /*--------------------------------------------------------------*/
 static	void	monitor_move( void )
 {
@@ -1870,12 +1870,12 @@ static	void	monitor_move( void )
 
 	/*================*/
 
-  if( start+size <= dist ){			/* Å¾Á÷¸µ-Å¾Á÷Àè¤¬ ½Å¤Ê¤é¤Ê¤¤*/
+  if( start+size <= dist ){			/* è»¢é€å…ƒ-è»¢é€å…ˆãŒ é‡ãªã‚‰ãªã„*/
     for( i=0; i<size; i++ ){
       data = peek_memory( s_bank, start+i );
       poke_memory( d_bank, dist+i, data );
     }
-  }else{					/* Å¾Á÷¸µ-Å¾Á÷Àè¤¬ ½Å¤Ê¤ë */
+  }else{					/* è»¢é€å…ƒ-è»¢é€å…ˆãŒ é‡ãªã‚‹ */
     for( i=size-1; i>=0; i-- ){
       data = peek_memory( s_bank, start+i );
       poke_memory( d_bank, dist+i, data );
@@ -1889,7 +1889,7 @@ static	void	monitor_move( void )
 
 /*--------------------------------------------------------------*/
 /* search [<value> [[<bank>] <start-addr> <end-addr>]]		*/
-/*	ÆÃÄê¤ÎÄê¿ô (1¥Ğ¥¤¥È) ¤ò¥µ¡¼¥Á				*/
+/*	ç‰¹å®šã®å®šæ•° (1ãƒã‚¤ãƒˆ) ã‚’ã‚µãƒ¼ãƒ				*/
 /*--------------------------------------------------------------*/
 static	int	save_search_addr = -1;
 static	int	save_search_size = -1;
@@ -1937,7 +1937,7 @@ static	void	monitor_search( void )
 
 	/*================*/
 
-  j=0;						/* °ìÃ×¤·¤¿¥¢¥É¥ì¥¹¤òÎóµó */
+  j=0;						/* ä¸€è‡´ã—ãŸã‚¢ãƒ‰ãƒ¬ã‚¹ã‚’åˆ—æŒ™ */
   for( i=0; i<save_search_size; i++ ){
     if( peek_memory( save_search_bank, save_search_addr+i )
         == save_search_data ){
@@ -1954,7 +1954,7 @@ static	void	monitor_search( void )
 
 /*--------------------------------------------------------------*/
 /* read [<bank>] <addr>						*/
-/*	ÆÃÄê¤Î¥¢¥É¥ì¥¹¤ò¥ê¡¼¥É					*/
+/*	ç‰¹å®šã®ã‚¢ãƒ‰ãƒ¬ã‚¹ã‚’ãƒªãƒ¼ãƒ‰					*/
 /*--------------------------------------------------------------*/
 static	void	monitor_read( void )
 {
@@ -1994,7 +1994,7 @@ static	void	monitor_read( void )
 }
 /*--------------------------------------------------------------*/
 /* write [<bank>] <addr> <data>					*/
-/*	ÆÃÄê¤Î¥¢¥É¥ì¥¹¤Ë¥é¥¤¥È					*/
+/*	ç‰¹å®šã®ã‚¢ãƒ‰ãƒ¬ã‚¹ã«ãƒ©ã‚¤ãƒˆ					*/
 /*--------------------------------------------------------------*/
 static	void	monitor_write( void )
 {
@@ -2040,7 +2040,7 @@ static	void	monitor_write( void )
 
 /*--------------------------------------------------------------*/
 /* in [<cpu>] <port>						*/
-/*	ÆÃÄê¤Î¥İ¡¼¥È¤«¤éÆşÎÏ					*/
+/*	ç‰¹å®šã®ãƒãƒ¼ãƒˆã‹ã‚‰å…¥åŠ›					*/
 /*--------------------------------------------------------------*/
 static	void	monitor_in( void )
 {
@@ -2081,7 +2081,7 @@ static	void	monitor_in( void )
 
 /*--------------------------------------------------------------*/
 /* out [<cpu>] <port> <data>					*/
-/*	ÆÃÄê¤Î¥İ¡¼¥È¤Ë½ĞÎÏ					*/
+/*	ç‰¹å®šã®ãƒãƒ¼ãƒˆã«å‡ºåŠ›					*/
 /*--------------------------------------------------------------*/
 static	void	monitor_out( void )
 {
@@ -2125,7 +2125,7 @@ static	void	monitor_out( void )
 
 /*--------------------------------------------------------------*/
 /* reset [<bas-mode>] [<clock-mode>] [<sound-board>] [<dipsw>]	*/
-/*	¥ê¥»¥Ã¥È¡£¥â¡¼¥É¤È¥µ¥¦¥ó¥É¥Ü¡¼¥É¤È¥Ç¥£¥Ã¥×¤òÀßÄê¤Ç¤­¤ë	*/
+/*	ãƒªã‚»ãƒƒãƒˆã€‚ãƒ¢ãƒ¼ãƒ‰ã¨ã‚µã‚¦ãƒ³ãƒ‰ãƒœãƒ¼ãƒ‰ã¨ãƒ‡ã‚£ãƒƒãƒ—ã‚’è¨­å®šã§ãã‚‹	*/
 /*--------------------------------------------------------------*/
 static	void	monitor_reset(void)
 {
@@ -2183,13 +2183,13 @@ static	void	monitor_reset(void)
     quasi88_reset(&cfg);
 
     /* quasi88_exec(); */
-    /* go ¤Ï¤·¤Ê¤¤¡£ reset-go ¤È¤¤¤¦¥³¥Ş¥ó¥É¤¬¤¢¤ë¤ÈÊØÍø¡© */
+    /* go ã¯ã—ãªã„ã€‚ reset-go ã¨ã„ã†ã‚³ãƒãƒ³ãƒ‰ãŒã‚ã‚‹ã¨ä¾¿åˆ©ï¼Ÿ */
 }
 
 /*--------------------------------------------------------------*/
 /*  reg [[<cpu>] [<name> <value>]]				*/
 /*  reg all							*/
-/*	¥ì¥¸¥¹¥¿¤ÎÆâÍÆ¤òÉ½¼¨¡¿ÊÑ¹¹				*/
+/*	ãƒ¬ã‚¸ã‚¹ã‚¿ã®å†…å®¹ã‚’è¡¨ç¤ºï¼å¤‰æ›´				*/
 /*--------------------------------------------------------------*/
 static	void	monitor_reg( void )
 {
@@ -2226,7 +2226,7 @@ static	void	monitor_reg( void )
 
 	/*================*/
 
-  if( reg==-1 ){				/* ¥ì¥¸¥¹¥¿É½¼¨ */
+  if( reg==-1 ){				/* ãƒ¬ã‚¸ã‚¹ã‚¿è¡¨ç¤º */
     if( !all  &&  cpu==-1 ){
       if( cpu_timing >= 2 )   all = TRUE;
       else{
@@ -2244,7 +2244,7 @@ static	void	monitor_reg( void )
     return;
   }
 
-  						/* ¥ì¥¸¥¹¥¿ÂåÆş */
+  						/* ãƒ¬ã‚¸ã‚¹ã‚¿ä»£å…¥ */
   if( cpu==-1 ){
     if( cpu_timing >= 2 ){
       cpu = ARG_MAIN;
@@ -2284,7 +2284,7 @@ static	void	monitor_reg( void )
 
 /*--------------------------------------------------------------*/
 /* disasm [[<cpu>][<start-addr>][#<steps>]]			*/
-/*	µÕ¥¢¥»¥ó¥Ö¥ë						*/
+/*	é€†ã‚¢ã‚»ãƒ³ãƒ–ãƒ«						*/
 /*--------------------------------------------------------------*/
 static	int	save_disasm_cpu     = -1;
 static	int	save_disasm_addr[2] = { -1, -1 };
@@ -2332,7 +2332,7 @@ static	void	monitor_disasm( void )
 
 	/*================*/
 
-  if( cpu == -1 ){					/* CPU Ì¤»ØÄê»ş */
+  if( cpu == -1 ){					/* CPU æœªæŒ‡å®šæ™‚ */
     cpu = save_disasm_cpu;
     if( cpu == -1 ){
       if( cpu_timing >= 2 ){
@@ -2347,7 +2347,7 @@ static	void	monitor_disasm( void )
   if( cpu==ARG_MAIN ) z80 = &z80main_cpu;
   else                z80 = &z80sub_cpu;
 
-  if( addr == -1 ){					/* ADDR Ì¤»ØÄê»ş */
+  if( addr == -1 ){					/* ADDR æœªæŒ‡å®šæ™‚ */
     addr = save_disasm_addr[ cpu ];
     if( addr == -1 ) addr = z80->PC.W;
   }
@@ -2366,7 +2366,7 @@ static	void	monitor_disasm( void )
 
 /*--------------------------------------------------------------*/
 /* go								*/
-/*	¼Â¹Ô							*/
+/*	å®Ÿè¡Œ							*/
 /*--------------------------------------------------------------*/
 static	void	monitor_go( void )
 {
@@ -2381,7 +2381,7 @@ static	void	monitor_go( void )
 /* trace <step>							*/
 /* trace #<step>						*/
 /* trace change							*/
-/*	»ØÄê¤·¤¿¥¹¥Æ¥Ã¥×Ê¬¤Ş¤¿¤ÏCPU½èÍı¤¬ÊÑ¤ï¤ë¤Ş¤Ç¡¢¼Â¹Ô	*/
+/*	æŒ‡å®šã—ãŸã‚¹ãƒ†ãƒƒãƒ—åˆ†ã¾ãŸã¯CPUå‡¦ç†ãŒå¤‰ã‚ã‚‹ã¾ã§ã€å®Ÿè¡Œ	*/
 /*--------------------------------------------------------------*/
 static	int	save_trace_change = FALSE;
 static	void	monitor_trace( void )
@@ -2425,8 +2425,8 @@ static	void	monitor_trace( void )
 /*--------------------------------------------------------------*/
 /* step								*/
 /* step [call] [jp] [rep] [all]					*/
-/*	1¥¹¥Æ¥Ã¥×¡¢¼Â¹Ô						*/
-/*	CALL¡¢DJNZ¡¢LDIR etc ¤Î¥¹¥­¥Ã¥×¤¬»ØÄê²ÄÇ½		*/
+/*	1ã‚¹ãƒ†ãƒƒãƒ—ã€å®Ÿè¡Œ						*/
+/*	CALLã€DJNZã€LDIR etc ã®ã‚¹ã‚­ãƒƒãƒ—ãŒæŒ‡å®šå¯èƒ½		*/
 /*--------------------------------------------------------------*/
 static	void	monitor_step( void )
 {
@@ -2509,7 +2509,7 @@ static	void	monitor_step( void )
 
 /*--------------------------------------------------------------*/
 /* S								*/
-/*	step all ¤ËÆ±¤¸						*/
+/*	step all ã«åŒã˜						*/
 /*--------------------------------------------------------------*/
 static	void	monitor_stepall( void )
 {
@@ -2577,7 +2577,7 @@ static	void	monitor_stepall( void )
 /* break [<cpu>] [PC|READ|WRITE|IN|OUT] <addr|port> [#<No>]	*/
 /* break [<cpu>] CLEAR [#<No>]					*/
 /* break							*/
-/*	¥Ö¥ì¡¼¥¯¥İ¥¤¥ó¥È¤ÎÀßÄê¡¿²ò½ü¡¿É½¼¨			*/
+/*	ãƒ–ãƒ¬ãƒ¼ã‚¯ãƒã‚¤ãƒ³ãƒˆã®è¨­å®šï¼è§£é™¤ï¼è¡¨ç¤º			*/
 /*--------------------------------------------------------------*/
 static	void	monitor_break( void )
 {
@@ -2635,7 +2635,7 @@ static	void	monitor_break( void )
       printf( "  %s:\n", (j==0)?"MAIN":"SUB" );
       for( i=0; i<NR_BP; i++ ){
 	printf( "    #%d  ", i+1 );
-	if (i < 9) printf(" ");			/* ¸«¤ä¤¹¤¯ by peach */
+	if (i < 9) printf(" ");			/* è¦‹ã‚„ã™ã by peach */
 	addr = break_point[j][i].addr;
 	switch( break_point[j][i].type ){
 	case BP_NONE:	printf("-- none --\n");				break;
@@ -2696,7 +2696,7 @@ static	void	monitor_break( void )
 /*--------------------------------------------------------------*/
 /* loadmem <filename> <bank> <start-addr> [<end-addr>]		*/
 /* loadmem <filename> <bank> <start-addr> [#<size>]		*/
-/*	¥Õ¥¡¥¤¥ë¤«¤é¥á¥â¥ê¤Ë¥í¡¼¥É				*/
+/*	ãƒ•ã‚¡ã‚¤ãƒ«ã‹ã‚‰ãƒ¡ãƒ¢ãƒªã«ãƒ­ãƒ¼ãƒ‰				*/
 /*--------------------------------------------------------------*/
 static	void	monitor_loadmem( void )
 {
@@ -2766,7 +2766,7 @@ static	void	monitor_loadmem( void )
 /*--------------------------------------------------------------*/
 /* savemem <filename> <bank> <start-addr> <end-addr>		*/
 /* savemem <filename> <bank> <start-addr> #<size>		*/
-/*	¥á¥â¥ê¤ò¥Õ¥¡¥¤¥ë¤Ë¥»¡¼¥Ö				*/
+/*	ãƒ¡ãƒ¢ãƒªã‚’ãƒ•ã‚¡ã‚¤ãƒ«ã«ã‚»ãƒ¼ãƒ–				*/
 /*--------------------------------------------------------------*/
 static	void	monitor_savemem( void )
 {
@@ -2818,8 +2818,8 @@ static	void	monitor_savemem( void )
 /* fbreak [<cpu>] [READ|WRITE|DIAG] <drive> <track> [<sector>] [#<No>]	*/
 /* fbreak [<cpu>] CLEAR [#<No>]						*/
 /* fbreak								*/
-/*	FDC ¥Ö¥ì¡¼¥¯¥İ¥¤¥ó¥È¤ÎÀßÄê¡¿²ò½ü¡¿É½¼¨				*/
-/*				¤³¤Îµ¡Ç½¤Ï peach»á¤Ë¤è¤ê¼ÂÁõ¤µ¤ì¤Ş¤·¤¿	*/
+/*	FDC ãƒ–ãƒ¬ãƒ¼ã‚¯ãƒã‚¤ãƒ³ãƒˆã®è¨­å®šï¼è§£é™¤ï¼è¡¨ç¤º				*/
+/*				ã“ã®æ©Ÿèƒ½ã¯ peachæ°ã«ã‚ˆã‚Šå®Ÿè£…ã•ã‚Œã¾ã—ãŸ	*/
 /*----------------------------------------------------------------------*/
 static	void	monitor_fbreak(void)
 {
@@ -2921,8 +2921,8 @@ static	void	monitor_fbreak(void)
 
 /*----------------------------------------------------------------------*/
 /* textscr								*/
-/*	¥Æ¥­¥¹¥È²èÌÌ¤ò¥³¥ó¥½¡¼¥ë¤ËÉ½¼¨					*/
-/*				¤³¤Îµ¡Ç½¤Ï peach»á¤Ë¤è¤ê¼ÂÁõ¤µ¤ì¤Ş¤·¤¿	*/
+/*	ãƒ†ã‚­ã‚¹ãƒˆç”»é¢ã‚’ã‚³ãƒ³ã‚½ãƒ¼ãƒ«ã«è¡¨ç¤º					*/
+/*				ã“ã®æ©Ÿèƒ½ã¯ peachæ°ã«ã‚ˆã‚Šå®Ÿè£…ã•ã‚Œã¾ã—ãŸ	*/
 /*----------------------------------------------------------------------*/
 static	void	print_text_screen(void)
 {
@@ -2931,7 +2931,7 @@ static	void	print_text_screen(void)
     int line;
     int width;
     int end;
-    Uchar text_buf[82];		/* 80Ê¸»ú + '\n' + '\0' */
+    Uchar text_buf[82];		/* 80æ–‡å­— + '\n' + '\0' */
     
     if (grph_ctrl & 0x20) line = 25;
     else                  line = 20;
@@ -2951,7 +2951,7 @@ static	void	print_text_screen(void)
 	    if (text_buf[j] == 0) text_buf[j] = ' ';
 	    else end = j;
 	}
-	/* ½ªÃ¼¤Ş¤Ç¤Î¶õÇò¤ÏÆş¤ì¤Ê¤¤ */
+	/* çµ‚ç«¯ã¾ã§ã®ç©ºç™½ã¯å…¥ã‚Œãªã„ */
 	text_buf[end + 1] = '\n';
 	text_buf[end + 2] = '\0';
 	print_hankaku(stdout, text_buf, alt_char);
@@ -2970,7 +2970,7 @@ static	void	monitor_textscr(void)
 
 /*--------------------------------------------------------------*/
 /* loadbas <filename> [<type>]					*/
-/*	BASIC LIST ¤òÆÉ¤ß¹ş¤à					*/
+/*	BASIC LIST ã‚’èª­ã¿è¾¼ã‚€					*/
 /*--------------------------------------------------------------*/
 #if 1					/* experimental by peach */
 static	void	monitor_loadbas(void)
@@ -3009,7 +3009,7 @@ static void monitor_loadbas(void) { printf("sorry, not support\n"); }
 #endif
 /*--------------------------------------------------------------*/
 /* savebas [<filename> [<type>]]				*/
-/*	BASIC LIST ¤ò½ĞÎÏ					*/
+/*	BASIC LIST ã‚’å‡ºåŠ›					*/
 /*--------------------------------------------------------------*/
 #if 1					/* experimental by peach */
 static	void	monitor_savebas(void)
@@ -3054,7 +3054,7 @@ static void monitor_savebas(void) { printf("sorry, not support\n"); }
 /*--------------------------------------------------------------*/
 /* set [<variable> [<value>] ]					*/
 /* show [<variable> ]						*/
-/*	ÆâÉôÊÑ¿ô¤òÉ½¼¨¡¿ÊÑ¹¹					*/
+/*	å†…éƒ¨å¤‰æ•°ã‚’è¡¨ç¤ºï¼å¤‰æ›´					*/
 /*--------------------------------------------------------------*/
 static	void	monitor_set_mem_printf(void)		/*** set mem ***/
 {
@@ -3070,22 +3070,22 @@ static	void	monitor_set_mem_printf(void)		/*** set mem ***/
 	    r6000 = "N ROM";
 	} else {					/*N88 BASIC*/
 	    r0000 = "MAIN ROM";
-	    if (ext_rom_bank & EXT_ROM_NOT) {		/* ÄÌ¾ïROM */
+	    if (ext_rom_bank & EXT_ROM_NOT) {		/* é€šå¸¸ROM */
 		r6000 = "MAIN ROM";
-	    } else {					/* ³ÈÄ¥ROM */
+	    } else {					/* æ‹¡å¼µROM */
 		r6000 = "EXT ROM";	/*misc_ctrl & MISC_CTRL_EBANK*/
 	    }
 	}
     }
     w0000 =
     w6000 = "MAIN_RAM";
-    if (ext_ram_ctrl & 0x01) {				/* ³ÈÄ¥RAM R²Ä */
+    if (ext_ram_ctrl & 0x01) {				/* æ‹¡å¼µRAM Rå¯ */
 	if (ext_ram_bank < use_extram * 4) {
 	    r0000 =
 	    r6000 = "EXT RAM"; 		/*ext_ram_bank*/
 	}
     }
-    if (ext_ram_ctrl & 0x10) {				/* ³ÈÄ¥RAM W²Ä */
+    if (ext_ram_ctrl & 0x10) {				/* æ‹¡å¼µRAM Wå¯ */
 	if (ext_ram_bank < use_extram * 4) {
 	    w0000 =
 	    w6000 = "EXT RAM";		/*ext_ram_bank*/
@@ -3103,14 +3103,14 @@ static	void	monitor_set_mem_printf(void)		/*** set mem ***/
     r8400 =
     w8400 = "MAIN RAM";
 
-    if ((misc_ctrl & MISC_CTRL_EVRAM)   &&	/* ³ÈÄ¥¥¢¥¯¥»¥¹¥â¡¼¥É */
-	(ALU2_ctrl & ALU2_CTRL_VACCESS)) {	/* VRAM³ÈÄ¥¥¢¥¯¥»¥¹ */
+    if ((misc_ctrl & MISC_CTRL_EVRAM)   &&	/* æ‹¡å¼µã‚¢ã‚¯ã‚»ã‚¹ãƒ¢ãƒ¼ãƒ‰ */
+	(ALU2_ctrl & ALU2_CTRL_VACCESS)) {	/* VRAMæ‹¡å¼µã‚¢ã‚¯ã‚»ã‚¹ */
 	rC000 =
 	rF000 =
 	wC000 =
 	wF000 = "VRAM Ext-Acc.";
-    } else if (! (misc_ctrl & MISC_CTRL_EVRAM) &&	/* ÆÈÎ©¥¢¥¯¥»¥¹¥â¡¼¥É*/
-	       (memory_bank != MEMORY_BANK_MAIN)) {	/* ¥á¥¤¥óBANK¤Ç¤Ê¤¤  */
+    } else if (! (misc_ctrl & MISC_CTRL_EVRAM) &&	/* ç‹¬ç«‹ã‚¢ã‚¯ã‚»ã‚¹ãƒ¢ãƒ¼ãƒ‰*/
+	       (memory_bank != MEMORY_BANK_MAIN)) {	/* ãƒ¡ã‚¤ãƒ³BANKã§ãªã„  */
 	rC000 =
 	rF000 =
 	wC000 =
@@ -3120,14 +3120,14 @@ static	void	monitor_set_mem_printf(void)		/*** set mem ***/
 	rC000 =
 	wC000 = "MAIN RAM";
 	if (high_mode &&
-	    (misc_ctrl & MISC_CTRL_TEXT_MAIN) == 0) {		/*¹âÂ®RAM*/
+	    (misc_ctrl & MISC_CTRL_TEXT_MAIN) == 0) {		/*é«˜é€ŸRAM*/
 	    rF000 =
 	    wF000 = "HIGH RAM";
 	} else {
 	    rF000 =
 	    wF000 = "MAIN RAM";
 	}
-	if (jisho_rom_ctrl == FALSE) {				/*¼­½ñROM*/
+	if (jisho_rom_ctrl == FALSE) {				/*è¾æ›¸ROM*/
 	    rC000 =
 	    rF000 = "JISHO ROM";	/*jisho_rom_bank*/
 	}
@@ -3814,7 +3814,7 @@ static	void	monitor_show(void)
 
 /*--------------------------------------------------------------*/
 /* resize <screen_size>						*/
-/*	²èÌÌ¥µ¥¤¥º¤òÊÑ¹¹					*/
+/*	ç”»é¢ã‚µã‚¤ã‚ºã‚’å¤‰æ›´					*/
 /*--------------------------------------------------------------*/
 static	void	monitor_resize(void)
 {
@@ -3872,11 +3872,11 @@ static	void	monitor_resize(void)
 /* drive eject [<drive_no>]					*/
 /* drive empty <drive_no>					*/
 /* drive set <drive_no> <filename >				*/
-/*	¥É¥é¥¤¥Ö´ØÏ¢½èÍı					*/
-/*		¥É¥é¥¤¥Ö¤ËÀßÄê¤µ¤ì¤¿¥Õ¥¡¥¤¥ë¤Î¾õÂÖ¤ò¸«¤ë	*/
-/*		¥É¥é¥¤¥Ö¤ò¶õ¤Ë¤¹¤ë				*/
-/*		¥É¥é¥¤¥Ö¤ò°ì»şÅª¤Ë¶õ¤Ë¤¹¤ë			*/
-/*		¥É¥é¥¤¥Ö¤Ë¥Õ¥¡¥¤¥ë¤ò¥»¥Ã¥È(¸ò´¹)		*/
+/*	ãƒ‰ãƒ©ã‚¤ãƒ–é–¢é€£å‡¦ç†					*/
+/*		ãƒ‰ãƒ©ã‚¤ãƒ–ã«è¨­å®šã•ã‚ŒãŸãƒ•ã‚¡ã‚¤ãƒ«ã®çŠ¶æ…‹ã‚’è¦‹ã‚‹	*/
+/*		ãƒ‰ãƒ©ã‚¤ãƒ–ã‚’ç©ºã«ã™ã‚‹				*/
+/*		ãƒ‰ãƒ©ã‚¤ãƒ–ã‚’ä¸€æ™‚çš„ã«ç©ºã«ã™ã‚‹			*/
+/*		ãƒ‰ãƒ©ã‚¤ãƒ–ã«ãƒ•ã‚¡ã‚¤ãƒ«ã‚’ã‚»ãƒƒãƒˆ(äº¤æ›)		*/
 /*--------------------------------------------------------------*/
 static	void	monitor_drive(void)
 {
@@ -4047,14 +4047,14 @@ static	void	monitor_drive(void)
 /* file format <filename> <image_no>				*/
 /* file unformat <filename> <image_no>				*/
 /* file rename <filename> <image_no> <image_name>		*/
-/*	¥Õ¥¡¥¤¥ë´ØÏ¢½èÍı					*/
-/*		¥Õ¥¡¥¤¥ë¤ò¸«¤ë					*/
-/*		¥Ö¥é¥ó¥¯¥¤¥á¡¼¥¸¤ò¥Õ¥¡¥¤¥ë¤ËÄÉ²Ã(ºîÀ®)		*/
-/*		¥¤¥á¡¼¥¸¤Î¥é¥¤¥È¥×¥í¥Æ¥¯¥È¤òÀßÄê		*/
-/*		¥¤¥á¡¼¥¸¤Î¥é¥¤¥È¥×¥í¥Æ¥¯¥È¤ò²ò½ü		*/
-/*		¥¤¥á¡¼¥¸¤ò¥Õ¥©¡¼¥Ş¥Ã¥È				*/
-/*		¥¤¥á¡¼¥¸¤ò¥¢¥ó¥Õ¥©¡¼¥Ş¥Ã¥È			*/
-/*		¥¤¥á¡¼¥¸Ì¾¤òÊÑ¹¹				*/
+/*	ãƒ•ã‚¡ã‚¤ãƒ«é–¢é€£å‡¦ç†					*/
+/*		ãƒ•ã‚¡ã‚¤ãƒ«ã‚’è¦‹ã‚‹					*/
+/*		ãƒ–ãƒ©ãƒ³ã‚¯ã‚¤ãƒ¡ãƒ¼ã‚¸ã‚’ãƒ•ã‚¡ã‚¤ãƒ«ã«è¿½åŠ (ä½œæˆ)		*/
+/*		ã‚¤ãƒ¡ãƒ¼ã‚¸ã®ãƒ©ã‚¤ãƒˆãƒ—ãƒ­ãƒ†ã‚¯ãƒˆã‚’è¨­å®š		*/
+/*		ã‚¤ãƒ¡ãƒ¼ã‚¸ã®ãƒ©ã‚¤ãƒˆãƒ—ãƒ­ãƒ†ã‚¯ãƒˆã‚’è§£é™¤		*/
+/*		ã‚¤ãƒ¡ãƒ¼ã‚¸ã‚’ãƒ•ã‚©ãƒ¼ãƒãƒƒãƒˆ				*/
+/*		ã‚¤ãƒ¡ãƒ¼ã‚¸ã‚’ã‚¢ãƒ³ãƒ•ã‚©ãƒ¼ãƒãƒƒãƒˆ			*/
+/*		ã‚¤ãƒ¡ãƒ¼ã‚¸åã‚’å¤‰æ›´				*/
 /*--------------------------------------------------------------*/
 static	void	monitor_file(void)
 {
@@ -4158,32 +4158,32 @@ static	void	monitor_file(void)
     case ARG_UNFORMAT:
     case ARG_RENAME:
 
-				/* ¥Õ¥¡¥¤¥ë¤ò³«¤¯ */
-	fp = osd_fopen(FTYPE_DISK, c, "r+b");		/* "r+b" ¤Ç¥ª¡¼¥×¥ó */
+				/* ãƒ•ã‚¡ã‚¤ãƒ«ã‚’é–‹ã */
+	fp = osd_fopen(FTYPE_DISK, c, "r+b");		/* "r+b" ã§ã‚ªãƒ¼ãƒ—ãƒ³ */
 	if (fp == NULL) {
-	    fp = osd_fopen(FTYPE_DISK, c, "rb");	/* "rb" ¤Ç¥ª¡¼¥×¥ó */
+	    fp = osd_fopen(FTYPE_DISK, c, "rb");	/* "rb" ã§ã‚ªãƒ¼ãƒ—ãƒ³ */
 	    ro = TRUE;
 	}
 
-	if (fp) {					/* ¥ª¡¼¥×¥ó¤Ç¤­¤¿¤é */
-	    if      (fp == drive[ 0 ].fp) drv = 0;	/* ¤¹¤Ç¤Ë¥É¥é¥¤¥Ö¤Ë */
-	    else if (fp == drive[ 1 ].fp) drv = 1;	/* ³«¤¤¤Æ¤Ê¤¤¤«¤ò   */
-	    else                          drv = -1;	/* ¥Á¥§¥Ã¥¯¤¹¤ë     */
+	if (fp) {					/* ã‚ªãƒ¼ãƒ—ãƒ³ã§ããŸã‚‰ */
+	    if      (fp == drive[ 0 ].fp) drv = 0;	/* ã™ã§ã«ãƒ‰ãƒ©ã‚¤ãƒ–ã« */
+	    else if (fp == drive[ 1 ].fp) drv = 1;	/* é–‹ã„ã¦ãªã„ã‹ã‚’   */
+	    else                          drv = -1;	/* ãƒã‚§ãƒƒã‚¯ã™ã‚‹     */
 	}
 
 
-	if (fp == NULL) {		/* ¥ª¡¼¥×¥ó¼ºÇÔ */
+	if (fp == NULL) {		/* ã‚ªãƒ¼ãƒ—ãƒ³å¤±æ•— */
 	    printf("Open error! %s\n", filename);
 	    break;
 	}
-	else if (ro) {			/* ¥ê¡¼¥É¥ª¥ó¥ê¡¼¤Ê¤Î¤Ç½èÍıÉÔ²Ä */
+	else if (ro) {			/* ãƒªãƒ¼ãƒ‰ã‚ªãƒ³ãƒªãƒ¼ãªã®ã§å‡¦ç†ä¸å¯ */
 	    if (drv < 0) osd_fclose(fp);
 	    printf("File %s is read only", filename);
 	    if (drv < 0) printf("\n");
 	    else         printf("(in DRIVE %d:)\n", drv + 1);
 	    break;
 	}
-	else if (drv >= 0 &&		/* ²õ¤ì¤¿¥¤¥á¡¼¥¸¤¬´Ş¤Ş¤ì¤ë¤Î¤ÇÉÔ²Ä */
+	else if (drv >= 0 &&		/* å£Šã‚ŒãŸã‚¤ãƒ¡ãƒ¼ã‚¸ãŒå«ã¾ã‚Œã‚‹ã®ã§ä¸å¯ */
 		 drive[ drv ].detect_broken_image) {
 	    printf("Warning! File %s maybe be broken!"
 		   " ..... continued, but not update drive status.\n",
@@ -4191,7 +4191,7 @@ static	void	monitor_file(void)
 	}
 
 
-				/* ¥³¥Ş¥ó¥ÉÊÌ½èÍı */
+				/* ã‚³ãƒãƒ³ãƒ‰åˆ¥å‡¦ç† */
 	switch (command) {
 	case ARG_CREATE:
 	    result = d88_append_blank(fp, drv);
@@ -4221,7 +4221,7 @@ static	void	monitor_file(void)
 	    s = "Rename image";
 	    break;
 	}
-				/* ¥¨¥é¡¼É½¼¨ */
+				/* ã‚¨ãƒ©ãƒ¼è¡¨ç¤º */
 	switch (result) {
 	case D88_SUCCESS:   printf("%s complete.\n", s);		 break;
 	case D88_NO_IMAGE:  printf("Image No. %d not exist.\n", img + 1);break;
@@ -4233,7 +4233,7 @@ static	void	monitor_file(void)
 	case D88_ERR:	    printf("Internal error\n");			 break;
 	}
 
-				/* ½ªÎ»½èÍı */
+				/* çµ‚äº†å‡¦ç† */
 	if (drv < 0) {
 	    osd_fclose(fp);
 	} else {
@@ -4253,7 +4253,7 @@ static	void	monitor_file(void)
 
 /*--------------------------------------------------------------*/
 /* statesave [<filename>]					*/
-/*	¥¹¥Æ¡¼¥È¥»¡¼¥Ö						*/
+/*	ã‚¹ãƒ†ãƒ¼ãƒˆã‚»ãƒ¼ãƒ–						*/
 /*--------------------------------------------------------------*/
 static	void	monitor_statesave(void)
 {
@@ -4288,7 +4288,7 @@ static	void	monitor_statesave(void)
 
 /*--------------------------------------------------------------*/
 /* stateload [<filename>]					*/
-/*	¥¹¥Æ¡¼¥È¥í¡¼¥É						*/
+/*	ã‚¹ãƒ†ãƒ¼ãƒˆãƒ­ãƒ¼ãƒ‰						*/
 /*--------------------------------------------------------------*/
 static	void	monitor_stateload(void)
 {
@@ -4329,7 +4329,7 @@ static	void	monitor_stateload(void)
 
 /*--------------------------------------------------------------*/
 /* snapshot							*/
-/*	¥¹¥¯¥ê¡¼¥ó¥¹¥Ê¥Ã¥×¥·¥ç¥Ã¥È¤ÎÊİÂ¸			*/
+/*	ã‚¹ã‚¯ãƒªãƒ¼ãƒ³ã‚¹ãƒŠãƒƒãƒ—ã‚·ãƒ§ãƒƒãƒˆã®ä¿å­˜			*/
 /*--------------------------------------------------------------*/
 static	void	monitor_snapshot(void)
 {
@@ -4360,7 +4360,7 @@ static	void	monitor_snapshot(void)
 
 /*--------------------------------------------------------------*/
 /* loadfont <filename> <format> <type>				*/
-/*	¥Õ¥©¥ó¥È¥Õ¥¡¥¤¥ë¤Î¥í¡¼¥É				*/
+/*	ãƒ•ã‚©ãƒ³ãƒˆãƒ•ã‚¡ã‚¤ãƒ«ã®ãƒ­ãƒ¼ãƒ‰				*/
 /*--------------------------------------------------------------*/
 static	void	monitor_loadfont(void)
 {
@@ -4466,7 +4466,7 @@ static	void	monitor_loadfont(void)
 
 /*--------------------------------------------------------------*/
 /* savefont <filename> <format> <type>				*/
-/*	¥Õ¥©¥ó¥È¥Õ¥¡¥¤¥ë¤Î¥»¡¼¥Ö				*/
+/*	ãƒ•ã‚©ãƒ³ãƒˆãƒ•ã‚¡ã‚¤ãƒ«ã®ã‚»ãƒ¼ãƒ–				*/
 /*--------------------------------------------------------------*/
 static	void	monitor_savefont(void)
 {
@@ -4557,7 +4557,7 @@ static	void	monitor_savefont(void)
 
 /*--------------------------------------------------------------*/
 /* tapeload [<filename>]					*/
-/*	¥í¡¼¥ÉÍÑ¥Æ¡¼¥×¥¤¥á¡¼¥¸¥Õ¥¡¥¤¥ë¤Î¥»¥Ã¥È			*/
+/*	ãƒ­ãƒ¼ãƒ‰ç”¨ãƒ†ãƒ¼ãƒ—ã‚¤ãƒ¡ãƒ¼ã‚¸ãƒ•ã‚¡ã‚¤ãƒ«ã®ã‚»ãƒƒãƒˆ			*/
 /*--------------------------------------------------------------*/
 static	void	monitor_tapeload(void)
 {
@@ -4594,7 +4594,7 @@ static	void	monitor_tapeload(void)
 
 /*--------------------------------------------------------------*/
 /* tapesave [<filename>]					*/
-/*	¥»¡¼¥ÖÍÑ¥Æ¡¼¥×¥¤¥á¡¼¥¸¥Õ¥¡¥¤¥ë¤Î¥»¥Ã¥È			*/
+/*	ã‚»ãƒ¼ãƒ–ç”¨ãƒ†ãƒ¼ãƒ—ã‚¤ãƒ¡ãƒ¼ã‚¸ãƒ•ã‚¡ã‚¤ãƒ«ã®ã‚»ãƒƒãƒˆ			*/
 /*--------------------------------------------------------------*/
 static	void	monitor_tapesave(void)
 {
@@ -4631,7 +4631,7 @@ static	void	monitor_tapesave(void)
 
 /*--------------------------------------------------------------*/
 /* printer [<filename>]						*/
-/*	¥×¥ê¥ó¥È¥¢¥¦¥ÈÍÑ¥¤¥á¡¼¥¸¥Õ¥¡¥¤¥ë¤Î¥»¥Ã¥È		*/
+/*	ãƒ—ãƒªãƒ³ãƒˆã‚¢ã‚¦ãƒˆç”¨ã‚¤ãƒ¡ãƒ¼ã‚¸ãƒ•ã‚¡ã‚¤ãƒ«ã®ã‚»ãƒƒãƒˆ		*/
 /*--------------------------------------------------------------*/
 static	void	monitor_printer(void)
 {
@@ -4666,7 +4666,7 @@ static	void	monitor_printer(void)
 
 /*--------------------------------------------------------------*/
 /* serialin [<filename>]					*/
-/*	¥·¥ê¥¢¥ëÆşÎÏÍÑ¥¤¥á¡¼¥¸¥Õ¥¡¥¤¥ë¤Î¥»¥Ã¥È			*/
+/*	ã‚·ãƒªã‚¢ãƒ«å…¥åŠ›ç”¨ã‚¤ãƒ¡ãƒ¼ã‚¸ãƒ•ã‚¡ã‚¤ãƒ«ã®ã‚»ãƒƒãƒˆ			*/
 /*--------------------------------------------------------------*/
 static	void	monitor_serialin(void)
 {
@@ -4712,7 +4712,7 @@ static	void	monitor_serialin(void)
 
 /*--------------------------------------------------------------*/
 /* serialout <filename>						*/
-/*	¥·¥ê¥¢¥ë½ĞÎÏÍÑ¥¤¥á¡¼¥¸¥Õ¥¡¥¤¥ë¤Î¥»¥Ã¥È			*/
+/*	ã‚·ãƒªã‚¢ãƒ«å‡ºåŠ›ç”¨ã‚¤ãƒ¡ãƒ¼ã‚¸ãƒ•ã‚¡ã‚¤ãƒ«ã®ã‚»ãƒƒãƒˆ			*/
 /*--------------------------------------------------------------*/
 static	void	monitor_serialout(void)
 {
@@ -4807,7 +4807,7 @@ static	void    monitor_misc(void)
 #ifdef USE_GNU_READLINE
 
 /*--------------------------------------------------------------*/
-/* readline ¤ò»È¤Ã¤Æ¤ß¤è¤¦¡£					*/
+/* readline ã‚’ä½¿ã£ã¦ã¿ã‚ˆã†ã€‚					*/
 /*--------------------------------------------------------------*/
 
 char *command_generator( char *text, int state );
@@ -4816,7 +4816,7 @@ char **fileman_completion( char *text, int start, int end );
 
 static void initialize_readline( void )
 {
-  rl_readline_name = "QUASI88";	 /*¤è¤¯¤ï¤«¤é¤ó¤¬ ~/.inputrc ¤Ë´Ø·¸¤¢¤ë¤é¤·¤¤*/
+  rl_readline_name = "QUASI88";	 /*ã‚ˆãã‚ã‹ã‚‰ã‚“ãŒ ~/.inputrc ã«é–¢ä¿‚ã‚ã‚‹ã‚‰ã—ã„*/
   rl_attempted_completion_function = (CPPFunction *)fileman_completion;
 }
 
@@ -4825,7 +4825,7 @@ char **fileman_completion( char *text, int start, int end )
   char **matches = NULL;
 
   int i=0;
-  char c;					/* "set " ¤ÈÆşÎÏ¤µ¤ì¤¿¾ì¹ç */
+  char c;					/* "set " ã¨å…¥åŠ›ã•ã‚ŒãŸå ´åˆ */
   while( (c = rl_line_buffer[i]) ){
     if( c==' ' || c=='\t' ){ i++; continue; }
     else                   break;
@@ -4838,7 +4838,7 @@ char **fileman_completion( char *text, int start, int end )
 #endif
   else
 
-  if (start == 0)				/* ¹ÔÆ¬¤Ç¤ÎÆşÎÏ¤Î¾ì¹ç */
+  if (start == 0)				/* è¡Œé ­ã§ã®å…¥åŠ›ã®å ´åˆ */
 #ifdef RL_READLINE_VERSION	/* ? */
     matches = rl_completion_matches( text, (rl_compentry_func_t *)command_generator );
 #else
@@ -4853,12 +4853,12 @@ char *command_generator( char *text, int state )
   static int count, len;
   char *name;
 
-  if( state == 0 ){		/* ¤³¤Î´Ø¿ô¡¢ºÇ½é¤Ï state=0 ¤Ç¸Æ¤Ó½Ğ¤µ¤ì¤ë */
-    count = 0;			/* ¤é¤·¤¤¤Î¤Ç¡¢¤½¤Î»ş¤ËÊÑ¿ô¤ò½é´ü²½¤¹¤ë¡£  */
+  if( state == 0 ){		/* ã“ã®é–¢æ•°ã€æœ€åˆã¯ state=0 ã§å‘¼ã³å‡ºã•ã‚Œã‚‹ */
+    count = 0;			/* ã‚‰ã—ã„ã®ã§ã€ãã®æ™‚ã«å¤‰æ•°ã‚’åˆæœŸåŒ–ã™ã‚‹ã€‚  */
     len = strlen (text);
   }
 
-  while( count < COUNTOF(monitor_cmd) ){	/* ¥³¥Ş¥ó¥ÉÌ¾¤ò¸¡º÷ */
+  while( count < COUNTOF(monitor_cmd) ){	/* ã‚³ãƒãƒ³ãƒ‰åã‚’æ¤œç´¢ */
 
     name = monitor_cmd[count].cmd;
     count ++;
@@ -4877,7 +4877,7 @@ char *command_generator( char *text, int state )
 
 char *set_arg_generator( char *text, int state )
 {
-  static int count, len;	/* set ¥³¥Ş¥ó¥É¤¬ÆşÎÏºÑ¤ß¤Î¾ì¹ç */
+  static int count, len;	/* set ã‚³ãƒãƒ³ãƒ‰ãŒå…¥åŠ›æ¸ˆã¿ã®å ´åˆ */
   char *name;
 
   if( state == 0 ){
@@ -4885,7 +4885,7 @@ char *set_arg_generator( char *text, int state )
     len = strlen (text);
   }
 
-  while( count < COUNTOF(monitor_variable) ){	/* ÊÑ¿ôÌ¾¤ò¸¡º÷ */
+  while( count < COUNTOF(monitor_variable) ){	/* å¤‰æ•°åã‚’æ¤œç´¢ */
 
     name = monitor_variable[count].var_name;
     count ++;
@@ -4908,7 +4908,7 @@ char *set_arg_generator( char *text, int state )
 
 
 /****************************************************************/
-/* ¥Ç¥Ğ¥Ã¥° ¥á¥¤¥ó½èÍı						*/
+/* ãƒ‡ãƒãƒƒã‚° ãƒ¡ã‚¤ãƒ³å‡¦ç†						*/
 /****************************************************************/
 
 static	int	monitor_job = 0;
@@ -4928,7 +4928,7 @@ void	monitor_init( void )
 
 
   {
-	/* °ìÈÖºÇ½é¤Ë¥â¥Ë¥¿¡¼¥â¡¼¥É¤ËÆş¤Ã¤¿»ş¤Ï¡¢¥á¥Ã¥»¡¼¥¸¤òÉ½¼¨ */
+	/* ä¸€ç•ªæœ€åˆã«ãƒ¢ãƒ‹ã‚¿ãƒ¼ãƒ¢ãƒ¼ãƒ‰ã«å…¥ã£ãŸæ™‚ã¯ã€ãƒ¡ãƒƒã‚»ãƒ¼ã‚¸ã‚’è¡¨ç¤º */
 
     static int enter_monitor_mode_first = TRUE;
     if( enter_monitor_mode_first ){
@@ -4957,7 +4957,7 @@ void	monitor_init( void )
   if (quasi88_event_flags & EVENT_DEBUG) {
     quasi88_event_flags &= ~EVENT_DEBUG;
 
-    /* ¥Ö¥ì¡¼¥¯¤·¤¿¾ì¹ç¤Ï¡¢¥ì¥¸¥¹¥¿É½¼¨ */
+    /* ãƒ–ãƒ¬ãƒ¼ã‚¯ã—ãŸå ´åˆã¯ã€ãƒ¬ã‚¸ã‚¹ã‚¿è¡¨ç¤º */
     switch( cpu_timing ){
     case 0:
       if( select_main_cpu ) z80_debug( &z80main_cpu, "[MAIN CPU]\n" );
@@ -4990,7 +4990,7 @@ void	monitor_main( void )
   int	i;
 
 
-  /* ¥â¡¼¥É¤¬ÀÚ¤êÂØ¤ï¤ë¤Ş¤Ç¡¢½èÍı¤òÂ³¹Ô */
+  /* ãƒ¢ãƒ¼ãƒ‰ãŒåˆ‡ã‚Šæ›¿ã‚ã‚‹ã¾ã§ã€å‡¦ç†ã‚’ç¶šè¡Œ */
   while ((quasi88_event_flags & EVENT_MODE_CHANGED) == 0) {
 
     switch( monitor_job ){
@@ -5000,11 +5000,11 @@ void	monitor_main( void )
 #ifndef USE_GNU_READLINE
 
       printf("QUASI88> ");
-      if( fgets( buf, MAX_CHRS, stdin ) == NULL ){	/* ^D ¤¬ÆşÎÏ¤µ¤ì¤¿¤é */
-#ifndef IGNORE_CTRL_D					/* ¶¯À©Åª¤Ë½ªÎ»¡£    */
-	quasi88_quit();					/* ²óÈòÊıË¡¤¬¤ï¤«¤é¤ó*/
+      if( fgets( buf, MAX_CHRS, stdin ) == NULL ){	/* ^D ãŒå…¥åŠ›ã•ã‚ŒãŸã‚‰ */
+#ifndef IGNORE_CTRL_D					/* å¼·åˆ¶çš„ã«çµ‚äº†ã€‚    */
+	quasi88_quit();					/* å›é¿æ–¹æ³•ãŒã‚ã‹ã‚‰ã‚“*/
 #else
-	quasi88_monitor();				/* IRIX/AIX¤ÏÂç¾æÉ×? */
+	quasi88_monitor();				/* IRIX/AIXã¯å¤§ä¸ˆå¤«? */
 #endif
 	break;
       }
@@ -5013,47 +5013,47 @@ void	monitor_main( void )
       {
 	char *p, *chk;
 	HIST_ENTRY *ph;
-	p = readline( "QUASI88> " );			/* GNU readline ¤Î  */
-	if( p==NULL ){					/* »ÅÍÍ¤¬¤¤¤Ş¤¤¤Á   */
-	  printf( "\n" );				/* ¤ï¤«¤é¤ó¡£       */
-	  break;					/* man ¤Ç¼Ğ¤áÆÉ¤ß   */
-	}else{						/* ¤·¤Æ¤ß¤¿¤¬¡¢±Ñ¸ì */
-							/* ¤ÏÍı²ò¤·¤¬¤¿¤¤¡£ */
+	p = readline( "QUASI88> " );			/* GNU readline ã®  */
+	if( p==NULL ){					/* ä»•æ§˜ãŒã„ã¾ã„ã¡   */
+	  printf( "\n" );				/* ã‚ã‹ã‚‰ã‚“ã€‚       */
+	  break;					/* man ã§æ–œã‚èª­ã¿   */
+	}else{						/* ã—ã¦ã¿ãŸãŒã€è‹±èª */
+							/* ã¯ç†è§£ã—ãŒãŸã„ã€‚ */
 	  ph = previous_history();
-	  if ( *p=='\0' && ph != NULL) {	/* ¥ê¥¿¡¼¥ó¥­¡¼¤ÇÄ¾Á°¤Î */
-	    strncpy( buf, ph->line, MAX_CHRS-1 );	/*¥³¥Ş¥ó¥É¤ò¼Â¹Ô */
+	  if ( *p=='\0' && ph != NULL) {	/* ãƒªã‚¿ãƒ¼ãƒ³ã‚­ãƒ¼ã§ç›´å‰ã® */
+	    strncpy( buf, ph->line, MAX_CHRS-1 );	/*ã‚³ãƒãƒ³ãƒ‰ã‚’å®Ÿè¡Œ */
 	  } else strncpy( buf, p, MAX_CHRS-1 );
 	  buf[ MAX_CHRS-1 ] = '\0';
 
-	  chk = p;	/* ¶õ¹Ô¤¸¤ã¤Ê¤±¤ì¤ĞÍúÎò¤Ë»Ä¤¹ */
+	  chk = p;	/* ç©ºè¡Œã˜ã‚ƒãªã‘ã‚Œã°å±¥æ­´ã«æ®‹ã™ */
 	  while( *chk ){
 	    if( *chk==' ' || *chk=='\t' ){ chk++;		continue; }
-	    /* Æ±¤¸¥³¥Ş¥ó¥É¤ÏÍúÎò¤Ë»Ä¤µ¤Ê¤¤ */
+	    /* åŒã˜ã‚³ãƒãƒ³ãƒ‰ã¯å±¥æ­´ã«æ®‹ã•ãªã„ */
 	    else if (ph != NULL && strcmp(chk, ph->line) == 0)	break;
 	    else			 { add_history( chk );  break;    }
 	  }
 	}
 	free( p );
-	/* ¤³¤Î¤¢¤¿¤ê¤Î½èÍı¤Ï¡¢peach¤µ¤ó¤Ë¤è¤ê²şÎÉ¤µ¤ì¤Ş¤·¤¿ */
+	/* ã“ã®ã‚ãŸã‚Šã®å‡¦ç†ã¯ã€peachã•ã‚“ã«ã‚ˆã‚Šæ”¹è‰¯ã•ã‚Œã¾ã—ãŸ */
       }
 #endif
 
-      getarg();						/* °ú¿ô¤òÊ¬²ò */
+      getarg();						/* å¼•æ•°ã‚’åˆ†è§£ */
 
-      if( d_argc==0 ){					/* ¶õ¹Ô¤Î¾ì¹ç */
+      if( d_argc==0 ){					/* ç©ºè¡Œã®å ´åˆ */
 	monitor_job = 0;
       }else{
 	for( i=0; i<COUNTOF(monitor_cmd); i++ ){
 	  if( strcmp( d_argv[0], monitor_cmd[i].cmd )==0 ) break;
 	}
-	if( i==COUNTOF(monitor_cmd) ){			/* Ìµ¸úÌ¿Îá¤Î¾ì¹ç */
+	if( i==COUNTOF(monitor_cmd) ){			/* ç„¡åŠ¹å‘½ä»¤ã®å ´åˆ */
 	  printf("Invalid command : %s\n",d_argv[0]);
 	  monitor_job = 0;
-	}else{						/* °ú¿ô¤¬ ? ¤Î¾ì¹ç */
+	}else{						/* å¼•æ•°ãŒ ? ã®å ´åˆ */
 	  if( d_argc==2 && strcmp( d_argv[1], "?" )==0 ){
 	    (monitor_cmd[i].help)();
 	    monitor_job = 0;
-	  }else{					/* ÄÌ¾ï¤ÎÌ¿Îá¤Î¾ì¹ç */
+	  }else{					/* é€šå¸¸ã®å‘½ä»¤ã®å ´åˆ */
 	    monitor_job = monitor_cmd[i].job;
 	    shift();
 	    fflush(NULL);

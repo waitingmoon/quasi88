@@ -1,11 +1,11 @@
 /************************************************************************/
 /*									*/
-/* ¥ª¥Ú¥³¡¼¥ÉÊÌ½èÍı							*/
+/* ã‚ªãƒšã‚³ãƒ¼ãƒ‰åˆ¥å‡¦ç†							*/
 /*									*/
 /************************************************************************/
 
 
-      /* 8¥Ó¥Ã¥ÈÅ¾Á÷Ì¿Îá */
+      /* 8ãƒ“ãƒƒãƒˆè»¢é€å‘½ä»¤ */
 
     case LD_A_A:   z80->ACC=z80->ACC;               break;
     case LD_A_B:   z80->ACC=z80->BC.B.h;            break;
@@ -103,7 +103,7 @@
       break;
 
 
-      /* 16¥Ó¥Ã¥ÈÅ¾Á÷Ì¿Îá */
+      /* 16ãƒ“ãƒƒãƒˆè»¢é€å‘½ä»¤ */
 
     case LD_BC_16:  M_LDWORD(BC);  break;
     case LD_DE_16:  M_LDWORD(DE);  break;
@@ -136,7 +136,7 @@
     case POP_AF:   M_POP(AF);   break;
 
 
-      /* 8¥Ó¥Ã¥È»»½ÑÏÀÍı±é»»Ì¿Îá */
+      /* 8ãƒ“ãƒƒãƒˆç®—è¡“è«–ç†æ¼”ç®—å‘½ä»¤ */
 
     case ADD_A_A:  M_ADD_A(z80->ACC);     break;
     case ADD_A_B:  M_ADD_A(z80->BC.B.h);  break;
@@ -238,7 +238,7 @@
     case DEC_xHL:
       I=M_RDMEM(z80->HL.W); M_DEC(I); M_WRMEM(z80->HL.W,I);  break;
 
-      /* 16¥Ó¥Ã¥È»»½Ñ±é»»Ì¿Îá */
+      /* 16ãƒ“ãƒƒãƒˆç®—è¡“æ¼”ç®—å‘½ä»¤ */
 
     case ADD_HL_BC:  M_ADDW(z80->HL.W,z80->BC.W);  break;
     case ADD_HL_DE:  M_ADDW(z80->HL.W,z80->DE.W);  break;
@@ -256,7 +256,7 @@
     case DEC_SP:   z80->SP.W--;  break;
 
 
-      /* ¥ì¥¸¥¹¥¿¸ò´¹Ì¿Îá */
+      /* ãƒ¬ã‚¸ã‚¹ã‚¿äº¤æ›å‘½ä»¤ */
 
     case EX_AF_AF:
       J.W=z80->AF.W; z80->AF.W=z80->AF1.W; z80->AF1.W=J.W;
@@ -276,7 +276,7 @@
       break;
 
 
-      /* Ê¬´ôÌ¿Îá */
+      /* åˆ†å²å‘½ä»¤ */
 
     case JP:       M_JP();                     break;
     case JP_NZ:
@@ -357,7 +357,7 @@
     case RST38:    M_RST(0x0038);   break;
 
 
-      /* ¥í¡¼¥Æ¡¼¥È¡¿¥·¥Õ¥ÈÌ¿Îá */
+      /* ãƒ­ãƒ¼ãƒ†ãƒ¼ãƒˆï¼ã‚·ãƒ•ãƒˆå‘½ä»¤ */
 
     case RLCA:
       I = z80->ACC>>7;
@@ -381,7 +381,7 @@
       break;
 
 
-      /* Æş½ĞÎÏÌ¿Îá */
+      /* å…¥å‡ºåŠ›å‘½ä»¤ */
 
     case IN_A_x8:
       I = M_RDIO( M_RDMEM(z80->PC.W++) );
@@ -392,7 +392,7 @@
       break;
 
 
-      /* ¤½¤ÎÂ¾¤ÎÌ¿Îá */
+      /* ãã®ä»–ã®å‘½ä»¤ */
 
     case NOP:  break;
 
@@ -401,12 +401,12 @@
       break;
     case EI:
       z80->IFF = INT_ENABLE;
-      if( z80->state0 < z80_state_intchk ){	/* ¤Ş¤ÀÆâÂ¦¥ë¡¼¥×È´¤±¤Ê¤¤¾ì¹ç*/
-	if( z80->INT_active ){				/* ÊİÎ±³ä¹ş¤¬¤¢¤ì¤Ğ  */
-	  z80->skip_intr_chk = TRUE;			/* ¤³¤³¤ÇÈ´¤±¤ë      */
+      if( z80->state0 < z80_state_intchk ){	/* ã¾ã å†…å´ãƒ«ãƒ¼ãƒ—æŠœã‘ãªã„å ´åˆ*/
+	if( z80->INT_active ){				/* ä¿ç•™å‰²è¾¼ãŒã‚ã‚Œã°  */
+	  z80->skip_intr_chk = TRUE;			/* ã“ã“ã§æŠœã‘ã‚‹      */
 	  z80_state_intchk = 0;
 	}
-      }else{					/* ¤â¤¦È´¤±¤ë¾ì¹ç */
+      }else{					/* ã‚‚ã†æŠœã‘ã‚‹å ´åˆ */
 	z80->skip_intr_chk = TRUE;
 	z80_state_intchk = 0;
       }

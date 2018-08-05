@@ -18,10 +18,10 @@
 #define PIO_EXIST	(1)
 
 typedef	struct{		
-  int	type;	      /* PORT ¤Î µ¡Ç½   READ ¤« WRITE ¤«                     */
-  int	exist;	      /* PA/PB ¡Ä¥Ç¡¼¥¿¤ÎÍ­Ìµ				     */
-  int	cont_f;	      /* PC Ï¢Â³¥¢¥¯¥»¥¹¥Õ¥é¥° (CPU ÀÚÂØ¤¨¥Õ¥é¥°)	     */
-  byte	data;	      /* PA/PB ¡ÄÆşÎÏ¤¹¤ë¥Ç¡¼¥¿ PC ¡ÄÆşÎÏ¤¹¤ë/½ĞÎÏ¤·¤¿¥Ç¡¼¥¿ */
+  int	type;	      /* PORT ã® æ©Ÿèƒ½   READ ã‹ WRITE ã‹                     */
+  int	exist;	      /* PA/PB â€¦ãƒ‡ãƒ¼ã‚¿ã®æœ‰ç„¡				     */
+  int	cont_f;	      /* PC é€£ç¶šã‚¢ã‚¯ã‚»ã‚¹ãƒ•ãƒ©ã‚° (CPU åˆ‡æ›¿ãˆãƒ•ãƒ©ã‚°)	     */
+  byte	data;	      /* PA/PB â€¦å…¥åŠ›ã™ã‚‹ãƒ‡ãƒ¼ã‚¿ PC â€¦å…¥åŠ›ã™ã‚‹/å‡ºåŠ›ã—ãŸãƒ‡ãƒ¼ã‚¿ */
 } pio_work;		
 
 extern	pio_work	pio_AB[2][2], pio_C[2][2];

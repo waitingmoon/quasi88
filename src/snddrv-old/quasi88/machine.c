@@ -94,7 +94,7 @@ static struct BEEP88interface beep88_interface =
 };
 
 
-/* ¥µ¥ó¥×¥ë¥Õ¥¡¥¤¥ë¤Ï¡¢¥â¥Î¥é¥ë¤Ç¤¢¤ì¤Ğ¡¢bit¿ô¡¢¼şÇÈ¿ô¤ÏÉÔÌä */
+/* ã‚µãƒ³ãƒ—ãƒ«ãƒ•ã‚¡ã‚¤ãƒ«ã¯ã€ãƒ¢ãƒãƒ©ãƒ«ã§ã‚ã‚Œã°ã€bitæ•°ã€å‘¨æ³¢æ•°ã¯ä¸å• */
 enum {
 	SAMPLE_NUM_MOTORON,
 	SAMPLE_NUM_MOTOROFF,
@@ -104,19 +104,19 @@ enum {
 };
 static const char *quasi88_sample_names[] =
 {
-	"motoron.wav",			/* ¥µ¥ó¥×¥ëÈÖ¹æ 0 */
-	"motoroff.wav",			/* ¥µ¥ó¥×¥ëÈÖ¹æ 1 */
-	"headdown.wav",			/* ¥µ¥ó¥×¥ëÈÖ¹æ 2 */
-	"headup.wav",			/* ¥µ¥ó¥×¥ëÈÖ¹æ 3 */
-	"seek.wav",				/* ¥µ¥ó¥×¥ëÈÖ¹æ 4 */
+	"motoron.wav",			/* ã‚µãƒ³ãƒ—ãƒ«ç•ªå· 0 */
+	"motoroff.wav",			/* ã‚µãƒ³ãƒ—ãƒ«ç•ªå· 1 */
+	"headdown.wav",			/* ã‚µãƒ³ãƒ—ãƒ«ç•ªå· 2 */
+	"headup.wav",			/* ã‚µãƒ³ãƒ—ãƒ«ç•ªå· 3 */
+	"seek.wav",				/* ã‚µãƒ³ãƒ—ãƒ«ç•ªå· 4 */
 	0       /* end of array */
 };
 
 static struct Samplesinterface quasi88_samples_interface =
 {
-	5,						/* Æ±»ş¤ËÈ¯²»¤¹¤ë¥Á¥ã¥ó¥Í¥ë¿ô	*/
+	5,						/* åŒæ™‚ã«ç™ºéŸ³ã™ã‚‹ãƒãƒ£ãƒ³ãƒãƒ«æ•°	*/
 	100,					/* volume */
-	quasi88_sample_names	/* ¥µ¥ó¥×¥ë¥Õ¥¡¥¤¥ëÌ¾°ìÍ÷		*/
+	quasi88_sample_names	/* ã‚µãƒ³ãƒ—ãƒ«ãƒ•ã‚¡ã‚¤ãƒ«åä¸€è¦§		*/
 };
 
 

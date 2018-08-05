@@ -1,7 +1,7 @@
 #ifndef	ROMAJI_H_INCLUDED
 #define	ROMAJI_H_INCLUDED
 
-/* ¥í¡¼¥Ş»úÆşÎÏ½èÍı */
+/* ãƒ­ãƒ¼ãƒå­—å…¥åŠ›å‡¦ç† */
 
 void	romaji_init( void );
 void	romaji_clear( void );

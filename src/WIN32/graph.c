@@ -1,7 +1,7 @@
 /***********************************************************************
- * е░еще╒еге├еп╜ш═¤ (е╖е╣е╞ер░═┬╕)
+ * уВ░уГйуГХуВгуГГуВпхЗжчРЖ (уВ╖уВ╣уГЖуГаф╛ЭхнШ)
  *
- *	╛▄║┘д╧бв graph.h ╗▓╛╚
+ *	шй│ч┤░уБпуАБ graph.h хПВчЕз
  ************************************************************************/
 
 #include <stdio.h>
@@ -20,16 +20,16 @@ int		g_keyrepeat;
 
 
 
-static	T_GRAPH_SPEC	graph_spec;		/* ┤Ё╦▄╛Ё╩є		*/
+static	T_GRAPH_SPEC	graph_spec;		/* хЯ║цЬмцГЕха▒		*/
 
-static	int		graph_exist;		/* ┐┐д╟бв▓ш╠╠└╕└о║╤д▀	*/
-static	T_GRAPH_INFO	graph_info;		/* д╜д╬╗■д╬бв▓ш╠╠╛Ё╩є	*/
+static	int		graph_exist;		/* чЬЯуБзуАБчФ╗щЭвчФЯцИРц╕ИуБ┐	*/
+static	T_GRAPH_INFO	graph_info;		/* уБЭуБоцЩВуБоуАБчФ╗щЭвцГЕха▒	*/
 
 
 /************************************************************************
- *	е░еще╒еге├еп╜ш═¤д╬╜щ┤№▓╜
- *	е░еще╒еге├еп╜ш═¤д╬╞░║ю
- *	е░еще╒еге├еп╜ш═¤д╬╜к╬╗
+ *	уВ░уГйуГХуВгуГГуВпхЗжчРЖуБохИЭцЬЯхМЦ
+ *	уВ░уГйуГХуВгуГГуВпхЗжчРЖуБохЛХф╜Ь
+ *	уВ░уГйуГХуВгуГГуВпхЗжчРЖуБоч╡Вф║Ж
  ************************************************************************/
 
 const T_GRAPH_SPEC	*graph_init(void)
@@ -65,9 +65,9 @@ const T_GRAPH_INFO	*graph_setup(int width, int height,
 {
     int win_width, win_height;
 
-    /* fullscreen, aspect д╧╠д╗╚═╤ */
+    /* fullscreen, aspect уБпцЬкф╜┐чФи */
 
-    /* еке╒е╣епеъб╝еєе╨е├е╒ебдЄ│╬╩▌д╣ды */
+    /* уВкуГХуВ╣уВпуГкуГ╝уГ│уГРуГГуГХуВбуВТчв║ф┐ЭуБЩуВЛ */
 
     if (buffer) {
 	free(buffer);
@@ -88,9 +88,9 @@ const T_GRAPH_INFO	*graph_setup(int width, int height,
     bmpInfo.bmiHeader.biCompression = BI_RGB;
 
 
-    /* ежедеєе╔ежд╬└╕└обвд╩ддд╖еъе╡еде║ */
+    /* уВжуВдуГ│уГЙуВжуБочФЯцИРуАБуБкуБДуБЧуГкуВ╡уВдуВ║ */
 
-    if (graph_exist == FALSE) {		/* ежедеєе╔еждм╠╡д▒дьд╨└╕└о */
+    if (graph_exist == FALSE) {		/* уВжуВдуГ│уГЙуВжуБМчДбуБСуВМуБ░чФЯцИР */
 
 	if (create_window(width, height) == FALSE) {
 	    free(buffer);
@@ -98,18 +98,18 @@ const T_GRAPH_INFO	*graph_setup(int width, int height,
 	    return NULL;
 	}
 
-    } else {				/* ежедеєе╔еждм═ндьд╨еъе╡еде║ */
+    } else {				/* уВжуВдуГ│уГЙуВжуБМцЬЙуВМуБ░уГкуВ╡уВдуВ║ */
 
 	win_width  = width;
 	win_height = height;
 	calc_window_size(&win_width, &win_height);
 	SetWindowPos(g_hWnd,
-		     HWND_TOP, 0, 0,		/* е└е▀б╝(╠╡╗ыд╡дьды)	*/
-		     win_width, win_height,	/* ежегеєе╔ежд╬╔¤бж╣тд╡	*/
+		     HWND_TOP, 0, 0,		/* уГАуГЯуГ╝(чДбшжЦуБХуВМуВЛ)	*/
+		     win_width, win_height,	/* уВжуВгуГ│уГЙуВжуБох╣ЕуГ╗щлШуБХ	*/
 		     SWP_NOMOVE | SWP_NOZORDER);
     }
 
-    /* graph_info д╦╜Ї╕└дЄе╗е├е╚д╣ды */
+    /* graph_info уБлшл╕шиАуВТуВ╗уГГуГИуБЩуВЛ */
 
     graph_info.fullscreen	= FALSE;
     graph_info.width		= width;
@@ -132,81 +132,81 @@ const T_GRAPH_INFO	*graph_setup(int width, int height,
 
 
 /*
- * ежедеєе╔еждЄ└╕└од╣ды
+ * уВжуВдуГ│уГЙуВжуВТчФЯцИРуБЩуВЛ
  */
 static int create_window(int width, int height)
 {
     WNDCLASSEX wc;
     int win_width, win_height;
 
-    /* ежегеєе╔ежепеще╣д╬╛Ё╩єдЄ└▀─ъ */
-    wc.cbSize = sizeof(wc);			/* ╣╜┬д┬╬е╡еде║ */
-    wc.style = 0;				/* ежедеєе╔еже╣е┐едеы */
-    wc.lpfnWndProc = WndProc;			/* ежегеєе╔еже╫еэе╖б╝е╕еу */
-    wc.cbClsExtra = 0;				/* │╚─е╛Ё╩є */
-    wc.cbWndExtra = 0;				/* │╚─е╛Ё╩є */
-    wc.hInstance = g_hInstance;			/* едеєе╣е┐еєе╣е╧еєе╔еы */
-    wc.hIcon = NULL;				/* еведе│еє */
+    /* уВжуВгуГ│уГЙуВжуВпуГйуВ╣уБоцГЕха▒уВТшинхоЪ */
+    wc.cbSize = sizeof(wc);			/* цзЛщАаф╜УуВ╡уВдуВ║ */
+    wc.style = 0;				/* уВжуВдуГ│уГЙуВжуВ╣уВ┐уВдуГл */
+    wc.lpfnWndProc = WndProc;			/* уВжуВгуГ│уГЙуВжуГЧуГнуВ╖уГ╝уВ╕уГг */
+    wc.cbClsExtra = 0;				/* цЛбх╝╡цГЕха▒ */
+    wc.cbWndExtra = 0;				/* цЛбх╝╡цГЕха▒ */
+    wc.hInstance = g_hInstance;			/* уВдуГ│уВ╣уВ┐уГ│уВ╣уГПуГ│уГЙуГл */
+    wc.hIcon = NULL;				/* уВвуВдуВ│уГ│ */
 /*
     wc.hIcon = (HICON)LoadImage(NULL, MAKEINTRESOURCE(IDI_APPLICATION),
 				IMAGE_ICON, 0, 0, LR_DEFAULTSIZE | LR_SHARED);
 */
-    wc.hIconSm = wc.hIcon;			/* ╛од╡ддеведе│еє */
-    wc.hCursor = NULL;				/* е▐еже╣елб╝е╜еы */
+    wc.hIconSm = wc.hIcon;			/* х░ПуБХуБДуВвуВдуВ│уГ│ */
+    wc.hCursor = NULL;				/* уГЮуВжуВ╣уВлуГ╝уВ╜уГл */
 /*
     wc.hCursor = (HCURSOR)LoadImage(NULL, MAKEINTRESOURCE(IDC_ARROW),
 				    IMAGE_CURSOR, 0, 0,
 				    LR_DEFAULTSIZE | LR_SHARED);
 */
-						/* ежегеєе╔еж╟╪╖╩ */
+						/* уВжуВгуГ│уГЙуВжшГМцЩп */
     wc.hbrBackground = (HBRUSH)GetStockObject(BLACK_BRUSH);
-/*  wc.lpszMenuName = NULL;*/			/* есе╦ехб╝╠╛ */
-    wc.lpszMenuName = "QUASI88";		/* есе╦ехб╝╠╛ вк quasi88.rc */
-    wc.lpszClassName = "Win32App";		/* ежегеєе╔ежепеще╣╠╛ ┼м┼Ў */
+/*  wc.lpszMenuName = NULL;*/			/* уГбуГЛуГеуГ╝хРН */
+    wc.lpszMenuName = "QUASI88";		/* уГбуГЛуГеуГ╝хРН тЖТ quasi88.rc */
+    wc.lpszClassName = "Win32App";		/* уВжуВгуГ│уГЙуВжуВпуГйуВ╣хРН щБйх╜У */
 
-    /* ежегеєе╔ежепеще╣дЄ┼╨╧┐д╣ды */
+    /* уВжуВгуГ│уГЙуВжуВпуГйуВ╣уВТчЩ╗щМ▓уБЩуВЛ */
     if (RegisterClassEx(&wc) == 0) { return FALSE; }
 
-    /* ежегеєе╔еже╣е┐едеыд╧д│дь */
+    /* уВжуВгуГ│уГЙуВжуВ╣уВ┐уВдуГлуБпуБУуВМ */
     winStyle = WS_OVERLAPPED | WS_CAPTION | WS_SYSMENU | WS_MINIMIZEBOX;
 
-    /* ежегеєе╔еже╡еде║д╬╖╫╗╗ */
+    /* уВжуВгуГ│уГЙуВжуВ╡уВдуВ║уБошиИчоЧ */
     win_width  = width;
     win_height = height;
     calc_window_size(&win_width, &win_height);
 
-    /* ежегеєе╔еждЄ║ю└од╣ды */
-    g_hWnd = CreateWindowEx(WS_EX_ACCEPTFILES,	/* │╚─еежегеєе╔еже╣е┐едеы */
-			    wc.lpszClassName,	/* ежегеєе╔ежепеще╣╠╛	  */
-			    "QUASI88 win32",	/* е┐еде╚еые╨б╝╩╕╗·╬є	  */
-			    winStyle,		/* ежегеєе╔еже╣е┐едеы	  */
-			    CW_USEDEFAULT,	/* ежегеєе╔ежд╬x║┬╔╕	  */
-			    CW_USEDEFAULT,	/* ежегеєе╔ежд╬y║┬╔╕	  */
-			    win_width,		/* ежегеєе╔ежд╬╔¤	  */
-			    win_height,		/* ежегеєе╔ежд╬╣тд╡	  */
-			    NULL,		/* ┐╞ежегеєе╔ежд╬е╧еєе╔еы */
-			    NULL,		/* есе╦ехб╝е╧еєе╔еы	  */
-			    g_hInstance,	/* едеєе╣е┐еєе╣е╧еєе╔еы	  */
-			    NULL);		/* ╔╒▓├╛Ё╩є		  */
+    /* уВжуВгуГ│уГЙуВжуВТф╜ЬцИРуБЩуВЛ */
+    g_hWnd = CreateWindowEx(WS_EX_ACCEPTFILES,	/* цЛбх╝╡уВжуВгуГ│уГЙуВжуВ╣уВ┐уВдуГл */
+			    wc.lpszClassName,	/* уВжуВгуГ│уГЙуВжуВпуГйуВ╣хРН	  */
+			    "QUASI88 win32",	/* уВ┐уВдуГИуГлуГРуГ╝цЦЗхнЧхИЧ	  */
+			    winStyle,		/* уВжуВгуГ│уГЙуВжуВ╣уВ┐уВдуГл	  */
+			    CW_USEDEFAULT,	/* уВжуВгуГ│уГЙуВжуБоxх║зциЩ	  */
+			    CW_USEDEFAULT,	/* уВжуВгуГ│уГЙуВжуБоyх║зциЩ	  */
+			    win_width,		/* уВжуВгуГ│уГЙуВжуБох╣Е	  */
+			    win_height,		/* уВжуВгуГ│уГЙуВжуБощлШуБХ	  */
+			    NULL,		/* шжкуВжуВгуГ│уГЙуВжуБоуГПуГ│уГЙуГл */
+			    NULL,		/* уГбуГЛуГеуГ╝уГПуГ│уГЙуГл	  */
+			    g_hInstance,	/* уВдуГ│уВ╣уВ┐уГ│уВ╣уГПуГ│уГЙуГл	  */
+			    NULL);		/* ф╗ШхКацГЕха▒		  */
 
     if (g_hWnd == NULL) { return FALSE; }
 
-    /* ежегеєе╔еждЄ╔╜╝ид╣ды */
+    /* уВжуВгуГ│уГЙуВжуВТшбичд║уБЩуВЛ */
     ShowWindow(g_hWnd, SW_SHOW);
     UpdateWindow(g_hWnd);
 
-    /* есе╦ехб╝е╧еєе╔еы */
+    /* уГбуГЛуГеуГ╝уГПуГ│уГЙуГл */
     g_hMenu = GetMenu(g_hWnd);
     
-    /* Drug & Drop д╬╡Ў▓─ */
+    /* Drug & Drop уБоши▒хПп */
 #if 0
-    /* ежедеєе╔ежд╬║ю└о╗■д╦бв WS_EX_ACCEPTFILES дЄд─д▒д╞дддыд╬д╟бвд│дьд╧╔╘═╫ */
+    /* уВжуВдуГ│уГЙуВжуБоф╜ЬцИРцЩВуБлуАБ WS_EX_ACCEPTFILES уВТуБдуБСуБжуБДуВЛуБоуБзуАБуБУуВМуБпф╕НшжБ */
     DragAcceptFiles(g_hWnd, TRUE);
 #endif
 
 
 #if 0
-    if (verbose_proc) {	/* е╟еге╣е╫еьед╛Ё╩є */
+    if (verbose_proc) {	/* уГЗуВгуВ╣уГЧуГмуВдцГЕха▒ */
 	HDC hdc;
 	hdc = GetDC(g_hWnd);
 	fprintf(debugfp, "Info: H-pixel %d\n", GetDeviceCaps(hdc, HORZRES));
@@ -221,7 +221,7 @@ static int create_window(int width, int height)
 
 
 /*
- * ╦▄┼Ўд╬ежедеєе╔еже╡еде║дЄ╖╫╗╗д╣ды
+ * цЬмх╜УуБоуВжуВдуГ│уГЙуВжуВ╡уВдуВ║уВТшиИчоЧуБЩуВЛ
  */
 static void calc_window_size(int *width, int *height)
 {
@@ -230,13 +230,13 @@ static void calc_window_size(int *width, int *height)
     rect.left = 0;	rect.right  = *width;
     rect.top  = 0;	rect.bottom = *height;
 
-    AdjustWindowRectEx(&rect,			/* епещедевеєе╚╢ы╖┴       */
-		       winStyle,		/* ежегеєе╔еже╣е┐едеы     */
-		       TRUE,			/* есе╦ехб╝е╒еще░         */
-		       0);			/* │╚─еежегеєе╔еже╣е┐едеы */
+    AdjustWindowRectEx(&rect,			/* уВпуГйуВдуВвуГ│уГИчЯйх╜в       */
+		       winStyle,		/* уВжуВгуГ│уГЙуВжуВ╣уВ┐уВдуГл     */
+		       TRUE,			/* уГбуГЛуГеуГ╝уГХуГйуВ░         */
+		       0);			/* цЛбх╝╡уВжуВгуГ│уГЙуВжуВ╣уВ┐уВдуГл */
 
-    *width  = rect.right - rect.left;		/* ╦▄┼Ўд╬ежегеєе╔ежд╬╔¤   */
-    *height = rect.bottom - rect.top;		/* ╦▄┼Ўд╬ежегеєе╔ежд╬╣тд╡ */
+    *width  = rect.right - rect.left;		/* цЬмх╜УуБоуВжуВгуГ│уГЙуВжуБох╣Е   */
+    *height = rect.bottom - rect.top;		/* цЬмх╜УуБоуВжуВгуГ│уГЙуВжуБощлШуБХ */
 }
 
 
@@ -251,8 +251,8 @@ void	graph_exit(void)
 }
 
 /************************************************************************
- *	┐зд╬│╬╩▌
- *	┐зд╬▓Є╩№
+ *	шЙ▓уБочв║ф┐Э
+ *	шЙ▓уБошзгцФ╛
  ************************************************************************/
 
 void	graph_add_color(const PC88_PALETTE_T color[],
@@ -265,7 +265,7 @@ void	graph_add_color(const PC88_PALETTE_T color[],
 	    	    (((unsigned long) color[i].green) <<  8) |
 	    	    (((unsigned long) color[i].blue)));
 
-	/* RGB()е▐епеэд╧бв╜ч╜°дм╚┐┼╛д╖д╞дддыд╬д╟╗╚дид╩дд */
+	/* RGB()уГЮуВпуГнуБпуАБщаЖх║ПуБМхПНш╗вуБЧуБжуБДуВЛуБоуБзф╜┐уБИуБкуБД */
     }
 }
 
@@ -273,11 +273,11 @@ void	graph_add_color(const PC88_PALETTE_T color[],
 
 void	graph_remove_color(int nr_pixel, unsigned long pixel[])
 {
-    /* ┐зд╦┤╪д╖д╞д╧▓┐дт┤╔═¤д╖д╩ддд╬д╟бвд│д│д╟дтд╩д╦дтд╖д╩дд */
+    /* шЙ▓уБлщЦвуБЧуБжуБпф╜ХуВВчобчРЖуБЧуБкуБДуБоуБзуАБуБУуБУуБзуВВуБкуБлуВВуБЧуБкуБД */
 }
 
 /************************************************************************
- *	е░еще╒еге├епд╬╣╣┐╖
+ *	уВ░уГйуГХуВгуГГуВпуБоцЫ┤цЦ░
  ************************************************************************/
 
 static	int	graph_update_counter = 0;
@@ -290,17 +290,17 @@ int	graph_update_WM_PAINT(void)
 
     hdc = BeginPaint(g_hWnd, &ps);
 
-    /* graph_update() д╦дшдъбв WM_PAINT еде┘еєе╚дм╚п└╕д╖д┐╛ь╣чбв╔┴▓шд╣дыбг
-       OS дм╛б╝ъд╦╚п└╕д╡д╗д┐ WM_PAINT еде┘еєе╚д╬╛ь╣чд╧бвд╩д╦дтд╖д╩ддбг
-       (quasi88_expose() д╬╜ш═¤д╦дшдъбв graph_update() дм╕╞д╙╜╨д╡дьдыд┐дс) */
+    /* graph_update() уБлуВИуВКуАБ WM_PAINT уВдуГЩуГ│уГИуБМчЩ║чФЯуБЧуБЯха┤хРИуАБцППчФ╗уБЩуВЛуАВ
+       OS уБМхЛЭцЙЛуБлчЩ║чФЯуБХуБЫуБЯ WM_PAINT уВдуГЩуГ│уГИуБоха┤хРИуБпуАБуБкуБлуВВуБЧуБкуБДуАВ
+       (quasi88_expose() уБохЗжчРЖуБлуВИуВКуАБ graph_update() уБМхС╝уБ│хЗ║уБХуВМуВЛуБЯуВБ) */
 
     if (graph_update_counter > 0) {
-#if 1	/* д╔д┴дщд╬ API д╟дтдшд╡д▓бг┬о┼┘д╧бй */
+#if 1	/* уБйуБбуВЙуБо API уБзуВВуВИуБХуБТуАВщАЯх║жуБпя╝Я */
 	StretchDIBits(hdc,
 		      0, 0, graph_info.width, graph_info.height,
 		      0, 0, graph_info.width, graph_info.height,
 		      buffer, &bmpInfo, DIB_RGB_COLORS, SRCCOPY);
-#else	/* д│д├д┴д╧бв┼╛┴ў└шд╬╣тд╡д╖дл╗╪─ъд╟днд╩дд */
+#else	/* уБУуБгуБбуБпуАБш╗вщАБхЕИуБощлШуБХуБЧуБЛцМЗхоЪуБзуБНуБкуБД */
 	SetDIBitsToDevice(hdc,
 			  0, 0, graph_info.width, graph_info.height,
 			  0, 0, 0, graph_info.height,
@@ -331,24 +331,24 @@ void	graph_update(int nr_rect, T_GRAPH_RECT rect[])
     InvalidateRect(g_hWnd, NULL, FALSE);
     UpdateWindow(g_hWnd);
 
-    /* д│д│д╟бв─╛└▄ежедеєе╔еж╔┴▓шдЄд╖дшджд╚д╖д┐д╬д└дмбвд╩дєдлджд▐дпдддлд╩ддбг
-       WndProc() д╬╞т╔Їд╟д╖длбвежедеєе╔еж╔┴▓шд╧д╟днд╩ддд╬длд╩бй
+    /* уБУуБУуБзуАБчЫ┤цОеуВжуВдуГ│уГЙуВжцППчФ╗уВТуБЧуВИуБЖуБиуБЧуБЯуБоуБауБМуАБуБкуВУуБЛуБЖуБ╛уБПуБДуБЛуБкуБДуАВ
+       WndProc() уБохЖЕщГиуБзуБЧуБЛуАБуВжуВдуГ│уГЙуВжцППчФ╗уБпуБзуБНуБкуБДуБоуБЛуБкя╝Я
 
-       д╚дъдвдид║бв InvalidateRect() дЄд╣дыд╚бв WM_PAINT еде┘еєе╚дм╚п└╕д╣ды
-       д╬д╟бвд│д╬╕хд╬ WndProc() д╬ WM_PAINT ╜ш═¤д╦д╞╔┴▓шд╡д╗дыд│д╚д╦д╖дшджбг
+       уБиуВКуБВуБИуБЪуАБ InvalidateRect() уВТуБЩуВЛуБиуАБ WM_PAINT уВдуГЩуГ│уГИуБМчЩ║чФЯуБЩуВЛ
+       уБоуБзуАБуБУуБох╛МуБо WndProc() уБо WM_PAINT хЗжчРЖуБлуБжцППчФ╗уБХуБЫуВЛуБУуБиуБлуБЧуВИуБЖуАВ
 
-       д┴д╩д▀д╦бв InvalidateRect() д╬─╛╕хд╦бв UpdateWindow() дЄ╕╞д╙╜╨д╣д╚бв
-       д│д╬┤╪┐Їд╬╞т╔Їд╟ WndProc() дм╕╞д╙╜╨д╡дьбв WM_PAINT д╬╜ш═¤дм╣╘дядьды
-       дщд╖ддбгд─д▐дъ UpdateWindow() дм╜кдяд├д┐╗■┼└д╟╔┴▓шд╧╜кдяд├д╞дддыбг
+       уБбуБкуБ┐уБлуАБ InvalidateRect() уБочЫ┤х╛МуБлуАБ UpdateWindow() уВТхС╝уБ│хЗ║уБЩуБиуАБ
+       уБУуБощЦвцХ░уБохЖЕщГиуБз WndProc() уБМхС╝уБ│хЗ║уБХуВМуАБ WM_PAINT уБохЗжчРЖуБМшбМуВПуВМуВЛ
+       уВЙуБЧуБДуАВуБдуБ╛уВК UpdateWindow() уБМч╡ВуВПуБгуБЯцЩВчВ╣уБзцППчФ╗уБпч╡ВуВПуБгуБжуБДуВЛуАВ
 
-       ╦▄═шд│д│д╧ nr_rect ▓єбв╜ш═¤дЄ╖лдъ╩╓д╣дшджд╦д╣д┘днд╩д╬д└дмбв╠╠┼▌д╩д╬д╟
-       ┴┤▓ш╠╠дЄ1▓єд└д▒╔┴▓шд╡д╗д╞дддыбг(┬одде▐е╖еєд╩дщ╡дд╦д╩дщд╩дд ^^;) */
+       цЬмцЭеуБУуБУуБп nr_rect хЫЮуАБхЗжчРЖуВТч╣░уВКш┐ФуБЩуВИуБЖуБлуБЩуБ╣уБНуБкуБоуБауБМуАБщЭвхАТуБкуБоуБз
+       хЕичФ╗щЭвуВТ1хЫЮуБауБСцППчФ╗уБХуБЫуБжуБДуВЛуАВ(щАЯуБДуГЮуВ╖уГ│уБкуВЙц░ЧуБлуБкуВЙуБкуБД ^^;) */
 }
 
 
 /************************************************************************
- *	е┐еде╚еыд╬└▀─ъ
- *	┬░└нд╬└▀─ъ
+ *	уВ┐уВдуГИуГлуБошинхоЪ
+ *	х▒ЮцАзуБошинхоЪ
  ************************************************************************/
 
 void	graph_set_window_title(const char *title)
