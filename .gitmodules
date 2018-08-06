@@ -1,0 +1,4 @@
+[submodule "dependencies/SDL"]
+	path = dependencies/SDL
+	url = git@github.com:spurious/SDL-mirror.git
+	branch = release-1.2.15
