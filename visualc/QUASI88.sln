@@ -1,9 +1,10 @@
-
-Microsoft Visual Studio Solution File, Format Version 10.00
-# Visual C++ Express 2008
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "QUASI88_sdl", "QUASI88_sdl.vcproj", "{655181F1-1D31-4343-A6D4-B04D98F9196F}"
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 15
+VisualStudioVersion = 15.0.27703.2047
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "QUASI88_sdl", "QUASI88_sdl.vcxproj", "{655181F1-1D31-4343-A6D4-B04D98F9196F}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "QUASI88_win32", "QUASI88_win32.vcproj", "{0C50D901-AF65-4ACE-88F6-1F4B5A10350E}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "QUASI88_win32", "QUASI88_win32.vcxproj", "{0C50D901-AF65-4ACE-88F6-1F4B5A10350E}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -27,5 +28,8 @@ Global
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {EC6D61AC-36BA-4EEC-BA2A-6803B622C25C}
 	EndGlobalSection
 EndGlobal
