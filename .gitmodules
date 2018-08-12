@@ -3,3 +3,6 @@
     url = git@github.com:spurious/SDL-mirror.git
     branch = release-1.2.15
     ignore = dirty
+[submodule "dependencies/libretro-common"]
+    path = dependencies/libretro-common
+    url = git@github.com:libretro/libretro-common.git
