@@ -17,6 +17,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "SDL", "SDL.vcxproj", "{81CE
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "SDLmain", "SDLmain.vcxproj", "{DA956FD3-E142-46F2-9DD5-C78BEBB56B7A}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "QUASI88_libretro", "QUASI88_libretro.vcxproj", "{5942B7EC-4744-494D-9B1B-CF85E038C69F}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Win32 = Debug|Win32
@@ -63,6 +65,18 @@ Global
 		{DA956FD3-E142-46F2-9DD5-C78BEBB56B7A}.Release|Win32.ActiveCfg = Release|Win32
 		{DA956FD3-E142-46F2-9DD5-C78BEBB56B7A}.Release|Win32.Build.0 = Release|Win32
 		{DA956FD3-E142-46F2-9DD5-C78BEBB56B7A}.Release|x64.ActiveCfg = Release_NoSTDIO|Win32
+		{5942B7EC-4744-494D-9B1B-CF85E038C69F}.Debug|Win32.ActiveCfg = Debug|Win32
+		{5942B7EC-4744-494D-9B1B-CF85E038C69F}.Debug|Win32.Build.0 = Debug|Win32
+		{5942B7EC-4744-494D-9B1B-CF85E038C69F}.Debug|x64.ActiveCfg = Debug|x64
+		{5942B7EC-4744-494D-9B1B-CF85E038C69F}.Debug|x64.Build.0 = Debug|x64
+		{5942B7EC-4744-494D-9B1B-CF85E038C69F}.Monitor|Win32.ActiveCfg = Release|Win32
+		{5942B7EC-4744-494D-9B1B-CF85E038C69F}.Monitor|Win32.Build.0 = Release|Win32
+		{5942B7EC-4744-494D-9B1B-CF85E038C69F}.Monitor|x64.ActiveCfg = Release|x64
+		{5942B7EC-4744-494D-9B1B-CF85E038C69F}.Monitor|x64.Build.0 = Release|x64
+		{5942B7EC-4744-494D-9B1B-CF85E038C69F}.Release|Win32.ActiveCfg = Release|Win32
+		{5942B7EC-4744-494D-9B1B-CF85E038C69F}.Release|Win32.Build.0 = Release|Win32
+		{5942B7EC-4744-494D-9B1B-CF85E038C69F}.Release|x64.ActiveCfg = Release|x64
+		{5942B7EC-4744-494D-9B1B-CF85E038C69F}.Release|x64.Build.0 = Release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
