@@ -72,22 +72,18 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <OutDir>libretro\$(Configuration)_$(Platform)\</OutDir>
     <IntDir>libretro\$(Configuration)_$(Platform)\</IntDir>
-    <IncludePath>$(VC_IncludePath);$(WindowsSDK_IncludePath);..\dependencies\libretro-common\include</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <OutDir>libretro\$(Configuration)_$(Platform)\</OutDir>
     <IntDir>libretro\$(Configuration)_$(Platform)\</IntDir>
-    <IncludePath>$(VC_IncludePath);$(WindowsSDK_IncludePath);..\dependencies\libretro-common\include</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <OutDir>libretro\$(Configuration)_$(Platform)\</OutDir>
     <IntDir>libretro\$(Configuration)_$(Platform)\</IntDir>
-    <IncludePath>$(VC_IncludePath);$(WindowsSDK_IncludePath);..\dependencies\libretro-common\include</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <OutDir>libretro\$(Configuration)_$(Platform)\</OutDir>
     <IntDir>libretro\$(Configuration)_$(Platform)\</IntDir>
-    <IncludePath>$(VC_IncludePath);$(WindowsSDK_IncludePath);..\dependencies\libretro-common\include</IncludePath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ClCompile>
@@ -95,28 +91,41 @@
       <Optimization>MaxSpeed</Optimization>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
-      <SDLCheck>true</SDLCheck>
+      <SDLCheck>
+      </SDLCheck>
       <ConformanceMode>true</ConformanceMode>
+      <AdditionalIncludeDirectories>..\dependencies\libretro-common\include;..\src;..\src\FWIN;..\src\WIN32;..\src\snddrv;..\src\snddrv\quasi88;..\src\snddrv\src;..\src\snddrv\src\sound;..\src\fmgen;$(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;_CRT_SECURE_NO_WARNINGS;USE_SOUND;USE_FMGEN;%(PreprocessorDefinitions);_WINDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <Link>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
+      <AdditionalDependencies>kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;imm32.lib;winmm.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
-      <SDLCheck>true</SDLCheck>
+      <SDLCheck>
+      </SDLCheck>
       <ConformanceMode>true</ConformanceMode>
+      <AdditionalIncludeDirectories>..\dependencies\libretro-common\include;..\src;..\src\FWIN;..\src\WIN32;..\src\snddrv;..\src\snddrv\quasi88;..\src\snddrv\src;..\src\snddrv\src\sound;..\src\fmgen;$(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;_CRT_SECURE_NO_WARNINGS;USE_SOUND;USE_FMGEN;DEBUGPRINTF;_WINDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
+    <Link>
+      <AdditionalDependencies>kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;imm32.lib;winmm.lib;%(AdditionalDependencies)</AdditionalDependencies>
+    </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
-      <SDLCheck>true</SDLCheck>
+      <SDLCheck>
+      </SDLCheck>
       <ConformanceMode>true</ConformanceMode>
+      <AdditionalIncludeDirectories>..\dependencies\libretro-common\include;..\src;..\src\FWIN;..\src\WIN32;..\src\snddrv;..\src\snddrv\quasi88;..\src\snddrv\src;..\src\snddrv\src\sound;..\src\fmgen;$(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;_CRT_SECURE_NO_WARNINGS;USE_SOUND;USE_FMGEN;DEBUGPRINTF;_WINDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -125,8 +134,11 @@
       <Optimization>MaxSpeed</Optimization>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
-      <SDLCheck>true</SDLCheck>
+      <SDLCheck>
+      </SDLCheck>
       <ConformanceMode>true</ConformanceMode>
+      <AdditionalIncludeDirectories>..\dependencies\libretro-common\include;..\src;..\src\FWIN;..\src\WIN32;..\src\snddrv;..\src\snddrv\quasi88;..\src\snddrv\src;..\src\snddrv\src\sound;..\src\fmgen;$(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;_CRT_SECURE_NO_WARNINGS;USE_SOUND;USE_FMGEN;%(PreprocessorDefinitions);_WINDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <Link>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
@@ -134,7 +146,71 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="..\dependencies\libretro-common\include\libretro.h" />
+  </ItemGroup>
+  <ItemGroup>
     <ClCompile Include="..\src\libretro\core.c" />
+    <ClCompile Include="..\src\basic.c" />
+    <ClCompile Include="..\src\crtcdmac.c" />
+    <ClCompile Include="..\src\emu.c" />
+    <ClCompile Include="..\src\fdc.c" />
+    <ClCompile Include="..\src\fmgen\fmgen.cpp" />
+    <ClCompile Include="..\src\fmgen\fmtimer.cpp" />
+    <ClCompile Include="..\src\fmgen\opna.cpp" />
+    <ClCompile Include="..\src\fmgen\psg.cpp" />
+    <ClCompile Include="..\src\FWIN\file-op.c" />
+    <ClCompile Include="..\src\getconf.c" />
+    <ClCompile Include="..\src\image.c" />
+    <ClCompile Include="..\src\intr.c" />
+    <ClCompile Include="..\src\keyboard.c" />
+    <ClCompile Include="..\src\memory.c" />
+    <ClCompile Include="..\src\menu-screen.c" />
+    <ClCompile Include="..\src\menu.c" />
+    <ClCompile Include="..\src\monitor.c" />
+    <ClCompile Include="..\src\pause.c" />
+    <ClCompile Include="..\src\pc88main.c" />
+    <ClCompile Include="..\src\pc88sub.c" />
+    <ClCompile Include="..\src\pio.c" />
+    <ClCompile Include="..\src\q8tk-glib.c" />
+    <ClCompile Include="..\src\q8tk.c" />
+    <ClCompile Include="..\src\quasi88.c" />
+    <ClCompile Include="..\src\romaji.c" />
+    <ClCompile Include="..\src\screen-16bpp.c" />
+    <ClCompile Include="..\src\screen-32bpp.c" />
+    <ClCompile Include="..\src\screen-8bpp.c" />
+    <ClCompile Include="..\src\screen-snapshot.c" />
+    <ClCompile Include="..\src\screen.c" />
+    <ClCompile Include="..\src\snapshot.c" />
+    <ClCompile Include="..\src\snddrv\quasi88\2203fmgen.cpp" />
+    <ClCompile Include="..\src\snddrv\quasi88\2608fmgen.cpp" />
+    <ClCompile Include="..\src\snddrv\quasi88\beep.c" />
+    <ClCompile Include="..\src\snddrv\quasi88\beepintf.c" />
+    <ClCompile Include="..\src\snddrv\quasi88\mame-quasi88.c" />
+    <ClCompile Include="..\src\snddrv\src\driver.c" />
+    <ClCompile Include="..\src\snddrv\src\restrack.c" />
+    <ClCompile Include="..\src\snddrv\src\sndintrf.c" />
+    <ClCompile Include="..\src\snddrv\src\sound.c" />
+    <ClCompile Include="..\src\snddrv\src\sound\2203intf.c" />
+    <ClCompile Include="..\src\snddrv\src\sound\2608intf.c" />
+    <ClCompile Include="..\src\snddrv\src\sound\ay8910.c" />
+    <ClCompile Include="..\src\snddrv\src\sound\flt_rc.c" />
+    <ClCompile Include="..\src\snddrv\src\sound\flt_vol.c" />
+    <ClCompile Include="..\src\snddrv\src\sound\fm.c" />
+    <ClCompile Include="..\src\snddrv\src\sound\samples.c" />
+    <ClCompile Include="..\src\snddrv\src\sound\wavwrite.c" />
+    <ClCompile Include="..\src\snddrv\src\sound\ymdeltat.c" />
+    <ClCompile Include="..\src\snddrv\src\streams.c" />
+    <ClCompile Include="..\src\soundbd.c" />
+    <ClCompile Include="..\src\status.c" />
+    <ClCompile Include="..\src\suspend.c" />
+    <ClCompile Include="..\src\WIN32\audio.c" />
+    <ClCompile Include="..\src\WIN32\event.c" />
+    <ClCompile Include="..\src\WIN32\graph.c" />
+    <ClCompile Include="..\src\WIN32\main.c" />
+    <ClCompile Include="..\src\WIN32\menubar.c" />
+    <ClCompile Include="..\src\WIN32\wait.c" />
+    <ClCompile Include="..\src\z80-debug.c" />
+    <ClCompile Include="..\src\z80.c" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
