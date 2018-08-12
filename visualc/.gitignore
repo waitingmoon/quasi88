@@ -5,10 +5,11 @@
 *.sln.docstates
 
 # Build results
-[Dd]ebug/
+[Dd]ebug*/
 [Dd]ebugPublic/
-[Rr]elease/
+[Rr]elease*/
 [Rr]eleases/
+[Mm]onitor*/
 x64/
 x86/
 bld/
