@@ -665,7 +665,7 @@ SOUND_OBJS.generic =
 
 #### Cフラグ
 
-CFLAGS           += -DUSE_SOUND
+CFLAGS           += -DUSE_SOUND -Wno-narrowing
 
 SOUND_CFLAGS      = -DPI=M_PI -I$(SRCDIR)/$(SNDDRV_DIR) -I$(SRCDIR)/$(SD_Q88_DIR) -I$(SRCDIR)/$(SRC_DIR) -I$(SRCDIR)/$(SOUND_DIR) -Wno-missing-declarations -Wno-unused
 
