@@ -35,7 +35,6 @@
 
 #include "emu.h"
 #include "drive.h"
-#include "event.h"
 #include "keyboard.h"
 #include "monitor.h"
 #include "snddrv.h"

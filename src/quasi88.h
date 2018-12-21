@@ -89,7 +89,10 @@ typedef union
 #define	INLINE	static
 #endif
 
-
+/*----------------------------------------------------------------------*/
+/* リセット依存の定義						*/
+/*----------------------------------------------------------------------*/
+#include "event.h"
 
 /*----------------------------------------------------------------------*/
 /* 変数 (verbose_*)、関数						*/
@@ -165,6 +168,8 @@ int	quasi88_is_exec(void);
 int	quasi88_is_menu(void);
 int	quasi88_is_pause(void);
 int	quasi88_is_monitor(void);
+void	quasi88_get_reset_cfg(T_RESET_CFG *cfg);
+void    quasi88_reset(const T_RESET_CFG *cfg);
 
 
 
