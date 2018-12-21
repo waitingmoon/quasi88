@@ -198,6 +198,12 @@
     <ClCompile Include="..\src\z80.c">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="..\src\WIN32\retroachievements.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\dependencies\RAIntegration\src\RA_Interface.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Library Include="lib\Release_Win32\SDL.lib" />
