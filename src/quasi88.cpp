@@ -159,6 +159,7 @@ void	quasi88_main(void)
 
 #if USE_RETROACHIEVEMENTS
         RA_HandleHTTPResults();
+        RA_DoAchievementsFrame();
 #endif
 
 	/* 終了の応答があるまで、繰り返し呼び続ける */
