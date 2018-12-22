@@ -706,7 +706,12 @@ void	quasi88_reset(const T_RESET_CFG *cfg)
  ************************************************************************/
 int	quasi88_stateload(int serial)
 {
-    int now_board, success;
+    int now_board, success = 0;
+
+#if USE_RETROACHIEVEMENTS
+    if (!RA_WarnDisableHardcore("load a state"))
+        return success;
+#endif
 
     if (serial >= 0) {			/* 連番指定あり (>=0) なら */
 	filename_set_state_serial(serial);	/* 連番を設定する */
@@ -741,7 +746,13 @@ int	quasi88_stateload(int serial)
     }
 
     if (verbose_proc) {
-	if (success) printf("Stateload...done\n");
+        if (success)
+        {
+            printf("Stateload...done\n");
+#if USE_RETROACHIEVEMENTS
+            RA_OnLoadState(filename_get_state());
+#endif
+        }
 	else         printf("Stateload...Failed, Reset start\n");
     }
 
@@ -782,7 +793,7 @@ int	quasi88_stateload(int serial)
  ************************************************************************/
 int	quasi88_statesave(int serial)
 {
-    int success;
+    int success = 0;
 
     if (serial >= 0) {			/* 連番指定あり (>=0) なら */
 	filename_set_state_serial(serial);	/* 連番を設定する */
@@ -793,7 +804,13 @@ int	quasi88_statesave(int serial)
     success = statesave();		/* ステートセーブ実行 */
 
     if (verbose_proc) {
-	if (success) printf("Statesave...done\n");
+        if (success)
+        {
+            printf("Statesave...done\n");
+#if USE_RETROACHIEVEMENTS
+            RA_OnSaveState(filename_get_state());
+#endif
+        }
 	else         printf("Statesave...Failed, Reset done\n");
     }
 
