@@ -2,25 +2,32 @@
  * メニューバー処理
  ************************************************************************/
 
-#include "quasi88.h"
-#include "device.h"
-#include "event.h"
+extern "C"
+{
+    #include "quasi88.h"
+    #include "device.h"
+    #include "event.h"
 
-#include "initval.h"
-#include "pc88main.h"		/* boot_basic, ...		*/
-#include "memory.h"		/* use_pcg			*/
-#include "soundbd.h"		/* sound_board			*/
-#include "intr.h"		/* cpu_clock_mhz		*/
-#include "keyboard.h"		/* mouse_mode			*/
-#include "fdc.h"		/* fdc_wait			*/
-#include "getconf.h"		/* config_save			*/
-#include "screen.h"		/* SCREEN_INTERLACE_NO ...	*/
-#include "emu.h"		/* cpu_timing, emu_reset()	*/
-#include "menu.h"		/* menu_sound_restart()		*/
-#include "drive.h"
-#include "snddrv.h"
+    #include "initval.h"
+    #include "pc88main.h"		/* boot_basic, ...		*/
+    #include "memory.h"		/* use_pcg			*/
+    #include "soundbd.h"		/* sound_board			*/
+    #include "intr.h"		/* cpu_clock_mhz		*/
+    #include "keyboard.h"		/* mouse_mode			*/
+    #include "fdc.h"		/* fdc_wait			*/
+    #include "getconf.h"		/* config_save			*/
+    #include "screen.h"		/* SCREEN_INTERLACE_NO ...	*/
+    #include "emu.h"		/* cpu_timing, emu_reset()	*/
+    #include "menu.h"		/* menu_sound_restart()		*/
+    #include "drive.h"
+    #include "snddrv.h"
 
-#include "resource.h"
+    #include "resource.h"
+}
+
+#if USE_RETROACHIEVEMENTS
+#include "retroachievements.h"
+#endif
 
 
 static	int	menubar_active = TRUE;
@@ -813,8 +820,12 @@ int	menubar_event(int id)
     case M_HELP_ABOUT:		f_help_about();			break;
 
     default:
-	/* 未知のイベントは FALSE を返す */
-	return FALSE;
+#if USE_RETROACHIEVEMENTS
+    return RA_HandleMenuEvent(id);
+#else
+    /* 未知のイベントは FALSE を返す */
+    return FALSE;
+#endif
     }
 
     return TRUE;

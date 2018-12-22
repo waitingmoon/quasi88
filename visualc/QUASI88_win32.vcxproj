@@ -168,7 +168,7 @@
     <ClCompile Include="..\src\pio.c" />
     <ClCompile Include="..\src\q8tk-glib.c" />
     <ClCompile Include="..\src\q8tk.c" />
-    <ClCompile Include="..\src\quasi88.c" />
+    <ClCompile Include="..\src\quasi88.cpp" />
     <ClCompile Include="..\src\romaji.c" />
     <ClCompile Include="..\src\screen-16bpp.c" />
     <ClCompile Include="..\src\screen-32bpp.c" />
@@ -201,8 +201,8 @@
     <ClCompile Include="..\src\WIN32\audio.c" />
     <ClCompile Include="..\src\WIN32\event.c" />
     <ClCompile Include="..\src\WIN32\graph.c" />
-    <ClCompile Include="..\src\WIN32\main.c" />
-    <ClCompile Include="..\src\WIN32\menubar.c" />
+    <ClCompile Include="..\src\WIN32\main.cpp" />
+    <ClCompile Include="..\src\WIN32\menubar.cpp" />
     <ClCompile Include="..\src\WIN32\retroachievements.cpp" />
     <ClCompile Include="..\src\WIN32\wait.c" />
     <ClCompile Include="..\src\z80-debug.c" />

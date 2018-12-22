@@ -9,6 +9,8 @@
 #ifndef FILE_OP_H_INCLUDED
 #define FILE_OP_H_INCLUDED
 
+#include "filename.h"
+
 
 /****************************************************************************
  * 扱えるパス名の最大長

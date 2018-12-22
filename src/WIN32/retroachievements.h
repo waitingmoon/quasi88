@@ -1,5 +1,9 @@
+#if USE_RETROACHIEVEMENTS
+
 #ifndef RETROACHIEVEMENTS_H
 #define RETROACHIEVEMENTS_H
+
+#include <RA_Interface.h>
 
 //	Return whether a game has been loaded. Should return FALSE if
 //	 no ROM is loaded, or a ROM has been unloaded.
@@ -27,4 +31,9 @@ extern void LoadROM(char* sFullPath);
 //	Installs these shared functions into the DLL
 extern void RA_InitShared();
 
+void RA_InitUI();
+int RA_HandleMenuEvent(int id);
+
 #endif /* RETROACHIEVEMENTS_H */
+
+#endif

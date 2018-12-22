@@ -1,6 +1,5 @@
 #if USE_RETROACHIEVEMENTS
 #include "retroachievements.h"
-#include "RA_Interface.h"
 
 extern "C"
 {
@@ -80,6 +79,28 @@ void LoadROM(const char* sFullPath)
 void RA_InitShared()
 {
     RA_InstallSharedFunctions(&GameIsActive, &CauseUnpause, &CausePause, &RebuildMenu, &GetEstimatedGameTitle, &ResetEmulation, &LoadROM);
+}
+
+void RA_InitUI()
+{
+    RA_Init(g_hWnd, /* RA_Quasi88 */ RA_FCEUX, Q_VERSION);
+    RA_InitShared();
+    RA_UpdateAppTitle("");
+    RebuildMenu();
+    RA_AttemptLogin(true);
+    RebuildMenu();
+}
+
+int RA_HandleMenuEvent(int id)
+{
+    if (LOWORD(id) >= IDM_RA_MENUSTART &&
+        LOWORD(id) < IDM_RA_MENUEND)
+    {
+        RA_InvokeDialog(LOWORD(id));
+        return TRUE;
+    }
+
+    return FALSE;
 }
 
 #endif

@@ -90,9 +90,6 @@
     <ClCompile Include="..\src\keyboard.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\src\WIN32\main.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="..\src\snddrv\quasi88\mame-quasi88.c">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -103,9 +100,6 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\src\menu.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\WIN32\menubar.c">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\src\monitor.c">
@@ -133,9 +127,6 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\src\q8tk.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\quasi88.c">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\src\snddrv\src\restrack.c">
@@ -202,6 +193,15 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\src\WIN32\retroachievements.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\WIN32\main.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\quasi88.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\WIN32\menubar.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
