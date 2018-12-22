@@ -32,6 +32,7 @@ extern void LoadROM(char* sFullPath);
 extern void RA_InitShared();
 
 void RA_InitUI();
+void RA_InitMemory();
 int RA_HandleMenuEvent(int id);
 
 #endif /* RETROACHIEVEMENTS_H */

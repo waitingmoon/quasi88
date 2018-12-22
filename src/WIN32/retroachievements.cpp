@@ -4,8 +4,43 @@
 extern "C"
 {
     #include "device.h"
+    #include "memory.h"
     #include "quasi88.h"
 }
+
+/****************************************************************************
+ * 実績処理に使用するメモリの読み書き関数
+ *****************************************************************************/
+unsigned char ByteReader(byte *buf, size_t nOffs)
+{
+    return *(buf + nOffs);
+}
+
+void ByteWriter(byte *buf, size_t nOffs, unsigned char nVal)
+{
+    *(buf + nOffs) = nVal;
+}
+
+unsigned char MainRAMReader(size_t nOffs)
+{
+    return ByteReader(main_ram, nOffs);
+}
+
+void MainRAMWriter(size_t nOffs, unsigned char nVal)
+{
+    ByteWriter(main_ram, nOffs, nVal);
+}
+
+unsigned char MainHighRAMReader(size_t nOffs)
+{
+    return ByteReader(main_high_ram, nOffs);
+}
+
+void MainHighRAMWriter(size_t nOffs, unsigned char nVal)
+{
+    ByteWriter(main_high_ram, nOffs, nVal);
+}
+
 
 int GetMenuItemIndex(HMENU hMenu, const char* ItemName)
 {
@@ -73,7 +108,7 @@ void ResetEmulation()
 
 void LoadROM(const char* sFullPath)
 {
-    quasi88_load_tape_insert(sFullPath);
+    quasi88_disk_insert_all(sFullPath, TRUE);
 }
 
 void RA_InitShared()
@@ -89,6 +124,13 @@ void RA_InitUI()
     RebuildMenu();
     RA_AttemptLogin(true);
     RebuildMenu();
+}
+
+void RA_InitMemory()
+{
+    RA_ClearMemoryBanks();
+    RA_InstallMemoryBank(0, MainRAMReader, MainRAMWriter, 0x10000);
+    RA_InstallMemoryBank(1, MainHighRAMReader, MainHighRAMWriter, 0x1000);
 }
 
 int RA_HandleMenuEvent(int id)

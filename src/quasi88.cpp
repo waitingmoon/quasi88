@@ -208,9 +208,6 @@ void	quasi88_stop(int normal_exit)
 
     case 4:			/* サウンドの初期化でNG */
 	if (ERR_DISP(4)) printf("sound system initialize failed!\n");
-#if USE_RETROACHIEVEMENTS
-    RA_Shutdown();
-#endif
 	event_exit();
 	screen_exit();
 	/* FALLTHROUGH */
@@ -230,6 +227,10 @@ void	quasi88_stop(int normal_exit)
     case 0:			/* 終了処理 すでに完了 */
 	break;
     }
+
+#if USE_RETROACHIEVEMENTS
+    RA_Shutdown();
+#endif
 
     proc = 0;	/* この関数を続けて呼んでも問題無いように、クリアしておく */
 }
@@ -962,6 +963,10 @@ void	quasi88_cfg_set_no_wait(int enable)
  *	・両ドライブ取り出し
  *	・指定ドライブ取り出し
  ************************************************************************/
+#if USE_RETROACHIEVEMENTS
+BYTE *disk_data = 0;
+#endif
+
 int	quasi88_disk_insert_all(const char *filename, int ro)
 {
     int success;
@@ -1005,6 +1010,27 @@ int	quasi88_disk_insert(int drv, const char *filename, int image, int ro)
 		filename_init_snap(TRUE);
 		filename_init_wav(TRUE);
 	    }
+
+#if USE_RETROACHIEVEMENTS
+        if (disk_data)
+        {
+            free(disk_data);
+        }
+
+        PC88_DRIVE_T d = drive[drv];
+        OSD_FILE *f = d.fp;
+        unsigned long disk_size = d.disk_end - d.disk_top;
+        unsigned long prev_loc = osd_ftell(f);
+        disk_data = (BYTE *)malloc(disk_size * sizeof(BYTE));
+        
+        osd_fseek(f, d.disk_top, SEEK_SET);
+        osd_fread(disk_data, sizeof(BYTE), disk_size, f);
+        osd_fflush(f);
+        osd_fseek(f, prev_loc, SEEK_SET);
+
+        RA_InitMemory();
+        RA_OnLoadNewRom(disk_data, disk_size);
+#endif
 	}
     }
 
