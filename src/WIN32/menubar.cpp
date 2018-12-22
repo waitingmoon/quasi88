@@ -1140,6 +1140,14 @@ static	void	f_set_buf(UINT uItem, int data)
 
 static	void	f_drv_chg(int data)
 {
+#if USE_RETROACHIEVEMENTS
+    MessageBox(g_hWnd,
+        "Loading into individual drives is disabled by RetroAchievements.\n\n \
+Please select \"Change\" at the root of the \"Disk\" menu to load an image, \
+or drag and drop a file into the emulator window.", "Disabled Feature", MB_OK);
+    return;
+#endif
+
     char filename[QUASI88_MAX_FILENAME];	/* フルパスファイル名 */
     const char *headline;
     int result;

@@ -997,6 +997,26 @@ int	quasi88_disk_insert_all(const char *filename, int ro)
 	if (disk_image_num(DRIVE_1) > 1) {
 	    quasi88_disk_insert_A_to_B(DRIVE_1, DRIVE_2, 1);
 	}
+
+#if USE_RETROACHIEVEMENTS
+    if (disk_data)
+    {
+        free(disk_data);
+    }
+
+    FILE *f = fopen(filename, "rb");
+    fseek(f, 0, SEEK_END);
+    unsigned long disk_size = (unsigned long)ftell(f);
+    disk_data = (BYTE *)malloc(disk_size * sizeof(BYTE));
+
+    fseek(f, 0, SEEK_SET);
+    fread(disk_data, sizeof(BYTE), disk_size, f);
+    fflush(f);
+    fclose(f);
+
+    RA_InitMemory();
+    RA_OnLoadNewRom(disk_data, disk_size);
+#endif
     }
 
     if (quasi88_is_exec()) {
@@ -1027,26 +1047,6 @@ int	quasi88_disk_insert(int drv, const char *filename, int image, int ro)
 		filename_init_snap(TRUE);
 		filename_init_wav(TRUE);
 	    }
-
-#if USE_RETROACHIEVEMENTS
-        if (disk_data)
-        {
-            free(disk_data);
-        }
-
-        FILE *f = fopen(filename, "rb");
-        fseek(f, 0, SEEK_END);
-        unsigned long disk_size = (unsigned long)ftell(f);
-        disk_data = (BYTE *)malloc(disk_size * sizeof(BYTE));
-        
-        fseek(f, 0, SEEK_SET);
-        fread(disk_data, sizeof(BYTE), disk_size, f);
-        fflush(f);
-        fclose(f);
-
-        RA_InitMemory();
-        RA_OnLoadNewRom(disk_data, disk_size);
-#endif
 	}
     }
 
