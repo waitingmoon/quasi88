@@ -248,13 +248,16 @@ OSD_FILE *osd_fopen(int type, const char *path, const char *mode)
     int i;
     OSD_FILE	*st;
     char	*fullname, *localname;
+    FILE    *origfile, *localfile;
+    char    *filebuf;
+    unsigned long filelen;
 
     st = NULL;
-    for (i=0; i<MAX_STREAM; i++) {	/* 空きバッファを探す */
-	if (osd_stream[i].fp == NULL) {		/* fp が NULL なら空き */
-	    st = &osd_stream[i];
-	    break;
-	}
+    for (i = 0; i < MAX_STREAM; i++) {	/* 空きバッファを探す */
+        if (osd_stream[i].fp == NULL) {		/* fp が NULL なら空き */
+            st = &osd_stream[i];
+            break;
+        }
     }
     if (st == NULL) return NULL;		/* 空きがなければ NG */
     st->path = NULL;
@@ -263,17 +266,42 @@ OSD_FILE *osd_fopen(int type, const char *path, const char *mode)
     fullname = _fullpath(NULL, path, 0);	/* ファイル名を取得する */
     if (fullname == NULL) return NULL;
 
-    localname = calloc(_MAX_PATH, sizeof(char));
-    osd_file_localname(fullname, localname);
+    if (type == FTYPE_DISK)
+    {
+        localname = calloc(_MAX_PATH, sizeof(char));
+        osd_file_localname(fullname, localname);
 
-    if (!osd_file_stat(localname)) /* 上書き用ファイルの有無をチェック */
-    {
-        free(localname); /* 上書き用ファイルは存在していない */
-    }
-    else
-    {
-        free(fullname); /* 上書き用ファイルをロードする */
-        fullname = localname;
+        if (!osd_file_stat(localname)) /* 上書き用ファイルの有無をチェック */
+        {
+            if ((origfile = fopen(fullname, "rb")) && (localfile = fopen(localname, "wb")))
+            {
+                fseek(localfile, 0, SEEK_SET);
+                fseek(origfile, 0, SEEK_END);
+                filelen = ftell(origfile);
+                fseek(origfile, 0, SEEK_SET);
+
+                filebuf = malloc(filelen);
+
+                fread(filebuf, 1, filelen, origfile);
+                fflush(origfile);
+                fwrite(filebuf, 1, filelen, localfile);
+
+                fclose(origfile);
+                fclose(localfile);
+
+                free(filebuf);
+            }
+            else
+            {
+                free(localname); /* 上書き用ファイルを利用しない */
+            }
+        }
+
+        if (localname)
+        {
+            free(fullname); /* 上書き用ファイルをロードする */
+            fullname = localname;
+        }
     }
 
 
