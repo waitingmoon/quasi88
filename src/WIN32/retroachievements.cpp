@@ -97,8 +97,13 @@ void RebuildMenu()
     DrawMenuBar(g_hWnd);
 }
 
+char loaded_title[_MAX_FNAME];
 void GetEstimatedGameTitle(char* sNameOut)
 {
+    if (loaded_title)
+    {
+        sNameOut = (char*)loaded_title;
+    }
 }
 
 void ResetEmulation()
@@ -120,7 +125,6 @@ void RA_InitUI()
 {
     RA_Init(g_hWnd, /* RA_Quasi88 */ RA_FCEUX, Q_VERSION);
     RA_InitShared();
-    RA_UpdateAppTitle("");
     RebuildMenu();
     RA_AttemptLogin(true);
     RebuildMenu();
@@ -131,6 +135,18 @@ void RA_InitMemory()
     RA_ClearMemoryBanks();
     RA_InstallMemoryBank(0, MainRAMReader, MainRAMWriter, 0x10000);
     RA_InstallMemoryBank(1, MainHighRAMReader, MainHighRAMWriter, 0x1000);
+}
+
+void RA_ClearMemory()
+{
+    RA_ClearMemoryBanks();
+    loaded_title[0] = '\0';
+}
+
+void RA_SetGameTitle(char *title)
+{
+    strcpy(loaded_title, title);
+    RA_UpdateAppTitle(title);
 }
 
 int RA_HandleMenuEvent(int id)

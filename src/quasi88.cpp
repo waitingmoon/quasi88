@@ -1005,6 +1005,7 @@ int	quasi88_disk_insert_all(const char *filename, int ro)
         free(disk_data);
     }
 
+    char basename[_MAX_FNAME];
     FILE *f = fopen(filename, "rb");
     fseek(f, 0, SEEK_END);
     unsigned long disk_size = (unsigned long)ftell(f);
@@ -1014,6 +1015,9 @@ int	quasi88_disk_insert_all(const char *filename, int ro)
     fread(disk_data, sizeof(BYTE), disk_size, f);
     fflush(f);
     fclose(f);
+
+    _splitpath(filename, NULL, NULL, basename, NULL);
+    RA_SetGameTitle(basename);
 
     RA_InitMemory();
     RA_OnLoadNewRom(disk_data, disk_size);
@@ -1088,6 +1092,10 @@ void	quasi88_disk_eject_all(void)
     for (drv = 0; drv<2; drv++) {
 	quasi88_disk_eject(drv);
     }
+
+#if USE_RETROACHIEVEMENTS
+    RA_ClearMemory();
+#endif
 
     boot_from_rom = TRUE;
 
