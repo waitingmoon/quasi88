@@ -243,13 +243,11 @@ struct OSD_FILE_STRUCT {
 #define	MAX_STREAM	8
 static	OSD_FILE	osd_stream[ MAX_STREAM ];
 
-
-
 OSD_FILE *osd_fopen(int type, const char *path, const char *mode)
 {
     int i;
     OSD_FILE	*st;
-    char	*fullname;
+    char	*fullname, *localname;
 
     st = NULL;
     for (i=0; i<MAX_STREAM; i++) {	/* 空きバッファを探す */
@@ -265,6 +263,18 @@ OSD_FILE *osd_fopen(int type, const char *path, const char *mode)
     fullname = _fullpath(NULL, path, 0);	/* ファイル名を取得する */
     if (fullname == NULL) return NULL;
 
+    localname = calloc(_MAX_PATH, sizeof(char));
+    osd_file_localname(fullname, localname);
+
+    if (!osd_file_stat(localname)) /* 上書き用ファイルの有無をチェック */
+    {
+        free(localname); /* 上書き用ファイルは存在していない */
+    }
+    else
+    {
+        free(fullname); /* 上書き用ファイルをロードする */
+        fullname = localname;
+    }
 
 
     switch (type) {
@@ -931,7 +941,22 @@ int	osd_file_stat(const char *pathname)
     }
 }
 
+/****************************************************************************
+ * 上書き用ファイルのパスの取得
+ ****************************************************************************/
+void osd_file_localname(const char *fullname, char *localname)
+{
+    char    filename[_MAX_FNAME], fileext[_MAX_EXT];
+    char    fullpath[_MAX_DIR];
 
+    _splitpath(fullname, NULL, NULL, filename, fileext); /* 上書き用ファイル名を取得する */
+    strcpy(fullpath, osd_dir_disk());
+    strcat(fullpath, "\\");
+    strcat(fullpath, filename);
+    strcat(fullpath, fileext);
+
+    strcpy(localname, fullpath);
+}
 
 
 

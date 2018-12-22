@@ -1034,16 +1034,15 @@ int	quasi88_disk_insert(int drv, const char *filename, int image, int ro)
             free(disk_data);
         }
 
-        PC88_DRIVE_T d = drive[drv];
-        OSD_FILE *f = d.fp;
-        unsigned long disk_size = d.disk_end - d.disk_top;
-        unsigned long prev_loc = osd_ftell(f);
+        FILE *f = fopen(filename, "rb");
+        fseek(f, 0, SEEK_END);
+        unsigned long disk_size = (unsigned long)ftell(f);
         disk_data = (BYTE *)malloc(disk_size * sizeof(BYTE));
         
-        osd_fseek(f, d.disk_top, SEEK_SET);
-        osd_fread(disk_data, sizeof(BYTE), disk_size, f);
-        osd_fflush(f);
-        osd_fseek(f, prev_loc, SEEK_SET);
+        fseek(f, 0, SEEK_SET);
+        fread(disk_data, sizeof(BYTE), disk_size, f);
+        fflush(f);
+        fclose(f);
 
         RA_InitMemory();
         RA_OnLoadNewRom(disk_data, disk_size);
