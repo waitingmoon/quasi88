@@ -4,8 +4,10 @@
 extern "C"
 {
     #include "device.h"
+    #include "initval.h"
     #include "memory.h"
     #include "quasi88.h"
+    #include "screen.h"
 }
 
 /****************************************************************************
@@ -123,7 +125,7 @@ void RA_InitShared()
 
 void RA_InitUI()
 {
-    RA_Init(g_hWnd, /* RA_Quasi88 */ RA_FCEUX, Q_VERSION);
+    RA_Init(g_hWnd, /* RA_Quasi88 */ 9, Q_VERSION);
     RA_InitShared();
     RebuildMenu();
     RA_AttemptLogin(true);
@@ -159,6 +161,15 @@ int RA_HandleMenuEvent(int id)
     }
 
     return FALSE;
+}
+
+void RA_RenderOverlayFrame()
+{
+    HDC hdc = GetDC(g_hWnd);
+    RECT window_size = { 0, 0, SCREEN_W, SCREEN_H };
+    ControllerInput input;
+
+    RA_UpdateRenderOverlay(hdc, &input, frameskip_rate / DEFAULT_VSYNC_FREQ_HZ, &window_size, use_fullscreen, quasi88_is_pause() > 0 ? true : false);
 }
 
 #endif
