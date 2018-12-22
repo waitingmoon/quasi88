@@ -160,7 +160,6 @@ void	quasi88_main(void)
 #if USE_RETROACHIEVEMENTS
         RA_HandleHTTPResults();
         RA_DoAchievementsFrame();
-        RA_RenderOverlayFrame();
 #endif
 
 	/* 終了の応答があるまで、繰り返し呼び続ける */
@@ -387,6 +386,9 @@ int	quasi88_loop(void)
 	if (quasi88_event_flags & EVENT_FRAME_UPDATE) {
 	    quasi88_event_flags &= ~EVENT_FRAME_UPDATE;
 	    screen_update();
+#if USE_RETROACHIEVEMENTS
+        RA_RenderOverlayFrame();
+#endif
 	    step = WAIT;
 	} else {
 	    step = step_after_wait;
