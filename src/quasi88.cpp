@@ -163,11 +163,12 @@ void	quasi88_main(void)
 	if (result == QUASI88_LOOP_EXIT) {
 	    break;
 	}
-
+    if (result == QUASI88_LOOP_ONE) {
 #if USE_RETROACHIEVEMENTS
-    RA_HandleHTTPResults();
-    RA_DoAchievementsFrame();
+        RA_HandleHTTPResults();
+        RA_DoAchievementsFrame();
 #endif
+    }
 
     }
 
