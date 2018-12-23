@@ -8,6 +8,7 @@ extern "C"
     #include "memory.h"
     #include "quasi88.h"
     #include "screen.h"
+    #include <windows.h>
 }
 
 /****************************************************************************
@@ -123,6 +124,7 @@ void RA_InitShared()
     RA_InstallSharedFunctions(&GameIsActive, &CauseUnpause, &CausePause, &RebuildMenu, &GetEstimatedGameTitle, &ResetEmulation, &LoadROM);
 }
 
+HDC hdc;
 void RA_InitUI()
 {
     RA_Init(g_hWnd, /* RA_Quasi88 */ 9, Q_VERSION);
@@ -130,6 +132,7 @@ void RA_InitUI()
     RebuildMenu();
     RA_AttemptLogin(true);
     RebuildMenu();
+    hdc = GetDC(g_hWnd);
 }
 
 void RA_InitMemory()
@@ -163,13 +166,16 @@ int RA_HandleMenuEvent(int id)
     return FALSE;
 }
 
+unsigned long lastTick = timeGetTime();
 void RA_RenderOverlayFrame()
 {
-    HDC hdc = GetDC(g_hWnd);
+    float timeSinceLastTick = (timeGetTime() - lastTick) / 1000.0f;
     RECT window_size = { 0, 0, SCREEN_W, SCREEN_H };
     ControllerInput input;
 
-    RA_UpdateRenderOverlay(hdc, &input, frameskip_rate / DEFAULT_VSYNC_FREQ_HZ, &window_size, use_fullscreen, (bool)quasi88_is_pause());
+    RA_UpdateRenderOverlay(hdc, &input, timeSinceLastTick, &window_size, use_fullscreen, (bool)quasi88_is_pause());
+
+    lastTick = timeGetTime();
 }
 
 #endif

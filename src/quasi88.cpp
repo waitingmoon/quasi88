@@ -166,7 +166,7 @@ void	quasi88_main(void)
 #if USE_RETROACHIEVEMENTS
     RA_HandleHTTPResults();
     RA_DoAchievementsFrame();
-    //RA_RenderOverlayFrame();
+    RA_RenderOverlayFrame();
 #endif
 
     }
