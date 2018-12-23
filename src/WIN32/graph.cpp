@@ -131,7 +131,7 @@ const T_GRAPH_INFO	*graph_setup(int width, int height,
     graph_info.write_only	= FALSE;
     graph_info.broken_mouse	= FALSE;
     graph_info.draw_start	= NULL;
-    graph_info.draw_finish = NULL;
+    graph_info.draw_finish	= NULL;
     graph_info.dont_frameskip	= FALSE;
 
     graph_exist = TRUE;
@@ -300,6 +300,15 @@ int	graph_update_WM_PAINT(void)
 
     hdc = BeginPaint(g_hWnd, &ps);
 
+#if USE_RETROACHIEVEMENTS
+    HDC hdc_main = hdc;
+    HDC hdc_buffer = CreateCompatibleDC(hdc);
+    HBITMAP hbm_buffer = CreateCompatibleBitmap(hdc, graph_info.width, graph_info.height);
+    SelectObject(hdc_buffer, hbm_buffer);
+
+    hdc = hdc_buffer;
+#endif
+
     /* graph_update() により、 WM_PAINT イベントが発生した場合、描画する。
        OS が勝手に発生させた WM_PAINT イベントの場合は、なにもしない。
        (quasi88_expose() の処理により、 graph_update() が呼び出されるため) */
@@ -324,6 +333,7 @@ int	graph_update_WM_PAINT(void)
 
 #if USE_RETROACHIEVEMENTS
     RA_RenderOverlayFrame(hdc);
+    BitBlt(hdc_main, 0, 0, graph_info.width, graph_info.height, hdc, 0, 0, SRCCOPY);
 #endif
 
 /*

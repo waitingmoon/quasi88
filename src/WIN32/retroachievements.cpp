@@ -3,12 +3,13 @@
 
 extern "C"
 {
+    #include <windows.h>
+
     #include "device.h"
     #include "initval.h"
     #include "memory.h"
     #include "quasi88.h"
     #include "screen.h"
-    #include <windows.h>
 }
 
 /****************************************************************************
