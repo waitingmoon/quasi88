@@ -78,9 +78,6 @@
     <ClCompile Include="..\src\getconf.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\src\WIN32\graph.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="..\src\image.c">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -91,9 +88,6 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\src\snddrv\quasi88\mame-quasi88.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\memory.c">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\src\menu-screen.c">
@@ -202,6 +196,12 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\src\WIN32\menubar.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\memory.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\WIN32\graph.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

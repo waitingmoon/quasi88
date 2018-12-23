@@ -124,7 +124,7 @@ void RA_InitShared()
     RA_InstallSharedFunctions(&GameIsActive, &CauseUnpause, &CausePause, &RebuildMenu, &GetEstimatedGameTitle, &ResetEmulation, &LoadROM);
 }
 
-HDC hdc;
+HDC main_hdc;
 void RA_InitUI()
 {
     RA_Init(g_hWnd, /* RA_Quasi88 */ 9, Q_VERSION);
@@ -132,7 +132,13 @@ void RA_InitUI()
     RebuildMenu();
     RA_AttemptLogin(true);
     RebuildMenu();
-    hdc = GetDC(g_hWnd);
+
+    if (main_hdc)
+    {
+        ReleaseDC(g_hWnd, main_hdc);
+    }
+
+    main_hdc = GetDC(g_hWnd);
 }
 
 void RA_InitMemory()
@@ -167,8 +173,11 @@ int RA_HandleMenuEvent(int id)
 }
 
 unsigned long last_tick = timeGetTime();
-void RA_RenderOverlayFrame()
+void RA_RenderOverlayFrame(HDC hdc)
 {
+    if (!hdc)
+        hdc = main_hdc;
+
     float delta_time = (timeGetTime() - last_tick) / 1000.0f;
 
     int width = WIDTH, height = HEIGHT;

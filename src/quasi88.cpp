@@ -159,14 +159,19 @@ void	quasi88_main(void)
 
 	/* 終了の応答があるまで、繰り返し呼び続ける */
 
-	if (quasi88_loop() == QUASI88_LOOP_EXIT) {
+    int result = quasi88_loop();
+	if (result == QUASI88_LOOP_EXIT) {
 	    break;
 	}
+#if 0 /* グラフィックの更新に構わず実績システムのオーバーレイを更新する */
+    if (result == QUASI88_LOOP_ONE) {
+        RA_RenderOverlayFrame(NULL);
+    }
+#endif
 
 #if USE_RETROACHIEVEMENTS
     RA_HandleHTTPResults();
     RA_DoAchievementsFrame();
-    RA_RenderOverlayFrame();
 #endif
 
     }

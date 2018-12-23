@@ -267,7 +267,7 @@
     <ClCompile Include="..\src\suspend.c" />
     <ClCompile Include="..\src\WIN32\audio.c" />
     <ClCompile Include="..\src\WIN32\event.c" />
-    <ClCompile Include="..\src\WIN32\graph.c" />
+    <ClCompile Include="..\src\WIN32\graph.cpp" />
     <ClCompile Include="..\src\WIN32\main.cpp" />
     <ClCompile Include="..\src\WIN32\menubar.cpp" />
     <ClCompile Include="..\src\WIN32\retroachievements.cpp" />

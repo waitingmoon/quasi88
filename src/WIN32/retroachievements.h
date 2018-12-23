@@ -36,7 +36,7 @@ void RA_InitMemory();
 void RA_ClearMemory();
 void RA_SetGameTitle(char *title);
 int RA_HandleMenuEvent(int id);
-void RA_RenderOverlayFrame();
+void RA_RenderOverlayFrame(HDC hdc);
 
 #endif /* RETROACHIEVEMENTS_H */
 

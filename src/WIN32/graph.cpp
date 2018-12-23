@@ -4,12 +4,17 @@
  *	詳細は、 graph.h 参照
  ************************************************************************/
 
-#include <stdio.h>
-#include <stdlib.h>
+extern "C"
+{
+    #include <stdio.h>
+    #include <stdlib.h>
 
-#include "quasi88.h"
-#include "graph.h"
-#include "device.h"
+    #include "quasi88.h"
+    #include "graph.h"
+    #include "device.h"
+}
+
+#include "retroachievements.h"
 
 
 
@@ -78,7 +83,7 @@ const T_GRAPH_INFO	*graph_setup(int width, int height,
 	free(buffer);
     }
 
-    buffer = malloc(width * height * sizeof(unsigned long));
+    buffer = (unsigned char *)malloc(width * height * sizeof(unsigned long));
     if (buffer == FALSE) {
 	return NULL;
     }
@@ -126,7 +131,7 @@ const T_GRAPH_INFO	*graph_setup(int width, int height,
     graph_info.write_only	= FALSE;
     graph_info.broken_mouse	= FALSE;
     graph_info.draw_start	= NULL;
-    graph_info.draw_finish	= NULL;
+    graph_info.draw_finish = NULL;
     graph_info.dont_frameskip	= FALSE;
 
     graph_exist = TRUE;
@@ -316,6 +321,10 @@ int	graph_update_WM_PAINT(void)
     } else {
 	drawn = FALSE;
     }
+
+#if USE_RETROACHIEVEMENTS
+    RA_RenderOverlayFrame(hdc);
+#endif
 
 /*
     fprintf(debugfp,
