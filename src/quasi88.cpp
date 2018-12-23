@@ -163,11 +163,6 @@ void	quasi88_main(void)
 	if (result == QUASI88_LOOP_EXIT) {
 	    break;
 	}
-#if 1 /* グラフィックの更新に構わず実績システムのオーバーレイを更新する */
-    if (result == QUASI88_LOOP_ONE) {
-        RA_RenderOverlayFrame(NULL);
-    }
-#endif
 
 #if USE_RETROACHIEVEMENTS
     RA_HandleHTTPResults();

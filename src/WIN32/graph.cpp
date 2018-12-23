@@ -334,6 +334,9 @@ int	graph_update_WM_PAINT(void)
 #if USE_RETROACHIEVEMENTS
     RA_RenderOverlayFrame(hdc);
     BitBlt(hdc_main, 0, 0, graph_info.width, graph_info.height, hdc, 0, 0, SRCCOPY);
+
+    DeleteObject(hbm_buffer);
+    DeleteDC(hdc_buffer);
 #endif
 
 /*
