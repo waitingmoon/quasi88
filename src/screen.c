@@ -102,7 +102,7 @@ static const SCREEN_SIZE_TABLE screen_size_tbl[ SCREEN_SIZE_END ] =
 static	int	screen_size_max = SCREEN_SIZE_END - 1; /*変更可能な最大サイズ*/
 static	int	screen_size_min = SCREEN_SIZE_HALF;    /*変更可能な最小サイズ*/
 /*CFG*/	int	screen_size	= SCREEN_SIZE_FULL;    /*画面サイズ指定      */
-static	int	now_screen_size;		       /*実際の、画面サイズ  */
+/*CFG*/	int	now_screen_size;		       /*実際の、画面サイズ  */
 
 
 static	int	enable_fullscreen = 0;	/* 全画面表示可能かどうか	*/

@@ -166,16 +166,35 @@ int RA_HandleMenuEvent(int id)
     return FALSE;
 }
 
-unsigned long lastTick = timeGetTime();
+unsigned long last_tick = timeGetTime();
 void RA_RenderOverlayFrame()
 {
-    float timeSinceLastTick = (timeGetTime() - lastTick) / 1000.0f;
-    RECT window_size = { 0, 0, SCREEN_W, SCREEN_H };
+    float delta_time = (timeGetTime() - last_tick) / 1000.0f;
+
+    int width = WIDTH, height = HEIGHT;
+
+    switch (now_screen_size)
+    {
+    case SCREEN_SIZE_HALF:
+        width >>= 1;
+        height >>= 1;
+        break;
+#ifdef	SUPPORT_DOUBLE
+    case SCREEN_SIZE_DOUBLE:
+        width <<= 1;
+        height <<= 1;
+        break;
+#endif
+    default:
+        break;
+    }
+
+    RECT window_size = { 0, 0, width, height };
     ControllerInput input;
 
-    RA_UpdateRenderOverlay(hdc, &input, timeSinceLastTick, &window_size, use_fullscreen, (bool)quasi88_is_pause());
+    RA_UpdateRenderOverlay(hdc, &input, delta_time, &window_size, use_fullscreen, (bool)quasi88_is_pause());
 
-    lastTick = timeGetTime();
+    last_tick = timeGetTime();
 }
 
 #endif
