@@ -445,9 +445,13 @@ static void menubar_item_setup(void)
     switch (i) {
     case SCREEN_SIZE_FULL:	uItem = M_SET_SIZ_FULL;	break;
     case SCREEN_SIZE_HALF:	uItem = M_SET_SIZ_HALF;	break;
+#ifdef SUPPORT_DOUBLE
+    case SCREEN_SIZE_DOUBLE: uItem = M_SET_SIZ_DOUBLE; break;
+#endif
     default:			uItem = 0;		break;
     }
-    CheckMenuRadioItem(g_hMenu, M_SET_SIZ_FULL, M_SET_SIZ_HALF, uItem,
+
+    CheckMenuRadioItem(g_hMenu, M_SET_SIZ_FULL, M_SET_SIZ_DOUBLE, uItem,
 		       MF_BYCOMMAND);
 
     i = use_pcg;						/* ＊＊＊＊ */
@@ -715,6 +719,9 @@ int	menubar_event(int id)
 
     case M_SET_SIZ_FULL:	f_set_size(id, SCREEN_SIZE_FULL);	break;
     case M_SET_SIZ_HALF:	f_set_size(id, SCREEN_SIZE_HALF);	break;
+#ifdef SUPPORT_DOUBLE
+    case M_SET_SIZ_DOUBLE:  f_set_size(id, SCREEN_SIZE_DOUBLE); break;
+#endif
 
     case M_SET_PCG:		f_set_pcg(id);			break;
 
@@ -975,7 +982,7 @@ static	void	f_set_size(UINT uItem, int data)
 {
     if (menubar_active == FALSE) { return; }
 
-    CheckMenuRadioItem(g_hMenu, M_SET_SIZ_FULL, M_SET_SIZ_HALF, uItem,
+    CheckMenuRadioItem(g_hMenu, M_SET_SIZ_FULL, M_SET_SIZ_DOUBLE, uItem,
 		       MF_BYCOMMAND);
     {
 	quasi88_cfg_set_size((int)data);
