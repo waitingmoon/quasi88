@@ -157,16 +157,17 @@ void	quasi88_main(void)
 {
     for (;;) {
 
-#if USE_RETROACHIEVEMENTS
-        RA_HandleHTTPResults();
-        RA_DoAchievementsFrame();
-#endif
-
 	/* 終了の応答があるまで、繰り返し呼び続ける */
 
 	if (quasi88_loop() == QUASI88_LOOP_EXIT) {
 	    break;
 	}
+
+#if USE_RETROACHIEVEMENTS
+    RA_HandleHTTPResults();
+    RA_DoAchievementsFrame();
+    //RA_RenderOverlayFrame();
+#endif
 
     }
 
@@ -386,9 +387,6 @@ int	quasi88_loop(void)
 	if (quasi88_event_flags & EVENT_FRAME_UPDATE) {
 	    quasi88_event_flags &= ~EVENT_FRAME_UPDATE;
 	    screen_update();
-#if USE_RETROACHIEVEMENTS
-        RA_RenderOverlayFrame();
-#endif
 	    step = WAIT;
 	} else {
 	    step = step_after_wait;
@@ -985,7 +983,8 @@ void	quasi88_cfg_set_no_wait(int enable)
  *	・指定ドライブ取り出し
  ************************************************************************/
 #if USE_RETROACHIEVEMENTS
-BYTE *disk_data = 0;
+BYTE *disk_data[2] = { 0 };
+unsigned long disk_len[2] = { 0 };
 #endif
 
 int	quasi88_disk_insert_all(const char *filename, int ro)
@@ -1001,30 +1000,6 @@ int	quasi88_disk_insert_all(const char *filename, int ro)
 	if (disk_image_num(DRIVE_1) > 1) {
 	    quasi88_disk_insert_A_to_B(DRIVE_1, DRIVE_2, 1);
 	}
-
-#if USE_RETROACHIEVEMENTS
-    if (disk_data)
-    {
-        free(disk_data);
-    }
-
-    char basename[_MAX_FNAME];
-    FILE *f = fopen(filename, "rb");
-    fseek(f, 0, SEEK_END);
-    unsigned long disk_size = (unsigned long)ftell(f);
-    disk_data = (BYTE *)malloc(disk_size * sizeof(BYTE));
-
-    fseek(f, 0, SEEK_SET);
-    fread(disk_data, sizeof(BYTE), disk_size, f);
-    fflush(f);
-    fclose(f);
-
-    _splitpath(filename, NULL, NULL, basename, NULL);
-    RA_SetGameTitle(basename);
-
-    RA_InitMemory();
-    RA_OnLoadNewRom(disk_data, disk_size);
-#endif
     }
 
     if (quasi88_is_exec()) {
@@ -1055,6 +1030,30 @@ int	quasi88_disk_insert(int drv, const char *filename, int image, int ro)
 		filename_init_snap(TRUE);
 		filename_init_wav(TRUE);
 	    }
+
+#if USE_RETROACHIEVEMENTS
+        char basename[_MAX_FNAME];
+        FILE *f = fopen(filename, "rb");
+        fseek(f, 0, SEEK_END);
+        unsigned long disk_size = (unsigned long)ftell(f);
+        disk_data[drv] = (BYTE *)malloc(disk_size * sizeof(BYTE));
+        disk_len[drv] = disk_size;
+
+        fseek(f, 0, SEEK_SET);
+        fread(disk_data[drv], sizeof(BYTE), disk_size, f);
+        fflush(f);
+        fclose(f);
+
+        _splitpath(filename, NULL, NULL, basename, NULL);
+        RA_SetGameTitle(basename);
+
+        RA_InitMemory();
+
+        BYTE *combined_disk_data = (BYTE *)malloc(disk_len[0] + disk_len[1]);
+        memcpy(combined_disk_data, disk_data[0], disk_len[0]);
+        memcpy(combined_disk_data + disk_len[0], disk_data[1], disk_len[1]);
+        RA_OnLoadNewRom(combined_disk_data, disk_len[0] + disk_len[1]);
+#endif
 	}
     }
 
@@ -1117,6 +1116,11 @@ void	quasi88_disk_eject(int drv)
 	    filename_init_snap(TRUE);
 	    filename_init_wav(TRUE);
 	}
+
+#if USE_RETROACHIEVEMENTS
+    free(disk_data[drv]);
+    disk_len[drv] = 0;
+#endif
     }
 
     if (quasi88_is_exec()) {

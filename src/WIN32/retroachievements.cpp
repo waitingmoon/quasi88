@@ -169,7 +169,7 @@ void RA_RenderOverlayFrame()
     RECT window_size = { 0, 0, SCREEN_W, SCREEN_H };
     ControllerInput input;
 
-    RA_UpdateRenderOverlay(hdc, &input, frameskip_rate / DEFAULT_VSYNC_FREQ_HZ, &window_size, use_fullscreen, quasi88_is_pause() > 0 ? true : false);
+    RA_UpdateRenderOverlay(hdc, &input, frameskip_rate / DEFAULT_VSYNC_FREQ_HZ, &window_size, use_fullscreen, (bool)quasi88_is_pause());
 }
 
 #endif
