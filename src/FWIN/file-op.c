@@ -266,12 +266,12 @@ OSD_FILE *osd_fopen(int type, const char *path, const char *mode)
     fullname = _fullpath(NULL, path, 0);	/* ファイル名を取得する */
     if (fullname == NULL) return NULL;
 
-    if (type == FTYPE_DISK)
+    if (type == FTYPE_DISK && osd_file_stat(fullname))
     {
         localname = calloc(_MAX_PATH, sizeof(char));
         osd_file_localname(fullname, localname);
 
-        if (!osd_file_stat(localname)) /* 上書き用ファイルの有無をチェック */
+        if (!osd_file_stat(localname) && !file_cmp(fullname, localname)) /* 上書き用ファイルの有無をチェック */
         {
             if ((origfile = fopen(fullname, "rb")) && (localfile = fopen(localname, "wb")))
             {
