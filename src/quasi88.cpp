@@ -1050,14 +1050,9 @@ int	quasi88_disk_insert(int drv, const char *filename, int image, int ro)
         {
             _splitpath(filename, NULL, NULL, basename, NULL);
             RA_SetGameTitle(basename);
+            RA_InitMemory();
+            RA_OnLoadNewRom(disk_data[0], disk_len[0]);
         }
-
-        RA_InitMemory();
-
-        BYTE *combined_disk_data = (BYTE *)malloc(disk_len[0] + disk_len[1]);
-        memcpy(combined_disk_data, disk_data[0], disk_len[0]);
-        memcpy(combined_disk_data + disk_len[0], disk_data[1], disk_len[1]);
-        RA_OnLoadNewRom(combined_disk_data, disk_len[0] + disk_len[1]);
 #endif
 	}
     }
@@ -1126,18 +1121,10 @@ void	quasi88_disk_eject(int drv)
     free(disk_data[drv]);
     disk_len[drv] = 0;
 
-    RA_OnReset();
-    RA_SetGameTitle("");
-
-    if (drv > DRIVE_1 && disk_len[0] > 0)
+    if (drv == DRIVE_1)
     {
-        /* 実績システムのイメージデータを再初期化する */
-        RA_InitMemory();
-
-        BYTE *combined_disk_data = (BYTE *)malloc(disk_len[0] + disk_len[1]);
-        memcpy(combined_disk_data, disk_data[0], disk_len[0]);
-        memcpy(combined_disk_data + disk_len[0], disk_data[1], disk_len[1]);
-        RA_OnLoadNewRom(combined_disk_data, disk_len[0] + disk_len[1]);
+        RA_OnReset();
+        RA_SetGameTitle("");
     }
 #endif
     }
