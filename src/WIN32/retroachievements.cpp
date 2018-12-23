@@ -35,15 +35,15 @@ void MainRAMWriter(size_t nOffs, unsigned char nVal)
     ByteWriter(main_ram, nOffs, nVal);
 }
 
-unsigned char MainHighRAMReader(size_t nOffs)
+/*unsigned char HighSpeedRAMReader(size_t nOffs)
 {
     return ByteReader(main_high_ram, nOffs);
 }
 
-void MainHighRAMWriter(size_t nOffs, unsigned char nVal)
+void HighSpeedRAMWriter(size_t nOffs, unsigned char nVal)
 {
     ByteWriter(main_high_ram, nOffs, nVal);
-}
+}*/
 
 
 int GetMenuItemIndex(HMENU hMenu, const char* ItemName)
@@ -146,7 +146,7 @@ void RA_InitMemory()
 {
     RA_ClearMemoryBanks();
     RA_InstallMemoryBank(0, MainRAMReader, MainRAMWriter, 0x10000);
-    RA_InstallMemoryBank(1, MainHighRAMReader, MainHighRAMWriter, 0x1000);
+    //RA_InstallMemoryBank(1, HighSpeedRAMReader, HighSpeedRAMWriter, 0x1000);
 }
 
 void RA_ClearMemory()
