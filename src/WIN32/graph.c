@@ -38,8 +38,13 @@ const T_GRAPH_SPEC	*graph_init(void)
 	printf("Initializing Graphic System ... ");
     }
 
+#ifdef SUPPORT_DOUBLE
+    graph_spec.window_max_width = 1280;
+    graph_spec.window_max_height = 960;
+#else
     graph_spec.window_max_width      = 640;
     graph_spec.window_max_height     = 480;
+#endif
     graph_spec.fullscreen_max_width  = 0;
     graph_spec.fullscreen_max_height = 0;
     graph_spec.forbid_status         = FALSE;
