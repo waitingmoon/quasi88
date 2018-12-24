@@ -35,7 +35,10 @@ void MainRAMWriter(size_t nOffs, unsigned char nVal)
     ByteWriter(main_ram, nOffs, nVal);
 }
 
-/*unsigned char HighSpeedRAMReader(size_t nOffs)
+/* アドレス空間をできるだけ締めるため、有用性の低い高速RAM・VRAMを無効にする */
+#define RA_ENABLE_VRAM 0
+#if RA_ENABLE_VRAM
+unsigned char HighSpeedRAMReader(size_t nOffs)
 {
     return ByteReader(main_high_ram, nOffs);
 }
@@ -43,7 +46,19 @@ void MainRAMWriter(size_t nOffs, unsigned char nVal)
 void HighSpeedRAMWriter(size_t nOffs, unsigned char nVal)
 {
     ByteWriter(main_high_ram, nOffs, nVal);
-}*/
+}
+
+unsigned char MainVRAMReader(size_t nOffs)
+{
+    return ByteReader(main_vram[nOffs >> 14], nOffs % 0x4000);
+}
+
+void MainVRAMWriter(size_t nOffs, unsigned char nVal)
+{
+    ByteWriter(main_vram[nOffs >> 14], nOffs % 0x4000 , nVal);
+}
+#endif
+
 
 
 int GetMenuItemIndex(HMENU hMenu, const char* ItemName)
@@ -148,7 +163,11 @@ void RA_InitMemory()
 {
     RA_ClearMemoryBanks();
     RA_InstallMemoryBank(0, MainRAMReader, MainRAMWriter, 0x10000);
-    //RA_InstallMemoryBank(1, HighSpeedRAMReader, HighSpeedRAMWriter, 0x1000);
+
+#if RA_ENABLE_VRAM
+    RA_InstallMemoryBank(1, HighSpeedRAMReader, HighSpeedRAMWriter, 0x1000);
+    RA_InstallMemoryBank(2, MainVRAMReader, MainVRAMWriter, 0x4000 * 4);
+#endif
 }
 
 void RA_ClearMemory()
