@@ -112,7 +112,9 @@ void GetEstimatedGameTitle(char* sNameOut)
 
 void ResetEmulation()
 {
-    quasi88_reset(NULL);
+    T_RESET_CFG cfg;
+    quasi88_get_reset_cfg(&cfg);
+    quasi88_reset(&cfg);
 }
 
 void LoadROM(const char* sFullPath)
