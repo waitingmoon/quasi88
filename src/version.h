@@ -2,11 +2,11 @@
 #define	VERSION_H
 
 #ifndef	Q_TITLE
-#define	Q_TITLE		"QUASI88"
+#define	Q_TITLE		"RAQUASI88"
 #endif
 
 #ifndef	Q_VERSION
-#define	Q_VERSION	"0.6.4"
+#define	Q_VERSION	"1.0.0"
 #endif
 
 #ifndef	Q_COMMENT
@@ -17,7 +17,7 @@
 
 
 #ifndef	Q_COPYRIGHT
-#define	Q_COPYRIGHT		"(c) 1998-2013 S.Fukunaga"
+#define	Q_COPYRIGHT		"(c) 1998-2018 S.Fukunaga, R.Zumer"
 #endif
 
 #ifdef	USE_SOUND
