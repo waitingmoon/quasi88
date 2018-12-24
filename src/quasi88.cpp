@@ -166,7 +166,9 @@ void	quasi88_main(void)
     if (result == QUASI88_LOOP_ONE) {
 #if USE_RETROACHIEVEMENTS
         RA_HandleHTTPResults();
-        RA_DoAchievementsFrame();
+
+        if (RA_GameIsActive())
+            RA_DoAchievementsFrame();
 #endif
     }
 
@@ -1033,7 +1035,6 @@ int	quasi88_disk_insert(int drv, const char *filename, int image, int ro)
 	    }
 
 #if USE_RETROACHIEVEMENTS
-        char basename[_MAX_FNAME];
         FILE *f = fopen(filename, "rb");
         fseek(f, 0, SEEK_END);
         unsigned long disk_size = (unsigned long)ftell(f);
@@ -1048,6 +1049,7 @@ int	quasi88_disk_insert(int drv, const char *filename, int image, int ro)
         /* 実績システムのイメージデータを初期化する */
         if (drv == DRIVE_1)
         {
+            char basename[_MAX_FNAME];
             _splitpath(filename, NULL, NULL, basename, NULL);
             RA_SetGameTitle(basename);
             RA_InitMemory();
@@ -1095,10 +1097,6 @@ void	quasi88_disk_eject_all(void)
 	quasi88_disk_eject(drv);
     }
 
-#if USE_RETROACHIEVEMENTS
-    RA_ClearMemory();
-#endif
-
     boot_from_rom = TRUE;
 
     if (quasi88_is_exec()) {
@@ -1123,8 +1121,7 @@ void	quasi88_disk_eject(int drv)
 
     if (drv == DRIVE_1)
     {
-        RA_OnReset();
-        RA_SetGameTitle("");
+        RA_OnGameClose();
     }
 #endif
     }

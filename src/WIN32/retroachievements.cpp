@@ -80,9 +80,10 @@ int GetMenuItemIndex(HMENU hMenu, const char* ItemName)
     return -1;
 }
 
+static char loaded_title[_MAX_FNAME] = { NULL };
 bool GameIsActive()
 {
-    return true;
+    return loaded_title[0] != NULL;
 }
 
 void CauseUnpause()
@@ -116,10 +117,9 @@ void RebuildMenu()
     DrawMenuBar(g_hWnd);
 }
 
-char loaded_title[_MAX_FNAME];
 void GetEstimatedGameTitle(char* sNameOut)
 {
-    if (loaded_title)
+    if (loaded_title[0] != NULL)
     {
         sNameOut = (char*)loaded_title;
     }
@@ -142,7 +142,7 @@ void RA_InitShared()
     RA_InstallSharedFunctions(&GameIsActive, &CauseUnpause, &CausePause, &RebuildMenu, &GetEstimatedGameTitle, &ResetEmulation, &LoadROM);
 }
 
-HDC main_hdc;
+static HDC main_hdc;
 void RA_InitUI()
 {
     RA_Init(g_hWnd, /* RA_Quasi88 */ 9, Q_VERSION);
@@ -170,10 +170,12 @@ void RA_InitMemory()
 #endif
 }
 
-void RA_ClearMemory()
+void RA_OnGameClose()
 {
     RA_ClearMemoryBanks();
+    RA_SetGameTitle("");
     loaded_title[0] = '\0';
+    RA_OnLoadNewRom(NULL, 0);
 }
 
 void RA_SetGameTitle(char *title)
@@ -194,7 +196,7 @@ int RA_HandleMenuEvent(int id)
     return FALSE;
 }
 
-unsigned long last_tick = timeGetTime();
+static unsigned long last_tick = timeGetTime();
 void RA_RenderOverlayFrame(HDC hdc)
 {
     if (!hdc)
