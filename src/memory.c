@@ -406,6 +406,9 @@ int	memory_allocate( void )
 
   if( size == 0x20000 ){
     has_kanji_rom = TRUE;
+#if LANG_EN
+    menu_lang = MENU_ENGLISH;
+#endif
   }else{
     has_kanji_rom = FALSE;
     menu_lang = MENU_ENGLISH;
