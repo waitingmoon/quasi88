@@ -200,7 +200,6 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <Library Include="lib\Release_x86\SDL.lib" />
     <Library Include="lib\Release_Win32\SDL.lib" />
     <Library Include="lib\Release_Win32\SDLmain.lib" />
   </ItemGroup>
