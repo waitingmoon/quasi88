@@ -3,8 +3,8 @@
 
 
 
-extern	int	debug_mode;			/* ¥Ç¥Ğ¥Ã¥°µ¡Ç½(¥â¥Ë¥¿¡¼)  */
-extern	char	alt_char;			/* ÂåÂØÊ¸»ú */
+extern	int	debug_mode;			/* ãƒ‡ãƒãƒƒã‚°æ©Ÿèƒ½(ãƒ¢ãƒ‹ã‚¿ãƒ¼)  */
+extern	char	alt_char;			/* ä»£æ›¿æ–‡å­— */
 
 void	set_signal( void );
 

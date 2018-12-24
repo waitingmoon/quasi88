@@ -3,44 +3,44 @@
 
 
 /***********************************************************************
- * ����ե��å����� (�����ƥ��¸)
+ * グラフィック処理 (システム依存)
  ************************************************************************/
 
 #include "screen.h"	/* PC88_PALETTE_T */
 
 
 /***********************************************************************
- * ���̤˴ؤ��롢���ܾ����ޤȤ᤿��¤��
+ * 画面に関する、基本情報をまとめた構造体
  ************************************************************************/
 typedef struct {
 
-    int		window_max_width;	/* ������ɥ�ɽ����ǽ�ʡ������	     */
-    int		window_max_height;	/* ���������Ƚĥ����� (�ԥ������)   */
-					/*	������ɥ�ɽ��������������� */
-					/*	̵�����ϡ�Ŭ�����礭���ͤ� */
-					/*	���åȤ��Ƥ�����(640�ʾ�)    */
+    int		window_max_width;	/* ウインドウ表示可能な、最大の	     */
+    int		window_max_height;	/* 横サイズと縦サイズ (ピクセル数)   */
+					/*	ウインドウ表示サイズに制約の */
+					/*	無い場合は、適当に大きな値を */
+					/*	セットしておく。(640以上)    */
 
-    int		fullscreen_max_width;	/* �ե륹���꡼��ɽ����ǽ�ʡ������  */
-    int		fullscreen_max_height;	/* ���������Ƚĥ����� (�ԥ������)   */
-					/*	�ե륹���꡼��ɽ���Ǥ��ʤ��� */
-					/*	��� 0 �򥻥åȤ��Ƥ���      */
+    int		fullscreen_max_width;	/* フルスクリーン表示可能な、最大の  */
+    int		fullscreen_max_height;	/* 横サイズと縦サイズ (ピクセル数)   */
+					/*	フルスクリーン表示できない場 */
+					/*	合は 0 をセットしておく      */
 
-    int		forbid_status;		/* ���ơ�����ɽ����ػߤ���ʤ顢��  */
+    int		forbid_status;		/* ステータス表示を禁止するなら、真  */
 
-    int		forbid_half;		/* Ⱦʬ������ɽ����ػߤ���ʤ顢��  */
+    int		forbid_half;		/* 半分サイズ表示を禁止するなら、真  */
 
 } T_GRAPH_SPEC;
 
 
 /***********************************************************************
- * ���� QUASI88 �����������оݤȤʤ���̤Ρ������ޤȤ᤿��¤��
+ * 現在 QUASI88 が処理する対象となる画面の、情報をまとめた構造体
  *
  *
- *		<--- byte_per_line --->		(*) width �ϡ��ºݤ�ɽ��
- *		<-- width (*) -->		����륨�ꥢ�Υԥ���������
- *     buffer =>@---------------+-----+ -	�Х��ȿ��Ǥϡ�
- *		|               |/////| ^	width * byte_per_pixel �Х���
- *		|               |/////| |	�Ȥʤ롣
+ *		<--- byte_per_line --->		(*) width は、実際に表示
+ *		<-- width (*) -->		されるエリアのピクセル幅。
+ *     buffer =>@---------------+-----+ -	バイト数では、
+ *		|               |/////| ^	width * byte_per_pixel バイト
+ *		|               |/////| |	となる。
  *		|               |/////| | height
  *		|               |/////| |
  *		|               |/////| v
@@ -48,98 +48,98 @@ typedef struct {
  *		|/////////////////////|
  *		+---------------------+
  *
- * (��) byte_per_pixel == 2 �λ������̥Хåե���Υԥ����� (X,Y) �ˤϡ�
+ * (例) byte_per_pixel == 2 の時、画面バッファ上のピクセル (X,Y) には、
  *	((unsigned short *) buffer) + (Y * byte_per_line / byte_per_pixel) + X
- *	�Ȥ��ơ�����������ǽ��
+ *	として、アクセス可能。
  *
- *	����Ū�ˤϡ� graph_add_color() �ˤƼ������� pixel ���ͤ򤳤���
- *	�饤�Ȥ��뤳�Ȥˤʤ롣
+ *	具体的には、 graph_add_color() にて取得した pixel の値をここに
+ *	ライトすることになる。
  *
  ************************************************************************/
 typedef struct {
 
-    int		fullscreen;	/* �����̥⡼�ɤʤ鿿��������ɥ��ʤ鵶 */
+    int		fullscreen;	/* 全画面モードなら真、ウインドウなら偽 */
 
-    int		width;		/* ���ݤ������̤Ρ������ǽ���ꥢ��	*/
-    int		height;		/* ���ݤ������̤Ρ������ǽ���ꥢ�⤵	*/
+    int		width;		/* 確保した画面の、描画可能エリア幅	*/
+    int		height;		/* 確保した画面の、描画可能エリア高さ	*/
 
-    int		byte_per_pixel;	/* ���ݤ������̤Υԥ����뤢����Х��ȿ�	*/
-				/*	1, 2, 4 �Τ����줫		*/
+    int		byte_per_pixel;	/* 確保した画面のピクセルあたりバイト数	*/
+				/*	1, 2, 4 のいずれか		*/
 
-    int		byte_per_line;	/* ���ݤ������̤�1�饤�󤢤���Х��ȿ�	*/
-				/*	(width * byte_per_line) �ʾ�	*/
+    int		byte_per_line;	/* 確保した画面の1ラインあたりバイト数	*/
+				/*	(width * byte_per_line) 以上	*/
 
-    void	*buffer;	/* ���ݤ������̤ΥХåե�		*/
-				/*	byte_per_pixel ����		*/
-				/*		1 �ʤ顢 unsigned char	*/
-				/*		2 �ʤ顢 unsigned short	*/
-				/*		4 �ʤ顢 unsigned int	*/
-				/*	�ǡ����������Ǥ���ݥ���	*/
+    void	*buffer;	/* 確保した画面のバッファ		*/
+				/*	byte_per_pixel が、		*/
+				/*		1 なら、 unsigned char	*/
+				/*		2 なら、 unsigned short	*/
+				/*		4 なら、 unsigned int	*/
+				/*	で、アクセスできるポインタ	*/
 
-    int		nr_color;	/* ���ݤ������̤ˤơ����Ѳ�ǽ�ʿ��ο�	*/
-				/*	Ʊ�������ѤǤ��뿧�ο�������	*/
-				/*	�����硢���ο��ο����֤���	*/
-				/*	���������ʲ��Τ����줫�Ȥ��롣	*/
+    int		nr_color;	/* 確保した画面にて、利用可能な色の数	*/
+				/*	同時に利用できる色の数に制約が	*/
+				/*	ある場合、その色の数を返す。	*/
+				/*	ただし、以下のいずれかとする。	*/
 				/*		16, 24, 144, 255	*/
-				/*	���ο������󤬤ʤ����ϡ�	*/
-				/*		255 �ʾ�		*/
+				/*	色の数に制約がない場合は、	*/
+				/*		255 以上		*/
 
-    int		write_only;	/* ���̤ΥХåե����ɽ��ԲĤξ�硢��	*/
-				/*	ľ�ܥե졼��Хåե�����ݤ���	*/
-				/*	���ʤɤϡ����ˤ��Ƥ�����	*/
+    int		write_only;	/* 画面のバッファが読出不可の場合、真	*/
+				/*	直接フレームバッファを確保した	*/
+				/*	場合などは、真にしておく。	*/
 
-    int		broken_mouse;	/* �ޥ�����������ɽ�����ꤢ��ʤ顢��	*/
-				/*	�ޥ�����������ɽ�������꤬����	*/
-				/*	�����ƥब����褦����		*/
-				/*	   X11-DGA:�ޥ�����������ϴ���	*/
-				/*	           Ū�ˡ�ɽ������ʤ���	*/
-				/*	   SDL-DGA:�ޥ������������ɽ��	*/
-				/*	           ������ȡ����̤˥���	*/
-				/*	           ���Ĥ��礬���롣	*/
-				/*	�����Υ����ƥ�Ǥϡ���˥塼	*/
-				/*	���̤��ȼ��Υ������������Ԥ�	*/
-				/*	�Τǡ� TRUE �򥻥åȤ��Ƥ�����	*/
-				/*	���̤Υ����ƥ�Ǥϡ�����Ϥʤ�	*/
-				/*	�Ȼפ��Τǡ� FALSE �򥻥åȤ���	*/
-				/*	�������ȡ�			*/
+    int		broken_mouse;	/* マウスカーソル表示問題ありなら、真	*/
+				/*	マウスカーソル表示に問題がある	*/
+				/*	システムがあるようだ。		*/
+				/*	   X11-DGA:マウスカーソルは基本	*/
+				/*	           的に、表示されない。	*/
+				/*	   SDL-DGA:マウスカーソルを表示	*/
+				/*	           させると、画面にゴミ	*/
+				/*	           が残る場合がある。	*/
+				/*	これらのシステムでは、メニュー	*/
+				/*	画面で独自のカーソル制御を行う	*/
+				/*	ので、 TRUE をセットしておく。	*/
+				/*	普通のシステムでは、問題はない	*/
+				/*	と思うので、 FALSE をセットして	*/
+				/*	おくこと。			*/
 
     void	(*draw_start)(void);
     void	(*draw_finish)(void);
-				/* ���̤ΥХåե��˥�����������ݤˡ�	*/
-				/* ��������˸ƤӽФ����ؿ�		*/
-				/*	buffer �Υ饤�Ȥ˺ݤ��ơ�ɬ�פ�	*/
-				/*	���������������硢����򵭽�	*/
-				/*	�����ؿ��򤳤������ꤷ�Ƥ�����	*/
-				/*	�ä�ɬ�פ��ʤ���С� NULL ��	*/
-				/*	���ꤷ�Ƥ�����			*/
+				/* 画面のバッファにアクセスする際に、	*/
+				/* その前後に呼び出される関数		*/
+				/*	buffer のライトに際して、必要な	*/
+				/*	内部処理がある場合、それを記述	*/
+				/*	した関数をここで設定しておく。	*/
+				/*	特に必要がなければ、 NULL を	*/
+				/*	設定しておく。			*/
 
-    int		dont_frameskip;	/* �ե졼�ॹ���åפ�ػߤ���ʤ顢��	*/
-				/*	���ʤ�С��ե졼�����ɬ�� 	*/
-				/*	graph_update ���ƤӽФ���롣	*/
-				/*	����򥹥��åפ����������ϡ�	*/
-				/*	graph_update �����ˤ��ȼ���	*/
-				/*	�����å׽������Ȥ߹��ळ�ȡ�	*/
+    int		dont_frameskip;	/* フレームスキップを禁止するなら、真	*/
+				/*	真ならば、フレーム毎に必ず 	*/
+				/*	graph_update が呼び出される。	*/
+				/*	描画をスキップさせたい場合は、	*/
+				/*	graph_update 内部にて独自に	*/
+				/*	スキップ処理を組み込むこと。	*/
 
 } T_GRAPH_INFO;
 
 
 
 /****************************************************************************
- * ����ե��å������ν��������λ
+ * グラフィック処理の初期化／終了
  *
  * const T_GRAPH_SPEC	*graph_init(void)
  *
- *	�����ƥ��¸�Υ���ե��å������ν������Ԥ���
- *	����������������顢���̤˴ؤ�����ܾ���� T_GRAPH_SPEC ���ѿ��ؤ�
- *	�ݥ��󥿤ˤ��֤��������˼��Ԥ������ϡ� NULL ���֤���
+ *	システム依存のグラフィック処理の初期化を行う。
+ *	初期化に成功したら、画面に関する基本情報を T_GRAPH_SPEC 型変数への
+ *	ポインタにて返す。処理に失敗した場合は、 NULL を返す。
  *
- *	o QUASI88 �ϡ���ư���� 1��������δؿ���ƤӽФ���
- *	  �����̥⡼�ɤ���ǽ�������̥������ڤ��ؤ��ϲ�ǽ�����ʤɤ�Ƚ�Ǥ��롣
+ *	o QUASI88 は、起動時に 1回だけこの関数を呼び出し、
+ *	  全画面モードが可能か、画面サイズ切り替えは可能か、などを判断する。
  *
  * void	graph_exit(void)
  *
- *	�����ƥ��¸�Υ���ե��å������θ������Ԥ���
- *	���δؿ��ϡ���λ���� 1������ƤӽФ���롣
+ *	システム依存のグラフィック処理の後始末を行う。
+ *	この関数は、終了時に 1回だけ呼び出される。
  *
  *****************************************************************************/
 const T_GRAPH_SPEC	*graph_init(void);
@@ -148,40 +148,40 @@ void			graph_exit(void);
 
 
 /****************************************************************************
- * ����ե��å�����������
+ * グラフィック処理の設定
  *
  * const T_GRAPH_INFO	*graph_setup(int width, int height,
  *				     int fullscreen, double aspect)
  *
- *	������ɥ���������ꥵ�������롣�ޤ��������̥⡼�ɤ��ڤ��ؤ��롣
- *	width, height �ϡ�������ɥ��ʤ��������̥⡼�ɤΥ�������
- *	ɬ���� width �� 8���ܿ��� height �� 2���ܿ������åȤ���롣
- *	fullscreen �����ʤ顢�����̥⡼�ɤˤ��롣
- *	aspect �ϡ���˥����Υ����ڥ����� (�Ĳ���)��
- *	4:3���ʤ� 1.3333�� 16:9���ʤ� 1.7778������ʤ��ʤ� 0.0 �Ȥʤ롣
- *	fullscreen �����ǡ� aspect > 0.0 �ʤ饢���ڥ�������θ���������̥⡼��
- *	�ˤ���Ȥ��줷�����⡣(���ΰ�����̵�뤷�Ƥ⡢�³��Ϥʤ�������)
+ *	ウインドウを作成・リサイズする。または全画面モードに切り替える。
+ *	width, height は、ウインドウないし全画面モードのサイズ。
+ *	必ず、 width は 8の倍数、 height は 2の倍数がセットされる。
+ *	fullscreen が真なら、全画面モードにする。
+ *	aspect は、モニターのアスペクト比 (縦横比)。
+ *	4:3型なら 1.3333、 16:9型なら 1.7778、設定なしなら 0.0 となる。
+ *	fullscreen が真で、 aspect > 0.0 ならアスペクト比を考慮した全画面モード
+ *	にするとうれしいかも。(この引数は無視しても、実害はないだろう)
  *
- *	ɬ�����⡢�����̤�ˤʤ�ʤ��Ƥ�褤��
- *	�����̥⡼�ɤ��ڤ��ؤ��˼��Ԥ����顢������ɥ���ɽ�����Ƥ�褤����
- *	���ꥵ�����������̥⡼�ɤ�̵���ʤ顢���������礭�ʡ������̥⡼�ɤ�
- *	���Ƥ�褤��(������⾮���ʥ������ˤ��ƤϤ����ʤ�)
+ *	必ずしも、指定通りにならなくてもよい。
+ *	全画面モードの切り替えに失敗したら、ウインドウで表示してもよいし、
+ *	指定サイズの全画面モードが無理なら、それよりも『大きな』全画面モードに
+ *	してもよい。(指定よりも小さなサイズにしてはいけない)
  *
- *	�ǽ�Ū�ˤɤΤ褦�ʽ�����̤ˤʤä����� T_GRAPH_INFO ���ѿ��ؤΥݥ���
- *	�ˤ��֤��������˼��Ԥ���³����ǽ�Ȥʤä����ϡ� NULL ���֤���
+ *	最終的にどのような処理結果になったかは T_GRAPH_INFO 型変数へのポインタ
+ *	にて返す。処理に失敗し、続行不能となった場合は、 NULL を返す。
  *
- *	o QUASI88 �ϡ� graph_init() ��ˡ����δؿ���ƤӽФ���
- *	  ���̥������䡢�����̥⡼�����ؤκݤˤ⡢���δؿ���ƤӽФ���
- *	  QUASI88 �ϥ�����ɥ���1�Ĥ����Ȥ�ʤ��Τǡ�2���ܰʹߤθƤӽФ����ϡ�
- *	  �����Υ�����ɥ��俧�ʤɤΡ����٤Ƥξ�����˴����롣
+ *	o QUASI88 は、 graph_init() 後に、この関数を呼び出す。
+ *	  画面サイズや、全画面モード切替の際にも、この関数を呼び出す。
+ *	  QUASI88 はウインドウを1個しか使わないので、2度目以降の呼び出し時は、
+ *	  以前のウインドウや色などの、すべての情報は破棄する。
  *
- *		<QUASI88 �β��̥������ڤ��ؤ����ν���>
+ *		<QUASI88 の画面サイズ切り替え時の処理>
  *
- *		  ��
+ *		  ：
  *		graph_setup();
- *		graph_add_color(���Ƥο�);
- *		graph_update(�������ΰ�);
- *		  ��
+ *		graph_add_color(全ての色);
+ *		graph_update(全画面領域);
+ *		  ：
  *
  ****************************************************************************/
 const T_GRAPH_INFO	*graph_setup(int width, int height,
@@ -189,48 +189,48 @@ const T_GRAPH_INFO	*graph_setup(int width, int height,
 
 
 /****************************************************************************
- * ���γ��ݤ��˴�
+ * 色の確保と破棄
  *
  * void	graph_add_color(const PC88_PALETTE_T color[],
  *			int nr_color, unsigned long pixel[])
  *
- *	color �Ϻ�������Ѥ��������ǡ� nr_color �Ĥ�����
- *	���� color ���б�����ԥ������ͤ� nr_color �Ĥ����� pixel ���֤���
+ *	color は今から使用したい色で、 nr_color 個の配列。
+ *	この color に対応するピクセル値を nr_color 個の配列 pixel に返す。
  *
- *	�㤨�С�(T_GRAPH_INFO *)->byte_per_pixel �� 2 �Ǥ����硢QUASI88 ��
- *	pixel �ˤ��֤��줿�ԥ������ͤ� unsigned short ���˥��㥹�Ȥ��ơ�
- *	(T_GRAPH_INFO *)->buffer ��ľ�ܥ饤�Ȥ��뤳�Ȥˤʤ롣
+ *	例えば、(T_GRAPH_INFO *)->byte_per_pixel が 2 である場合、QUASI88 は
+ *	pixel にて返されたピクセル値を unsigned short 型にキャストして、
+ *	(T_GRAPH_INFO *)->buffer に直接ライトすることになる。
  *
- *	o TrueColor �δĶ��Ǥϡ� color �� RGB�ͤ򤽤Τޤޥԥ�����ե����ޥåȤ�
- *	  �Ѵ����ơ�pixel[] �˥��åȤ���Ф褤�Ϥ���
+ *	o TrueColor の環境では、 color の RGB値をそのままピクセルフォーマットに
+ *	  変換して、pixel[] にセットすればよいはず。
  *
  *
  * void	graph_remove_color(int nr_pixel, unsigned long pixel[])
  *
- *	pixel �ϡ����Ѥ��ʤ��ʤä����ǡ� nr_pixel �Ĥ�����
- *	graph_add_color() �ˤƼ������� pixel ���ͤ����åȤ���Ƥ��롣
+ *	pixel は、使用しなくなった色で、 nr_pixel 個の配列。
+ *	graph_add_color() にて取得した pixel の値がセットされている。
  *
- *	o TrueColor �δĶ��Ǥϡ��ä˲����������ɬ�פϤʤ��ϥ���
+ *	o TrueColor の環境では、特に何も処理する必要はないハズ。
  *
- *	o ���ѤǤ��뿧�����������ƥ�ˤ�ä����¤���Ƥ����硢���δ�����ɬ��
- *	  �ˤʤ뤳�Ȥ����롣 (X11 �� PseudoColor �Ƕ�ͭ���顼��Ȥ����ʤ�)
+ *	o 使用できる色数が、システムによって制限されている場合、色の管理が必要
+ *	  になることがある。 (X11 の PseudoColor で共有カラーを使う場合など)
  * 
- *	  QUASI88 �� graph_remove_color ��ƤӽФ���硢���ΰ����� pixel �ϡ�
- *	  ľ���� graph_add_color() �ˤƳ��ݤ��� nr_color �Ĥ� pixel ��
- *	  Ʊ���Ȥʤ�褦�ˤ��Ƥ��롣 (�ĤޤꡢLIFO����)
+ *	  QUASI88 が graph_remove_color を呼び出す場合、その引数の pixel は、
+ *	  直前の graph_add_color() にて確保した nr_color 個の pixel と
+ *	  同じとなるようにしてある。 (つまり、LIFO方式)
  *
- *		  ��
- *		graph_add_color(8��);		���ơ������Ѥ�8�����ݤ���
- *		  ��
- *		graph_add_color(16��);		�ᥤ���Ѥ�16�����ݤ���
- *		  ��
- *		graph_remove_color(16��);	ľ����16�����˴�����
- *		  ��
- *		graph_remove_color(8��);	����ˤ�������8�����˴�����
- *		  ��
+ *		  ：
+ *		graph_add_color(8色);		ステータス用に8色確保する
+ *		  ：
+ *		graph_add_color(16色);		メイン用に16色確保する
+ *		  ：
+ *		graph_remove_color(16色);	直前の16色を破棄する
+ *		  ：
+ *		graph_remove_color(8色);	さらにその前の8色を破棄する
+ *		  ：
  *
- *	  ���Τ��Ȥ�����Ȥ��ơ� graph_add_color(), graph_remove_color() ��
- *	  ��������ɬ�פ����롣
+ *	  このことを前提として、 graph_add_color(), graph_remove_color() を
+ *	  実装する必要がある。
  *
  *****************************************************************************/
 void	graph_add_color(const PC88_PALETTE_T color[],
@@ -240,36 +240,36 @@ void	graph_remove_color(int nr_pixel, unsigned long pixel[]);
 
 
 /***********************************************************************
- * ���̤ι���
+ * 画面の更新
  *
  * void	graph_update(int nr_rect, T_SCREEN_RECT rect[])
- *	�����ǡ�����ºݤ����褹�롣
- *	���褷�������ꥢ����T_SCREEN_RECT �������� rect[] �� nr_rect ��ʬ��
- *	���åȤ���Ƥ���Τǡ����Υ��ꥢ�����褹�롣
+ *	画像データを実際に描画する。
+ *	描画したいエリアが、T_SCREEN_RECT 型の配列 rect[] に nr_rect 個分、
+ *	セットされているので、このエリアを描画する。
  *
- *	o QUASI88 �ϡ�ɽ���κݤ˰ʲ��ν�˽������롣
+ *	o QUASI88 は、表示の際に以下の順に処理する。
  *
- *	    if (�ե졼�ॹ���åפ��ʤ�?) {		��1
- *		if (�ѥ�å��Ѳ�����?) {
- *		    graph_remove_color(����Υѥ�åȤǻȤä���);
- *		    graph_add_color(����Υѥ�åȤǻȤ���);
- *		    �����Ѳ�����Ȥ���
+ *	    if (フレームスキップしない?) {		※1
+ *		if (パレット変化あり?) {
+ *		    graph_remove_color(前回のパレットで使った色);
+ *		    graph_add_color(今回のパレットで使う色);
+ *		    画面変化ありとする
  *		}
- *		if (�����Ѳ�����?) {
- *		    if (draw_start != NULL) {		��2
+ *		if (画面変化あり?) {
+ *		    if (draw_start != NULL) {		※2
  *			(*draw_start)();
  *		    }
- *		    buffer ��������
- *		    if (draw_finish != NULL) {		��2
+ *		    buffer 更新する
+ *		    if (draw_finish != NULL) {		※2
  *			(*draw_finish)();
  *		    }
- *		    graph_update(���̾�Ρ��������줿����ΰ�);
+ *		    graph_update(画面上の、更新された矩形領域);
  *	    }
  *
- *		��1 graph_setup() �ˤơ� dont_frameskip �����Ǥ��ä���硢
- *		    ������ե졼�ॹ���åפ��ʤ�
- *		��2 graph_setup() �ˤơ� draw_start / draw_finish ��
- *		    �ؿ��ݥ��󥿤����ꤵ�줿���Τߡ��ƤӽФ���
+ *		※1 graph_setup() にて、 dont_frameskip が真であった場合、
+ *		    常時、フレームスキップしない
+ *		※2 graph_setup() にて、 draw_start / draw_finish の
+ *		    関数ポインタが設定された場合のみ、呼び出す。
  *
  ************************************************************************/
 typedef struct {
@@ -282,19 +282,19 @@ void	graph_update(int nr_rect, T_GRAPH_RECT rect[]);
 
 
 /***********************************************************************
- * °��������
- *	�����ϼ������ʤ��Ƥ⡢�����餯���ߥ��ư��ˤϱƶ��Ϥʤ���
- *	�����ƥब���ݡ��Ȥ��Ƥ�����ܤ�����С��������������Ф褤��
+ * 属性の設定
+ *	これらは実装しなくても、おそらくエミュの動作には影響はない。
+ *	システムがサポートしている項目があれば、それらを実装すればよい。
  *
  * void	graph_set_window_title(const char *title)
- *	������ɥ��Υ����ȥ�����ꤹ�롣
- *	title ������ʸ����ǡ� 255ʸ������� ASCII��
+ *	ウインドウのタイトルを設定する。
+ *	title がその文字列で、 255文字以内の ASCII。
  *
  * void	graph_set_attribute(int mouse_show, int grab, int keyrepeat_on)
- *	���ޤ��ޤ�°�������ꤹ�롣
- *	mouse_show �����ʤ顢�ޥ������������ɽ�����롣���ʤ�õ�롣
- *	grab �� ���ʤ顢�ޥ������������Ϥ򥰥�֤��롣���ʤ餷�ʤ���
- *	keyrepeat_on �����ʤ顢������ԡ��Ȥ򥪥�ˤ��롣���ʤ饪�դˤ��롣
+ *	さまざまな属性を設定する。
+ *	mouse_show が真なら、マウスカーソルを表示する。偽なら消去する。
+ *	grab が 真なら、マウス・キー入力をグラブする。偽ならしない。
+ *	keyrepeat_on が真なら、キーリピートをオンにする。偽ならオフにする。
  *
  ************************************************************************/
 void	graph_set_window_title(const char *title);

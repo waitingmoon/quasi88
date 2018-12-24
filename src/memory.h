@@ -2,56 +2,56 @@
 #define MEMORY_H_INCLUDED
 
 
-extern	int	set_version;	/* ¥Ğ¡¼¥¸¥ç¥ó¶¯À©ÊÑ¹¹ '0' ¡Á '9'	*/
-extern	int	rom_version;	/* (ÊÑ¹¹Á°¤Î) BASIC ROM¥Ğ¡¼¥¸¥ç¥ó	*/
+extern	int	set_version;	/* ãƒãƒ¼ã‚¸ãƒ§ãƒ³å¼·åˆ¶å¤‰æ›´ '0' ã€œ '9'	*/
+extern	int	rom_version;	/* (å¤‰æ›´å‰ã®) BASIC ROMãƒãƒ¼ã‚¸ãƒ§ãƒ³	*/
 
-extern	int	use_extram;			/* 128KB³ÈÄ¥RAM¤ò»È¤¦	*/
-extern	int	use_jisho_rom;			/* ¼­½ñROM¤ò»È¤¦	*/
-extern	int	use_built_in_font;		/* ÆâÂ¢¥Õ¥©¥ó¥È¤ò»È¤¦	*/
-extern	int	use_pcg;			/* PCG-8100¥µ¥İ¡¼¥È	*/
-extern	int	font_type;			/* ¥Õ¥©¥ó¥È¤Î¼ïÎà	*/
-extern	int	font_loaded;			/* ¥í¡¼¥É¤·¤¿¥Õ¥©¥ó¥È¼ï	*/
-
-
-extern	int	memory_wait;			/* ¥á¥â¥ê¥¦¥§¥¤¥ÈÍ­Ìµ	*/
-
-extern	char	*file_compatrom;		/* P88SR emu ¤ÎROM¤ò»È¤¦*/
-
-extern	int	has_kanji_rom;			/* ´Á»úROM¤ÎÍ­Ìµ	*/
-
-extern	int	linear_ext_ram;			/* ³ÈÄ¥RAM¤òÏ¢Â³¤µ¤»¤ë	*/
+extern	int	use_extram;			/* 128KBæ‹¡å¼µRAMã‚’ä½¿ã†	*/
+extern	int	use_jisho_rom;			/* è¾æ›¸ROMã‚’ä½¿ã†	*/
+extern	int	use_built_in_font;		/* å†…è”µãƒ•ã‚©ãƒ³ãƒˆã‚’ä½¿ã†	*/
+extern	int	use_pcg;			/* PCG-8100ã‚µãƒãƒ¼ãƒˆ	*/
+extern	int	font_type;			/* ãƒ•ã‚©ãƒ³ãƒˆã®ç¨®é¡	*/
+extern	int	font_loaded;			/* ãƒ­ãƒ¼ãƒ‰ã—ãŸãƒ•ã‚©ãƒ³ãƒˆç¨®	*/
 
 
-extern	byte	*main_rom;			/* ¥á¥¤¥ó ROM (32KB)	*/
-extern	byte	(*main_rom_ext)[0x2000];	/* ³ÈÄ¥ ROM   (8KB *4)	*/
+extern	int	memory_wait;			/* ãƒ¡ãƒ¢ãƒªã‚¦ã‚§ã‚¤ãƒˆæœ‰ç„¡	*/
+
+extern	char	*file_compatrom;		/* P88SR emu ã®ROMã‚’ä½¿ã†*/
+
+extern	int	has_kanji_rom;			/* æ¼¢å­—ROMã®æœ‰ç„¡	*/
+
+extern	int	linear_ext_ram;			/* æ‹¡å¼µRAMã‚’é€£ç¶šã•ã›ã‚‹	*/
+
+
+extern	byte	*main_rom;			/* ãƒ¡ã‚¤ãƒ³ ROM (32KB)	*/
+extern	byte	(*main_rom_ext)[0x2000];	/* æ‹¡å¼µ ROM   (8KB *4)	*/
 extern	byte	*main_rom_n;			/* N-BASIC    (32KB)	*/
-extern	byte	*main_ram;			/* ¥á¥¤¥ó RAM (64KB)	*/
-extern	byte	*main_high_ram;			/* ¹âÂ® RAM(¤ÎÎ¢) (4KB)	*/
-extern	byte	*sub_romram;			/* ¥µ¥Ö ROM/RAM (32KB)	*/
+extern	byte	*main_ram;			/* ãƒ¡ã‚¤ãƒ³ RAM (64KB)	*/
+extern	byte	*main_high_ram;			/* é«˜é€Ÿ RAM(ã®è£) (4KB)	*/
+extern	byte	*sub_romram;			/* ã‚µãƒ– ROM/RAM (32KB)	*/
 
-extern	byte	(*kanji_rom)[65536][2];		/* ´Á»ú ROM   (128KB*2)	*/
+extern	byte	(*kanji_rom)[65536][2];		/* æ¼¢å­— ROM   (128KB*2)	*/
 
-extern	byte	(*ext_ram)[0x8000];		/* ³ÈÄ¥ RAM   (32KB*4¡Á)*/
-extern	byte	(*jisho_rom)[0x4000];		/* ¼­½ñ ROM   (16KB*32)	*/
+extern	byte	(*ext_ram)[0x8000];		/* æ‹¡å¼µ RAM   (32KB*4ã€œ)*/
+extern	byte	(*jisho_rom)[0x4000];		/* è¾æ›¸ ROM   (16KB*32)	*/
 
 extern	byte	(*main_vram)[4];		/* VRAM[0x4000][4]	*/
-extern	byte	*font_rom;			/* ¥Õ¥©¥ó¥È¥¤¥á¡¼¥¸     */
-extern	byte	*font_pcg;			/* ¥Õ¥©¥ó¥È¥¤¥á¡¼¥¸(PCG)*/
-extern	byte	*font_mem;			/* ¥Õ¥©¥ó¥È¥¤¥á¡¼¥¸(fix)*/
-extern	byte	*font_mem2;			/* ¥Õ¥©¥ó¥È¥¤¥á¡¼¥¸(2nd)*/
-extern	byte	*font_mem3;			/* ¥Õ¥©¥ó¥È¥¤¥á¡¼¥¸(3rd)*/
+extern	byte	*font_rom;			/* ãƒ•ã‚©ãƒ³ãƒˆã‚¤ãƒ¡ãƒ¼ã‚¸     */
+extern	byte	*font_pcg;			/* ãƒ•ã‚©ãƒ³ãƒˆã‚¤ãƒ¡ãƒ¼ã‚¸(PCG)*/
+extern	byte	*font_mem;			/* ãƒ•ã‚©ãƒ³ãƒˆã‚¤ãƒ¡ãƒ¼ã‚¸(fix)*/
+extern	byte	*font_mem2;			/* ãƒ•ã‚©ãƒ³ãƒˆã‚¤ãƒ¡ãƒ¼ã‚¸(2nd)*/
+extern	byte	*font_mem3;			/* ãƒ•ã‚©ãƒ³ãƒˆã‚¤ãƒ¡ãƒ¼ã‚¸(3rd)*/
 
 
-				/* ¥¤¥ê¡¼¥¬¥ë¤ÊÊıË¡¤Ç¥á¥â¥ê¥¢¥¯¥»¥¹¤¹¤ë	*/
+				/* ã‚¤ãƒªãƒ¼ã‚¬ãƒ«ãªæ–¹æ³•ã§ãƒ¡ãƒ¢ãƒªã‚¢ã‚¯ã‚»ã‚¹ã™ã‚‹	*/
 #define	main_vram4 (bit32 *)main_vram		/* VRAM long word accrss*/
 
 #define	ROM_VERSION	main_rom[0x79d7]
 
 
 
-extern	byte	*dummy_rom;			/* ¥À¥ß¡¼ROM (32KB)	*/
-extern	byte	*dummy_ram;			/* ¥À¥ß¡¼RAM (32KB)	*/
-extern	byte	kanji_dummy_rom[16][2];		/* ´Á»ú¥À¥ß¡¼ROM	*/
+extern	byte	*dummy_rom;			/* ãƒ€ãƒŸãƒ¼ROM (32KB)	*/
+extern	byte	*dummy_ram;			/* ãƒ€ãƒŸãƒ¼RAM (32KB)	*/
+extern	byte	kanji_dummy_rom[16][2];		/* æ¼¢å­—ãƒ€ãƒŸãƒ¼ROM	*/
 
 
 

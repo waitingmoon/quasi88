@@ -3,26 +3,26 @@
 
 
 
-extern	int	crtc_active;		/* CRTC¤Î¾õÂÖ 0:CRTCºîÆ° 1:CRTCÄä»ß */
-extern	int	crtc_intr_mask;		/* CRTC¤Î³ä¹ş¥Ş¥¹¥¯ ==3 ¤ÇÉ½¼¨	    */
-extern	int	crtc_cursor[2];		/* ¥«¡¼¥½¥ë°ÌÃÖ ÈóÉ½¼¨¤Î»ş¤Ï(-1,-1) */
-extern	byte	crtc_format[5];		/* CRTC ´ü²½»ş¤Î¥Õ¥©¡¼¥Ş¥Ã¥È	    */
+extern	int	crtc_active;		/* CRTCã®çŠ¶æ…‹ 0:CRTCä½œå‹• 1:CRTCåœæ­¢ */
+extern	int	crtc_intr_mask;		/* CRTCã®å‰²è¾¼ãƒã‚¹ã‚¯ ==3 ã§è¡¨ç¤º	    */
+extern	int	crtc_cursor[2];		/* ã‚«ãƒ¼ã‚½ãƒ«ä½ç½® éè¡¨ç¤ºã®æ™‚ã¯(-1,-1) */
+extern	byte	crtc_format[5];		/* CRTC æœŸåŒ–æ™‚ã®ãƒ•ã‚©ãƒ¼ãƒãƒƒãƒˆ	    */
 
-extern	int	crtc_reverse_display;	/* ¿¿¡ÄÈ¿Å¾É½¼¨ / µ¶¡ÄÄÌ¾ïÉ½¼¨	*/
-extern	int	crtc_skip_line;		/* ¿¿¡Ä1¹ÔÈô¤Ğ¤·É½¼¨ / µ¶¡ÄÄÌ¾ï */
-extern	int	crtc_cursor_style;	/* ¥Ö¥í¥Ã¥¯ / ¥¢¥ó¥À¥é¥¤¥ó	*/
-extern	int	crtc_cursor_blink;	/* ¿¿¡ÄÅÀÌÇ¤¹¤ë µ¶¡ÄÅÀÌÇ¤·¤Ê¤¤	*/
-extern	int	crtc_attr_non_separate;	/* ¿¿¡ÄVRAM¡¢ATTR ¤¬¸ò¸ß¤ËÊÂ¤Ö	*/
-extern	int	crtc_attr_color;	/* ¿¿¡Ä¥«¥é¡¼ µ¶¡ÄÇò¹õ		*/
-extern	int	crtc_attr_non_special;	/* µ¶¡Ä¹Ô¤Î½ª¤ê¤Ë ATTR ¤¬ÊÂ¤Ö	*/
+extern	int	crtc_reverse_display;	/* çœŸâ€¦åè»¢è¡¨ç¤º / å½â€¦é€šå¸¸è¡¨ç¤º	*/
+extern	int	crtc_skip_line;		/* çœŸâ€¦1è¡Œé£›ã°ã—è¡¨ç¤º / å½â€¦é€šå¸¸ */
+extern	int	crtc_cursor_style;	/* ãƒ–ãƒ­ãƒƒã‚¯ / ã‚¢ãƒ³ãƒ€ãƒ©ã‚¤ãƒ³	*/
+extern	int	crtc_cursor_blink;	/* çœŸâ€¦ç‚¹æ»…ã™ã‚‹ å½â€¦ç‚¹æ»…ã—ãªã„	*/
+extern	int	crtc_attr_non_separate;	/* çœŸâ€¦VRAMã€ATTR ãŒäº¤äº’ã«ä¸¦ã¶	*/
+extern	int	crtc_attr_color;	/* çœŸâ€¦ã‚«ãƒ©ãƒ¼ å½â€¦ç™½é»’		*/
+extern	int	crtc_attr_non_special;	/* å½â€¦è¡Œã®çµ‚ã‚Šã« ATTR ãŒä¸¦ã¶	*/
 
-extern	int	CRTC_SZ_LINES;		/* É½¼¨¤¹¤ë·å¿ô (20/25)		*/
-#define		CRTC_SZ_COLUMNS	(80)	/* É½¼¨¤¹¤ë¹Ô¿ô (80¸ÇÄê)	*/
-extern	int	crtc_sz_lines;		/* ·å¿ô (20¡Á25)		*/
-extern	int	crtc_sz_columns;	/* ¹Ô¿ô (2¡Á80)			*/
-extern	int	crtc_sz_attrs;		/* Â°À­ÎÌ (1¡Á20)		*/
-extern	int	crtc_byte_per_line;	/* 1¹Ô¤¢¤¿¤ê¤Î¥á¥â¥ê ¥Ğ¥¤¥È¿ô	*/
-extern	int	crtc_font_height;	/* ¥Õ¥©¥ó¥È¤Î¹â¤µ ¥É¥Ã¥È¿ô(8/10)*/
+extern	int	CRTC_SZ_LINES;		/* è¡¨ç¤ºã™ã‚‹æ¡æ•° (20/25)		*/
+#define		CRTC_SZ_COLUMNS	(80)	/* è¡¨ç¤ºã™ã‚‹è¡Œæ•° (80å›ºå®š)	*/
+extern	int	crtc_sz_lines;		/* æ¡æ•° (20ã€œ25)		*/
+extern	int	crtc_sz_columns;	/* è¡Œæ•° (2ã€œ80)			*/
+extern	int	crtc_sz_attrs;		/* å±æ€§é‡ (1ã€œ20)		*/
+extern	int	crtc_byte_per_line;	/* 1è¡Œã‚ãŸã‚Šã®ãƒ¡ãƒ¢ãƒª ãƒã‚¤ãƒˆæ•°	*/
+extern	int	crtc_font_height;	/* ãƒ•ã‚©ãƒ³ãƒˆã®é«˜ã• ãƒ‰ãƒƒãƒˆæ•°(8/10)*/
 
 
 extern	pair	dmac_address[4];
@@ -33,24 +33,24 @@ extern	int	dmac_mode;
 
 
 
-	/**** ¥Æ¥­¥¹¥ÈÉ½¼¨ ****/
+	/**** ãƒ†ã‚­ã‚¹ãƒˆè¡¨ç¤º ****/
 
 enum {
-  TEXT_DISABLE,		/* ¥Æ¥­¥¹¥ÈÉ½¼¨¤Ê¤·				*/
-  TEXT_ATTR_ONLY,	/*  ¡·    Ã¢¤·Â°À­¤Î¤ßÍ­¸ú (Çò¹õ¥°¥é¥Õ¥£¥Ã¥¯»ş)	*/
-  TEXT_ENABLE,		/* ¥Æ¥­¥¹¥ÈÉ½¼¨¤¢¤ê				*/
+  TEXT_DISABLE,		/* ãƒ†ã‚­ã‚¹ãƒˆè¡¨ç¤ºãªã—				*/
+  TEXT_ATTR_ONLY,	/*  ã€ƒ    ä½†ã—å±æ€§ã®ã¿æœ‰åŠ¹ (ç™½é»’ã‚°ãƒ©ãƒ•ã‚£ãƒƒã‚¯æ™‚)	*/
+  TEXT_ENABLE,		/* ãƒ†ã‚­ã‚¹ãƒˆè¡¨ç¤ºã‚ã‚Š				*/
   End_of_TEXT
 };
-extern	int	text_display;		/* ¥Æ¥­¥¹¥ÈÉ½¼¨¾õÂÖ¥Õ¥é¥°	*/
-extern	int	blink_cycle;		/* ÅÀÌÇ¤Î¼ş´ü	8/16/24/32	*/
-extern	int	blink_counter;		/* ÅÀÌÇÀ©¸æ¥«¥¦¥ó¥¿		*/
+extern	int	text_display;		/* ãƒ†ã‚­ã‚¹ãƒˆè¡¨ç¤ºçŠ¶æ…‹ãƒ•ãƒ©ã‚°	*/
+extern	int	blink_cycle;		/* ç‚¹æ»…ã®å‘¨æœŸ	8/16/24/32	*/
+extern	int	blink_counter;		/* ç‚¹æ»…åˆ¶å¾¡ã‚«ã‚¦ãƒ³ã‚¿		*/
 
 
 void	set_text_display(void);
 
 
 
-extern	int	dma_wait_count;		/* DMA¤Ç¾ÃÈñ¤¹¤ë¥µ¥¤¥¯¥ë¿ô	*/
+extern	int	dma_wait_count;		/* DMAã§æ¶ˆè²»ã™ã‚‹ã‚µã‚¤ã‚¯ãƒ«æ•°	*/
 
 #define	SET_DMA_WAIT_COUNT()	dma_wait_count =			\
 					crtc_byte_per_line * crtc_sz_lines
@@ -59,7 +59,7 @@ extern	int	dma_wait_count;		/* DMA¤Ç¾ÃÈñ¤¹¤ë¥µ¥¤¥¯¥ë¿ô	*/
 
 
 
-	/* ¥Æ¥­¥¹¥È½èÍı */
+	/* ãƒ†ã‚­ã‚¹ãƒˆå‡¦ç† */
 
 extern	int	text_attr_flipflop;
 extern	Ushort	text_attr_buf[2][2048];

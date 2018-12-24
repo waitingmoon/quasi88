@@ -2,7 +2,7 @@
 #define Q8TK_GLIB_H_INCLUDED
 
 
-/* ·ÓÀş ³Ñ 123456789_I = ¨¦¨ª¨¥¨§¨«¨©¨£¨¨¨¤¨¡¨¢ */
+/* ç½«ç·š è§’ 123456789_I = â””â”´â”˜â”œâ”¼â”¤â”Œâ”¬â”â”€â”‚ */
 
 #define	Q8GR_G_1	(0x9a)
 #define	Q8GR_G_2	(0x90)
@@ -16,21 +16,21 @@
 #define	Q8GR_G__	(0x95)
 #define	Q8GR_G_I	(0x96)
 
-/* ·ÓÀş ´İ 1357 = ¨¦¨¥¨£¨¤ */
+/* ç½«ç·š ä¸¸ 1357 = â””â”˜â”Œâ” */
 
 #define	Q8GR_C_1	(0x9e)
 #define	Q8GR_C_3	(0x9f)
 #define	Q8GR_C_7	(0x9c)
 #define	Q8GR_C_9	(0x9d)
 
-/* Ìğ°õ ¢¬¢­¢«¢ª */
+/* çŸ¢å° â†‘â†“â†â†’ */
 
 #define	Q8GR_A_U	(0x1e)
 #define	Q8GR_A_D	(0x1f)
 #define	Q8GR_A_L	(0x1d)
 #define	Q8GR_A_R	(0x1c)
 
-/* ¥Ü¥¿¥óÅù ¡ü¡û  ¢£¡ß¢¢¡² */
+/* ãƒœã‚¿ãƒ³ç­‰ â—â—‹  â– Ã—â–¡ï¼¿ */
 
 #define	Q8GR_B_ON	(0xec)
 #define	Q8GR_B_OFF	(0xed)
@@ -40,7 +40,7 @@
 #define	Q8GR_B_B	(0xdb)
 #define	Q8GR_B_UL	(0x80)
 
-/* ¥¢¥Ã¥Ñ¡¼¥é¥¤¥ó¤Ê¤É */
+/* ã‚¢ãƒƒãƒ‘ãƒ¼ãƒ©ã‚¤ãƒ³ãªã© */
 
 #define	Q8GR_L_UPPER	(0x94)
 #define	Q8GR_L_UNDER	(0x80)
@@ -60,7 +60,7 @@ void	q8gr_set_cursor_blink(void);
 
 void	q8gr_clear_screen(void);
 
-extern	Q8tkWidget	dummy_widget_window; /* ¥À¥ß¡¼¤ÎÌ¤»ÈÍÑ¥¦¥£¥¸¥Ã¥È */
+extern	Q8tkWidget	dummy_widget_window; /* ãƒ€ãƒŸãƒ¼ã®æœªä½¿ç”¨ã‚¦ã‚£ã‚¸ãƒƒãƒˆ */
 #define	Q8GR_WIDGET_NONE	(NULL)
 #define	Q8GR_WIDGET_WINDOW	((void *)&dummy_widget_window)
 

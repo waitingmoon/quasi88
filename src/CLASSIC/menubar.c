@@ -1,5 +1,5 @@
 /***********************************************************************
- * ¥á¥Ë¥å¡¼¥Ğ¡¼½èÍı
+ * ãƒ¡ãƒ‹ãƒ¥ãƒ¼ãƒãƒ¼å‡¦ç†
  ************************************************************************/
 
 #include <string.h>
@@ -229,7 +229,7 @@ static	T_RESET_CFG	menubar_reset_cfg;
 #define	M_MISC_STATUS			9
 
 /***********************************************************************
- * ¥á¥Ë¥å¡¼¥Ğ¡¼À¸À®
+ * ãƒ¡ãƒ‹ãƒ¥ãƒ¼ãƒãƒ¼ç”Ÿæˆ
  ************************************************************************/
 Boolean mac_create_menubar(void)
 {
@@ -274,8 +274,8 @@ Boolean mac_create_menubar(void)
 
 
 /****************************************************************************
- * ¥â¡¼¥ÉÀÚ¤êÂØ¤¨»ş¤Î¡¢¥á¥Ë¥å¡¼¥Ğ¡¼¤Î½èÍıºÆÀßÄê
- *	¥¨¥ß¥å¥â¡¼¥É¤È¥á¥Ë¥å¡¼¥â¡¼¥É¤Ç¡¢¥á¥Ë¥å¡¼¥Ğ¡¼¤ÎÆâÍÆ¤òÊÑ¹¹¤¹¤ë
+ * ãƒ¢ãƒ¼ãƒ‰åˆ‡ã‚Šæ›¿ãˆæ™‚ã®ã€ãƒ¡ãƒ‹ãƒ¥ãƒ¼ãƒãƒ¼ã®å‡¦ç†å†è¨­å®š
+ *	ã‚¨ãƒŸãƒ¥ãƒ¢ãƒ¼ãƒ‰ã¨ãƒ¡ãƒ‹ãƒ¥ãƒ¼ãƒ¢ãƒ¼ãƒ‰ã§ã€ãƒ¡ãƒ‹ãƒ¥ãƒ¼ãƒãƒ¼ã®å†…å®¹ã‚’å¤‰æ›´ã™ã‚‹
  *****************************************************************************/
 static void menubar_item_setup(void);
 static void menubar_item_sensitive(int sensitive);
@@ -284,17 +284,17 @@ void	menubar_setup(int active)
 {
     if (active) {
 
-	/*  ¥á¥Ë¥å¡¼¥Ğ¡¼¤ÎÆâÍÆ¤òÀßÄê */
+	/*  ãƒ¡ãƒ‹ãƒ¥ãƒ¼ãƒãƒ¼ã®å†…å®¹ã‚’è¨­å®š */
 	menubar_item_setup();
 
-	/* »È¤¨¤Ê¤¯¤·¤¿¹àÌÜ¤ò»È¤¨¤ë¤è¤¦¤Ë¤¹¤ë (¥¨¥ß¥å¥â¡¼¥É³«»Ï»ş) */
+	/* ä½¿ãˆãªãã—ãŸé …ç›®ã‚’ä½¿ãˆã‚‹ã‚ˆã†ã«ã™ã‚‹ (ã‚¨ãƒŸãƒ¥ãƒ¢ãƒ¼ãƒ‰é–‹å§‹æ™‚) */
 	menubar_item_sensitive(TRUE);
 
 	menubar_active = TRUE;
 
     } else {
 
-	/* ¤Û¤È¤ó¤É¤Î¹àÌÜ¤ò»È¤¨¤Ê¤¯¤¹¤ë (¥á¥Ë¥å¡¼¥â¡¼¥É³«»Ï»ş) */
+	/* ã»ã¨ã‚“ã©ã®é …ç›®ã‚’ä½¿ãˆãªãã™ã‚‹ (ãƒ¡ãƒ‹ãƒ¥ãƒ¼ãƒ¢ãƒ¼ãƒ‰é–‹å§‹æ™‚) */
 	menubar_item_sensitive(FALSE);
 
 	menubar_active = FALSE;
@@ -306,7 +306,7 @@ void	menubar_setup(int active)
 
 
 
-/* ¥é¥¸¥ª¥á¥Ë¥å¡¼¤Î°ì¤Ä¤ò¥Á¥§¥Ã¥¯¤¹¤ë */
+/* ãƒ©ã‚¸ã‚ªãƒ¡ãƒ‹ãƒ¥ãƒ¼ã®ä¸€ã¤ã‚’ãƒã‚§ãƒƒã‚¯ã™ã‚‹ */
 static void check_radio_item(int subMenu, int start, int end, int uItem)
 {
     int i;
@@ -317,7 +317,7 @@ static void check_radio_item(int subMenu, int start, int end, int uItem)
 }
 
 
-/* ¥á¥Ë¥å¡¼¥¢¥¤¥Æ¥à¤ÎÊ¸»úÎó¤òÊÑ¹¹ */
+/* ãƒ¡ãƒ‹ãƒ¥ãƒ¼ã‚¢ã‚¤ãƒ†ãƒ ã®æ–‡å­—åˆ—ã‚’å¤‰æ›´ */
 static void change_menuitem_label(int subMenu, int uItem, char *s)
 {
     unsigned char str[256];
@@ -333,7 +333,7 @@ static void change_menuitem_label(int subMenu, int uItem, char *s)
 }
 
 
-/* ¥Õ¥¡¥¤¥ë¤ò³«¤¯ ¥À¥¤¥¢¥í¥° */
+/* ãƒ•ã‚¡ã‚¤ãƒ«ã‚’é–‹ã ãƒ€ã‚¤ã‚¢ãƒ­ã‚° */
 static Boolean openGetFile(FSSpec *file)
 {
     StandardFileReply reply;
@@ -348,7 +348,7 @@ static Boolean openGetFile(FSSpec *file)
 }
 
 
-/* ¥Õ¥¡¥¤¥ë¤òÊİÂ¸¥À¥¤¥¢¥í¥° */
+/* ãƒ•ã‚¡ã‚¤ãƒ«ã‚’ä¿å­˜ãƒ€ã‚¤ã‚¢ãƒ­ã‚° */
 static Boolean openPutFile(FSSpec *file)
 {
     StandardFileReply reply;
@@ -364,7 +364,7 @@ static Boolean openPutFile(FSSpec *file)
 }
 
 
-/* ¥À¥¤¥¢¥í¥°¤ÇÁªÂò¤·¤¿¥Õ¥¡¥¤¥ëÌ¾¤ò¼èÆÀ */
+/* ãƒ€ã‚¤ã‚¢ãƒ­ã‚°ã§é¸æŠã—ãŸãƒ•ã‚¡ã‚¤ãƒ«åã‚’å–å¾— */
 static char *get_filename(FSSpec *file)
 {
     OSErr  err;
@@ -402,7 +402,7 @@ static char *get_filename(FSSpec *file)
 
 
 
-/* Reset ¥á¥Ë¥å¡¼¥¢¥¤¥Æ¥à¤Î¥é¥Ù¥ë¤ò¹¹¿·¤¹¤ë */
+/* Reset ãƒ¡ãƒ‹ãƒ¥ãƒ¼ã‚¢ã‚¤ãƒ†ãƒ ã®ãƒ©ãƒ™ãƒ«ã‚’æ›´æ–°ã™ã‚‹ */
 static void update_sys_reset(void)
 {
     char buf[32];
@@ -430,7 +430,7 @@ static void update_sys_reset(void)
 
 
 
-/* Drive ¥á¥Ë¥å¡¼¥¢¥¤¥Æ¥à¤òÉ½¼¨¤¹¤ë¡¦±£¤¹ */
+/* Drive ãƒ¡ãƒ‹ãƒ¥ãƒ¼ã‚¢ã‚¤ãƒ†ãƒ ã‚’è¡¨ç¤ºã™ã‚‹ãƒ»éš ã™ */
 static void update_drive(void)
 {
     int uItem;
@@ -444,8 +444,8 @@ static void update_drive(void)
 
 	if (disk_image_exist(drv)) {
 
-	    /* ¥¤¥á¡¼¥¸¤Î¿ô¤ÎÊ¬¡¢¥á¥Ë¥å¡¼¥¢¥¤¥Æ¥à¤òÉ½¼¨¤¹¤ë¡£
-	       ¥é¥Ù¥ë¤Ï¡¢¥¤¥á¡¼¥¸Ì¾¤Ë¥»¥Ã¥È¤·Ä¾¤¹¡£           */
+	    /* ã‚¤ãƒ¡ãƒ¼ã‚¸ã®æ•°ã®åˆ†ã€ãƒ¡ãƒ‹ãƒ¥ãƒ¼ã‚¢ã‚¤ãƒ†ãƒ ã‚’è¡¨ç¤ºã™ã‚‹ã€‚
+	       ãƒ©ãƒ™ãƒ«ã¯ã€ã‚¤ãƒ¡ãƒ¼ã‚¸åã«ã‚»ãƒƒãƒˆã—ç›´ã™ã€‚           */
 	    for (i = 0; i < MIN(disk_image_num(drv), 9); i++) {
 		uItem = i + 1;
 
@@ -465,7 +465,7 @@ static void update_drive(void)
 
 	} else {
 
-	    /* ¥Ç¥£¥¹¥¯¤¬¤Ê¤¤¾ì¹ç ¡Ä ËÜÅö¤Ï¾Ã¤·¤¿¤¤¤ó¤À¤±¤É¡¢¤É¤¦¤¹¤ë¤Î? */
+	    /* ãƒ‡ã‚£ã‚¹ã‚¯ãŒãªã„å ´åˆ â€¦ æœ¬å½“ã¯æ¶ˆã—ãŸã„ã‚“ã ã‘ã©ã€ã©ã†ã™ã‚‹ã®? */
 	    for (i=0; i<9; i++) {
 		uItem = i + 1;
 		sprintf(buf, "%d  nonexistant", i + 1);
@@ -474,25 +474,25 @@ static void update_drive(void)
 	    }
 	}
 
-	/* ÁªÂòÃæ¥¤¥á¡¼¥¸¤Î¡¢¥é¥¸¥ª¥á¥Ë¥å¡¼¤ò¥¢¥¯¥Æ¥£¥Ö¤Ë¤¹¤ë */
+	/* é¸æŠä¸­ã‚¤ãƒ¡ãƒ¼ã‚¸ã®ã€ãƒ©ã‚¸ã‚ªãƒ¡ãƒ‹ãƒ¥ãƒ¼ã‚’ã‚¢ã‚¯ãƒ†ã‚£ãƒ–ã«ã™ã‚‹ */
 
-	if (disk_image_exist(drv) == FALSE ||	/* ¥Õ¥¡¥¤¥ë¤Ê¤· or */
-	    drive_check_empty(drv)) {		/* ¶õ¤òÁªÂò        */
+	if (disk_image_exist(drv) == FALSE ||	/* ãƒ•ã‚¡ã‚¤ãƒ«ãªã— or */
+	    drive_check_empty(drv)) {		/* ç©ºã‚’é¸æŠ        */
 
-	    uItem = 10;					/*    ¢ª NO Disk */
+	    uItem = 10;					/*    â†’ NO Disk */
 
 	} else {
 	    i = disk_image_selected(drv);
-	    if (0 <= i && i <= 9) {			/* 1¡Á9ÈÖÌÜÁªÂò */
-		uItem = i + 1;				/*    ¢ª ¤½¤ì¤À */
-	    } else {					/* 10ÈÖÌÜ¡Á     */
-		uItem = 0;				/*    ¢ª ¤Ê¤·   */
+	    if (0 <= i && i <= 9) {			/* 1ã€œ9ç•ªç›®é¸æŠ */
+		uItem = i + 1;				/*    â†’ ãã‚Œã  */
+	    } else {					/* 10ç•ªç›®ã€œ     */
+		uItem = 0;				/*    â†’ ãªã—   */
 	    }
 	}
 	check_radio_item(base, 1, 10, uItem);
     }
 
-    /* ¥á¥Ë¥å¡¼¤ÎÌ¾Á°¤òÊÑ¤¨¤¿¤ê¡¢Ìµ¸ú¤Ë¤·¤¿¤ê */
+    /* ãƒ¡ãƒ‹ãƒ¥ãƒ¼ã®åå‰ã‚’å¤‰ãˆãŸã‚Šã€ç„¡åŠ¹ã«ã—ãŸã‚Š */
 
     for (drv = 0; drv < NR_DRIVE; drv ++) {
 	const char *s;
@@ -516,7 +516,7 @@ static void update_drive(void)
     }
 }
 
-/* Tape Load ¥á¥Ë¥å¡¼¥¢¥¤¥Æ¥à¤Î¥é¥Ù¥ë¤òÊÑ¤¨¤¿¤ê»ÈÍÑÉÔ²Ä¤Ë¤·¤¿¤ê */
+/* Tape Load ãƒ¡ãƒ‹ãƒ¥ãƒ¼ã‚¢ã‚¤ãƒ†ãƒ ã®ãƒ©ãƒ™ãƒ«ã‚’å¤‰ãˆãŸã‚Šä½¿ç”¨ä¸å¯ã«ã—ãŸã‚Š */
 static void update_misc_cload(void)
 {
     int uItem;
@@ -525,7 +525,7 @@ static void update_misc_cload(void)
 
     s = filename_get_tape_name(CLOAD);
 
-    /* ¥Æ¡¼¥×¤¢¤ê¤Ê¤é¥Õ¥¡¥¤¥ëÌ¾¤ò¡¢¤Ê¤·¤Ê¤é¥Ç¥Õ¥©¥ë¥È¤Î¥é¥Ù¥ë¤òÉ½¼¨ */
+    /* ãƒ†ãƒ¼ãƒ—ã‚ã‚Šãªã‚‰ãƒ•ã‚¡ã‚¤ãƒ«åã‚’ã€ãªã—ãªã‚‰ãƒ‡ãƒ•ã‚©ãƒ«ãƒˆã®ãƒ©ãƒ™ãƒ«ã‚’è¡¨ç¤º */
     uItem = M_MISC_CLOAD_S;
     {
 	if (s) { my_strncpy(buf, s, sizeof(buf)); }
@@ -533,17 +533,17 @@ static void update_misc_cload(void)
 	change_menuitem_label(M_MISC_CLOAD, uItem, buf);
     }
 
-    /* ¥Æ¡¼¥×¤¢¤ê¤Ê¤é¡¢¥é¥¸¥ª¥á¥Ë¥å¡¼¤ò¥¢¥¯¥Æ¥£¥Ö¤Ë */
+    /* ãƒ†ãƒ¼ãƒ—ã‚ã‚Šãªã‚‰ã€ãƒ©ã‚¸ã‚ªãƒ¡ãƒ‹ãƒ¥ãƒ¼ã‚’ã‚¢ã‚¯ãƒ†ã‚£ãƒ–ã« */
     uItem = M_MISC_CLOAD_S;
     CheckItem(GetMenuRef(M_MISC_CLOAD), uItem, (s) ? true : false);
 
-    /* ¥Æ¡¼¥×¤¢¤ê¤Ê¤é unset ¤òÉ½¼¨¡¢¤Ê¤·¤Ê¤é±£¤¹ */
+    /* ãƒ†ãƒ¼ãƒ—ã‚ã‚Šãªã‚‰ unset ã‚’è¡¨ç¤ºã€ãªã—ãªã‚‰éš ã™ */
     uItem = M_MISC_CLOAD_U;
     if (s) { EnableItem(GetMenuRef(M_MISC_CLOAD), uItem); }
     else   { DisableItem(GetMenuRef(M_MISC_CLOAD), uItem); }
 }
 
-/* Tape Save ¥á¥Ë¥å¡¼¥¢¥¤¥Æ¥à¤Î¥é¥Ù¥ë¤òÊÑ¤¨¤¿¤ê»ÈÍÑÉÔ²Ä¤Ë¤·¤¿¤ê */
+/* Tape Save ãƒ¡ãƒ‹ãƒ¥ãƒ¼ã‚¢ã‚¤ãƒ†ãƒ ã®ãƒ©ãƒ™ãƒ«ã‚’å¤‰ãˆãŸã‚Šä½¿ç”¨ä¸å¯ã«ã—ãŸã‚Š */
 static void update_misc_csave(void)
 {
     int uItem;
@@ -552,7 +552,7 @@ static void update_misc_csave(void)
 
     s = filename_get_tape_name(CSAVE);
 
-    /* ¥Æ¡¼¥×¤¢¤ê¤Ê¤é¥Õ¥¡¥¤¥ëÌ¾¤ò¡¢¤Ê¤·¤Ê¤é¥Ç¥Õ¥©¥ë¥È¤Î¥é¥Ù¥ë¤òÉ½¼¨ */
+    /* ãƒ†ãƒ¼ãƒ—ã‚ã‚Šãªã‚‰ãƒ•ã‚¡ã‚¤ãƒ«åã‚’ã€ãªã—ãªã‚‰ãƒ‡ãƒ•ã‚©ãƒ«ãƒˆã®ãƒ©ãƒ™ãƒ«ã‚’è¡¨ç¤º */
     uItem = M_MISC_CSAVE_S;
     {
 	if (s) { my_strncpy(buf, s, sizeof(buf)); }
@@ -560,17 +560,17 @@ static void update_misc_csave(void)
 	change_menuitem_label(M_MISC_CSAVE, uItem, buf);
     }
 
-    /* ¥Æ¡¼¥×¤¢¤ê¤Ê¤é¡¢¥é¥¸¥ª¥á¥Ë¥å¡¼¤ò¥¢¥¯¥Æ¥£¥Ö¤Ë */
+    /* ãƒ†ãƒ¼ãƒ—ã‚ã‚Šãªã‚‰ã€ãƒ©ã‚¸ã‚ªãƒ¡ãƒ‹ãƒ¥ãƒ¼ã‚’ã‚¢ã‚¯ãƒ†ã‚£ãƒ–ã« */
     uItem = M_MISC_CSAVE_S;
     CheckItem(GetMenuRef(M_MISC_CSAVE), uItem, (s) ? true : false);
 
-    /* ¥Æ¡¼¥×¤¢¤ê¤Ê¤é unset ¤òÉ½¼¨¡¢¤Ê¤·¤Ê¤é±£¤¹ */
+    /* ãƒ†ãƒ¼ãƒ—ã‚ã‚Šãªã‚‰ unset ã‚’è¡¨ç¤ºã€ãªã—ãªã‚‰éš ã™ */
     uItem = M_MISC_CSAVE_U;
     if (s) { EnableItem(GetMenuRef(M_MISC_CSAVE), uItem); }
     else   { DisableItem(GetMenuRef(M_MISC_CSAVE), uItem); }
 }
 
-/* Sound Record ¥á¥Ë¥å¡¼¥¢¥¤¥Æ¥à¤Î¥Á¥§¥Ã¥¯¤òÊÑ¹¹¤¹¤ë */
+/* Sound Record ãƒ¡ãƒ‹ãƒ¥ãƒ¼ã‚¢ã‚¤ãƒ†ãƒ ã®ãƒã‚§ãƒƒã‚¯ã‚’å¤‰æ›´ã™ã‚‹ */
 static void update_misc_record(void)
 {
     int uItem;
@@ -585,7 +585,7 @@ static void update_misc_record(void)
 
 
 /*======================================================================
- * ¥á¥Ë¥å¡¼¥Ğ¡¼¤ÎÆâÍÆ¤òºÆ½é´ü²½
+ * ãƒ¡ãƒ‹ãƒ¥ãƒ¼ãƒãƒ¼ã®å†…å®¹ã‚’å†åˆæœŸåŒ–
  *======================================================================*/
 static void menubar_item_setup(void)
 {
@@ -620,7 +620,7 @@ static void menubar_item_setup(void)
 
     /* Setting ----------------------------------------------------------*/
 
-    i = quasi88_cfg_now_wait_rate();				/* ¡ö¡ö¡ö¡ö */
+    i = quasi88_cfg_now_wait_rate();				/* ï¼Šï¼Šï¼Šï¼Š */
     switch (i) {
     case 25:		uItem = M_SET_SPD_25;		break;
     case 50:		uItem = M_SET_SPD_50;		break;
@@ -631,11 +631,11 @@ static void menubar_item_setup(void)
     }
     check_radio_item(M_SET_SPD, M_SET_SPD_25, M_SET_SPD_400, uItem);
 
-    i = quasi88_cfg_now_no_wait();				/* ¡ö¡ö¡ö¡ö */
+    i = quasi88_cfg_now_no_wait();				/* ï¼Šï¼Šï¼Šï¼Š */
     uItem = M_SET_SPD_MAX;
     CheckItem(GetMenuRef(M_SET_SPD), uItem, (i ? true : false));
 
-    i = cpu_timing;						/* ¡ö¡ö¡ö¡ö */
+    i = cpu_timing;						/* ï¼Šï¼Šï¼Šï¼Š */
     switch (i) {
     case 0:		uItem = M_SET_SUB_SOME;		break;
     case 1:		uItem = M_SET_SUB_OFT;		break;
@@ -644,11 +644,11 @@ static void menubar_item_setup(void)
     }
     check_radio_item(M_SET_SUB, M_SET_SUB_SOME, M_SET_SUB_ALL, uItem);
 
-    i = fdc_wait;						/* ¡ö¡ö¡ö¡ö */
+    i = fdc_wait;						/* ï¼Šï¼Šï¼Šï¼Š */
     uItem = M_SET_FDCWAIT;
     CheckItem(GetMenuRef(M_SET), uItem, (i ? true : false));
 
-    i = quasi88_cfg_now_frameskip_rate();			/* ¡ö¡ö¡ö¡ö */
+    i = quasi88_cfg_now_frameskip_rate();			/* ï¼Šï¼Šï¼Šï¼Š */
     switch (i) {
     case 1:		uItem = M_SET_REF_60;		break;
     case 2:		uItem = M_SET_REF_30;		break;
@@ -658,7 +658,7 @@ static void menubar_item_setup(void)
     }
     check_radio_item(M_SET_REF, M_SET_REF_60, M_SET_REF_15, uItem);
 
-    i = quasi88_cfg_now_interlace();				/* ¡ö¡ö¡ö¡ö */
+    i = quasi88_cfg_now_interlace();				/* ï¼Šï¼Šï¼Šï¼Š */
     switch (i) {
     case SCREEN_INTERLACE_NO:	uItem = M_SET_INT_NO;	break;
     case SCREEN_INTERLACE_SKIP:	uItem = M_SET_INT_SKIP;	break;
@@ -667,7 +667,7 @@ static void menubar_item_setup(void)
     }
     check_radio_item(M_SET_INT, M_SET_INT_NO, M_SET_INT_YES, uItem);
 
-    i = quasi88_cfg_now_size();					/* ¡ö¡ö¡ö¡ö */
+    i = quasi88_cfg_now_size();					/* ï¼Šï¼Šï¼Šï¼Š */
     switch (i) {
     case SCREEN_SIZE_FULL:	uItem = M_SET_SIZ_FULL;	break;
     case SCREEN_SIZE_HALF:	uItem = M_SET_SIZ_HALF;	break;
@@ -675,15 +675,15 @@ static void menubar_item_setup(void)
     }
     check_radio_item(M_SET_SIZ, M_SET_SIZ_FULL, M_SET_SIZ_HALF, uItem);
 
-    i = quasi88_cfg_now_fullscreen();				/* ¡ö¡ö¡ö¡ö */
+    i = quasi88_cfg_now_fullscreen();				/* ï¼Šï¼Šï¼Šï¼Š */
     uItem = M_SET_FUL;
     CheckItem(GetMenuRef(M_SET), uItem, (i ? true : false));
 
-    i = use_pcg;						/* ¡ö¡ö¡ö¡ö */
+    i = use_pcg;						/* ï¼Šï¼Šï¼Šï¼Š */
     uItem = M_SET_PCG;
     CheckItem(GetMenuRef(M_SET), uItem, (i ? true : false));
 
-    i = mouse_mode;						/* ¡ö¡ö¡ö¡ö */
+    i = mouse_mode;						/* ï¼Šï¼Šï¼Šï¼Š */
     switch (i) {
     case MOUSE_NONE:		uItem = M_SET_MO_NO;	break;
     case MOUSE_MOUSE:		uItem = M_SET_MO_MOUSE;	break;
@@ -693,7 +693,7 @@ static void menubar_item_setup(void)
     }
     check_radio_item(M_SET_MO, M_SET_MO_NO, M_SET_MO_JOY, uItem);
 
-    i = cursor_key_mode;					/* ¡ö¡ö¡ö¡ö */
+    i = cursor_key_mode;					/* ï¼Šï¼Šï¼Šï¼Š */
     switch (i) {
     case 0:		uItem = M_SET_CUR_DEF;		break;
     case 1:		uItem = M_SET_CUR_TEN;		break;
@@ -701,18 +701,18 @@ static void menubar_item_setup(void)
     }
     check_radio_item(M_SET_CUR, M_SET_CUR_DEF, M_SET_CUR_TEN, uItem);
 
-    i = numlock_emu;						/* ¡ö¡ö¡ö¡ö */
+    i = numlock_emu;						/* ï¼Šï¼Šï¼Šï¼Š */
     uItem = M_SET_NUMLOCK;
     CheckItem(GetMenuRef(M_SET), uItem, (i ? true : false));
 
-    i = romaji_input_mode;					/* ¡ö¡ö¡ö¡ö */
+    i = romaji_input_mode;					/* ï¼Šï¼Šï¼Šï¼Š */
     uItem = M_SET_ROMAJI;
     CheckItem(GetMenuRef(M_SET), uItem, (i ? true : false));
 
 #ifdef	USE_SOUND
     if (xmame_has_sound()) {
 #ifdef	USE_FMGEN
-	i = xmame_cfg_get_use_fmgen();				/* ¡ö¡ö¡ö¡ö */
+	i = xmame_cfg_get_use_fmgen();				/* ï¼Šï¼Šï¼Šï¼Š */
 	switch (i) {
 	case 0:		uItem = M_SET_FM_MAME;		break;
 	case 1:		uItem = M_SET_FM_FMGEN;		break;
@@ -723,7 +723,7 @@ static void menubar_item_setup(void)
 	DisableItem(GetMenuRef(M_SET), 16);
 #endif
 
-	i = xmame_cfg_get_sample_freq();			/* ¡ö¡ö¡ö¡ö */
+	i = xmame_cfg_get_sample_freq();			/* ï¼Šï¼Šï¼Šï¼Š */
 	switch (i) {
 	case 44100:	uItem = M_SET_FRQ_44;		break;
 	case 22050:	uItem = M_SET_FRQ_22;		break;
@@ -766,7 +766,7 @@ static void menubar_item_setup(void)
 }
 
 /*======================================================================
- * ¥á¥Ë¥å¡¼¥Ğ¡¼»ÈÍÑ²ÄÇ½¹àÌÜ¤òÀßÄê
+ * ãƒ¡ãƒ‹ãƒ¥ãƒ¼ãƒãƒ¼ä½¿ç”¨å¯èƒ½é …ç›®ã‚’è¨­å®š
  *======================================================================*/
 static void menubar_item_sensitive(int sensitive)
 {
@@ -802,7 +802,7 @@ static void menubar_item_sensitive(int sensitive)
 
 
 /***********************************************************************
- * ¥á¥Ë¥å¡¼¥Ğ¡¼¥³¡¼¥ë¥Ğ¥Ã¥¯´Ø¿ô
+ * ãƒ¡ãƒ‹ãƒ¥ãƒ¼ãƒãƒ¼ã‚³ãƒ¼ãƒ«ãƒãƒƒã‚¯é–¢æ•°
  ************************************************************************/
 
 static	void	aboutBox(void);
@@ -1085,11 +1085,11 @@ void doMenuCommand(long	menuResult)
 }
 
 /*======================================================================
- * ¥á¥Ë¥å¡¼¥Ğ¡¼¥µ¥Ö´Ø¿ô
+ * ãƒ¡ãƒ‹ãƒ¥ãƒ¼ãƒãƒ¼ã‚µãƒ–é–¢æ•°
  *======================================================================*/
 
 /*----------------------------------------------------------------------
- * System ¥á¥Ë¥å¡¼
+ * System ãƒ¡ãƒ‹ãƒ¥ãƒ¼
  *----------------------------------------------------------------------*/
 
 static	void	f_sys_reset(void)
@@ -1158,7 +1158,7 @@ static	void	f_sys_exit(void)
 }
 
 /*----------------------------------------------------------------------
- * Setting ¥á¥Ë¥å¡¼
+ * Setting ãƒ¡ãƒ‹ãƒ¥ãƒ¼
  *----------------------------------------------------------------------*/
 
 static	void	f_set_speed(int uItem, int data)
@@ -1177,7 +1177,7 @@ static	void	f_set_nowait(int uItem)
 
     if (menubar_active == FALSE) { return; }
 
-    active = quasi88_cfg_now_no_wait() ? FALSE : TRUE; 	/* µÕ¤Ë¤¹¤ë */
+    active = quasi88_cfg_now_no_wait() ? FALSE : TRUE; 	/* é€†ã«ã™ã‚‹ */
     CheckItem(GetMenuRef(M_SET_SPD), uItem, (active ? true : false));
 
     quasi88_cfg_set_no_wait(active);
@@ -1192,7 +1192,7 @@ static	void	f_set_subcpu(int uItem, int data)
 	if (cpu_timing != (int)data) {
 	    cpu_timing = (int)data;
 	    emu_reset();
-	    /* Â¾¤ËºÆ½é´ü²½¤¹¤Ù¤­¤â¤Î¤Ï¤Ê¤¤¤Î¤«¡© */
+	    /* ä»–ã«å†åˆæœŸåŒ–ã™ã¹ãã‚‚ã®ã¯ãªã„ã®ã‹ï¼Ÿ */
 	}
     }
 }
@@ -1203,7 +1203,7 @@ static	void	f_set_fdcwait(int uItem)
 
     if (menubar_active == FALSE) { return; }
 
-    active = fdc_wait ? FALSE : TRUE; 			/* µÕ¤Ë¤¹¤ë */
+    active = fdc_wait ? FALSE : TRUE; 			/* é€†ã«ã™ã‚‹ */
     CheckItem(GetMenuRef(M_SET), uItem, (active ? true : false));
 
     fdc_wait = active;
@@ -1245,7 +1245,7 @@ static	void	f_set_full(int uItem)
 
     if (menubar_active == FALSE) { return; }
 
-    active = quasi88_cfg_now_fullscreen() ? FALSE : TRUE; 	/* µÕ¤Ë¤¹¤ë */
+    active = quasi88_cfg_now_fullscreen() ? FALSE : TRUE; 	/* é€†ã«ã™ã‚‹ */
     CheckItem(GetMenuRef(M_SET), uItem, (active ? true : false));
 
     quasi88_cfg_set_fullscreen(active);
@@ -1257,7 +1257,7 @@ static	void	f_set_pcg(int uItem)
 
     if (menubar_active == FALSE) { return; }
 
-    active = use_pcg ? FALSE : TRUE; 				/* µÕ¤Ë¤¹¤ë */
+    active = use_pcg ? FALSE : TRUE; 				/* é€†ã«ã™ã‚‹ */
     CheckItem(GetMenuRef(M_SET), uItem, (active ? true : false));
 
     use_pcg = active;
@@ -1295,7 +1295,7 @@ static	void	f_set_numlock(int uItem)
 
     if (menubar_active == FALSE) { return; }
 
-    active = numlock_emu ? FALSE : TRUE; 		/* µÕ¤Ë¤¹¤ë */
+    active = numlock_emu ? FALSE : TRUE; 		/* é€†ã«ã™ã‚‹ */
     CheckItem(GetMenuRef(M_SET), uItem, (active ? true : false));
 
     quasi88_cfg_key_numlock(active);
@@ -1307,7 +1307,7 @@ static	void	f_set_romaji(int uItem)
 
     if (menubar_active == FALSE) { return; }
 
-    active = romaji_input_mode ? FALSE : TRUE; 		/* µÕ¤Ë¤¹¤ë */
+    active = romaji_input_mode ? FALSE : TRUE; 		/* é€†ã«ã™ã‚‹ */
     CheckItem(GetMenuRef(M_SET), uItem, (active ? true : false));
 
     quasi88_cfg_key_romaji(active);
@@ -1321,7 +1321,7 @@ static	void	f_set_fm(int uItem, int data)
 
     check_radio_item(M_SET_FM, M_SET_FM_MAME, M_SET_FM_FMGEN, uItem);
     {
-	//¤ä¤Ã¤«¤¤
+	//ã‚„ã£ã‹ã„
 	if (((xmame_cfg_get_use_fmgen())          && ((int)data == FALSE)) ||
 	    ((xmame_cfg_get_use_fmgen() == FALSE) && ((int)data))) {
 
@@ -1342,7 +1342,7 @@ static	void	f_set_frq(int uItem, int data)
 
     check_radio_item(M_SET_FRQ, M_SET_FRQ_44, M_SET_FRQ_08, uItem);
     {
-	//¤ä¤Ã¤«¤¤
+	//ã‚„ã£ã‹ã„
 	if (xmame_cfg_get_sample_freq() != (int)data) {
 	    if (8000 <= (int)data && (int)data <= 48000) {
 		xmame_cfg_set_sample_freq((int)data);
@@ -1356,13 +1356,13 @@ static	void	f_set_frq(int uItem, int data)
 }
 
 /*----------------------------------------------------------------------
- * Drive ¥á¥Ë¥å¡¼
+ * Drive ãƒ¡ãƒ‹ãƒ¥ãƒ¼
  *----------------------------------------------------------------------*/
 
 static	void	f_drv_chg(int data)
 {
     FSSpec file;
-    char *filename;				/* ¥Õ¥ë¥Ñ¥¹¥Õ¥¡¥¤¥ëÌ¾ */
+    char *filename;				/* ãƒ•ãƒ«ãƒ‘ã‚¹ãƒ•ã‚¡ã‚¤ãƒ«å */
     const char *headline;
 
     if (menubar_active == FALSE) { return; }
@@ -1373,7 +1373,7 @@ static	void	f_drv_chg(int data)
     default:		headline = "Open Disk-Image-File";		break;
     }	
 
-    /* headline ¤Î½ĞÈÖ¤¬¤Ê¤¤¡Ä */
+    /* headline ã®å‡ºç•ªãŒãªã„â€¦ */
 
     if (openGetFile(&file) &&
 	(filename = get_filename(&file))) {
@@ -1391,12 +1391,12 @@ static	void	f_drv_chg(int data)
 
 	}
 
-	/* ¤¹¤Ç¤Ë¥Õ¥¡¥¤¥ë¤òÊÄ¤¸¤Æ¤¤¤ë¤Î¤Ç¡¢¼ºÇÔ¤·¤Æ¤â¥á¥Ë¥å¡¼¥Ğ¡¼¹¹¿· */
+	/* ã™ã§ã«ãƒ•ã‚¡ã‚¤ãƒ«ã‚’é–‰ã˜ã¦ã„ã‚‹ã®ã§ã€å¤±æ•—ã—ã¦ã‚‚ãƒ¡ãƒ‹ãƒ¥ãƒ¼ãƒãƒ¼æ›´æ–° */
 	update_drive();
     }
 
-    /* ReadOnlyÂ°À­¤Î¥Õ¥¡¥¤¥ë¤ò³«¤¯¤È¡¢°Ê¹ß Drive 1: ¤Î¥á¥Ë¥å¡¼¤¬ */
-    /* Ìµ¸ú¤Ë¤Ê¤ë? ¤É¤¦¤¹¤ì¤Ğ¤¤¤¤ ? */
+    /* ReadOnlyå±æ€§ã®ãƒ•ã‚¡ã‚¤ãƒ«ã‚’é–‹ãã¨ã€ä»¥é™ Drive 1: ã®ãƒ¡ãƒ‹ãƒ¥ãƒ¼ãŒ */
+    /* ç„¡åŠ¹ã«ãªã‚‹? ã©ã†ã™ã‚Œã°ã„ã„ ? */
 }
 
 static	void	f_drv_drv1(int uItem, int data)
@@ -1437,7 +1437,7 @@ static	void	f_drv_unset(void)
 }
 
 /*----------------------------------------------------------------------
- * Misc ¥á¥Ë¥å¡¼
+ * Misc ãƒ¡ãƒ‹ãƒ¥ãƒ¼
  *----------------------------------------------------------------------*/
 
 static	void	f_misc_capture(void)
@@ -1453,7 +1453,7 @@ static	void	f_misc_record(int uItem)
 
     if (menubar_active == FALSE) { return; }
 
-    active = xmame_wavout_opened() ? FALSE : TRUE; 	/* µÕ¤Ë¤¹¤ë */
+    active = xmame_wavout_opened() ? FALSE : TRUE; 	/* é€†ã«ã™ã‚‹ */
 
     if (active == FALSE) {
 	if (xmame_wavout_opened()) {
@@ -1473,21 +1473,21 @@ static	void	f_misc_record(int uItem)
 static	void	f_misc_cload_s(void)
 {
     FSSpec file;
-    char *filename;				/* ¥Õ¥ë¥Ñ¥¹¥Õ¥¡¥¤¥ëÌ¾ */
+    char *filename;				/* ãƒ•ãƒ«ãƒ‘ã‚¹ãƒ•ã‚¡ã‚¤ãƒ«å */
     const char *headline = "Open Tape-Image-File for LOAD";
 
     if (menubar_active == FALSE) { return; }
 
-    if (filename_get_tape(CLOAD)) { return; }	/* ¥Æ¡¼¥×¤¢¤ê¤Ê¤éÌá¤ë */
+    if (filename_get_tape(CLOAD)) { return; }	/* ãƒ†ãƒ¼ãƒ—ã‚ã‚Šãªã‚‰æˆ»ã‚‹ */
 
-    /* headline ¤Î½ĞÈÖ¤¬¤Ê¤¤¡Ä */
+    /* headline ã®å‡ºç•ªãŒãªã„â€¦ */
 
     if (openGetFile(&file) &&
 	(filename = get_filename(&file))) {
 
 	int ok = quasi88_load_tape_insert(filename);
 
-	/* ¤¹¤Ç¤Ë¥Õ¥¡¥¤¥ë¤òÊÄ¤¸¤Æ¤¤¤ë¤Î¤Ç¡¢¼ºÇÔ¤·¤Æ¤â¥á¥Ë¥å¡¼¥Ğ¡¼¹¹¿· */
+	/* ã™ã§ã«ãƒ•ã‚¡ã‚¤ãƒ«ã‚’é–‰ã˜ã¦ã„ã‚‹ã®ã§ã€å¤±æ•—ã—ã¦ã‚‚ãƒ¡ãƒ‹ãƒ¥ãƒ¼ãƒãƒ¼æ›´æ–° */
 	update_misc_cload();
     }
 }
@@ -1504,21 +1504,21 @@ static	void	f_misc_cload_u(void)
 static	void	f_misc_csave_s(void)
 {
     FSSpec file;
-    char *filename;				/* ¥Õ¥ë¥Ñ¥¹¥Õ¥¡¥¤¥ëÌ¾ */
+    char *filename;				/* ãƒ•ãƒ«ãƒ‘ã‚¹ãƒ•ã‚¡ã‚¤ãƒ«å */
     const char *headline = "Open Tape-Image-File for SAVE (append)";
 
     if (menubar_active == FALSE) { return; }
 
-    if (filename_get_tape(CSAVE)) { return; }	/* ¥Æ¡¼¥×¤¢¤ê¤Ê¤éÌá¤ë */
+    if (filename_get_tape(CSAVE)) { return; }	/* ãƒ†ãƒ¼ãƒ—ã‚ã‚Šãªã‚‰æˆ»ã‚‹ */
 
-    /* headline ¤Î½ĞÈÖ¤¬¤Ê¤¤¡Ä */
+    /* headline ã®å‡ºç•ªãŒãªã„â€¦ */
 
     if (openPutFile(&file) &&
 	(filename = get_filename(&file))) {
 
 	int ok = quasi88_save_tape_insert(filename);
 
-	/* ¤¹¤Ç¤Ë¥Õ¥¡¥¤¥ë¤òÊÄ¤¸¤Æ¤¤¤ë¤Î¤Ç¡¢¼ºÇÔ¤·¤Æ¤â¥á¥Ë¥å¡¼¥Ğ¡¼¹¹¿· */
+	/* ã™ã§ã«ãƒ•ã‚¡ã‚¤ãƒ«ã‚’é–‰ã˜ã¦ã„ã‚‹ã®ã§ã€å¤±æ•—ã—ã¦ã‚‚ãƒ¡ãƒ‹ãƒ¥ãƒ¼ãƒãƒ¼æ›´æ–° */
 	update_misc_csave();
     }
 }
@@ -1538,7 +1538,7 @@ static	void	f_misc_sload(int data)
 
     quasi88_stateload((int) data);
 
-    /* ÀßÄê¤ä¥Õ¥¡¥¤¥ëÌ¾¤¬ÊÑ¹¹¤µ¤ì¤¿¤Ï¤º¤Ê¤Î¤Ç¡¢¥á¥Ë¥å¡¼¥Ğ¡¼¤òÁ´¤Æ¹¹¿· */
+    /* è¨­å®šã‚„ãƒ•ã‚¡ã‚¤ãƒ«åãŒå¤‰æ›´ã•ã‚ŒãŸã¯ãšãªã®ã§ã€ãƒ¡ãƒ‹ãƒ¥ãƒ¼ãƒãƒ¼ã‚’å…¨ã¦æ›´æ–° */
     menubar_setup(TRUE);
 }
 
@@ -1555,14 +1555,14 @@ static	void	f_misc_status(int uItem)
 
     if (menubar_active == FALSE) { return; }
 
-    active = quasi88_cfg_now_showstatus() ? FALSE : TRUE; 	/* µÕ¤Ë¤¹¤ë */
+    active = quasi88_cfg_now_showstatus() ? FALSE : TRUE; 	/* é€†ã«ã™ã‚‹ */
     CheckItem(GetMenuRef(M_MISC), uItem, (active ? true : false));
 
     quasi88_cfg_set_showstatus(active);
 }
 
 /*----------------------------------------------------------------------
- * Apple ¥á¥Ë¥å¡¼
+ * Apple ãƒ¡ãƒ‹ãƒ¥ãƒ¼
  *----------------------------------------------------------------------*/
 
 static void aboutBox(void)

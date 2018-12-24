@@ -1,11 +1,11 @@
 /***********************************************************************
- * ¥¤¥Ù¥ó¥È½èÍı (¥·¥¹¥Æ¥à°ÍÂ¸)
+ * ã‚¤ãƒ™ãƒ³ãƒˆå‡¦ç† (ã‚·ã‚¹ãƒ†ãƒ ä¾å­˜)
  *
- *	¾ÜºÙ¤Ï¡¢ event.h »²¾È
+ *	è©³ç´°ã¯ã€ event.h å‚ç…§
  ************************************************************************/
 
 /* ----------------------------------------------------------------------
- *		¥Ø¥Ã¥À¥Õ¥¡¥¤¥ëÉô
+ *		ãƒ˜ãƒƒãƒ€ãƒ•ã‚¡ã‚¤ãƒ«éƒ¨
  * ---------------------------------------------------------------------- */
 
 #include <X11/Xlib.h>
@@ -35,74 +35,74 @@
 #ifdef	XDEEP32
 int	x11_get_focus = TRUE;
 #else
-int	x11_get_focus;			/* ¸½ºß¡¢¥Õ¥©¡¼¥«¥¹¤¢¤ê¤«¤É¤¦¤«	*/
+int	x11_get_focus;			/* ç¾åœ¨ã€ãƒ•ã‚©ãƒ¼ã‚«ã‚¹ã‚ã‚Šã‹ã©ã†ã‹	*/
 #endif
 
-int	x11_scaling = FALSE;		/* ¥Ş¥¦¥¹ºÂÉ¸¤Î¥¹¥±¡¼¥ê¥ó¥°Í­Ìµ	*/
-int	x11_scale_x_num = 0;		/* °Ê²¼¡¢¤½¤Îºİ¤Î¥Ñ¥é¥á¡¼¥¿	*/
+int	x11_scaling = FALSE;		/* ãƒã‚¦ã‚¹åº§æ¨™ã®ã‚¹ã‚±ãƒ¼ãƒªãƒ³ã‚°æœ‰ç„¡	*/
+int	x11_scale_x_num = 0;		/* ä»¥ä¸‹ã€ãã®éš›ã®ãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿	*/
 int	x11_scale_x_den = 1;
 int	x11_scale_y_num = 0;
 int	x11_scale_y_den = 1;
 
 
 
-int	keyboard_type = 1;		/* ¥­¡¼¥Ü¡¼¥É¤Î¼ïÎà                */
-char	*file_keyboard = NULL;		/* ¥­¡¼ÀßÄê¥Õ¥¡¥¤¥ëÌ¾		   */
+int	keyboard_type = 1;		/* ã‚­ãƒ¼ãƒœãƒ¼ãƒ‰ã®ç¨®é¡                */
+char	*file_keyboard = NULL;		/* ã‚­ãƒ¼è¨­å®šãƒ•ã‚¡ã‚¤ãƒ«å		   */
 
-int	use_xdnd = TRUE;		/* XDnD ¤ËÂĞ±ş¤¹¤ë¤«¤É¤¦¤«	   */
-int	use_joydevice = TRUE;		/* ¥¸¥ç¥¤¥¹¥Æ¥£¥Ã¥¯¥Ç¥Ğ¥¤¥¹¤ò³«¤¯? */
+int	use_xdnd = TRUE;		/* XDnD ã«å¯¾å¿œã™ã‚‹ã‹ã©ã†ã‹	   */
+int	use_joydevice = TRUE;		/* ã‚¸ãƒ§ã‚¤ã‚¹ãƒ†ã‚£ãƒƒã‚¯ãƒ‡ãƒã‚¤ã‚¹ã‚’é–‹ã? */
 
 
 static	int mouse_jumped = FALSE;
 
 
-static	const char *debug_x11keysym(int code); /* ¥Ç¥Ğ¥Ã¥°ÍÑ */
+static	const char *debug_x11keysym(int code); /* ãƒ‡ãƒãƒƒã‚°ç”¨ */
 /*==========================================================================
- * ¥­¡¼ÇÛÎó¤Ë¤Ä¤¤¤Æ
+ * ã‚­ãƒ¼é…åˆ—ã«ã¤ã„ã¦
  *
- *  °ìÈÌ¥­¡¼(Ê¸»ú¥­¡¼) ¤Ï¡¢
- *	106 ¥­¡¼¥Ü¡¼¥É¤Î¾ì¹ç¡¢PC-8801 ¤ÈÆ±¤¸¤Ê¤Î¤ÇÌäÂê¤Ê¤·¡£
- *	101 ¥­¡¼¥Ü¡¼¥É¤Î¾ì¹ç¡¢°ìÉôÇÛÃÖ¤¬°Û¤Ê¤ë¤·¡¢¥­¡¼¤¬Â­¤ê¤Ê¤¤¡£
- *	¤È¤ê¤¢¤¨¤º¡¢°Ê²¼¤Î¤è¤¦¤ËÇÛÃÖ¤·¤Æ¤ß¤ë¡£
- *		` ¢ª \¡¢ = ¢ª ^¡¢ [ ] ¤Ï¤½¤Î¤Ş¤Ş¡¢ \ ¢ª @¡¢' ¢ª :¡¢±¦CTRL ¢ª _
+ *  ä¸€èˆ¬ã‚­ãƒ¼(æ–‡å­—ã‚­ãƒ¼) ã¯ã€
+ *	106 ã‚­ãƒ¼ãƒœãƒ¼ãƒ‰ã®å ´åˆã€PC-8801 ã¨åŒã˜ãªã®ã§å•é¡Œãªã—ã€‚
+ *	101 ã‚­ãƒ¼ãƒœãƒ¼ãƒ‰ã®å ´åˆã€ä¸€éƒ¨é…ç½®ãŒç•°ãªã‚‹ã—ã€ã‚­ãƒ¼ãŒè¶³ã‚Šãªã„ã€‚
+ *	ã¨ã‚Šã‚ãˆãšã€ä»¥ä¸‹ã®ã‚ˆã†ã«é…ç½®ã—ã¦ã¿ã‚‹ã€‚
+ *		` â†’ \ã€ = â†’ ^ã€ [ ] ã¯ãã®ã¾ã¾ã€ \ â†’ @ã€' â†’ :ã€å³CTRL â†’ _
  *
- *  ÆÃ¼ì¥­¡¼(µ¡Ç½¥­¡¼) ¤Ï¡¢
- *	¥Û¥¹¥ÈÂ¦¤Î¥­¡¼¹ï°õ¤È»÷¤¿Ê·°Ïµ¤¤Îµ¡Ç½¤ò¡¢PC-8801¤Î¥­¡¼¤Ë³ä¤êÅö¤Æ¤è¤¦¡£
- *	Pause ¤Ï STOP¡¢ PrintScreen ¤Ï COPY ¤Ê¤É¡£¸Ä¿ÍÅª¤Ê¼ç´Ñ¤Ç·è¤á¤ë¡£
+ *  ç‰¹æ®Šã‚­ãƒ¼(æ©Ÿèƒ½ã‚­ãƒ¼) ã¯ã€
+ *	ãƒ›ã‚¹ãƒˆå´ã®ã‚­ãƒ¼åˆ»å°ã¨ä¼¼ãŸé›°å›²æ°—ã®æ©Ÿèƒ½ã‚’ã€PC-8801ã®ã‚­ãƒ¼ã«å‰²ã‚Šå½“ã¦ã‚ˆã†ã€‚
+ *	Pause ã¯ STOPã€ PrintScreen ã¯ COPY ãªã©ã€‚å€‹äººçš„ãªä¸»è¦³ã§æ±ºã‚ã‚‹ã€‚
  *
- *  ¥Æ¥ó¥­¡¼¤Ï¡¢
- *	PC-8801¤È106¥­¡¼¤Ç¥­¡¼¹ï°õ¤¬¼ã´³°Û¤Ê¤ë¤¬¡¢¤½¤Î¤Ş¤Ş¤Î¥­¡¼¹ï°õ¤ò»È¤¦¡£
+ *  ãƒ†ãƒ³ã‚­ãƒ¼ã¯ã€
+ *	PC-8801ã¨106ã‚­ãƒ¼ã§ã‚­ãƒ¼åˆ»å°ãŒè‹¥å¹²ç•°ãªã‚‹ãŒã€ãã®ã¾ã¾ã®ã‚­ãƒ¼åˆ»å°ã‚’ä½¿ã†ã€‚
  *
- *  ºÇ²¼ÃÊ¤Î¥­¡¼¤ÎÇÛÃÖ¤Ï¡¢Å¬Åö¤Ë³ä¤ê¿¶¤ë¡£ (¥«¥Ã¥³¤Î¥­¡¼¤Ë¤Ï³ä¤ê¿¶¤é¤Ê¤¤)
+ *  æœ€ä¸‹æ®µã®ã‚­ãƒ¼ã®é…ç½®ã¯ã€é©å½“ã«å‰²ã‚ŠæŒ¯ã‚‹ã€‚ (ã‚«ãƒƒã‚³ã®ã‚­ãƒ¼ã«ã¯å‰²ã‚ŠæŒ¯ã‚‰ãªã„)
  *
- *	PC-8801        ¤«¤Ê GRPH ·èÄê  ¥¹¥Ú¡¼¥¹ ÊÑ´¹  PC    Á´³Ñ
- *	101¥­¡¼   Ctrl      Alt        ¥¹¥Ú¡¼¥¹             Alt          Ctrl
- *	104¥­¡¼   Ctrl Win  Alt        ¥¹¥Ú¡¼¥¹             Alt  Win App Ctrl
- *	109¥­¡¼   Ctrl Win  Alt ÌµÊÑ´¹ ¥¹¥Ú¡¼¥¹ ÊÑ´¹ (¤Ò¤é) Alt  Win App Ctrl
- *	mac ?     Ctrl      Opt (Cmd)  ¥¹¥Ú¡¼¥¹      (cmd) (Opt)        (Ctrl)
+ *	PC-8801        ã‹ãª GRPH æ±ºå®š  ã‚¹ãƒšãƒ¼ã‚¹ å¤‰æ›  PC    å…¨è§’
+ *	101ã‚­ãƒ¼   Ctrl      Alt        ã‚¹ãƒšãƒ¼ã‚¹             Alt          Ctrl
+ *	104ã‚­ãƒ¼   Ctrl Win  Alt        ã‚¹ãƒšãƒ¼ã‚¹             Alt  Win App Ctrl
+ *	109ã‚­ãƒ¼   Ctrl Win  Alt ç„¡å¤‰æ› ã‚¹ãƒšãƒ¼ã‚¹ å¤‰æ› (ã²ã‚‰) Alt  Win App Ctrl
+ *	mac ?     Ctrl      Opt (Cmd)  ã‚¹ãƒšãƒ¼ã‚¹      (cmd) (Opt)        (Ctrl)
  *
  *===========================================================================*/
 
-/* ¥½¥Õ¥È¥¦¥§¥¢NumLock ¤ò¥ª¥ó¤·¤¿ºİ¤Î¡¢¥­¡¼¥Ğ¥¤¥ó¥Ç¥£¥ó¥°ÊÑ¹¹¥Æ¡¼¥Ö¥ë */
+/* ã‚½ãƒ•ãƒˆã‚¦ã‚§ã‚¢NumLock ã‚’ã‚ªãƒ³ã—ãŸéš›ã®ã€ã‚­ãƒ¼ãƒã‚¤ãƒ³ãƒ‡ã‚£ãƒ³ã‚°å¤‰æ›´ãƒ†ãƒ¼ãƒ–ãƒ« */
 
 typedef struct {
     int		type;		/* KEYCODE_INVALID / SYM / SCAN		*/
-    int		code;		/* ¥­¡¼¥·¥ó¥Ü¥ë¡¢¤Ê¤¤¤·¡¢¥¹¥­¥ã¥ó¥³¡¼¥É	*/
-    int		new_key88;	/* NumLock ON »ş¤Î QUASI88¥­¡¼¥³¡¼¥É	*/
-    int		org_key88;	/* NumLock OFF»ş¤Î QUASI88¥­¡¼¥³¡¼¥É	*/
+    int		code;		/* ã‚­ãƒ¼ã‚·ãƒ³ãƒœãƒ«ã€ãªã„ã—ã€ã‚¹ã‚­ãƒ£ãƒ³ã‚³ãƒ¼ãƒ‰	*/
+    int		new_key88;	/* NumLock ON æ™‚ã® QUASI88ã‚­ãƒ¼ã‚³ãƒ¼ãƒ‰	*/
+    int		org_key88;	/* NumLock OFFæ™‚ã® QUASI88ã‚­ãƒ¼ã‚³ãƒ¼ãƒ‰	*/
 } T_BINDING;
 
 
-/* ¥­¡¼¥Ğ¥¤¥ó¥Ç¥£¥ó¥°¤ò¥Ç¥Õ¥©¥ë¥È(½é´üÃÍ)¤«¤éÊÑ¹¹¤¹¤ëºİ¤Î¡¢¥Æ¡¼¥Ö¥ë */
+/* ã‚­ãƒ¼ãƒã‚¤ãƒ³ãƒ‡ã‚£ãƒ³ã‚°ã‚’ãƒ‡ãƒ•ã‚©ãƒ«ãƒˆ(åˆæœŸå€¤)ã‹ã‚‰å¤‰æ›´ã™ã‚‹éš›ã®ã€ãƒ†ãƒ¼ãƒ–ãƒ« */
 
 typedef struct {
     int		type;		/* KEYCODE_INVALID / SYM / SCAN		*/
-    int		code;		/* ¥­¡¼¥·¥ó¥Ü¥ë¡¢¤Ê¤¤¤·¡¢¥¹¥­¥ã¥ó¥³¡¼¥É	*/
-    int		key88;		/* ÊÑ¹¹¤¹¤ë QUASI88¥­¡¼¥³¡¼¥É           */
+    int		code;		/* ã‚­ãƒ¼ã‚·ãƒ³ãƒœãƒ«ã€ãªã„ã—ã€ã‚¹ã‚­ãƒ£ãƒ³ã‚³ãƒ¼ãƒ‰	*/
+    int		key88;		/* å¤‰æ›´ã™ã‚‹ QUASI88ã‚­ãƒ¼ã‚³ãƒ¼ãƒ‰           */
 } T_REMAPPING;
 
 
-/* X11 ¤Î keysym ¤ò 0¡Á511 ¤ÎÈÏ°Ï¤Ë´İ¤á¤ë */
+/* X11 ã® keysym ã‚’ 0ã€œ511 ã®ç¯„å›²ã«ä¸¸ã‚ã‚‹ */
 
 #define	LOCAL_KEYSYM(ks)						    \
 	((((ks) & 0xff00) == 0xff00)			/* XK_MISCELLANY */ \
@@ -111,42 +111,42 @@ typedef struct {
 					? (ks) : 0))
 
 /*----------------------------------------------------------------------
- * X11 ¤Î keysym ¤ò QUASI88 ¤Î ¥­¡¼¥³¡¼¥É¤ËÊÑ´¹¤¹¤ë¥Æ¡¼¥Ö¥ë
- *	XK_LATIN1 ¤È XK_MISCELLANY ¤Î¥­¡¼¥·¥ó¥Ü¥ë¤Î¤ß¡£
+ * X11 ã® keysym ã‚’ QUASI88 ã® ã‚­ãƒ¼ã‚³ãƒ¼ãƒ‰ã«å¤‰æ›ã™ã‚‹ãƒ†ãƒ¼ãƒ–ãƒ«
+ *	XK_LATIN1 ã¨ XK_MISCELLANY ã®ã‚­ãƒ¼ã‚·ãƒ³ãƒœãƒ«ã®ã¿ã€‚
  *
- *	¥­¡¼¥·¥ó¥Ü¥ë XK_xxx ¤¬²¡¤µ¤ì¤¿¤é¡¢ 
- *	keysym2key88[ XK_xxx ] ¤¬²¡¤µ¤ì¤¿¤È¤¹¤ë¡£
+ *	ã‚­ãƒ¼ã‚·ãƒ³ãƒœãƒ« XK_xxx ãŒæŠ¼ã•ã‚ŒãŸã‚‰ã€ 
+ *	keysym2key88[ XK_xxx ] ãŒæŠ¼ã•ã‚ŒãŸã¨ã™ã‚‹ã€‚
  *
- *	keysym2key88[] ¤Ë¤Ï¡¢ KEY88_xxx ¤ò¥»¥Ã¥È¤·¤Æ¤ª¤¯¡£
- *	½é´üÃÍ¤Ï keysym2key88_default[] ¤ÈÆ±¤¸
+ *	keysym2key88[] ã«ã¯ã€ KEY88_xxx ã‚’ã‚»ãƒƒãƒˆã—ã¦ãŠãã€‚
+ *	åˆæœŸå€¤ã¯ keysym2key88_default[] ã¨åŒã˜
  *----------------------------------------------------------------------*/
 static int keysym2key88[ 256 + 256 ];
 
 
 
 /*----------------------------------------------------------------------
- * X11 ¤Î scancode ¤ò QUASI88 ¤Î ¥­¡¼¥³¡¼¥É¤ËÊÑ´¹¤¹¤ë¥Æ¡¼¥Ö¥ë
+ * X11 ã® scancode ã‚’ QUASI88 ã® ã‚­ãƒ¼ã‚³ãƒ¼ãƒ‰ã«å¤‰æ›ã™ã‚‹ãƒ†ãƒ¼ãƒ–ãƒ«
  *
- *	¥¹¥­¥ã¥ó¥³¡¼¥É code ¤¬²¡¤µ¤ì¤¿¤é¡¢
- *	keycode2key88[ code ] ¤¬²¡¤µ¤ì¤¿¤È¤¹¤ë¡£
+ *	ã‚¹ã‚­ãƒ£ãƒ³ã‚³ãƒ¼ãƒ‰ code ãŒæŠ¼ã•ã‚ŒãŸã‚‰ã€
+ *	keycode2key88[ code ] ãŒæŠ¼ã•ã‚ŒãŸã¨ã™ã‚‹ã€‚
  *
- *	keycode2key88[] ¤Ë¤Ï¡¢ KEY88_xxx ¤Ş¤¿¤Ï -1 ¤ò¥»¥Ã¥È¤·¤Æ¤ª¤¯¡£
- *	¤³¤ì¤Ï keysym2key88[] ¤ËÍ¥Àè¤µ¤ì¤ë¡£(¤¿¤À¤· -1 ¤Î¾ì¹ç¤ÏÌµ¸ú)
- *	½é´üÃÍ¤Ï Á´¤Æ -1¡¢ÊÑ´¹²ÄÇ½¤Ê¥¹¥­¥ã¥ó¥³¡¼¥É¤Ï 0¡Á255¤Ş¤Ç¤ËÀ©¸Â¡£
+ *	keycode2key88[] ã«ã¯ã€ KEY88_xxx ã¾ãŸã¯ -1 ã‚’ã‚»ãƒƒãƒˆã—ã¦ãŠãã€‚
+ *	ã“ã‚Œã¯ keysym2key88[] ã«å„ªå…ˆã•ã‚Œã‚‹ã€‚(ãŸã ã— -1 ã®å ´åˆã¯ç„¡åŠ¹)
+ *	åˆæœŸå€¤ã¯ å…¨ã¦ -1ã€å¤‰æ›å¯èƒ½ãªã‚¹ã‚­ãƒ£ãƒ³ã‚³ãƒ¼ãƒ‰ã¯ 0ã€œ255ã¾ã§ã«åˆ¶é™ã€‚
  *----------------------------------------------------------------------*/
 static int scancode2key88[ 256 ];
 
  
 
 /*----------------------------------------------------------------------
- * ¥½¥Õ¥È¥¦¥§¥¢ NumLock ¥ª¥ó»ş¤Î ¥­¡¼¥³¡¼¥ÉÊÑ´¹¾ğÊó
+ * ã‚½ãƒ•ãƒˆã‚¦ã‚§ã‚¢ NumLock ã‚ªãƒ³æ™‚ã® ã‚­ãƒ¼ã‚³ãƒ¼ãƒ‰å¤‰æ›æƒ…å ±
  *
- *	binding[].code (X11 ¤Î keysym ¤Ê¤¤¤· keycode) ¤¬²¡¤µ¤ì¤¿¤é¡¢
- *	binding[].new_key88 (KEY88_xxx) ¤¬²¡¤µ¤ì¤¿¤³¤È¤Ë¤¹¤ë¡£
+ *	binding[].code (X11 ã® keysym ãªã„ã— keycode) ãŒæŠ¼ã•ã‚ŒãŸã‚‰ã€
+ *	binding[].new_key88 (KEY88_xxx) ãŒæŠ¼ã•ã‚ŒãŸã“ã¨ã«ã™ã‚‹ã€‚
  *
- *	¥½¥Õ¥È¥¦¥§¥¢ NumLock ¥ª¥ó»ş¤Ï¡¢¤³¤Î¾ğÊó¤Ë¤·¤¿¤¬¤Ã¤Æ¡¢
- *	keysym2key88[] ¡¢ keycode2key88[] ¤ò½ñ¤­´¹¤¨¤ë¡£
- *	ÊÑ¹¹¤Ç¤­¤ë¥­¡¼¤Î¸Ä¿ô¤Ï¡¢64¸Ä¤Ş¤Ç (¤³¤ì¤À¤±¤¢¤ì¤Ğ¤¤¤¤¤À¤í¤¦)
+ *	ã‚½ãƒ•ãƒˆã‚¦ã‚§ã‚¢ NumLock ã‚ªãƒ³æ™‚ã¯ã€ã“ã®æƒ…å ±ã«ã—ãŸãŒã£ã¦ã€
+ *	keysym2key88[] ã€ keycode2key88[] ã‚’æ›¸ãæ›ãˆã‚‹ã€‚
+ *	å¤‰æ›´ã§ãã‚‹ã‚­ãƒ¼ã®å€‹æ•°ã¯ã€64å€‹ã¾ã§ (ã“ã‚Œã ã‘ã‚ã‚Œã°ã„ã„ã ã‚ã†)
  *----------------------------------------------------------------------*/
 static T_BINDING binding[ 64 ];
 
@@ -155,13 +155,13 @@ static T_BINDING binding[ 64 ];
 
 
 /*----------------------------------------------------------------------
- * XK_xxx ¢ª KEY88_xxx ÊÑ´¹¥Æ¡¼¥Ö¥ë (¥Ç¥Õ¥©¥ë¥È)
+ * XK_xxx â†’ KEY88_xxx å¤‰æ›ãƒ†ãƒ¼ãƒ–ãƒ« (ãƒ‡ãƒ•ã‚©ãƒ«ãƒˆ)
  *----------------------------------------------------------------------*/
 
 static const int keysym2key88_default[ 256 + 256 ] =
 {
   /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -*/
-  /* from XK_LATIN1					0x0000¡Á0x00FF	*/
+  /* from XK_LATIN1					0x0000ã€œ0x00FF	*/
   /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -*/
 
   0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
@@ -280,14 +280,14 @@ static const int keysym2key88_default[ 256 + 256 ] =
 
 
   /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -*/
-  /* from XK_MISCELLANY					0xFF00¡Á0xFFFF	*/
+  /* from XK_MISCELLANY					0xFF00ã€œ0xFFFF	*/
   /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -*/
 
   0, 0, 0, 0, 0, 0, 0, 0,
   KEY88_BS,		/*	XK_BackSpace		0xFF08	   */
   KEY88_TAB,		/*	XK_Tab			0xFF09	   */
-  KEY88_RETURN,		/*	XK_Linefeed		0xFF0A	Ìµ */
-  KEY88_HOME,		/*	XK_Clear		0xFF0B	Ìµ */
+  KEY88_RETURN,		/*	XK_Linefeed		0xFF0A	ç„¡ */
+  KEY88_HOME,		/*	XK_Clear		0xFF0B	ç„¡ */
   0,
   KEY88_RETURNL,	/*	XK_Return		0xFF0D	   */
   0, 0,
@@ -301,30 +301,30 @@ static const int keysym2key88_default[ 256 + 256 ] =
   KEY88_ESC, 		/*	XK_Escape		0xFF1B	   */
   0, 0, 0, 0,
 
-  0,			/*	XK_Multi_key		0xFF20	Ìµ */
+  0,			/*	XK_Multi_key		0xFF20	ç„¡ */
   0,			/*	XK_Kanji		0xFF21	   */
   KEY88_KETTEI,		/*	XK_Muhenkan		0xFF22	   */
   KEY88_HENKAN,		/*	XK_Henkan_Mode		0xFF23	   */
   KEY88_KANA,		/*	XK_Romaji		0xFF24     */
-  0,			/*	XK_Hiragana		0xFF25  Ìµ */
-  0,			/*	XK_Katakana		0xFF26  Ìµ */
+  0,			/*	XK_Hiragana		0xFF25  ç„¡ */
+  0,			/*	XK_Katakana		0xFF26  ç„¡ */
   KEY88_KANA,		/*	XK_Hiragana_Katakana	0xFF27	   */
-  0,			/*	XK_Zenkaku		0xFF28  Ìµ */
-  0,			/*	XK_Hankaku		0xFF29  Ìµ */
+  0,			/*	XK_Zenkaku		0xFF28  ç„¡ */
+  0,			/*	XK_Hankaku		0xFF29  ç„¡ */
   KEY88_ZENKAKU,	/*	XK_Zenkaku_Hankaku	0xFF2A	   */
-  0,			/*	XK_Touroku		0xFF2B  Ìµ */
-  0,			/*	XK_Massyo		0xFF2C  Ìµ */
-  KEY88_KANA,		/*	XK_Kana_Lock		0xFF2D	Ìµ */
-  KEY88_KANA,		/*	XK_Kana_Shift		0xFF2E  Ìµ */
-  0,			/*	XK_Eisu_Shift		0xFF2F  Ìµ */
+  0,			/*	XK_Touroku		0xFF2B  ç„¡ */
+  0,			/*	XK_Massyo		0xFF2C  ç„¡ */
+  KEY88_KANA,		/*	XK_Kana_Lock		0xFF2D	ç„¡ */
+  KEY88_KANA,		/*	XK_Kana_Shift		0xFF2E  ç„¡ */
+  0,			/*	XK_Eisu_Shift		0xFF2F  ç„¡ */
 
   KEY88_CAPS,		/*	XK_Eisu_toggle		0xFF30     */
   0, 0, 0, 0, 0, 0,
-  0,			/*	XK_Kanji_Bangou		0xFF37  Ìµ */
+  0,			/*	XK_Kanji_Bangou		0xFF37  ç„¡ */
   0, 0, 0, 0,
-  0,			/*	XK_SingleCandidate	0xFF3C	Ìµ */
-  0,			/*	XK_Zen_Koho		0xFF3D	Ìµ */
-  0,			/*	XK_Mae_Koho		0xFF3E	Ìµ */
+  0,			/*	XK_SingleCandidate	0xFF3C	ç„¡ */
+  0,			/*	XK_Zen_Koho		0xFF3D	ç„¡ */
+  0,			/*	XK_Mae_Koho		0xFF3E	ç„¡ */
   0,
 
   0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
@@ -337,20 +337,20 @@ static const int keysym2key88_default[ 256 + 256 ] =
   KEY88_ROLLDOWN,	/*	XK_Prior		0xFF55	   */
   KEY88_ROLLUP,		/*	XK_Next			0xFF56	   */
   KEY88_HELP,		/*	XK_End			0xFF57	   */
-  0,			/*	XK_Begin		0xFF58	Ìµ */
+  0,			/*	XK_Begin		0xFF58	ç„¡ */
   0, 0, 0, 0, 0, 0, 0,
 
-  0,			/*	XK_Select		0xFF60	Ìµ */
+  0,			/*	XK_Select		0xFF60	ç„¡ */
   KEY88_COPY,		/*	XK_Print		0xFF61	   */
   KEY88_COPY,		/*	XK_Execute		0xFF62	   */
   KEY88_INS, 		/*	XK_Insert		0xFF63	   */
   0,
-  0,			/*	XK_Undo			0xFF65	Ìµ */
-  0,			/*	XK_Redo			0xFF66	Ìµ */
+  0,			/*	XK_Undo			0xFF65	ç„¡ */
+  0,			/*	XK_Redo			0xFF66	ç„¡ */
   0,			/*	XK_Menu			0xFF67	   */
-  0,			/*	XK_Find			0xFF68	Ìµ */
-  0,			/*	XK_Cancel		0xFF69	Ìµ */
-  KEY88_HELP,		/*	XK_Help			0xFF6A	Ìµ */
+  0,			/*	XK_Find			0xFF68	ç„¡ */
+  0,			/*	XK_Cancel		0xFF69	ç„¡ */
+  KEY88_HELP,		/*	XK_Help			0xFF6A	ç„¡ */
   KEY88_STOP,		/*	XK_Break		0xFF6B	   */
   0, 0, 0, 0,
 
@@ -358,18 +358,18 @@ static const int keysym2key88_default[ 256 + 256 ] =
   KEY88_HENKAN,		/*	XK_Mode_switch		0xFF7E	   */
   0,			/*	XK_Num_Lock		0xFF7F	   */
 
-  KEY88_SPACE,		/*	XK_KP_Space		0xFF80	Ìµ */
+  KEY88_SPACE,		/*	XK_KP_Space		0xFF80	ç„¡ */
   0, 0, 0, 0, 0, 0, 0, 0,
-  KEY88_TAB,		/*	XK_KP_Tab		0xFF89	Ìµ */
+  KEY88_TAB,		/*	XK_KP_Tab		0xFF89	ç„¡ */
   0, 0, 0,
   KEY88_RETURNR,	/*	XK_KP_Enter		0xFF8D	   */
   0, 0,
 
   0,
-  KEY88_F1,		/*	XK_KP_F1		0xFF91	Ìµ */
-  KEY88_F2,		/*	XK_KP_F2		0xFF92	Ìµ */
-  KEY88_F3,		/*	XK_KP_F3		0xFF93	Ìµ */
-  KEY88_F4,		/*	XK_KP_F4		0xFF94	Ìµ */
+  KEY88_F1,		/*	XK_KP_F1		0xFF91	ç„¡ */
+  KEY88_F2,		/*	XK_KP_F2		0xFF92	ç„¡ */
+  KEY88_F3,		/*	XK_KP_F3		0xFF93	ç„¡ */
+  KEY88_F4,		/*	XK_KP_F4		0xFF94	ç„¡ */
   KEY88_KP_7,		/*	XK_KP_Home		0xFF95	   */
   KEY88_KP_4,		/*	XK_KP_Left		0xFF96	   */
   KEY88_KP_8,		/*	XK_KP_Up		0xFF97	   */
@@ -385,7 +385,7 @@ static const int keysym2key88_default[ 256 + 256 ] =
   0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
   KEY88_KP_MULTIPLY,	/*	XK_KP_Multiply		0xFFAA	   */
   KEY88_KP_ADD,		/*	XK_KP_Add		0xFFAB	   */
-  KEY88_KP_COMMA,	/*	XK_KP_Separator		0xFFAC	Ìµ */
+  KEY88_KP_COMMA,	/*	XK_KP_Separator		0xFFAC	ç„¡ */
   KEY88_KP_SUB,		/*	XK_KP_Subtract		0xFFAD	   */
   KEY88_KP_PERIOD,	/*	XK_KP_Decimal		0xFFAE	   */
   KEY88_KP_DIVIDE,	/*	XK_KP_Divide		0xFFAF	   */
@@ -401,7 +401,7 @@ static const int keysym2key88_default[ 256 + 256 ] =
   KEY88_KP_8,		/*	XK_KP_8			0xFFB8	   */
   KEY88_KP_9,		/*	XK_KP_9			0xFFB9	   */
   0, 0, 0,
-  KEY88_KP_EQUAL,	/*	XK_KP_Equal		0xFFBD	Ìµ */
+  KEY88_KP_EQUAL,	/*	XK_KP_Equal		0xFFBD	ç„¡ */
   KEY88_F1,		/*	XK_F1			0xFFBE	   */
   KEY88_F2,		/*	XK_F2			0xFFBF	   */
 
@@ -415,45 +415,45 @@ static const int keysym2key88_default[ 256 + 256 ] =
   KEY88_F10,		/*	XK_F10			0xFFC7	   */
   KEY88_F11,		/*	XK_F11			0xFFC8	   */
   KEY88_F12,		/*	XK_F12			0xFFC9	   */
-  KEY88_F13,		/*	XK_F13			0xFFCA	Ìµ */
-  KEY88_F14,		/*	XK_F14			0xFFCB	Ìµ */
-  KEY88_F15,		/*	XK_F15			0xFFCC	Ìµ */
-  KEY88_F16,		/*	XK_F16			0xFFCD	Ìµ */
-  KEY88_F17,		/*	XK_F17			0xFFCE	Ìµ */
-  KEY88_F18,		/*	XK_F18			0xFFCF	Ìµ */
+  KEY88_F13,		/*	XK_F13			0xFFCA	ç„¡ */
+  KEY88_F14,		/*	XK_F14			0xFFCB	ç„¡ */
+  KEY88_F15,		/*	XK_F15			0xFFCC	ç„¡ */
+  KEY88_F16,		/*	XK_F16			0xFFCD	ç„¡ */
+  KEY88_F17,		/*	XK_F17			0xFFCE	ç„¡ */
+  KEY88_F18,		/*	XK_F18			0xFFCF	ç„¡ */
 
-  KEY88_F19,		/*	XK_F19			0xFFD0	Ìµ */
-  KEY88_F20,		/*	XK_F20			0xFFD1	Ìµ */
-  0,			/*	XK_F21			0xFFD2	Ìµ */
-  0,			/*	XK_F22			0xFFD3	Ìµ */
-  0,			/*	XK_F23			0xFFD4	Ìµ */
-  0,			/*	XK_F24			0xFFD5	Ìµ */
-  0,			/*	XK_F25			0xFFD6	Ìµ */
-  0,			/*	XK_F26			0xFFD7	Ìµ */
-  0,			/*	XK_F27			0xFFD8	Ìµ */
-  0,			/*	XK_F28			0xFFD9	Ìµ */
-  0,			/*	XK_F29			0xFFDA	Ìµ */
-  0,			/*	XK_F30			0xFFDB	Ìµ */
-  0,			/*	XK_F31			0xFFDC	Ìµ */
-  0,			/*	XK_F32			0xFFDD	Ìµ */
-  0,			/*	XK_F33			0xFFDE	Ìµ */
-  0,			/*	XK_F34			0xFFDF	Ìµ */
+  KEY88_F19,		/*	XK_F19			0xFFD0	ç„¡ */
+  KEY88_F20,		/*	XK_F20			0xFFD1	ç„¡ */
+  0,			/*	XK_F21			0xFFD2	ç„¡ */
+  0,			/*	XK_F22			0xFFD3	ç„¡ */
+  0,			/*	XK_F23			0xFFD4	ç„¡ */
+  0,			/*	XK_F24			0xFFD5	ç„¡ */
+  0,			/*	XK_F25			0xFFD6	ç„¡ */
+  0,			/*	XK_F26			0xFFD7	ç„¡ */
+  0,			/*	XK_F27			0xFFD8	ç„¡ */
+  0,			/*	XK_F28			0xFFD9	ç„¡ */
+  0,			/*	XK_F29			0xFFDA	ç„¡ */
+  0,			/*	XK_F30			0xFFDB	ç„¡ */
+  0,			/*	XK_F31			0xFFDC	ç„¡ */
+  0,			/*	XK_F32			0xFFDD	ç„¡ */
+  0,			/*	XK_F33			0xFFDE	ç„¡ */
+  0,			/*	XK_F34			0xFFDF	ç„¡ */
 
-  0,			/*	XK_F35			0xFFE0	Ìµ */
+  0,			/*	XK_F35			0xFFE0	ç„¡ */
   KEY88_SHIFTL,		/*	XK_Shift_L		0xFFE1	   */
   KEY88_SHIFTR,		/*	XK_Shift_R		0xFFE2	   */
   KEY88_CTRL,		/*	XK_Control_L		0xFFE3	   */
   KEY88_CTRL,		/*	XK_Control_R		0xFFE4	   */
   KEY88_CAPS,		/*	XK_Caps_Lock		0xFFE5	   */
-  KEY88_CAPS,		/*	XK_Shift_Lock		0xFFE6	Ìµ */
+  KEY88_CAPS,		/*	XK_Shift_Lock		0xFFE6	ç„¡ */
   KEY88_GRAPH,		/*	XK_Meta_L		0xFFE7	   */
   KEY88_GRAPH,		/*	XK_Meta_R		0xFFE8	   */
   KEY88_GRAPH,		/*	XK_Alt_L		0xFFE9	   */
   KEY88_GRAPH,		/*	XK_Alt_R		0xFFEA	   */
   0,			/*	XK_Super_L		0xFFEB	   */
   0,			/*	XK_Super_R		0xFFEC	   */
-  0,			/*	XK_Hyper_L		0xFFED	Ìµ */
-  0,			/*	XK_Hyper_R		0xFFEE	Ìµ */
+  0,			/*	XK_Hyper_L		0xFFED	ç„¡ */
+  0,			/*	XK_Hyper_R		0xFFEE	ç„¡ */
   0,
 
   0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
@@ -464,10 +464,10 @@ static const int keysym2key88_default[ 256 + 256 ] =
 
 
 /*----------------------------------------------------------------------
- * keysym2key88[]   ¤Î½é´üÃÍ¤Ï¡¢keysym2key88_default[] ¤ÈÆ±¤¸¡¢
- * scancode2key88[] ¤Î½é´üÃÍ¤Ï¡¢Á´¤Æ -1 (Ì¤»ÈÍÑ) ¤Ç¤¢¤ë¤¬¡¢
- * ¥­¡¼¥Ü¡¼¥É¤Î¼ïÎà¤Ë±ş¤¸¤Æ¡¢keysym2key88[] ¤È scancode2key88[] ¤Î°ìÉô¤ò
- * ÊÑ¹¹¤¹¤ë¤³¤È¤Ë¤¹¤ë¡£°Ê²¼¤Ï¡¢¤½¤ÎÊÑ¹¹¤Î¾ğÊó¡£
+ * keysym2key88[]   ã®åˆæœŸå€¤ã¯ã€keysym2key88_default[] ã¨åŒã˜ã€
+ * scancode2key88[] ã®åˆæœŸå€¤ã¯ã€å…¨ã¦ -1 (æœªä½¿ç”¨) ã§ã‚ã‚‹ãŒã€
+ * ã‚­ãƒ¼ãƒœãƒ¼ãƒ‰ã®ç¨®é¡ã«å¿œã˜ã¦ã€keysym2key88[] ã¨ scancode2key88[] ã®ä¸€éƒ¨ã‚’
+ * å¤‰æ›´ã™ã‚‹ã“ã¨ã«ã™ã‚‹ã€‚ä»¥ä¸‹ã¯ã€ãã®å¤‰æ›´ã®æƒ…å ±ã€‚
  *----------------------------------------------------------------------*/
 
 static const T_REMAPPING remapping_106[] =
@@ -479,7 +479,7 @@ static const T_REMAPPING remapping_106[] =
 /*  {	KEYCODE_SYM,  XK_Control_R,	KEY88_UNDERSCORE,   },*/
 
     {	KEYCODE_SCAN,	  19,		KEY88_0,	    },   /* 0        */
-    {	KEYCODE_SCAN,	 123,		KEY88_UNDERSCORE,   },   /* \ _ ¥í   */
+    {	KEYCODE_SCAN,	 123,		KEY88_UNDERSCORE,   },   /* \ _ ãƒ­   */
 
     {	KEYCODE_INVALID, 0,		0,		    },
 };
@@ -518,7 +518,7 @@ static const T_REMAPPING remapping_101[] =
 
 
 /*----------------------------------------------------------------------
- * ¥½¥Õ¥È¥¦¥§¥¢ NumLock ¥ª¥ó»ş¤Î ¥­¡¼¥³¡¼¥ÉÊÑ´¹¾ğÊó (¥Ç¥Õ¥©¥ë¥È)
+ * ã‚½ãƒ•ãƒˆã‚¦ã‚§ã‚¢ NumLock ã‚ªãƒ³æ™‚ã® ã‚­ãƒ¼ã‚³ãƒ¼ãƒ‰å¤‰æ›æƒ…å ± (ãƒ‡ãƒ•ã‚©ãƒ«ãƒˆ)
  *----------------------------------------------------------------------*/
 
 static const T_BINDING binding_106[] =
@@ -617,9 +617,9 @@ static const T_BINDING binding_101[] =
 
 
 /******************************************************************************
- * ¥¤¥Ù¥ó¥È¥Ï¥ó¥É¥ê¥ó¥°
+ * ã‚¤ãƒ™ãƒ³ãƒˆãƒãƒ³ãƒ‰ãƒªãƒ³ã‚°
  *
- *	1/60Ëè¤Ë¸Æ¤Ó½Ğ¤µ¤ì¤ë¡£
+ *	1/60æ¯ã«å‘¼ã³å‡ºã•ã‚Œã‚‹ã€‚
  *****************************************************************************/
 static	int	analyze_keyconf_file(void);
 
@@ -627,7 +627,7 @@ static	void	xdnd_receive_drag(XClientMessageEvent *E);
 static	void	xdnd_receive_drop(XSelectionEvent *E);
 
 /*
- * ¤³¤ì¤Ï µ¯Æ°»ş¤Ë1²ó¤À¤±¸Æ¤Ğ¤ì¤ë
+ * ã“ã‚Œã¯ èµ·å‹•æ™‚ã«1å›ã ã‘å‘¼ã°ã‚Œã‚‹
  */
 void	event_init(void)
 {
@@ -635,14 +635,14 @@ void	event_init(void)
     const T_BINDING   *bin;
     int i;
 
-    /* ¥¸¥ç¥¤¥¹¥Æ¥£¥Ã¥¯½é´ü²½ */
+    /* ã‚¸ãƒ§ã‚¤ã‚¹ãƒ†ã‚£ãƒƒã‚¯åˆæœŸåŒ– */
 
     if (use_joydevice) {
 	joystick_init();
     }
 
 
-    /* ¥­¡¼¥Ş¥Ã¥Ô¥ó¥°½é´ü²½ */
+    /* ã‚­ãƒ¼ãƒãƒƒãƒ”ãƒ³ã‚°åˆæœŸåŒ– */
 
     memset(keysym2key88, 0, sizeof(keysym2key88));
     for (i=0; i<COUNTOF(scancode2key88); i++) {
@@ -654,7 +654,7 @@ void	event_init(void)
 
     switch (keyboard_type) {
 
-    case 0:					/* ¥Ç¥Õ¥©¥ë¥È¥­¡¼¥Ü¡¼¥É */
+    case 0:					/* ãƒ‡ãƒ•ã‚©ãƒ«ãƒˆã‚­ãƒ¼ãƒœãƒ¼ãƒ‰ */
 	if (analyze_keyconf_file()) {
 	    ;
 	} else {
@@ -666,8 +666,8 @@ void	event_init(void)
 	break;
 
 
-    case 1:					/* 106ÆüËÜ¸ì¥­¡¼¥Ü¡¼¥É */
-    case 2:					/* 101±Ñ¸ì¥­¡¼¥Ü¡¼¥É ? */
+    case 1:					/* 106æ—¥æœ¬èªã‚­ãƒ¼ãƒœãƒ¼ãƒ‰ */
+    case 2:					/* 101è‹±èªã‚­ãƒ¼ãƒœãƒ¼ãƒ‰ ? */
 	memcpy(keysym2key88,
 	       keysym2key88_default, sizeof(keysym2key88_default));
 
@@ -706,7 +706,7 @@ void	event_init(void)
 
 
 
-    /* ¥½¥Õ¥È¥¦¥§¥¢NumLock »ş¤Î¥­¡¼º¹¤·ÂØ¤¨¤Î½àÈ÷ */
+    /* ã‚½ãƒ•ãƒˆã‚¦ã‚§ã‚¢NumLock æ™‚ã®ã‚­ãƒ¼å·®ã—æ›¿ãˆã®æº–å‚™ */
 
     for (i=0; i<COUNTOF(binding); i++) {
 
@@ -728,7 +728,7 @@ void	event_init(void)
 
 
 /*
- * Ìó 1/60 Ëè¤Ë¸Æ¤Ğ¤ì¤ë
+ * ç´„ 1/60 æ¯ã«å‘¼ã°ã‚Œã‚‹
  */
 void	event_update(void)
 {
@@ -746,20 +746,20 @@ void	event_update(void)
 	case KeyPress:		/*------------------------------------------*/
 	case KeyRelease:
 
-	/* °Ê²¼¤Î¤É¤Ã¤Á¤ò»È¤¦¤Î¤¬Àµ²ò¡© ¼èÆÀ½ĞÍè¤ë keysym ¤¬°ã¤¦¤Î¤À¤¬ ¡Ä¡Ä */
+	/* ä»¥ä¸‹ã®ã©ã£ã¡ã‚’ä½¿ã†ã®ãŒæ­£è§£ï¼Ÿ å–å¾—å‡ºæ¥ã‚‹ keysym ãŒé•ã†ã®ã ãŒ â€¦â€¦ */
 #if 0
 	    keysym = XLookupKeysym((XKeyEvent *)&E, 0);
-	    /* ¡¦Shift + TAB ¤Ï XK_TAB ¤¬ÊÖ¤ë				*/
-	    /* ¡¦Shift + \ (¥·¥Õ¥È¤Îº¸¤Î¥­¡¼) ¤Ï XK_backslash ¤¬ÊÖ¤ë	*/
+	    /* ãƒ»Shift + TAB ã¯ XK_TAB ãŒè¿”ã‚‹				*/
+	    /* ãƒ»Shift + \ (ã‚·ãƒ•ãƒˆã®å·¦ã®ã‚­ãƒ¼) ã¯ XK_backslash ãŒè¿”ã‚‹	*/
 #else
 	    XLookupString((XKeyEvent *)&E, dummy, 0, &keysym, NULL);
-	    /* ¡¦Shift + TAB ¤Ï XK_ISO_Left_Tab ¤¬ÊÖ¤ë			*/
-	    /* ¡¦Shift + \ (¥·¥Õ¥È¤Îº¸¤Î¥­¡¼) ¤Ï XK_underscore ¤¬ÊÖ¤ë	*/
+	    /* ãƒ»Shift + TAB ã¯ XK_ISO_Left_Tab ãŒè¿”ã‚‹			*/
+	    /* ãƒ»Shift + \ (ã‚·ãƒ•ãƒˆã®å·¦ã®ã‚­ãƒ¼) ã¯ XK_underscore ãŒè¿”ã‚‹	*/
 #endif
 
 	    if (quasi88_is_exec()) {
 
-		/* scancode2key88[] ¤¬ÄêµÁºÑ¤Ê¤é¡¢¤½¤Î¥­¡¼¥³¡¼¥É¤òÍ¥Àè¤¹¤ë */
+		/* scancode2key88[] ãŒå®šç¾©æ¸ˆãªã‚‰ã€ãã®ã‚­ãƒ¼ã‚³ãƒ¼ãƒ‰ã‚’å„ªå…ˆã™ã‚‹ */
 		if (E.xkey.keycode < COUNTOF(scancode2key88) &&
 		    scancode2key88[ E.xkey.keycode ] >= 0) {
 
@@ -785,7 +785,7 @@ void	event_update(void)
 		    }
 		}
 
-	    } else {			/* (¥á¥Ë¥å¡¼¤Ê¤É) */
+	    } else {			/* (ãƒ¡ãƒ‹ãƒ¥ãƒ¼ãªã©) */
 
 		if ((keysym & 0xff00) == 0xff00) {	    /* XK_MISCELLANY */
 
@@ -821,7 +821,7 @@ void	event_update(void)
 	    switch (x11_mouse_rel_move) {
 
 	    case 1:
-		/* DGA¡§¥Ş¥¦¥¹°ÜÆ°¥¤¥Ù¥ó¥È¤Ï¾ï¤ËÁêÂĞ°ÜÆ°ÎÌ¤¬¥»¥Ã¥È¤µ¤ì¤ë */
+		/* DGAï¼šãƒã‚¦ã‚¹ç§»å‹•ã‚¤ãƒ™ãƒ³ãƒˆã¯å¸¸ã«ç›¸å¯¾ç§»å‹•é‡ãŒã‚»ãƒƒãƒˆã•ã‚Œã‚‹ */
 
 		x = E.xmotion.x;
 		y = E.xmotion.y;
@@ -832,14 +832,14 @@ void	event_update(void)
 		break;
 
 	    case -1:
-		/* ¥¦¥¤¥ó¥É¥¦¥°¥é¥Ö»ş¤Ï¡¢¥Ş¥¦¥¹¤¬¥¦¥¤¥ó¥É¥¦¤ÎÃ¼¤Ë¤¿¤É¤êÃå¤¯¤È
-		   ¤½¤ì°Ê¾åÆ°¤±¤Ê¤¯¤Ê¤ë¡£
-		   ¤½¤³¤Ç¡¢¥Ş¥¦¥¹¤ò¾ï¤Ë¥¦¥¤¥ó¥É¥¦¤ÎÃæ±û¤Ë¥¸¥ã¥ó¥×¤µ¤»¤ë¤³¤È¤Ç¡¢
-		   Ìµ¸Â¤Ë¥Ş¥¦¥¹¤òÆ°¤«¤¹¤³¤È¤¬¤Ç¤­¤ë¤«¤Î¤è¤¦¤Ë¤¹¤ë¡£
-		   ¤³¤Î»ş¡¢¥Ş¥¦¥¹¤òÈóÉ½¼¨¤Ë¤·¤Æ¤ª¤«¤Ê¤¤¤È¡¢ÌµÍÍ¤ÊÍÍ»Ò¤¬¸«¤¨¤ë
-		   ¤Î¤ÇÃí°Õ¡£
-		   ¤Ê¤ª¡¢XWarpPointer ¤Ç¥İ¥¤¥ó¥¿¤ò°ÜÆ°¤µ¤»¤ë¤È¡¢¤½¤ì¤Ë±ş¤¸¤Æ
-		   MotionNotify ¤¬È¯À¸¤¹¤ë¤Î¤Ç¡¢Ìµ»ë¤¹¤ë¤³¤È¡£*/
+		/* ã‚¦ã‚¤ãƒ³ãƒ‰ã‚¦ã‚°ãƒ©ãƒ–æ™‚ã¯ã€ãƒã‚¦ã‚¹ãŒã‚¦ã‚¤ãƒ³ãƒ‰ã‚¦ã®ç«¯ã«ãŸã©ã‚Šç€ãã¨
+		   ãã‚Œä»¥ä¸Šå‹•ã‘ãªããªã‚‹ã€‚
+		   ãã“ã§ã€ãƒã‚¦ã‚¹ã‚’å¸¸ã«ã‚¦ã‚¤ãƒ³ãƒ‰ã‚¦ã®ä¸­å¤®ã«ã‚¸ãƒ£ãƒ³ãƒ—ã•ã›ã‚‹ã“ã¨ã§ã€
+		   ç„¡é™ã«ãƒã‚¦ã‚¹ã‚’å‹•ã‹ã™ã“ã¨ãŒã§ãã‚‹ã‹ã®ã‚ˆã†ã«ã™ã‚‹ã€‚
+		   ã“ã®æ™‚ã€ãƒã‚¦ã‚¹ã‚’éè¡¨ç¤ºã«ã—ã¦ãŠã‹ãªã„ã¨ã€ç„¡æ§˜ãªæ§˜å­ãŒè¦‹ãˆã‚‹
+		   ã®ã§æ³¨æ„ã€‚
+		   ãªãŠã€XWarpPointer ã§ãƒã‚¤ãƒ³ã‚¿ã‚’ç§»å‹•ã•ã›ã‚‹ã¨ã€ãã‚Œã«å¿œã˜ã¦
+		   MotionNotify ãŒç™ºç”Ÿã™ã‚‹ã®ã§ã€ç„¡è¦–ã™ã‚‹ã“ã¨ã€‚*/
 
 		if (mouse_jumped) { mouse_jumped = FALSE; break; }
 
@@ -861,7 +861,7 @@ void	event_update(void)
 		break;
 
 	    default:
-		/* ÄÌ¾ï¡§¥Ş¥¦¥¹°ÜÆ°¥¤¥Ù¥ó¥È¤Ï¡¢¥¦¥¤¥ó¥É¥¦ºÂÉ¸¤¬¥»¥Ã¥È¤µ¤ì¤ë */
+		/* é€šå¸¸ï¼šãƒã‚¦ã‚¹ç§»å‹•ã‚¤ãƒ™ãƒ³ãƒˆã¯ã€ã‚¦ã‚¤ãƒ³ãƒ‰ã‚¦åº§æ¨™ãŒã‚»ãƒƒãƒˆã•ã‚Œã‚‹ */
 
 		x = E.xmotion.x;
 		y = E.xmotion.y;
@@ -878,8 +878,8 @@ void	event_update(void)
 
 	case ButtonPress:	/*------------------------------------------*/
 	case ButtonRelease:
-	    /* ¥Ş¥¦¥¹°ÜÆ°¥¤¥Ù¥ó¥È¤âÆ±»ş¤Ë½èÍı¤¹¤ëÉ¬Í×¤¬¤¢¤ë¤Ê¤é¡¢
-	       quasi88_mouse_moved_abs/rel ´Ø¿ô¤ò¤³¤³¤Ç¸Æ¤Ó½Ğ¤·¤Æ¤ª¤¯ */
+	    /* ãƒã‚¦ã‚¹ç§»å‹•ã‚¤ãƒ™ãƒ³ãƒˆã‚‚åŒæ™‚ã«å‡¦ç†ã™ã‚‹å¿…è¦ãŒã‚ã‚‹ãªã‚‰ã€
+	       quasi88_mouse_moved_abs/rel é–¢æ•°ã‚’ã“ã“ã§å‘¼ã³å‡ºã—ã¦ãŠã */
 
 	    if      (E.xbutton.button == Button1) key88 = KEY88_MOUSE_L;
 	    else if (E.xbutton.button == Button2) key88 = KEY88_MOUSE_M;
@@ -892,7 +892,7 @@ void	event_update(void)
 	    break;
 
 	case ClientMessage:	/*------------------------------------------*/
-	    /* ¥¦¥¤¥ó¥É¥¦¤¬ÇË²õ¤µ¤ì¤¿¾ì¹ç¤Ï¡¢¤³¤³¤Ç½ªÎ» */
+	    /* ã‚¦ã‚¤ãƒ³ãƒ‰ã‚¦ãŒç ´å£Šã•ã‚ŒãŸå ´åˆã¯ã€ã“ã“ã§çµ‚äº† */
 	    if (E.xclient.message_type == x11_atom_kill_type &&
 		(Atom)E.xclient.data.l[0] == x11_atom_kill_data) {
 
@@ -901,13 +901,13 @@ void	event_update(void)
 		break;
 	    }
 
-	    /* Drag & Drop ¤Î¥Á¥§¥Ã¥¯ */
+	    /* Drag & Drop ã®ãƒã‚§ãƒƒã‚¯ */
 	    if (use_xdnd)
 		xdnd_receive_drag((XClientMessageEvent *)&E);
 	    break;
 
 	case SelectionNotify:	/*------------------------------------------*/
-	    /* Drag & Drop ¤Î¥Á¥§¥Ã¥¯ */
+	    /* Drag & Drop ã®ãƒã‚§ãƒƒã‚¯ */
 	    if (use_xdnd)
 		xdnd_receive_drop((XSelectionEvent *)&E);
 	    break; 
@@ -930,8 +930,8 @@ void	event_update(void)
 	}
     }
 
-    /* X11 ¤Ë¤ÏÉ¸½à¤Ç¥¸¥ç¥¤¥¹¥Æ¥Ã¥¯¥¤¥Ù¥ó¥È¤¬È¯À¸¤·¤Ê¤¤¡£
-       ¤Ê¤Î¤Ç¡¢¤³¤³¤Ç¥¸¥ç¥¤¥¹¥Æ¥Ã¥¯¾õÂÖ¤ò¥İ¡¼¥ê¥ó¥°¤·¤Æ½èÍı¤¹¤ë */
+    /* X11 ã«ã¯æ¨™æº–ã§ã‚¸ãƒ§ã‚¤ã‚¹ãƒ†ãƒƒã‚¯ã‚¤ãƒ™ãƒ³ãƒˆãŒç™ºç”Ÿã—ãªã„ã€‚
+       ãªã®ã§ã€ã“ã“ã§ã‚¸ãƒ§ã‚¤ã‚¹ãƒ†ãƒƒã‚¯çŠ¶æ…‹ã‚’ãƒãƒ¼ãƒªãƒ³ã‚°ã—ã¦å‡¦ç†ã™ã‚‹ */
 
     joystick_update();
 }
@@ -939,7 +939,7 @@ void	event_update(void)
 
 
 /*
- * ¤³¤ì¤Ï ½ªÎ»»ş¤Ë1²ó¤À¤±¸Æ¤Ğ¤ì¤ë
+ * ã“ã‚Œã¯ çµ‚äº†æ™‚ã«1å›ã ã‘å‘¼ã°ã‚Œã‚‹
  */
 void	event_exit(void)
 {
@@ -949,24 +949,24 @@ void	event_exit(void)
 
 
 /***********************************************************************
- * ¸½ºß¤Î¥Ş¥¦¥¹ºÂÉ¸¼èÆÀ´Ø¿ô
+ * ç¾åœ¨ã®ãƒã‚¦ã‚¹åº§æ¨™å–å¾—é–¢æ•°
  *
- *	¸½ºß¤Î¥Ş¥¦¥¹¤ÎÀäÂĞºÂÉ¸¤ò *x, *y ¤Ë¥»¥Ã¥È
+ *	ç¾åœ¨ã®ãƒã‚¦ã‚¹ã®çµ¶å¯¾åº§æ¨™ã‚’ *x, *y ã«ã‚»ãƒƒãƒˆ
  ************************************************************************/
 
 void	event_get_mouse_pos(int *x, int *y)
 {
     if (x11_mouse_rel_move) {
 
-	/* DGA¤ª¤è¤Ó¥¦¥¤¥ó¥É¥¦¥°¥é¥Ö»ş¤Ï¡¢¥Ş¥¦¥¹¤ÎÀäÂĞºÂÉ¸¤ÏÂ¸ºß¤·¤Ê¤¤¡£ */
+	/* DGAãŠã‚ˆã³ã‚¦ã‚¤ãƒ³ãƒ‰ã‚¦ã‚°ãƒ©ãƒ–æ™‚ã¯ã€ãƒã‚¦ã‚¹ã®çµ¶å¯¾åº§æ¨™ã¯å­˜åœ¨ã—ãªã„ã€‚ */
 
     } else {
 
-	Window root_return;			/* ¥ë¡¼¥È¥¦¥¤¥ó¥É¥¦ID     */
-	Window child_return;			/* »Ò¥¦¥¤¥ó¥É¥¦ID(¤¢¤ì¤Ğ) */
-	int    root_x, root_y;			/* ¥ë¡¼¥È¥¦¥¤¥ó¥É¥¦¤ÎºÂÉ¸ */
-	int    win_x,  win_y;			/* »ØÄê¥¦¥¤¥ó¥É¥¦¤ÎºÂÉ¸   */
-	unsigned int button;			/* ¥Ş¥¦¥¹¥Ü¥¿¥ó¤Î²¡²¼¾õ¶· */
+	Window root_return;			/* ãƒ«ãƒ¼ãƒˆã‚¦ã‚¤ãƒ³ãƒ‰ã‚¦ID     */
+	Window child_return;			/* å­ã‚¦ã‚¤ãƒ³ãƒ‰ã‚¦ID(ã‚ã‚Œã°) */
+	int    root_x, root_y;			/* ãƒ«ãƒ¼ãƒˆã‚¦ã‚¤ãƒ³ãƒ‰ã‚¦ã®åº§æ¨™ */
+	int    win_x,  win_y;			/* æŒ‡å®šã‚¦ã‚¤ãƒ³ãƒ‰ã‚¦ã®åº§æ¨™   */
+	unsigned int button;			/* ãƒã‚¦ã‚¹ãƒœã‚¿ãƒ³ã®æŠ¼ä¸‹çŠ¶æ³ */
 
 	if (XQueryPointer(x11_display, x11_window, &root_return, &child_return,
 			  &root_x, &root_y, 
@@ -981,7 +981,7 @@ void	event_get_mouse_pos(int *x, int *y)
 
     }
 
-    /* ÀäÂĞºÂÉ¸¤¬Ìµ¤¤¾ì¹ç¤Ï¡¢¤È¤ê¤¢¤¨¤º²èÌÌÃæ±û¤ÎºÂÉ¸¤òÊÖ¤¹¤³¤È¤Ë¤·¤è¤¦ */
+    /* çµ¶å¯¾åº§æ¨™ãŒç„¡ã„å ´åˆã¯ã€ã¨ã‚Šã‚ãˆãšç”»é¢ä¸­å¤®ã®åº§æ¨™ã‚’è¿”ã™ã“ã¨ã«ã—ã‚ˆã† */
 
     *x = x11_width  / 2;
     *y = x11_height / 2;
@@ -991,7 +991,7 @@ void	event_get_mouse_pos(int *x, int *y)
 
 
 /******************************************************************************
- * ¥½¥Õ¥È¥¦¥§¥¢ NumLock Í­¸ú¡¿Ìµ¸ú
+ * ã‚½ãƒ•ãƒˆã‚¦ã‚§ã‚¢ NumLock æœ‰åŠ¹ï¼ç„¡åŠ¹
  *
  *****************************************************************************/
 
@@ -1032,14 +1032,14 @@ void	event_numlock_off(void) { numlock_setup(FALSE); }
 
 
 /******************************************************************************
- * ¥¨¥ß¥å¥ì¡¼¥È¡¿¥á¥Ë¥å¡¼¡¿¥İ¡¼¥º¡¿¥â¥Ë¥¿¡¼¥â¡¼¥É ¤Î ³«»Ï»ş¤Î½èÍı
+ * ã‚¨ãƒŸãƒ¥ãƒ¬ãƒ¼ãƒˆï¼ãƒ¡ãƒ‹ãƒ¥ãƒ¼ï¼ãƒãƒ¼ã‚ºï¼ãƒ¢ãƒ‹ã‚¿ãƒ¼ãƒ¢ãƒ¼ãƒ‰ ã® é–‹å§‹æ™‚ã®å‡¦ç†
  *
  *****************************************************************************/
 
 void	event_switch(void)
 {
 #if 1
-    /* ´ûÂ¸¤Î¥¤¥Ù¥ó¥È¤ò¤¹¤Ù¤ÆÇË´ş */
+    /* æ—¢å­˜ã®ã‚¤ãƒ™ãƒ³ãƒˆã‚’ã™ã¹ã¦ç ´æ£„ */
     XEvent E;
     while (XCheckWindowEvent(x11_display, x11_window,
 			     ExposureMask|KeyPressMask|KeyReleaseMask|
@@ -1049,7 +1049,7 @@ void	event_switch(void)
 #endif
 
 
-    /* ¥¦¥¤¥ó¥É¥¦¥°¥é¥ÖÃæ¤Ï¡¢¥Ş¥¦¥¹¤ò²èÌÌÃæ±û¤Ø°ÜÆ° */
+    /* ã‚¦ã‚¤ãƒ³ãƒ‰ã‚¦ã‚°ãƒ©ãƒ–ä¸­ã¯ã€ãƒã‚¦ã‚¹ã‚’ç”»é¢ä¸­å¤®ã¸ç§»å‹• */
     if (x11_mouse_rel_move == -1) {
 	XWarpPointer(x11_display, None, x11_window, 0, 0, 0, 0,
 		     x11_width / 2, x11_height / 2);
@@ -1063,7 +1063,7 @@ void	event_switch(void)
 
 #if 0
 /***********************************************************************
- * ¶¯À©½ªÎ»¤Î¥¤¥Ù¥ó¥È¤òÀ¸À®
+ * å¼·åˆ¶çµ‚äº†ã®ã‚¤ãƒ™ãƒ³ãƒˆã‚’ç”Ÿæˆ
  ************************************************************************/
 void	event_quit_signal(void)
 {
@@ -1085,7 +1085,7 @@ void	event_quit_signal(void)
 /****************************************************************************
  ****************************************************************************
  *
- *	XDnD ¤òÅ¬Åö¤Ë¼ÂÁõ¤·¤Æ¤ß¤¿¡£¼ÂÁõ¤Ë¤Ï¤¢¤Ş¤ê¼«¿®¤Ê¤·¡£
+ *	XDnD ã‚’é©å½“ã«å®Ÿè£…ã—ã¦ã¿ãŸã€‚å®Ÿè£…ã«ã¯ã‚ã¾ã‚Šè‡ªä¿¡ãªã—ã€‚
  *
  ****************************************************************************
  *****************************************************************************/
@@ -1116,7 +1116,7 @@ static Atom MIME_text_plain;
 static Atom MIME_text_uri_list;
 
 /*
- *	µ¯Æ°»ş¤Ë1²ó¤À¤±¸Æ¤Ó½Ğ¤¹¡£(Atom¤ò¼èÆÀorÀßÄê¤¹¤ë)
+ *	èµ·å‹•æ™‚ã«1å›ã ã‘å‘¼ã³å‡ºã™ã€‚(Atomã‚’å–å¾—orè¨­å®šã™ã‚‹)
  */
 void	xdnd_initialize(void)
 {
@@ -1168,7 +1168,7 @@ void	xdnd_initialize(void)
 
 
 /*
- *	¥¦¥¤¥ó¥É¥¦À¸À®»ş¤Ë¸Æ¤Ó½Ğ¤¹ (XDnd¤Î»ÈÍÑ¤òÀë¸À¤¹¤ë)
+ *	ã‚¦ã‚¤ãƒ³ãƒ‰ã‚¦ç”Ÿæˆæ™‚ã«å‘¼ã³å‡ºã™ (XDndã®ä½¿ç”¨ã‚’å®£è¨€ã™ã‚‹)
  */
 void	xdnd_start(void)
 {
@@ -1181,7 +1181,7 @@ void	xdnd_start(void)
 
 
 /*
- *	¥¤¥Ù¥ó¥È½èÍı
+ *	ã‚¤ãƒ™ãƒ³ãƒˆå‡¦ç†
  */
 
 static int	xdnd_ver;
@@ -1195,12 +1195,12 @@ static	void	xdnd_receive_drag(XClientMessageEvent *E)
 {
     if (E->message_type == XA_XdndEnter) {
 	/*
-	  ¢£¢£¢£¢£ ºÇ½é¡§¥Ş¥¦¥¹¤¬¥¦¥¤¥ó¥É¥¦¤ËÆş¤Ã¤Æ¤­¤¿»ş¤Î¥¤¥Ù¥ó¥È ¢£¢£¢£¢£
+	  â– â– â– â–  æœ€åˆï¼šãƒã‚¦ã‚¹ãŒã‚¦ã‚¤ãƒ³ãƒ‰ã‚¦ã«å…¥ã£ã¦ããŸæ™‚ã®ã‚¤ãƒ™ãƒ³ãƒˆ â– â– â– â– 
 
-	  E->data.l[0]		¥½¡¼¥¹¥¦¥£¥ó¥É¥¦¤Î XID
-	  E->data.l[1]		¾å°Ì 8bit ¥×¥í¥È¥³¥ë¥Ğ¡¼¥¸¥ç¥ó
-     				bit 0 ¤¬¿¿¤Ê¤é3¸Ä°Ê¾å¤Î¥Ç¡¼¥¿¥¿¥¤¥×¤¢¤ê
-	  E->data.l[2]-[4]	¥Ç¡¼¥¿¥¿¥¤¥× 1¸ÄÌÜ¡¢2¸ÄÌÜ¡¢3¸ÄÌÜ
+	  E->data.l[0]		ã‚½ãƒ¼ã‚¹ã‚¦ã‚£ãƒ³ãƒ‰ã‚¦ã® XID
+	  E->data.l[1]		ä¸Šä½ 8bit ãƒ—ãƒ­ãƒˆã‚³ãƒ«ãƒãƒ¼ã‚¸ãƒ§ãƒ³
+     				bit 0 ãŒçœŸãªã‚‰3å€‹ä»¥ä¸Šã®ãƒ‡ãƒ¼ã‚¿ã‚¿ã‚¤ãƒ—ã‚ã‚Š
+	  E->data.l[2]-[4]	ãƒ‡ãƒ¼ã‚¿ã‚¿ã‚¤ãƒ— 1å€‹ç›®ã€2å€‹ç›®ã€3å€‹ç›®
 	*/
 
 	xdnd_from = (Window)E->data.l[0];
@@ -1209,7 +1209,7 @@ static	void	xdnd_receive_drag(XClientMessageEvent *E)
 	xdnd_step = ENTER;
 	xdnd_type = None;
 
-	if ((E->data.l[1] & 1) == 0) {	/* ¥Ç¡¼¥¿¥¿¥¤¥×¤Ï3¸Ä°ÊÆâ */
+	if ((E->data.l[1] & 1) == 0) {	/* ãƒ‡ãƒ¼ã‚¿ã‚¿ã‚¤ãƒ—ã¯3å€‹ä»¥å†… */
 
 	    if        ((Atom)E->data.l[2] == MIME_text_uri_list ||
 		       (Atom)E->data.l[3] == MIME_text_uri_list ||
@@ -1223,7 +1223,7 @@ static	void	xdnd_receive_drag(XClientMessageEvent *E)
 		xdnd_type = MIME_text_plain;
 	    }
 
-	} else {			/* ¥Ç¡¼¥¿¥¿¥¤¥×¤â¤Ã¤È¤¢¤ë */
+	} else {			/* ãƒ‡ãƒ¼ã‚¿ã‚¿ã‚¤ãƒ—ã‚‚ã£ã¨ã‚ã‚‹ */
 	    Atom type;
 	    int format;
 	    unsigned long nitems, bytes, i;
@@ -1248,18 +1248,18 @@ static	void	xdnd_receive_drag(XClientMessageEvent *E)
     } else if (E->message_type == XA_XdndPosition) {
 
 	/*
-	  ¢£¢£¢£¢£ ÅÓÃæ¡§¥Ş¥¦¥¹¤¬¥¦¥¤¥ó¥É¥¦Æâ¤òÆ°¤¯»ş¤Î¥¤¥Ù¥ó¥È ¢£¢£¢£¢£
+	  â– â– â– â–  é€”ä¸­ï¼šãƒã‚¦ã‚¹ãŒã‚¦ã‚¤ãƒ³ãƒ‰ã‚¦å†…ã‚’å‹•ãæ™‚ã®ã‚¤ãƒ™ãƒ³ãƒˆ â– â– â– â– 
 
-	  E->data.l[0]	¥½¡¼¥¹¥¦¥£¥ó¥É¥¦¤Î XID
-	  E->data.l[1]	Í½Ìó
-	  E->data.l[2]	¥Ş¥¦¥¹¤ÎºÂÉ¸ (x << 16) | y
-	  E->data.l[3]	¥¿¥¤¥à¥¹¥¿¥ó¥×
-	  E->data.l[4]	¥ê¥¯¥¨¥¹¥È¥¢¥¯¥·¥ç¥ó
+	  E->data.l[0]	ã‚½ãƒ¼ã‚¹ã‚¦ã‚£ãƒ³ãƒ‰ã‚¦ã® XID
+	  E->data.l[1]	äºˆç´„
+	  E->data.l[2]	ãƒã‚¦ã‚¹ã®åº§æ¨™ (x << 16) | y
+	  E->data.l[3]	ã‚¿ã‚¤ãƒ ã‚¹ã‚¿ãƒ³ãƒ—
+	  E->data.l[4]	ãƒªã‚¯ã‚¨ã‚¹ãƒˆã‚¢ã‚¯ã‚·ãƒ§ãƒ³
 	*/
 
 	if (xdnd_from != (Window)E->data.l[0] ||
 	    xdnd_to   !=         E->window) {
-	    /* ¤ó¡© °ã¤¦¤¾¡© */
+	    /* ã‚“ï¼Ÿ é•ã†ãï¼Ÿ */
 	    ;
 	} else if (xdnd_step == ENTER || xdnd_step == POS) {
 
@@ -1294,15 +1294,15 @@ static	void	xdnd_receive_drag(XClientMessageEvent *E)
 
     } else if (E->message_type == XA_XdndLeave) {
 	/*
-	  ¢£¢£¢£¢£ ºÇ¸å¡§¥Ş¥¦¥¹¤¬¥¦¥¤¥ó¥É¥¦¤ò½Ğ¤¿»ş¤Î¥¤¥Ù¥ó¥È ¢£¢£¢£¢£
+	  â– â– â– â–  æœ€å¾Œï¼šãƒã‚¦ã‚¹ãŒã‚¦ã‚¤ãƒ³ãƒ‰ã‚¦ã‚’å‡ºãŸæ™‚ã®ã‚¤ãƒ™ãƒ³ãƒˆ â– â– â– â– 
 
-	  E->data.l[0]	¥½¡¼¥¹¥¦¥£¥ó¥É¥¦¤Î XID
-	  E->data.l[1]	Í½Ìó
+	  E->data.l[0]	ã‚½ãƒ¼ã‚¹ã‚¦ã‚£ãƒ³ãƒ‰ã‚¦ã® XID
+	  E->data.l[1]	äºˆç´„
 	*/
 
 	if (xdnd_from != (Window)E->data.l[0] ||
 	    xdnd_to   !=         E->window) {
-	    /* ¤ó¡© °ã¤¦¤¾¡© */
+	    /* ã‚“ï¼Ÿ é•ã†ãï¼Ÿ */
 	    ;
 	} else {
 	    xdnd_step = YET;
@@ -1310,15 +1310,15 @@ static	void	xdnd_receive_drag(XClientMessageEvent *E)
 
     } else if (E->message_type == XA_XdndDrop) {
 	/*
-	  ¢£¢£¢£¢£ ¼Â¹Ô¡§¥¦¥¤¥ó¥É¥¦Æâ¤Ç¥É¥í¥Ã¥×¤µ¤ì¤¿»ş¤Î¥¤¥Ù¥ó¥È ¢£¢£¢£¢£
+	  â– â– â– â–  å®Ÿè¡Œï¼šã‚¦ã‚¤ãƒ³ãƒ‰ã‚¦å†…ã§ãƒ‰ãƒ­ãƒƒãƒ—ã•ã‚ŒãŸæ™‚ã®ã‚¤ãƒ™ãƒ³ãƒˆ â– â– â– â– 
 
-	  E->data.l[0]	¥½¡¼¥¹¥¦¥£¥ó¥É¥¦¤Î XID
-	  E->data.l[1]	Í½Ìó
+	  E->data.l[0]	ã‚½ãƒ¼ã‚¹ã‚¦ã‚£ãƒ³ãƒ‰ã‚¦ã® XID
+	  E->data.l[1]	äºˆç´„
 	*/
 
 	if (xdnd_from != (Window)E->data.l[0] ||
 	    xdnd_to   !=         E->window) {
-	    /* ¤ó¡© °ã¤¦¤¾¡© */
+	    /* ã‚“ï¼Ÿ é•ã†ãï¼Ÿ */
 	    ;
 	} else {
 	    if (xdnd_step == POS) {
@@ -1348,7 +1348,7 @@ static	void	xdnd_receive_drag(XClientMessageEvent *E)
 	}
 
     } else {
-	/* º¤¤Ã¤¿¡£¤ï¤«¤é¤Ê¤¤¡Ä¡Ä¡Ä */
+	/* å›°ã£ãŸã€‚ã‚ã‹ã‚‰ãªã„â€¦â€¦â€¦ */
 	;
     }
 }
@@ -1362,7 +1362,7 @@ static	void	xdnd_receive_drop(XSelectionEvent *E)
     int			ret;
 
     /*
-      ¢£¢£¢£¢£ ·ëËö¡§¥É¥í¥Ã¥×¸å¤ËÄÌÃÎ¤µ¤ì¤ë¥¤¥Ù¥ó¥È ¢£¢£¢£¢£
+      â– â– â– â–  çµæœ«ï¼šãƒ‰ãƒ­ãƒƒãƒ—å¾Œã«é€šçŸ¥ã•ã‚Œã‚‹ã‚¤ãƒ™ãƒ³ãƒˆ â– â– â– â– 
     */
 
     if (E->property == XV_DND_SELECTION) {
@@ -1496,11 +1496,11 @@ static int drop_filename(const char *buf, int size)
 
 
 /****************************************************************************
- * ¥­¡¼ÀßÄê¥Õ¥¡¥¤¥ë¤òÆÉ¤ß¹ş¤ó¤Ç¡¢ÀßÄê¤¹¤ë¡£
- *	ÀßÄê¥Õ¥¡¥¤¥ë¤¬Ìµ¤±¤ì¤Ğµ¶¡¢¤¢¤ì¤Ğ½èÍı¤·¤Æ¿¿¤òÊÖ¤¹
+ * ã‚­ãƒ¼è¨­å®šãƒ•ã‚¡ã‚¤ãƒ«ã‚’èª­ã¿è¾¼ã‚“ã§ã€è¨­å®šã™ã‚‹ã€‚
+ *	è¨­å®šãƒ•ã‚¡ã‚¤ãƒ«ãŒç„¡ã‘ã‚Œã°å½ã€ã‚ã‚Œã°å‡¦ç†ã—ã¦çœŸã‚’è¿”ã™
  *****************************************************************************/
 
-/* X11 ¤Î keysym ¤ÎÊ¸»úÎó¤ò int ÃÍ¤ËÊÑ´¹¤¹¤ë¥Æ¡¼¥Ö¥ë */
+/* X11 ã® keysym ã®æ–‡å­—åˆ—ã‚’ int å€¤ã«å¤‰æ›ã™ã‚‹ãƒ†ãƒ¼ãƒ–ãƒ« */
 
 static const T_SYMBOL_TABLE x11keysym_list[] =
 {
@@ -1872,7 +1872,7 @@ static const T_SYMBOL_TABLE x11keysym_list[] =
     {	"XK_Hyper_L",		XK_Hyper_L              }, /*	0xFFED	*/
     {	"XK_Hyper_R",		XK_Hyper_R              }, /*	0xFFEE	*/
 };
-/* ¥Ç¥Ğ¥Ã¥°ÍÑ */
+/* ãƒ‡ãƒãƒƒã‚°ç”¨ */
 static	const char *debug_x11keysym(int code)
 {
     int i;
@@ -1884,20 +1884,20 @@ static	const char *debug_x11keysym(int code)
 }
 
 
-/* ¥­¡¼ÀßÄê¥Õ¥¡¥¤¥ë¤Î¡¢¼±ÊÌ¥¿¥°¤ò¥Á¥§¥Ã¥¯¤¹¤ë¥³¡¼¥ë¥Ğ¥Ã¥¯´Ø¿ô */
+/* ã‚­ãƒ¼è¨­å®šãƒ•ã‚¡ã‚¤ãƒ«ã®ã€è­˜åˆ¥ã‚¿ã‚°ã‚’ãƒã‚§ãƒƒã‚¯ã™ã‚‹ã‚³ãƒ¼ãƒ«ãƒãƒƒã‚¯é–¢æ•° */
 
 static const char *identify_callback(const char *parm1,
 				     const char *parm2,
 				     const char *parm3)
 {
     if (my_strcmp(parm1, "[X11]") == 0) {
-	return NULL;				/* Í­¸ú */
+	return NULL;				/* æœ‰åŠ¹ */
     }
 
-    return "";					/* Ìµ¸ú */
+    return "";					/* ç„¡åŠ¹ */
 }
 
-/* ¥­¡¼ÀßÄê¥Õ¥¡¥¤¥ë¤Î¡¢ÀßÄê¤ò½èÍı¤¹¤ë¥³¡¼¥ë¥Ğ¥Ã¥¯´Ø¿ô */
+/* ã‚­ãƒ¼è¨­å®šãƒ•ã‚¡ã‚¤ãƒ«ã®ã€è¨­å®šã‚’å‡¦ç†ã™ã‚‹ã‚³ãƒ¼ãƒ«ãƒãƒƒã‚¯é–¢æ•° */
 
 static const char *setting_callback(int type,
 				    int code,
@@ -1908,7 +1908,7 @@ static const char *setting_callback(int type,
 
     if (type == KEYCODE_SCAN) {
 	if (code >= COUNTOF(scancode2key88)) {
-	    return "scancode too large";	/* Ìµ¸ú */
+	    return "scancode too large";	/* ç„¡åŠ¹ */
 	}
 	scancode2key88[ code ] = key88;
     } else {
@@ -1917,7 +1917,7 @@ static const char *setting_callback(int type,
 
     if (numlock_key88 >= 0) {
 	if (binding_cnt >= COUNTOF(binding)) {
-	    return "too many NumLock-code";	/* Ìµ¸ú */
+	    return "too many NumLock-code";	/* ç„¡åŠ¹ */
 	}
 	binding[ binding_cnt ].type      = type;
 	binding[ binding_cnt ].code      = code;
@@ -1925,18 +1925,18 @@ static const char *setting_callback(int type,
 	binding_cnt ++;
     }
 
-    return NULL;				/* Í­¸ú */
+    return NULL;				/* æœ‰åŠ¹ */
 }
 
-/* ¥­¡¼ÀßÄê¥Õ¥¡¥¤¥ë¤Î½èÍı´Ø¿ô */
+/* ã‚­ãƒ¼è¨­å®šãƒ•ã‚¡ã‚¤ãƒ«ã®å‡¦ç†é–¢æ•° */
 
 static	int	analyze_keyconf_file(void)
 {
     return
-	config_read_keyconf_file(file_keyboard,		  /* ¥­¡¼ÀßÄê¥Õ¥¡¥¤¥ë*/
-				 identify_callback,	  /* ¼±ÊÌ¥¿¥°¹Ô ´Ø¿ô */
-				 x11keysym_list,	  /* ÊÑ´¹¥Æ¡¼¥Ö¥ë    */
-				 COUNTOF(x11keysym_list), /* ¥Æ¡¼¥Ö¥ë¥µ¥¤¥º  */
-				 TRUE,			  /* Âç¾®Ê¸»úÌµ»ë    */
-				 setting_callback);	  /* ÀßÄê¹Ô ´Ø¿ô     */
+	config_read_keyconf_file(file_keyboard,		  /* ã‚­ãƒ¼è¨­å®šãƒ•ã‚¡ã‚¤ãƒ«*/
+				 identify_callback,	  /* è­˜åˆ¥ã‚¿ã‚°è¡Œ é–¢æ•° */
+				 x11keysym_list,	  /* å¤‰æ›ãƒ†ãƒ¼ãƒ–ãƒ«    */
+				 COUNTOF(x11keysym_list), /* ãƒ†ãƒ¼ãƒ–ãƒ«ã‚µã‚¤ã‚º  */
+				 TRUE,			  /* å¤§å°æ–‡å­—ç„¡è¦–    */
+				 setting_callback);	  /* è¨­å®šè¡Œ é–¢æ•°     */
 }

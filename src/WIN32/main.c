@@ -5,9 +5,9 @@
 /************************************************************************/
 
 /*
- * ImmDisableIME() �ϡ� WINVER >= 0x040A �����API�餷����(Win98/2K�ʹ�)
- * VC6 �Ǥϡ��ʤˤ⤷�ʤ��� WINVER == 0x0400 �ȤʤäƤ��ޤ��Τǡ�
- * windows.h �򥤥󥯥롼�ɤ������ˡ� WINVER ����Ū�˻��ꤷ�Ƥ��ޤ���
+ * ImmDisableIME() は、 WINVER >= 0x040A 限定のAPIらしい。(Win98/2K以降)
+ * VC6 では、なにもしないと WINVER == 0x0400 となってしまうので、
+ * windows.h をインクルードする前に、 WINVER を強制的に指定してしまおう
  */
 #ifdef	_MSC_VER
 #ifndef WINVER
@@ -33,7 +33,7 @@
 
 FILE	*debugfp;
 /***********************************************************************
- * �ᥤ�����
+ * メイン処理
  ************************************************************************/
 static	void	finish(void);
 
@@ -46,7 +46,7 @@ int WINAPI WinMain(HINSTANCE hInst,
 
 
 #ifndef	NDEBUG
-    /* ���󥽡�����������ɸ����Ϥ������Ƥ� */
+    /* コンソールを作成し，標準出力を割り当てる */
     AllocConsole();
     freopen("CONOUT$", "w", stdout);
 #endif
@@ -58,26 +58,26 @@ int WINAPI WinMain(HINSTANCE hInst,
 
 
 #if 1
-    /* IME ��̵���ˤ��Ƥ��� (imm.h, imm32.lib)		*/
-    /* ������ɥ��������˸ƤӽФ�ɬ�פ�����餷��	*/
+    /* IME を無効にしておく (imm.h, imm32.lib)		*/
+    /* ウインドウ生成前に呼び出す必要があるらしい	*/
 #if (WINVER >= 0x040A)
     ImmDisableIME(0);
 #endif
 #endif
 
-    /* �����ν���ͤ���� (����������Ϥʤ����ʡ�) */
-    romaji_type = 1;			/* �����޻��Ѵ��ε�§�� MS-IME���� */
+    /* 一部の初期値を改変 (いいやり方はないかな…) */
+    romaji_type = 1;			/* ローマ字変換の規則を MS-IME風に */
 
 
-    if (config_init(0, NULL,		/* �Ķ������ & �������� */
+    if (config_init(0, NULL,		/* 環境初期化 & 引数処理 */
 		    NULL,
 		    NULL)) {
 
-	quasi88_atexit(finish);		/* quasi88() �¹���˶�����λ�����ݤ�
-					   ������Хå��ؿ�����Ͽ���� */
-	quasi88();			/* PC-8801 ���ߥ�졼����� */
+	quasi88_atexit(finish);		/* quasi88() 実行中に強制終了した際の
+					   コールバック関数を登録する */
+	quasi88();			/* PC-8801 エミュレーション */
 
-	config_exit();			/* ������������� */
+	config_exit();			/* 引数処理後始末 */
     }
 
     return 0;
@@ -86,21 +86,21 @@ int WINAPI WinMain(HINSTANCE hInst,
 
 
 /*
- * ������λ���Υ�����Хå��ؿ� (quasi88_exit()�ƽл��ˡ����������)
+ * 強制終了時のコールバック関数 (quasi88_exit()呼出時に、処理される)
  */
 static	void	finish(void)
 {
-    config_exit();			/* ������������� */
+    config_exit();			/* 引数処理後始末 */
 }
 
 
 
 /***********************************************************************
- * ���ơ��ȥ����ɡ����ơ��ȥ�����
+ * ステートロード／ステートセーブ
  ************************************************************************/
 
-/*	¾�ξ��󤹤٤Ƥ������� or �����֤��줿��˸ƤӽФ���롣
- *	ɬ�פ˱����ơ������ƥ��ͭ�ξ�����ղä��Ƥ⤤�����ȡ�
+/*	他の情報すべてがロード or セーブされた後に呼び出される。
+ *	必要に応じて、システム固有の情報を付加してもいいかと。
  */
 
 int	stateload_system(void)
@@ -115,7 +115,7 @@ int	statesave_system(void)
 
 
 /***********************************************************************
- * ��˥塼���̤�ɽ�����롢�����ƥ��ͭ��å�����
+ * メニュー画面に表示する、システム固有メッセージ
  ************************************************************************/
 
 int	menu_about_osd_msg(int        req_japanese,
@@ -130,14 +130,14 @@ int	menu_about_osd_msg(int        req_japanese,
 
     static const char *about_jp =
     {
-	"�ե륹���꡼��ɽ���ϥ��ݡ��Ȥ���Ƥ��ޤ���\n"
-	"���祤���ƥ��å��ϥ��ݡ��Ȥ���Ƥ��ޤ���\n"
-	"�ޥ������������ɽ������ϥ��ݡ��Ȥ���Ƥ��ޤ���\n"
-	"��������ե�������ɤ߹��ߤϥ��ݡ��Ȥ���Ƥ��ޤ���\n"
+	"フルスクリーン表示はサポートされていません\n"
+	"ジョイスティックはサポートされていません\n"
+	"マウスカーソルの表示制御はサポートされていません\n"
+	"キー設定ファイルの読み込みはサポートされていません\n"
     };
 
 
-    *result_code = -1;				/* ʸ�������ɻ���ʤ� */
+    *result_code = -1;				/* 文字コード指定なし */
 
     if (req_japanese == FALSE) {
 	*message = about_en;

@@ -3,62 +3,62 @@
 
 
 
-/* --- Z80 CPU ¤Î¥¨¥ß¥å¥ì¡¼¥È¹½Â¤ÂÎ --- */
+/* --- Z80 CPU ã®ã‚¨ãƒŸãƒ¥ãƒ¬ãƒ¼ãƒˆæ§‹é€ ä½“ --- */
 
 typedef struct{
 
-  pair	AF, BC, DE, HL;			/* ÈÆÍÑ¥ì¥¸¥¹¥¿ */
-  pair	IX, IY, PC, SP;			/* ÀìÍÑ¥ì¥¸¥¹¥¿ */
-  pair	AF1,BC1,DE1,HL1;		/*  Î¢ ¥ì¥¸¥¹¥¿	*/
-  byte	I, R;				/* ÆÃ¼ì¥ì¥¸¥¹¥¿ */
-  byte	R_saved;			/* R reg - bit7 ÊİÂ¸ÍÑ */
-  Uchar	IFF,IFF2;			/* IFF1 ¡¢IFF2	*/
-  Uchar	IM;				/* ³ä¹ş¥â¡¼¥É	*/
-  Uchar	HALT;				/* HALT ¥Õ¥é¥°	*/
+  pair	AF, BC, DE, HL;			/* æ±ç”¨ãƒ¬ã‚¸ã‚¹ã‚¿ */
+  pair	IX, IY, PC, SP;			/* å°‚ç”¨ãƒ¬ã‚¸ã‚¹ã‚¿ */
+  pair	AF1,BC1,DE1,HL1;		/*  è£ ãƒ¬ã‚¸ã‚¹ã‚¿	*/
+  byte	I, R;				/* ç‰¹æ®Šãƒ¬ã‚¸ã‚¹ã‚¿ */
+  byte	R_saved;			/* R reg - bit7 ä¿å­˜ç”¨ */
+  Uchar	IFF,IFF2;			/* IFF1 ã€IFF2	*/
+  Uchar	IM;				/* å‰²è¾¼ãƒ¢ãƒ¼ãƒ‰	*/
+  Uchar	HALT;				/* HALT ãƒ•ãƒ©ã‚°	*/
 
   int	INT_active;
-  int	icount;				/* ¼¡¤Î³ä¹şÈ¯À¸¤Ş¤Ç¤Î¥¹¥Æ¡¼¥È¿ô	*/
-  int	state0;				/* ½èÍı¤·¤¿Áí¥¹¥Æ¡¼¥È¿ô	*/
-					/* (z80->intr_update)()¸Æ½Ğ»ş¤Ë½é´ü²½*/
+  int	icount;				/* æ¬¡ã®å‰²è¾¼ç™ºç”Ÿã¾ã§ã®ã‚¹ãƒ†ãƒ¼ãƒˆæ•°	*/
+  int	state0;				/* å‡¦ç†ã—ãŸç·ã‚¹ãƒ†ãƒ¼ãƒˆæ•°	*/
+					/* (z80->intr_update)()å‘¼å‡ºæ™‚ã«åˆæœŸåŒ–*/
 
   int	skip_intr_chk;
 
-  Uchar	log;				/* ¿¿¤Ê¤é¥Ç¥Ğ¥Ã¥°ÍÑ¤Î¥í¥°¤òµ­Ï¿	*/
-  Uchar	break_if_halt;			/* HALT»ş¤Ë½èÍı¥ë¡¼¥×¤«¤é¶¯À©Ã¦½Ğ*/
+  Uchar	log;				/* çœŸãªã‚‰ãƒ‡ãƒãƒƒã‚°ç”¨ã®ãƒ­ã‚°ã‚’è¨˜éŒ²	*/
+  Uchar	break_if_halt;			/* HALTæ™‚ã«å‡¦ç†ãƒ«ãƒ¼ãƒ—ã‹ã‚‰å¼·åˆ¶è„±å‡º*/
 
   byte	(*fetch)(word);
-  byte	(*mem_read)(word);		/* ¥á¥â¥ê¥ê¡¼¥É´Ø¿ô	*/
-  void	(*mem_write)(word,byte);	/* ¥á¥â¥ê¥é¥¤¥È´Ø¿ô	*/
-  byte	(*io_read)(byte);		/* I/O ÆşÎÏ´Ø¿ô		*/
-  void	(*io_write)(byte,byte);		/* I/O ½ĞÎÏ´Ø¿ô		*/
+  byte	(*mem_read)(word);		/* ãƒ¡ãƒ¢ãƒªãƒªãƒ¼ãƒ‰é–¢æ•°	*/
+  void	(*mem_write)(word,byte);	/* ãƒ¡ãƒ¢ãƒªãƒ©ã‚¤ãƒˆé–¢æ•°	*/
+  byte	(*io_read)(byte);		/* I/O å…¥åŠ›é–¢æ•°		*/
+  void	(*io_write)(byte,byte);		/* I/O å‡ºåŠ›é–¢æ•°		*/
 
-  void	(*intr_update)(void);		/* ³ä¹ş¾ğÊó¹¹¿·´Ø¿ô	*/
-  int	(*intr_ack)(void);		/* ³ä¹ş±şÅú´Ø¿ô		*/
+  void	(*intr_update)(void);		/* å‰²è¾¼æƒ…å ±æ›´æ–°é–¢æ•°	*/
+  int	(*intr_ack)(void);		/* å‰²è¾¼å¿œç­”é–¢æ•°		*/
 
-  pair  PC_prev;			/* Ä¾Á°¤Î PC (¥â¥Ë¥¿ÍÑ)	*/
+  pair  PC_prev;			/* ç›´å‰ã® PC (ãƒ¢ãƒ‹ã‚¿ç”¨)	*/
 
 } z80arch;
 
 
-/* IFF ¤ÎÃæ¿È */
+/* IFF ã®ä¸­èº« */
 #define INT_DISABLE	(0)
 #define INT_ENABLE	(1)
 
 
 
 /*------------------------------------------------------------------------
- * ¸½ºß½èÍıÃæ¤Î CPU ¤ÎÆ°ºî¤ò¶¯À©Åª¤Ë»ß¤á¤ë¤¿¤á¤Î¥Ş¥¯¥í
+ * ç¾åœ¨å‡¦ç†ä¸­ã® CPU ã®å‹•ä½œã‚’å¼·åˆ¶çš„ã«æ­¢ã‚ã‚‹ãŸã‚ã®ãƒã‚¯ãƒ­
  *------------------------------------------------------------------------*/
 
-extern	int z80_state_goal;	/* ¤³¤Îstate¿ôÊ¬¡¢½èÍı¤ò·«¤êÊÖ¤¹(0¤ÇÌµ¸Â) */
-extern	int z80_state_intchk;	/* ¤³¤Îstate¿ô¼Â¹Ô¸å¡¢³ä¹şÈ½Äê¤¹¤ë	  */
+extern	int z80_state_goal;	/* ã“ã®stateæ•°åˆ†ã€å‡¦ç†ã‚’ç¹°ã‚Šè¿”ã™(0ã§ç„¡é™) */
+extern	int z80_state_intchk;	/* ã“ã®stateæ•°å®Ÿè¡Œå¾Œã€å‰²è¾¼åˆ¤å®šã™ã‚‹	  */
 
 
-/* PIOÀ©¸æ¤Ë¤è¤ëCPUÀÚÂØ»ş¤ä¡¢¥á¥Ë¥å¡¼Á«°Ü»ş¤Ê¤É¤Ë¡¢CPU½èÍı¤ò¶¯À©Åª¤ËÄä»ß */
+/* PIOåˆ¶å¾¡ã«ã‚ˆã‚‹CPUåˆ‡æ›¿æ™‚ã‚„ã€ãƒ¡ãƒ‹ãƒ¥ãƒ¼é·ç§»æ™‚ãªã©ã«ã€CPUå‡¦ç†ã‚’å¼·åˆ¶çš„ã«åœæ­¢ */
    
 #define	CPU_BREAKOFF()	do{ z80_state_intchk = 0; z80_state_goal = 1; }while(0)
 
-/* ³ä¹şÈ¯À¸¾ò·ïÊÑ¹¹»ş¤Ë¡¢CPU½èÍı¤ò¶¯À©Åª¤Ë ³ä¹ş¹¹¿·½èÍı¤ËÊ¬´ô */
+/* å‰²è¾¼ç™ºç”Ÿæ¡ä»¶å¤‰æ›´æ™‚ã«ã€CPUå‡¦ç†ã‚’å¼·åˆ¶çš„ã« å‰²è¾¼æ›´æ–°å‡¦ç†ã«åˆ†å² */
 
 #define	CPU_REFRESH_INTERRUPT()		do{ z80_state_intchk = 0; }while(0)
 

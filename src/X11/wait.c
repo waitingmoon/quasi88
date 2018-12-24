@@ -1,11 +1,11 @@
 /***********************************************************************
- * ��������Ĵ������ (�����ƥ��¸)
+ * ウエイト調整処理 (システム依存)
  *
- *	�ܺ٤ϡ� wait.h ����
+ *	詳細は、 wait.h 参照
  ************************************************************************/
 
-/* select, usleep, nanosleep �Τ����줫�Υ����ƥॳ�������Ѥ���Τǡ�
-   �ʲ��Τɤ줫��Ĥ�Ĥ��ơ�¾�ϥ����ȥ����Ȥ��� */
+/* select, usleep, nanosleep のいずれかのシステムコールを使用するので、
+   以下のどれか一つを残して、他はコメントアウトする */
 
 #define USE_SELECT
 /* #define USE_USLEEP */
@@ -31,22 +31,22 @@
 
 
 /*---------------------------------------------------------------------------*/
-static	int	wait_do_sleep;			/* idle���� sleep ����       */
-	int	wait_sleep_min_us = 100;	/* �Ĥ� idle���֤����� us�ʲ���
-						   ���ϡ� sleep �������Ԥġ�
-						   (MAX 1�� = 1,000,000us) */
+static	int	wait_do_sleep;			/* idle時間 sleep する       */
+	int	wait_sleep_min_us = 100;	/* 残り idle時間がこの us以下の
+						   場合は、 sleep せずに待つ。
+						   (MAX 1秒 = 1,000,000us) */
 
-static	int	wait_counter = 0;		/* Ϣ³������֥����С�������*/
-static	int	wait_count_max = 10;		/* ����ʾ�Ϣ³�����С�������
-						   ��ö,����Ĵ������������ */
+static	int	wait_counter = 0;		/* 連続何回時間オーバーしたか*/
+static	int	wait_count_max = 10;		/* これ以上連続オーバーしたら
+						   一旦,時刻調整を初期化する */
 
 	int	show_fps;			/* test */
 static	void	display_fps(void);		/* test */
 
-/* �������Ȥ˻��Ѥ�����֤�����ɽ���ϡ� usñ�̤Ȥ��롣 (ms�������٤��㤤�Τ�) 
+/* ウェイトに使用する時間の内部表現は、 us単位とする。 (msだと精度が低いので) 
 
-   ��������ؿ� (gettimeofday() �ʤ�) �Ǽ������������ us ���Ѵ����ơ�
-   long long �����ݻ����뤳�Ȥˤ��褦�� */
+   時刻取得関数 (gettimeofday() など) で取得した時刻を us に変換して、
+   long long 型で保持することにしよう。 */
 
 #ifdef	HAVE_LONG_LONG
 typedef	long long	T_WAIT_TICK;
@@ -54,47 +54,47 @@ typedef	long long	T_WAIT_TICK;
 typedef	long		T_WAIT_TICK;
 #endif
 
-static	T_WAIT_TICK	next_time;		/* ���ե졼��λ��� */
-static	T_WAIT_TICK	delta_time;		/* 1 �ե졼��λ��� */
+static	T_WAIT_TICK	next_time;		/* 次フレームの時刻 */
+static	T_WAIT_TICK	delta_time;		/* 1 フレームの時間 */
 
-static	T_WAIT_TICK	sleep_min_time = 100;	/* sleep ��ǽ�ʺǾ����� */
+static	T_WAIT_TICK	sleep_min_time = 100;	/* sleep 可能な最小時間 */
 
 
 
-/* ---- ���ꤵ�줿���� (usecñ��) sleep ���� ---- */
+/* ---- 指定された時間 (usec単位) sleep する ---- */
 
 INLINE	void	delay_usec(unsigned int usec)
 {
-#if	defined(USE_SELECT)		/* select ��Ȥ� */
+#if	defined(USE_SELECT)		/* select を使う */
 
     struct timeval tv;
     tv.tv_sec  = 0;
     tv.tv_usec = usec;
     select(0, NULL, NULL, NULL, &tv);
 
-#elif	defined(USE_USLEEP)		/* usleep ��Ȥ� */
+#elif	defined(USE_USLEEP)		/* usleep を使う */
 
     usleep(usec);
 
-#elif	defined(USE_NANOSLEEP)		/* nanosleep ��Ȥ� */
+#elif	defined(USE_NANOSLEEP)		/* nanosleep を使う */
 
     struct timespec ts;
     ts.tv_sec = 0;
     ts.tv_nsec = usec * 1000;
     nanosleep(&ts, NULL);
 
-#else					/* �ɤ��Ȥ��ʤ� ! */
+#else					/* どれも使えない ! */
     wait_do_sleep = FALSE; /* X_X; */
 #endif
 }
 
 
 
-/* ---- ���߻����������� (usecñ��) ---- */
+/* ---- 現在時刻を取得する (usec単位) ---- */
 static int tick_error = FALSE;
 
 
-#ifdef  HAVE_GETTIMEOFDAY		/* gettimeofday() ��Ȥ� */
+#ifdef  HAVE_GETTIMEOFDAY		/* gettimeofday() を使う */
 
 static struct timeval start_tv;
 
@@ -133,10 +133,10 @@ INLINE	T_WAIT_TICK	get_tick(void)
  #endif
 }
 
-#else					/* clock() ��Ȥ� */
+#else					/* clock() を使う */
 
-/* #define CLOCK_SLICE	CLK_TCK */		/* ���줸�����ܡ� */
-#define	CLOCK_SLICE	CLOCKS_PER_SEC		/* ���ä������� */
+/* #define CLOCK_SLICE	CLK_TCK */		/* これじゃ駄目？ */
+#define	CLOCK_SLICE	CLOCKS_PER_SEC		/* こっちが正解？ */
 
 INLINE	void		set_tick(void)
 {
@@ -162,7 +162,7 @@ INLINE	T_WAIT_TICK	get_tick(void)
 
 
 /****************************************************************************
- * ��������Ĵ�������ν��������λ
+ * ウェイト調整処理の初期化／終了
  *****************************************************************************/
 int	wait_vsync_init(void)
 {
@@ -184,7 +184,7 @@ void	wait_vsync_exit(void)
 
 
 /****************************************************************************
- * ��������Ĵ������������
+ * ウェイト調整処理の設定
  *****************************************************************************/
 void	wait_vsync_setup(long vsync_cycle_us, int do_sleep)
 {
@@ -194,59 +194,59 @@ void	wait_vsync_setup(long vsync_cycle_us, int do_sleep)
     wait_counter = 0;
 
 
-    delta_time = (T_WAIT_TICK) vsync_cycle_us;		/* 1�ե졼����� */
-    next_time  = get_tick() + delta_time;		/* ���ե졼����� */
+    delta_time = (T_WAIT_TICK) vsync_cycle_us;		/* 1フレーム時間 */
+    next_time  = get_tick() + delta_time;		/* 次フレーム時刻 */
 
-    wait_do_sleep = do_sleep;				/* Sleep ̵ͭ */
+    wait_do_sleep = do_sleep;				/* Sleep 有無 */
 }
 
 
 
 /****************************************************************************
- * ��������Ĵ�������μ¹�
+ * ウェイト調整処理の実行
  *****************************************************************************/
 int	wait_vsync_update(void)
 {
     int	on_time = FALSE;
     T_WAIT_TICK	diff_us;
 
-    /* �¹���ϡ�sleep ���뤫�ɤ����ϡ����ץ����ˤ�뤱�ɡ� */
-    /* ��˥塼�Ǥ�ɬ�� sleep �����뤳�Ȥˤ��롣              */
-    /* (�줤FreeBSD �ǡ��ʤ����ϥ󥰥��åפ��뤳�Ȥ�����ġ�) */
-    /* (PAUSE�������ʤ��Τ����ġĤʤ���?                  ) */
+    /* 実行中は、sleep するかどうかは、オプションによるけど、 */
+    /* メニューでは必ず sleep させることにする。              */
+    /* (旧いFreeBSD で、なぜかハングアップすることがある……) */
+    /* (PAUSE中は問題ないのだが……なぜに?                  ) */
     int need_sleep = (quasi88_is_exec() ? wait_do_sleep : TRUE);
 
     diff_us = next_time - get_tick();
 
     if (tick_error == FALSE) {
 
-	if (diff_us > 0) {	/* �ޤ����֤�;�äƤ���ʤ� */
-			 	/* diff_us �̥ߥ��å������� */
-	    if (need_sleep) {		/* ���֤����ޤ� sleep ������ */
+	if (diff_us > 0) {	/* まだ時間が余っているなら */
+			 	/* diff_us μミリ秒ウェイト */
+	    if (need_sleep) {		/* 時間が来るまで sleep する場合 */
 
-		/* FreeBSD ���ξ�硢�ʲ��Τ��������ܤ���ˡ�ʳ��ϡ�
-		   10msñ�̤ǥ��꡼�פ��뤳�Ȥ�Ƚ����
-		   �Ĥޤꡢ55.4hz�ξ�硢18ms�ǤϤʤ���20ms�Υ��꡼��
-		   �ˤʤ롣*/
+		/* FreeBSD ？の場合、以下のうち２番目の方法以外は、
+		   10ms単位でスリープすることが判明。
+		   つまり、55.4hzの場合、18msではなく、20msのスリープ
+		   になる。*/
 
 #if 1
-		/* ver 0.6.3 �ޤǤ���ˡ
-		   �������٤ޤǥ������Ȥ򤷤Ƥ��뤿��㴳�٤줬ȯ������Ϥ���
-		   ������ɥΥ������װ����� */
-		if (diff_us < sleep_min_time) {	/* �Ĥ�Ϥ��ʤ�ӥ�����������*/
+		/* ver 0.6.3 までの方法
+		   時間丁度までウェイトをしているため若干遅れが発生するはず。
+		   サウンドノイズの要因か？ */
+		if (diff_us < sleep_min_time) {	/* 残り僅かならビジーウェイト*/
 		    while (tick_error == FALSE) {
 			if (next_time <= get_tick())
 			    break;
 		    }
-		} else {			/* �Ĥ�¿����Хǥ��쥤      */
+		} else {			/* 残り多ければディレイ      */
 		    delay_usec(diff_us);
 		}
 #elif 0
-		/* 1ms �ʾ���֤�������� 100us �� sleep ��
-		   1ms ̤���ξ��ϥӥ����������Ȥ򤷤Ƥߤ���XMAME����
-		   �ӥ����������Ȥ�������٤ǤϤʤ���100us���˽����褦��
-		   �Ȥ������� 100us �� sleep �� CPU��٤� 100% �᤯�ˤʤ�
-		   ���Ȥ�Ƚ��������Ϥޤ�������*/
+		/* 1ms 以上時間がある場合は 100us の sleep を、
+		   1ms 未満の場合はビジーウェイトをしてみた。XMAME風？
+		   ビジーウェイトも時間丁度ではなく、100us早めに終えよう。
+		   ところが、 100us の sleep は CPU負荷が 100% 近くになる
+		   ことが判明。これはまずいか。*/
 		while (tick_error == FALSE) {
 		    diff_us = next_time - get_tick();
 		    if (diff_us >= 1000) {
@@ -256,13 +256,13 @@ int	wait_vsync_update(void)
 		    }
 		}
 #elif 0
-		/* SDL �� 1ms ñ�̤� sleep �ǡ�CPU��٤�ʤ���������ɤ�
-		   �Υ������Ǥʤ��Τǡ����Τޤ޿������Ƥߤ褦��*/
+		/* SDL は 1ms 単位の sleep で、CPU負荷もなく、サウンドも
+		   ノイズがでないので、そのまま真似してみよう。*/
 		if (diff_us >= 1000) {
 		    delay_usec((diff_us/1000) * 1000);
 		}
 #elif 0
-		/* �������� */
+		/* 上の折衷案 */
 		while (tick_error == FALSE) {
 		    diff_us = next_time - get_tick();
 		    if (diff_us >= 1100) {
@@ -272,7 +272,7 @@ int	wait_vsync_update(void)
 		    }
 		}
 #endif
-	    } else {			/* ���֤����ޤ�Tick ��ƻ뤹���� */
+	    } else {			/* 時間が来るまでTick を監視する場合 */
 
 		while (tick_error == FALSE) {
 		    if (next_time <= get_tick())
@@ -285,16 +285,16 @@ int	wait_vsync_update(void)
     }
 
 
-    /* ���ե졼�����򻻽� */
+    /* 次フレーム時刻を算出 */
     next_time += delta_time;
 
 
-    if (on_time) {			/* ������˽����Ǥ��� */
+    if (on_time) {			/* 時間内に処理できた */
 	wait_counter = 0;
-    } else {				/* ������˽����Ǥ��Ƥ��ʤ� */
+    } else {				/* 時間内に処理できていない */
 	wait_counter ++;
-	if (wait_counter >= wait_count_max) {	/* �٤줬�Ҥɤ����� */
-	    wait_vsync_setup((long) delta_time,	/* �������Ȥ�����   */
+	if (wait_counter >= wait_count_max) {	/* 遅れがひどい場合は */
+	    wait_vsync_setup((long) delta_time,	/* ウェイトを初期化   */
 			     wait_do_sleep);
 	}
     }
@@ -323,7 +323,7 @@ int	wait_vsync_update(void)
 /****************************************************************************
  *
  *****************************************************************************/
-/* Ŭ���� fps �׻� */
+/* 適当に fps 計算 */
 static	void	display_fps(void)
 {
 #ifdef  HAVE_GETTIMEOFDAY
@@ -332,7 +332,7 @@ static	void	display_fps(void)
     static int prev_drawn_count;
     static int prev_vsync_count;
 
-    /* ���� tv0 �Ͻ����̤�ʤΤǡ����߻���򥻥å� */
+    /* 初回は tv0 は初期化未なので、現在時刻をセット */
     if (tv0.tv_sec == 0 &&
 	tv0.tv_usec == 0) {
 	gettimeofday(&tv0, 0);
@@ -340,8 +340,8 @@ static	void	display_fps(void)
 
     if (quasi88_is_exec()) {
 
-	/* ���δؿ��ϡ����������� �� �ե졼����˸ƤӽФ���롣
-	   60�ե졼���(��1��)�ƤӽФ��줿�顢FPS��׻�����ɽ������ */
+	/* この関数は、ウェイト毎 ＝ フレーム毎に呼び出される。
+	   60フレーム回(約1秒)呼び出されたら、FPSを計算し、表示する */
 	if (++ frame_count >= 60) {
 
 	    char buf[32];

@@ -5,8 +5,8 @@
 #include "file-op.h"
 
 
-#if 0	/* ¢ª file-op.h */
-extern char file_snap[QUASI88_MAX_FILENAME];	/* ¥¹¥Ê¥Ã¥×¥·¥ç¥Ã¥È¥Ù¡¼¥¹Éô */
+#if 0	/* â†’ file-op.h */
+extern char file_snap[QUASI88_MAX_FILENAME];	/* ã‚¹ãƒŠãƒƒãƒ—ã‚·ãƒ§ãƒƒãƒˆãƒ™ãƒ¼ã‚¹éƒ¨ */
 #endif
 
 
@@ -16,15 +16,15 @@ enum {
   SNAPSHOT_FMT_PPM,
   SNAPSHOT_FMT_RAW
 };
-extern	int	snapshot_format;	/* ¥¹¥Ê¥Ã¥×¥·¥ç¥Ã¥È¥Õ¥©¡¼¥Ş¥Ã¥È	*/
+extern	int	snapshot_format;	/* ã‚¹ãƒŠãƒƒãƒ—ã‚·ãƒ§ãƒƒãƒˆãƒ•ã‚©ãƒ¼ãƒãƒƒãƒˆ	*/
 
 
-					/* ¥¹¥Ê¥Ã¥×¥·¥ç¥Ã¥È¥³¥Ş¥ó¥É	*/
+					/* ã‚¹ãƒŠãƒƒãƒ—ã‚·ãƒ§ãƒƒãƒˆã‚³ãƒãƒ³ãƒ‰	*/
 #define	SNAPSHOT_CMD_SIZE	(1024)
 extern	char	snapshot_cmd[ SNAPSHOT_CMD_SIZE ];
-extern	char	snapshot_cmd_do;	/* ¥³¥Ş¥ó¥É¼Â¹Ô¤ÎÍ­Ìµ		*/
+extern	char	snapshot_cmd_do;	/* ã‚³ãƒãƒ³ãƒ‰å®Ÿè¡Œã®æœ‰ç„¡		*/
 
-extern	char	snapshot_cmd_enable;	/* ¥³¥Ş¥ó¥É¼Â¹Ô¤Î²ÄÈİ		*/
+extern	char	snapshot_cmd_enable;	/* ã‚³ãƒãƒ³ãƒ‰å®Ÿè¡Œã®å¯å¦		*/
 
 
 void		filename_init_snap(int synchronize);

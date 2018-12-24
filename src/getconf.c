@@ -1,6 +1,6 @@
 /************************************************************************/
 /*									*/
-/* ╡п╞░─╛╕хд╬░·┐Їд╬╜ш═¤д╚бвеяб╝епд╬╜щ┤№▓╜				*/
+/* ш╡╖хЛХчЫ┤х╛МуБох╝ХцХ░уБохЗжчРЖуБиуАБуГпуГ╝уВпуБохИЭцЬЯхМЦ				*/
 /*									*/
 /************************************************************************/
 
@@ -37,7 +37,7 @@
 
 /*----------------------------------------------------------------------*/
 
-/* -f6 .. -f10 еке╫е╖ечеєд╬░·┐Їд╚бв╡б╟╜д╬┬╨▒■░ь═ў */
+/* -f6 .. -f10 уВкуГЧуВ╖уГзуГ│уБох╝ХцХ░уБиуАБцйЯшГ╜уБохп╛х┐Ьф╕Ашжз */
 static const struct {	
     int		num;
     char	*str;
@@ -54,7 +54,7 @@ static const struct {
     { FN_SPEED_UP,    "SPEED-UP",    },
     { FN_SPEED_DOWN,  "SPEED-DOWN",  },
     { FN_FULLSCREEN,  "FULLSCREEN",  },
-    { FN_FULLSCREEN,  "DGA",         },	/* ╕▀┤╣д╬д┐дс */
+    { FN_FULLSCREEN,  "DGA",         },	/* ф║ТцПЫуБоуБЯуВБ */
     { FN_SNAPSHOT,    "SNAPSHOT",    },
     { FN_IMAGE_NEXT1, "IMAGE-NEXT1", },
     { FN_IMAGE_PREV1, "IMAGE-PREV1", },
@@ -75,33 +75,33 @@ static const struct {
 
 /*----------------------------------------------------------------------*/
 
-/* еке╫е╖ечеєдЄдддпд─длд╬е░еыб╝е╫д╦╩мд▒д╞бв═е└ш┼┘дЄ└▀─ъд╣дыбг*/
+/* уВкуГЧуВ╖уГзуГ│уВТуБДуБПуБдуБЛуБоуВ░уГлуГ╝уГЧуБлхИЖуБСуБжуАБхДкхЕИх║жуВТшинхоЪуБЩуВЛуАВ*/
 #define	OPT_GROUPS	(400)
 static	signed char	opt_prioroty[ OPT_GROUPS ];
 
 /*----------------------------------------------------------------------*/
 
-	T_CONFIG_IMAGE	config_image;	/* ░·┐Їд╟╗╪─ъд╡дьд┐едесб╝е╕е╒ебедеы */
+	T_CONFIG_IMAGE	config_image;	/* х╝ХцХ░уБзцМЗхоЪуБХуВМуБЯуВдуГбуГ╝уВ╕уГХуВбуВдуГл */
 
-static	int	load_config = TRUE;	/* ┐┐д╟бв╡п╞░╗■д╦└▀─ъ╞╔д▀╣■др */
-	int	save_config = FALSE;	/* ┐┐д╟бв╜к╬╗╗■д╦└▀─ъ╩▌┬╕д╣ды */
+static	int	load_config = TRUE;	/* чЬЯуБзуАБш╡╖хЛХцЩВуБлшинхоЪшкнуБ┐ш╛╝уВА */
+	int	save_config = FALSE;	/* чЬЯуБзуАБч╡Вф║ЖцЩВуБлшинхоЪф┐ЭхнШуБЩуВЛ */
 
-/* е╪еые╫╔╜╝и═╤д╬бве│е▐еєе╔ (argv[0]) */
+/* уГШуГлуГЧшбичд║чФиуБоуАБуВ│уГЮуГ│уГЙ (argv[0]) */
 static	char	*command = "QUASI88";
 
-/* е╖е╣е╞ер░═┬╕д╬е╪еые╫╔╜╝и┤╪┐Ї */
+/* уВ╖уВ╣уГЖуГаф╛ЭхнШуБоуГШуГлуГЧшбичд║щЦвцХ░ */
 static	void	(*help_msg_osd)(void) = NULL;
 
-/* е╖е╣е╞ер░═┬╕д╬еке╫е╖ечеєе╞б╝е╓еы */
+/* уВ╖уВ╣уГЖуГаф╛ЭхнШуБоуВкуГЧуВ╖уГзуГ│уГЖуГ╝уГЦуГл */
 static	const	T_CONFIG_TABLE *option_table_osd;
 
-/* е╡ежеєе╔╖╧д╬еке╫е╖ечеєе╞б╝е╓еы */
+/* уВ╡уВжуГ│уГЙч│╗уБоуВкуГЧуВ╖уГзуГ│уГЖуГ╝уГЦуГл */
 static	const	T_CONFIG_TABLE *option_table_sound;
 
 /*----------------------------------------------------------------------*/
 
-/* е│б╝еые╨е├еп┤╪┐Їд╬░·┐Ї (char *) дм╠д╗╚═╤д╬╛ь╣чбв
- * еяб╝е╦еєе░дм╜╨д╞▌╡╞лд╖ддд╬д╟бв gcc д╦═ъдєд╟╡Ўд╖д╞дтдщджбг */
+/* уВ│уГ╝уГлуГРуГГуВпщЦвцХ░уБох╝ХцХ░ (char *) уБМцЬкф╜┐чФиуБоха┤хРИуАБ
+ * уГпуГ╝уГЛуГ│уВ░уБМхЗ║уБжщм▒щЩ╢уБЧуБДуБоуБзуАБ gcc уБлща╝уВУуБзши▒уБЧуБжуВВуВЙуБЖуАВ */
 #if defined(__GNUC__)
 #define	UNUSED_ARG	__attribute__((__unused__)) char *dummy
 #else
@@ -194,15 +194,15 @@ static int oo_setinput(int type, int key, char *keysym)
     if (code < 0) {
 	return 1;
     } else {
-	if (type == 0) {		/* елб╝е╜еыенб╝ */
+	if (type == 0) {		/* уВлуГ╝уВ╜уГлуВнуГ╝ */
 	    cursor_key_mode = 2;
 	    cursor_key_assign[ key ] = code;
 	}
-	else if (type == 1) {		/* е▐еже╣ */
+	else if (type == 1) {		/* уГЮуВжуВ╣ */
 	    mouse_key_mode = 2;
 	    mouse_key_assign[ key ] = code;
 	}
-	else if (type == 2) {		/* е╕ечеде╣е╞еге├еп */
+	else if (type == 2) {		/* уВ╕уГзуВдуВ╣уГЖуВгуГГуВп */
 	    joy_key_mode = 2;
 	    joy_key_assign[ key ] = code;
 	}
@@ -301,7 +301,7 @@ static int o_serialout(UNUSED_ARG) { return oo_image(&config_image.sout); }
 
 static int o_diskimage(UNUSED_ARG)
 {
-/*  config_image.d[DRIVE_1] = └▀─ъ║╤д▀ */
+/*  config_image.d[DRIVE_1] = шинхоЪц╕ИуБ┐ */
     config_image.d[DRIVE_2] = NULL;
     config_image.n[DRIVE_1] = 0;
     config_image.n[DRIVE_2] = 0;
@@ -313,10 +313,10 @@ static int o_diskimage(UNUSED_ARG)
 
 /*----------------------------------------------------------------------*/
 
-/* ╠╡╕·д╩еке╫е╖ечеєд╟бв░·┐ЇдЄ╚╝дж╛ь╣чбве└е▀б╝д╬ int╖┐╩╤┐ЇдЄ═╤░╒д╖д╞дкдп */
+/* чДбхК╣уБкуВкуГЧуВ╖уГзуГ│уБзуАБх╝ХцХ░уВТф╝┤уБЖха┤хРИуАБуГАуГЯуГ╝уБо intхЮЛхдЙцХ░уВТчФицДПуБЧуБжуБКуБП */
 static	int	invalid_arg;
 
-/* └▀─ъ╩▌┬╕д╬║▌д╦бв╞├╩╠д╩╜ш═¤дЄд╣ды┤╪┐Ї */
+/* шинхоЪф┐ЭхнШуБощЪЫуБлуАБчЙ╣хИеуБкхЗжчРЖуВТуБЩуВЛщЦвцХ░ */
 static int save_bau(const struct T_CONFIG_TABLE *op, char opt_arg[255]);
 static int save_ver(const struct T_CONFIG_TABLE *op, char opt_arg[255]);
 static int save_fn(const struct T_CONFIG_TABLE *op, char opt_arg[255]);
@@ -326,7 +326,7 @@ static int save_joy(const struct T_CONFIG_TABLE *op, char opt_arg[255]);
 
 static const T_CONFIG_TABLE option_table[] =
 {
-  /*  1б┴30 : PC-8801└▀─ъеке╫е╖ечеє */
+  /*  1уАЬ30 : PC-8801шинхоЪуВкуГЧуВ╖уГзуГ│ */
 
   {   1, "n",            X_FIX,  &boot_basic,      BASIC_N,               0,0, OPT_SAVE },
   {   1, "v1s",          X_FIX,  &boot_basic,      BASIC_V1S,             0,0, OPT_SAVE },
@@ -359,7 +359,7 @@ static const T_CONFIG_TABLE option_table[] =
   {  15, "serialmouse",  X_FIX,  &use_siomouse,    TRUE,                  0,0, OPT_SAVE },
   {  15, "noserialmouse",X_FIX,  &use_siomouse,    FALSE,                 0,0, OPT_SAVE },
 
-  /*  31б┴60 : еие▀ехеьб╝е╖ечеє└▀─ъеке╫е╖ечеє */
+  /*  31уАЬ60 : уВиуГЯуГеуГмуГ╝уВ╖уГзуГ│шинхоЪуВкуГЧуВ╖уГзуГ│ */
 
   {  31, "cpu",          X_INT,  &cpu_timing,      0, 2,                    0, OPT_SAVE },
   {  32, "cpu1count",    X_INT,  &CPU_1_COUNT,     1, 65536,                0, 0        },
@@ -382,7 +382,7 @@ static const T_CONFIG_TABLE option_table[] =
   {  44, "exchange",     X_FIX,  &disk_exchange,   TRUE,                  0,0, OPT_SAVE },
   {  44, "noexchange",   X_FIX,  &disk_exchange,   FALSE,                 0,0, OPT_SAVE },
 
-  /*  61б┴90 : ▓ш╠╠╔╜╝и└▀─ъеке╫е╖ечеє */
+  /*  61уАЬ90 : чФ╗щЭвшбичд║шинхоЪуВкуГЧуВ╖уГзуГ│ */
 
   {  61, "frameskip",    X_INT,  &frameskip_rate,  1, 65536,                0, OPT_SAVE },
   {  62, "autoskip",     X_FIX,  &use_auto_skip,   TRUE,                  0,0, OPT_SAVE },
@@ -420,7 +420,7 @@ static const T_CONFIG_TABLE option_table[] =
   {  75, "statusimage",  X_FIX,  &status_imagename,TRUE,                  0,0, OPT_SAVE },
   {  75, "nostatusimage",X_FIX,  &status_imagename,FALSE,                 0,0, OPT_SAVE },
 
-  /*  91б┴160: енб╝└▀─ъеке╫е╖ечеє */
+  /*  91уАЬ160: уВнуГ╝шинхоЪуВкуГЧуВ╖уГзуГ│ */
 
   {  91, "tenkey",       X_FIX,  &tenkey_emu,      TRUE,                  0,0, OPT_SAVE },
   {  91, "notenkey",     X_FIX,  &tenkey_emu,      FALSE,                 0,0, OPT_SAVE },
@@ -475,7 +475,7 @@ static const T_CONFIG_TABLE option_table[] =
   { 136, "mouseswap",    X_FIX,  &mouse_swap_button, TRUE,                0,0, OPT_SAVE },
   { 137, "mousespeed",   X_INT,  &mouse_sensitivity, 5, 400,                0, OPT_SAVE },
 
-  /* 161б┴180: есе╦ехб╝└▀─ъеке╫е╖ечеє */
+  /* 161уАЬ180: уГбуГЛуГеуГ╝шинхоЪуВкуГЧуВ╖уГзуГ│ */
 
   { 161, "menu",         X_NOP,  0,                0, 0, o_menu,               0        },
   { 162, "english",      X_FIX,  &menu_lang,       MENU_ENGLISH,          0,0, 0        },
@@ -491,7 +491,7 @@ static const T_CONFIG_TABLE option_table[] =
   { 166, "menucursor",   X_FIX,  &use_swcursor,    TRUE,                  0,0, 0        },
   { 166, "nomenucursor", X_FIX,  &use_swcursor,    FALSE,                 0,0, 0        },
 
-  /* 181б┴250: е╖е╣е╞ер└▀─ъеке╫е╖ечеє */
+  /* 181уАЬ250: уВ╖уВ╣уГЖуГашинхоЪуВкуГЧуВ╖уГзуГ│ */
 
   { 181, "romdir",       X_STR,  NULL,             0, 0, o_romdir,             0        },
   { 182, "diskdir",      X_STR,  NULL,             0, 0, o_diskdir,            0        },
@@ -507,7 +507,7 @@ static const T_CONFIG_TABLE option_table[] =
   { 191, "nofocus",      X_FIX,  &need_focus,      FALSE,                 0,0, 0        },
   { 192, "sleep",        X_FIX,  &wait_by_sleep,   TRUE,                  0,0, OPT_SAVE },
   { 192, "nosleep",      X_FIX,  &wait_by_sleep,   FALSE,                 0,0, OPT_SAVE },
-  /*193  ║я╜№ */
+  /*193  хЙКщЩд */
   { 194, "ro",           X_FIX,  &menu_readonly,   TRUE,                  0,0, 0        },
   { 194, "rw",           X_FIX,  &menu_readonly,   FALSE,                 0,0, 0        },
   { 195, "ignore_ro",    X_FIX,  &fdc_ignore_readonly,  TRUE,             0,0, 0        },
@@ -516,7 +516,7 @@ static const T_CONFIG_TABLE option_table[] =
   { 197, "saveconfig",   X_FIX,  &save_config,     TRUE,                  0,0, OPT_SAVE },
   { 197, "nosaveconfig", X_FIX,  &save_config,     FALSE,                 0,0, OPT_SAVE },
 
-  /* 251б┴299: е╟е╨е├е░═╤еке╫е╖ечеє */
+  /* 251уАЬ299: уГЗуГРуГГуВ░чФиуВкуГЧуВ╖уГзуГ│ */
 
   { 251, "help",         X_NOP,  0,                0, 0, o_help,               0        },
   { 252, "verbose",      X_INT,  &verbose_level,   0x00, 0xff,              0, 0        },
@@ -557,7 +557,7 @@ static const T_CONFIG_TABLE option_table[] =
 
 
 #if 0
-  /* ░╩▓╝д╬еке╫е╖ечеєд╧бвд╣д┘д╞╟╤╗▀ */
+  /* ф╗еф╕ЛуБоуВкуГЧуВ╖уГзуГ│уБпуАБуБЩуБ╣уБжх╗Гцнв */
   {   0, "menukey",      X_INV,                                       0,0,0,0, 0        },
   {   0, "joyassign",    X_INT,  &invalid_arg,                          0,0,0, 0        },
   {   0, "joykey",       X_INV,                                       0,0,0,0, 0        },
@@ -570,14 +570,14 @@ static const T_CONFIG_TABLE option_table[] =
 #endif
 
 
-  /* 300б┴349: е╖е╣е╞ер░═┬╕еке╫е╖ечеє */
-  /* д│д╬╚╧░╧д╬е░еыб╝е╫д╧бве╖е╣е╞ер░═┬╕еке╫е╖ечеєд╬е╞б╝е╓еы═╤д╦═╜╠є */
+  /* 300уАЬ349: уВ╖уВ╣уГЖуГаф╛ЭхнШуВкуГЧуВ╖уГзуГ│ */
+  /* уБУуБочпДхЫ▓уБоуВ░уГлуГ╝уГЧуБпуАБуВ╖уВ╣уГЖуГаф╛ЭхнШуВкуГЧуВ╖уГзуГ│уБоуГЖуГ╝уГЦуГлчФиуБлф║Ич┤Д */
 
 
-  /* 350б┴399: е╡ежеєе╔░═┬╕еке╫е╖ечеє */
-  /* д│д╬╚╧░╧д╬е░еыб╝е╫д╧бве╡ежеєе╔░═┬╕еке╫е╖ечеєд╬е╞б╝е╓еы═╤д╦═╜╠є */
+  /* 350уАЬ399: уВ╡уВжуГ│уГЙф╛ЭхнШуВкуГЧуВ╖уГзуГ│ */
+  /* уБУуБочпДхЫ▓уБоуВ░уГлуГ╝уГЧуБпуАБуВ╡уВжуГ│уГЙф╛ЭхнШуВкуГЧуВ╖уГзуГ│уБоуГЖуГ╝уГЦуГлчФиуБлф║Ич┤Д */
 
-#ifndef	USE_SOUND		/* е╡ежеєе╔д╩д╖╗■д╬еке╫е╖ечеє (╠╡╗ы) */
+#ifndef	USE_SOUND		/* уВ╡уВжуГ│уГЙуБкуБЧцЩВуБоуВкуГЧуВ╖уГзуГ│ (чДбшжЦ) */
 
   /* src/snddrv/src/unix/sound.c */
   {   0, "samples",            X_INV,                                 0,0,0,0, 0        },
@@ -670,27 +670,27 @@ static const T_CONFIG_TABLE option_table[] =
 
 #endif
 
-  /* ╜к├╝ */
+  /* ч╡Вчлп */
   {   0, NULL,           X_INV,                                       0,0,0,0, 0        },
 };
 
 
 
 /*--------------------------------------------------------------------------
- * 2╕─д╬╧в┬│д╖д┐░·┐Ї opt1, opt2 дЄ╜ш═¤д╣дыбг
- * д▐д║бвеке╫е╖ечеєе╞б╝е╓еы osd_options длдщ╣ч├╫д╣дыдле┴езе├епд╣дыбг
- * ╣ч├╫д╖д╩д▒дьд╨бв sound_options длдщ╣ч├╫д╣дыдле┴езе├епд╣дыбг
- * д▐д└╣ч├╫д╖д╩д▒дьд╨бв xmame_config_check_option() дЄ╕╞д╙╜╨д╣бг
- * ╣ч├╫д╖д┐╛ь╣чд╟дтбв═е└ш┼┘ priority д╦дшд├д╞д╧бв╜ш═¤дме╣ене├е╫д╡дьдыбг
+ * 2хАЛуБощАгч╢ЪуБЧуБЯх╝ХцХ░ opt1, opt2 уВТхЗжчРЖуБЩуВЛуАВ
+ * уБ╛уБЪуАБуВкуГЧуВ╖уГзуГ│уГЖуГ╝уГЦуГл osd_options уБЛуВЙхРИшЗ┤уБЩуВЛуБЛуГБуВзуГГуВпуБЩуВЛуАВ
+ * хРИшЗ┤уБЧуБкуБСуВМуБ░уАБ sound_options уБЛуВЙхРИшЗ┤уБЩуВЛуБЛуГБуВзуГГуВпуБЩуВЛуАВ
+ * уБ╛уБахРИшЗ┤уБЧуБкуБСуВМуБ░уАБ xmame_config_check_option() уВТхС╝уБ│хЗ║уБЩуАВ
+ * хРИшЗ┤уБЧуБЯха┤хРИуБзуВВуАБхДкхЕИх║ж priority уБлуВИуБгуБжуБпуАБхЗжчРЖуБМуВ╣уВнуГГуГЧуБХуВМуВЛуАВ
  *
- *	╠сдъ├═	1  б─ ╜ш═¤д╖д┐░·┐Їдм1╕─ (opt1 д╬д▀╜ш═¤бг opt2 д╧╠д╜ш═¤)
- *		2  б─ ╜ш═¤д╖д┐░·┐Їдм2╕─ (opt1 д╚ opt2 дЄ╜ш═¤)
- *		0  б─ opt1 дм╠д├╬д╬░·┐Їд╬д┐дсбв opt1 opt2 д╚дтд╦╠д╜ш═¤
- *		-1 б─ ╞т╔Їд╟├╫╠┐┼кд╩░█╛ядм╚п└╕
+ *	цИ╗уВКхАд	1  тАж хЗжчРЖуБЧуБЯх╝ХцХ░уБМ1хАЛ (opt1 уБоуБ┐хЗжчРЖуАВ opt2 уБпцЬкхЗжчРЖ)
+ *		2  тАж хЗжчРЖуБЧуБЯх╝ХцХ░уБМ2хАЛ (opt1 уБи opt2 уВТхЗжчРЖ)
+ *		0  тАж opt1 уБМцЬкчЯеуБох╝ХцХ░уБоуБЯуВБуАБ opt1 opt2 уБиуВВуБлцЬкхЗжчРЖ
+ *		-1 тАж хЖЕщГиуБзшЗ┤хС╜чЪДуБкчХ░х╕╕уБМчЩ║чФЯ
  *
- *	╜ш═¤┼╙├цд╬░█╛я (░·┐Їд╟╗╪─ъд╖д┐├═дм╚╧░╧│░д╩д╔) дфбв
- *	═е└ш┼┘д╦дшдъ╜ш═¤дме╣ене├е╫д╡дьд┐дшджд╩╛ь╣чд╧бв
- *	└╡д╖дп╜ш═¤д╟днд┐╛ь╣чд╚╞▒══д╦бв 1 дл 2 дЄ╩╓д╣бг
+ *	хЗжчРЖщАФф╕нуБочХ░х╕╕ (х╝ХцХ░уБзцМЗхоЪуБЧуБЯхАдуБМчпДхЫ▓хдЦуБкуБй) уВДуАБ
+ *	хДкхЕИх║жуБлуВИуВКхЗжчРЖуБМуВ╣уВнуГГуГЧуБХуВМуБЯуВИуБЖуБкха┤хРИуБпуАБ
+ *	цнгуБЧуБПхЗжчРЖуБзуБНуБЯха┤хРИуБихРМцзШуБлуАБ 1 уБЛ 2 уВТш┐ФуБЩуАВ
  *--------------------------------------------------------------------------*/
 
 static	int	check_option(char *opt1, char *opt2, int priority,
@@ -707,7 +707,7 @@ static	int	check_option(char *opt1, char *opt2, int priority,
     if (opt1[0] != '-') return -1;
 
 
-    /* еке╫е╖ечеє╩╕╗·╬єд╦д╦╣ч├╫д╣дыдтд╬дЄ├╡д╖д▐д╖дчдж */
+    /* уВкуГЧуВ╖уГзуГ│цЦЗхнЧхИЧуБлуБлхРИшЗ┤уБЩуВЛуВВуБоуВТцОвуБЧуБ╛уБЧуВЗуБЖ */
 
     for (op = &option_table[0]; op->name; op++) {
 	if (strcmp(&opt1[1], op->name) == 0) break;
@@ -715,7 +715,7 @@ static	int	check_option(char *opt1, char *opt2, int priority,
 
     if (op->name == NULL) {
 
-	/* ╕лд─длдщд╩д▒дьд╨бв osd_options д╬еке╫е╖ечеєдлдщ├╡д╖д▐д╣ */
+	/* шжЛуБдуБЛуВЙуБкуБСуВМуБ░уАБ osd_options уБоуВкуГЧуВ╖уГзуГ│уБЛуВЙцОвуБЧуБ╛уБЩ */
 
 	if (osd_options) {
 	    for (op = &osd_options[0]; op->name; op++) {
@@ -725,7 +725,7 @@ static	int	check_option(char *opt1, char *opt2, int priority,
 
 	if (op->name == NULL) {
 
-	    /* ╕лд─длдщд╩д▒дьд╨бв sound_options д╬еке╫е╖ечеєдлдщ├╡д╖д▐д╣ */
+	    /* шжЛуБдуБЛуВЙуБкуБСуВМуБ░уАБ sound_options уБоуВкуГЧуВ╖уГзуГ│уБЛуВЙцОвуБЧуБ╛уБЩ */
 
 	    if (sound_options) {
 		for (op = &sound_options[0]; op->name; op++) {
@@ -735,7 +735,7 @@ static	int	check_option(char *opt1, char *opt2, int priority,
 
 	    if (op->name == NULL) {
 
-		/* д╜дьд╟дт╕лд─длдщд╩д▒дьд╨бвMAME д╬еке╫е╖ечеєдлдщ├╡д╖д▐д╣ */
+		/* уБЭуВМуБзуВВшжЛуБдуБЛуВЙуБкуБСуВМуБ░уАБMAME уБоуВкуГЧуВ╖уГзуГ│уБЛуВЙцОвуБЧуБ╛уБЩ */
 
 		ret_val = xmame_config_check_option(opt1, opt2, priority);
 		return ret_val;
@@ -743,7 +743,7 @@ static	int	check_option(char *opt1, char *opt2, int priority,
 	}
     }
 
-	/* ╕лд─длдьд╨╜ш═¤бгд┐д└д╖бв╚┐▒╟д╧ '═е└ш┼┘дм╣тдд' дл '╞▒д╕' ╛ь╣чд╬д▀ */
+	/* шжЛуБдуБЛуВМуБ░хЗжчРЖуАВуБЯуБауБЧуАБхПНцШауБп 'хДкхЕИх║жуБМщлШуБД' уБЛ 'хРМуБШ' ха┤хРИуБоуБ┐ */
 
     if (priority < opt_prioroty[ op->group ]) {
 	ignore = TRUE;
@@ -753,11 +753,11 @@ static	int	check_option(char *opt1, char *opt2, int priority,
     applied = FALSE;
 
 
-	/* еке╫е╖ечеєд╬е┐еде╫╩╠д╦╜ш═¤д╖д▐д╣ */
+	/* уВкуГЧуВ╖уГзуГ│уБоуВ┐уВдуГЧхИеуБлхЗжчРЖуБЧуБ╛уБЩ */
 
     switch (op->type) {
 
-    case X_FIX:		/* д╩д╖:   *var = (int)val1 [─ъ┐Ї]           */
+    case X_FIX:		/* уБкуБЧ:   *var = (int)val1 [хоЪцХ░]           */
 	{
 	    if (ignore == FALSE) {
 		*((int*)op->var) = (int)op->val1;
@@ -766,7 +766,7 @@ static	int	check_option(char *opt1, char *opt2, int priority,
 	}
 	break;
 
-    case X_INT:		/* int:    *var = argv  [╚╧░╧ var1б┴val2]    */
+    case X_INT:		/* int:    *var = argv  [чпДхЫ▓ var1уАЬval2]    */
 	{
 	    int low, high, work;
 
@@ -791,7 +791,7 @@ static	int	check_option(char *opt1, char *opt2, int priority,
 	}
 	break;
 
-    case X_DBL:		/* double: *var = argv  [╚╧░╧ var1б┴val2]    */
+    case X_DBL:		/* double: *var = argv  [чпДхЫ▓ var1уАЬval2]    */
 	{
 	    double low, high, work;
 
@@ -816,7 +816,7 @@ static	int	check_option(char *opt1, char *opt2, int priority,
 	}
 	break;
 
-    case X_STR:		/* ╩╕╗·╬є: strcpy(var, argv);                */
+    case X_STR:		/* цЦЗхнЧхИЧ: strcpy(var, argv);                */
 	{
 	    char *work;
 
@@ -847,7 +847,7 @@ static	int	check_option(char *opt1, char *opt2, int priority,
 	}
 	break;
 
-    case X_NOP:		/* ╠╡╜ш═¤:                                   */
+    case X_NOP:		/* чДбхЗжчРЖ:                                   */
 	if (op->var) {
 	    if (opt2) {
 		ret_val ++;
@@ -864,7 +864,7 @@ static	int	check_option(char *opt1, char *opt2, int priority,
 	}
 	break;
 
-    case X_INV:		/* ╠╡╕·:                                     */
+    case X_INV:		/* чДбхК╣:                                     */
 	if (op->var && opt2) {
 	    ret_val ++;
 	    fprintf(stderr, "error: invalid option %s %s\n", opt1, opt2);
@@ -878,7 +878,7 @@ static	int	check_option(char *opt1, char *opt2, int priority,
     }
 
 
-    /* ╜ш═¤╕хд╬╕╞д╙╜╨д╖┤╪┐Їдмдвдьд╨бвд╜дьдЄ╕╞д╙д▐д╣ */
+    /* хЗжчРЖх╛МуБохС╝уБ│хЗ║уБЧщЦвцХ░уБМуБВуВМуБ░уАБуБЭуВМуВТхС╝уБ│уБ╛уБЩ */
 
     if (op->func && applied) {
 	if ((op->func)(opt2) != 0) {
@@ -887,7 +887,7 @@ static	int	check_option(char *opt1, char *opt2, int priority,
     }
 
 
-    /* ═е└ш┼┘дЄ╜ёдн┤╣дид╞дкдядъ */
+    /* хДкхЕИх║жуВТцЫ╕уБНцПЫуБИуБжуБКуВПуВК */
 
     if (applied) {
 	opt_prioroty[ op->group ] = priority;
@@ -904,10 +904,10 @@ static	int	check_option(char *opt1, char *opt2, int priority,
 
 
 /*--------------------------------------------------------------------------
- * ╡п╞░╗■д╬еке╫е╖ечеєдЄ▓Є└╧д╣дыбг
- *	╠сдъ├═д╧бв╖╤┬│╔╘╟╜д╩░█╛ядм╚п└╕д╖д┐╗■д╧╡╢бвд╜дь░╩│░д╧┐┐бг
+ * ш╡╖хЛХцЩВуБоуВкуГЧуВ╖уГзуГ│уВТшзгцЮРуБЩуВЛуАВ
+ *	цИ╗уВКхАдуБпуАБч╢Щч╢Ъф╕НшГ╜уБкчХ░х╕╕уБМчЩ║чФЯуБЧуБЯцЩВуБпхБ╜уАБуБЭуВМф╗ехдЦуБпчЬЯуАВ
  *
- *	-help еке╫е╖ечеєдЄд─д▒дыд╚бв╢п└й┼кд╦╜к╬╗д╣дыбг
+ *	-help уВкуГЧуВ╖уГзуГ│уВТуБдуБСуВЛуБиуАБх╝╖хИ╢чЪДуБлч╡Вф║ЖуБЩуВЛуАВ
  *--------------------------------------------------------------------------*/
 static	int	get_option(int argc, char *argv[], int priority,
 			   const T_CONFIG_TABLE *osd_options,
@@ -921,11 +921,11 @@ static	int	get_option(int argc, char *argv[], int priority,
 
     for (i=1; i<argc; ) {
 
-	/* '-' ░╩│░д╟╗╧д▐дыеке╫е╖ечеєд╧бве╟еге╣епедесб╝е╕д╬е╒ебедеы╠╛ */
+	/* '-' ф╗ехдЦуБзхзЛуБ╛уВЛуВкуГЧуВ╖уГзуГ│уБпуАБуГЗуВгуВ╣уВпуВдуГбуГ╝уВ╕уБоуГХуВбуВдуГлхРН */
 	if (*argv[i] != '-') {
 	    char *fname = NULL;
 
-	    /* едесб╝е╕е╒ебедеыдм╗╪─ъ▓─╟╜длд╔дждлдЄе┴езе├еп (╔╘▓─д╟дт╖╤┬│) */
+	    /* уВдуГбуГ╝уВ╕уГХуВбуВдуГлуБМцМЗхоЪхПпшГ╜уБЛуБйуБЖуБЛуВТуГБуВзуГГуВп (ф╕НхПпуБзуВВч╢Щч╢Ъ) */
 	    if (strlen(argv[i]) >= QUASI88_MAX_FILENAME) {
 		fprintf(stderr,
 			"error: image file name \"%s\" is too long\n",
@@ -950,13 +950,13 @@ static	int	get_option(int argc, char *argv[], int priority,
 		}
 	    }
 
-	    /* ░╩╣▀д╬░·┐Їд╟бв┐Ї├═дм┬│д▒д╨бвд╜дьд╧едесб╝е╕╚╓╣цдЄ╝ид╣ */
-	    for (j=0; i+j+1 < argc; j++) {	/* ░·┐Їдм┬│дп╕┬дъ╜ш═¤ */
+	    /* ф╗ещЩНуБох╝ХцХ░уБзуАБцХ░хАдуБМч╢ЪуБСуБ░уАБуБЭуВМуБпуВдуГбуГ╝уВ╕чХкхП╖уВТчд║уБЩ */
+	    for (j=0; i+j+1 < argc; j++) {	/* х╝ХцХ░уБМч╢ЪуБПщЩРуВКхЗжчРЖ */
 
 		char *end;
 		int   img = strtol(argv[i+j+1], &end, 0);
 
-		if (*end != '\0') break;	/* ░·┐Їдм┐Ї├═д╟д╩д▒дьд╨├ц├╟ */
+		if (*end != '\0') break;	/* х╝ХцХ░уБМцХ░хАдуБзуБкуБСуВМуБ░ф╕нцЦн */
 
 		if (fname) {
 		    if (j == 0) drive --;
@@ -974,7 +974,7 @@ static	int	get_option(int argc, char *argv[], int priority,
 			if ((img < 1) || (img > MAX_NR_IMAGE)) {
 			    fprintf(stderr, "error: invalid image-number %d."
 				    " (change image-no to 1)\n", img);
-			    img = 1;	/* едесб╝е╕╚╓╣цдм╚╧░╧│░д╩дщбв1 д╦д╣ды*/
+			    img = 1;	/* уВдуГбуГ╝уВ╕чХкхП╖уБМчпДхЫ▓хдЦуБкуВЙуАБ1 уБлуБЩуВЛ*/
 			}
 
 			free(config_image.d[ drive ]);
@@ -987,21 +987,21 @@ static	int	get_option(int argc, char *argv[], int priority,
 		}
 	    }
 
-	    i += j + 1;			/* ╜ш═¤д╖д┐░·┐Їд╬╕─┐ЇдЄ▓├╗╗ */
+	    i += j + 1;			/* хЗжчРЖуБЧуБЯх╝ХцХ░уБохАЛцХ░уВТхКачоЧ */
 
-	} else {		/* '-' д╟╗╧д▐ды░·┐Їд╧бвеке╫е╖ечеє */
+	} else {		/* '-' уБзхзЛуБ╛уВЛх╝ХцХ░уБпуАБуВкуГЧуВ╖уГзуГ│ */
 
 	    j = check_option(argv[i], (i+1 < argc) ? argv[i+1] : NULL,
 			     priority, osd_options, sound_options);
-	    if (j < 0) {		/* ├╫╠┐┼кеиещб╝д╩дщбв▓Є└╧╝║╟╘ */
+	    if (j < 0) {		/* шЗ┤хС╜чЪДуВиуГйуГ╝уБкуВЙуАБшзгцЮРхд▒цХЧ */
 		return FALSE;
 	    }
-	    if (j == 0) {		/* ╠д├╬д╬еке╫е╖ечеєд╧бве╣ене├е╫ */
+	    if (j == 0) {		/* цЬкчЯеуБоуВкуГЧуВ╖уГзуГ│уБпуАБуВ╣уВнуГГуГЧ */
 		fprintf(stderr, "error: unknown option %s\n", argv[i]);
 		j = 1;
 	    }
 
-	    i += j;			/* ╜ш═¤д╖д┐░·┐Їд╬╕─┐ЇдЄ▓├╗╗ */
+	    i += j;			/* хЗжчРЖуБЧуБЯх╝ХцХ░уБохАЛцХ░уВТхКачоЧ */
 	}
     }
 
@@ -1014,13 +1014,13 @@ static	int	get_option(int argc, char *argv[], int priority,
 
 
 /*--------------------------------------------------------------------------
- * ┤─╢не╒ебедеыд╬еке╫е╖ечеєдЄ▓Є└╧д╣дыбг
- *	╠сдъ├═д╧бв╖╤┬│╔╘╟╜д╩░█╛ядм╚п└╕д╖д┐╗■д╧╡╢бвд╜дь░╩│░д╧┐┐бг
+ * чТ░хвГуГХуВбуВдуГлуБоуВкуГЧуВ╖уГзуГ│уВТшзгцЮРуБЩуВЛуАВ
+ *	цИ╗уВКхАдуБпуАБч╢Щч╢Ъф╕НшГ╜уБкчХ░х╕╕уБМчЩ║чФЯуБЧуБЯцЩВуБпхБ╜уАБуБЭуВМф╗ехдЦуБпчЬЯуАВ
  *
- *	-help еке╫е╖ечеєдЄд─д▒дыд╚бв╢п└й┼кд╦╜к╬╗д╣дыбг
+ *	-help уВкуГЧуВ╖уГзуГ│уВТуБдуБСуВЛуБиуАБх╝╖хИ╢чЪДуБлч╡Вф║ЖуБЩуВЛуАВ
  *--------------------------------------------------------------------------*/
 
-/* ┤─╢не╒ебедеы1╣╘двд┐дъд╬║╟┬ч╩╕╗·┐Ї */
+/* чТ░хвГуГХуВбуВдуГл1шбМуБВуБЯуВКуБоцЬАхдзцЦЗхнЧцХ░ */
 #define	MAX_RCFILE_LINE	(256)
 
 
@@ -1036,7 +1036,7 @@ static	int	get_config_file(OSD_FILE *fp, int priority,
     int  line_cnt = 0;
 
 
-		/* └▀─ъе╒ебедеыдЄ1╣╘д┼д─▓Є└╧ */
+		/* шинхоЪуГХуВбуВдуГлуВТ1шбМуБеуБдшзгцЮР */
 
     while (osd_fgets(line, MAX_RCFILE_LINE, fp)) {
 
@@ -1044,7 +1044,7 @@ static	int	get_config_file(OSD_FILE *fp, int priority,
 	parm1 = parm2 = parm3 = NULL;
 	str = line;
 
-		/* е╤ещесб╝е┐дЄ parm1б┴parm3 д╦е╗е├е╚ */
+		/* уГСуГйуГбуГ╝уВ┐уВТ parm1уАЬparm3 уБлуВ╗уГГуГИ */
 
 	{                      b = &buffer[0];    str = my_strtok(b, str); }
 	if (str) { parm1 = b;  b += strlen(b)+1;  str = my_strtok(b, str); }
@@ -1052,24 +1052,24 @@ static	int	get_config_file(OSD_FILE *fp, int priority,
 	if (str) { parm3 = b;  }
 
 
-		/* е╤ещесб╝е┐дмд╩д▒дьд╨╝бд╬╣╘д╪бвдвдьд╨▓Є└╧╜ш═¤ */
+		/* уГСуГйуГбуГ╝уВ┐уБМуБкуБСуВМуБ░цмбуБошбМуБ╕уАБуБВуВМуБ░шзгцЮРхЗжчРЖ */
 
-	if      (parm1 == NULL) {		/* е╤ещесб╝е┐д╩д╖    */
+	if      (parm1 == NULL) {		/* уГСуГйуГбуГ╝уВ┐уБкуБЧ    */
 	    ;
 
-	} else if (parm3) {			/* е╤ещесб╝е┐3╕─░╩╛х */
+	} else if (parm3) {			/* уГСуГйуГбуГ╝уВ┐3хАЛф╗еф╕К */
 	    fprintf(stderr,
 		    "warning: too many argument in line %d\n", line_cnt);
 
-	} else {				/* е╤ещесб╝е┐1б┴2╕─  */
+	} else {				/* уГСуГйуГбуГ╝уВ┐1уАЬ2хАЛ  */
 	    result = check_option(parm1, parm2, priority,
 				  osd_options, sound_options);
 
 	    if ((result == 1 && parm2 == NULL) || (result == 2 && parm2)) {
 		;
-	    } else if (result < 0) {	/* ├╫╠┐┼кеиещб╝д╩дщбв▓Є└╧╝║╟╘ */
+	    } else if (result < 0) {	/* шЗ┤хС╜чЪДуВиуГйуГ╝уБкуВЙуАБшзгцЮРхд▒цХЧ */
 		return FALSE;
-	    } else {			/* еиещб╝╗■д╧ еиещб╝╣╘дЄ╔╜╝и */
+	    } else {			/* уВиуГйуГ╝цЩВуБп уВиуГйуГ╝шбМуВТшбичд║ */
 		fprintf(stderr, "warning: error in line %d\n", line_cnt);
 	    }
 	}
@@ -1094,8 +1094,8 @@ static	int	get_config_file(OSD_FILE *fp, int priority,
 
 
 /***********************************************************************
- * ░·┐Їд╬╜ш═¤
- *	еиещб╝╚п└╕д╩д╔д╟╜ш═¤дЄ┬│╣╘д╟днд╩дд╛ь╣чбв╡╢дЄ╩╓д╣бг
+ * х╝ХцХ░уБохЗжчРЖ
+ *	уВиуГйуГ╝чЩ║чФЯуБкуБйуБзхЗжчРЖуВТч╢ЪшбМуБзуБНуБкуБДха┤хРИуАБхБ╜уВТш┐ФуБЩуАВ
  ************************************************************************/
 
 static void set_verbose(void)
@@ -1138,21 +1138,21 @@ int	config_init(int argc,
     config_image.sout     = NULL;
 
 
-	/* XMAMEе╡ежеєе╔┤╪╧вд╬└▀─ъдЄ╜щ┤№▓╜ */
+	/* XMAMEуВ╡уВжуГ│уГЙщЦвщАгуБошинхоЪуВТхИЭцЬЯхМЦ */
 
     xmame_config_init();
 
     option_table_sound = xmame_config_get_opt_tbl();
 
 
-	/* └▀─ъе╒ебедеыд╬е╟егеьепе╚еъ╠╛д╩д╔дЄ╜щ┤№▓╜ */
+	/* шинхоЪуГХуВбуВдуГлуБоуГЗуВгуГмуВпуГИуГкхРНуБкуБйуВТхИЭцЬЯхМЦ */
 
     if (osd_file_config_init() == FALSE) {
 	return FALSE;
     }
 
 
-	/* ╡п╞░╗■д╬еке╫е╖ечеєдЄ▓Є└╧ */
+	/* ш╡╖хЛХцЩВуБоуВкуГЧуВ╖уГзуГ│уВТшзгцЮР */
 
     if (get_option(argc, argv, 2,
 		   option_table_osd, option_table_sound) == FALSE) {
@@ -1160,12 +1160,12 @@ int	config_init(int argc,
     }
 
 
-	/* е╟еге╣епедесб╝е╕╗╪─ъдвдъд╩дщбвд╜д╬е╒ебедеы╠╛(е╤е╣╠╛)дЄ╩ф┤░д╣ды */
+	/* уГЗуВгуВ╣уВпуВдуГбуГ╝уВ╕цМЗхоЪуБВуВКуБкуВЙуАБуБЭуБоуГХуВбуВдуГлхРН(уГСуВ╣хРН)уВТшгЬхоМуБЩуВЛ */
 
     if (resume_flag == FALSE) {
 	int same = FALSE;
 
-		/* ╞▒д╕е╒ебедеы(╠╛)дЄ╗╪─ъд╖д╞дддыдлдЄбве┴езе├еп */
+		/* хРМуБШуГХуВбуВдуГл(хРН)уВТцМЗхоЪуБЧуБжуБДуВЛуБЛуВТуАБуГБуВзуГГуВп */
 	if (config_image.d[DRIVE_1] &&
 	    config_image.d[DRIVE_2] &&
 	    strcmp(config_image.d[DRIVE_1], config_image.d[DRIVE_2]) == 0) {
@@ -1185,7 +1185,7 @@ int	config_init(int argc,
 		free(config_image.d[i]);
 		config_image.d[i] = fname;
 
-		/* ╞▒д╕е╒ебедеыдЄ╗╪─ъд╖д╞ддды╛ь╣чбв1▓є╠▄д╬╜ш═¤д╟╚┤д▒ды */
+		/* хРМуБШуГХуВбуВдуГлуВТцМЗхоЪуБЧуБжуБДуВЛха┤хРИуАБ1хЫЮчЫоуБохЗжчРЖуБзцКЬуБСуВЛ */
 		if (i == DRIVE_1 && same) {
 		    free(config_image.d[DRIVE_2]);
 		    config_image.d[DRIVE_2] = fname;
@@ -1196,9 +1196,9 @@ int	config_init(int argc,
     }
 
 
-	/* └▀─ъе╒ебедеы╜ш═¤			*/
-	/*	step 0 : ╢ж─╠└▀─ъе╒ебедеыдЄ▓Є└╧	*/
-	/*	step 1 : ╕─╩╠└▀─ъе╒ебедеыдЄ▓Є└╧	*/
+	/* шинхоЪуГХуВбуВдуГлхЗжчРЖ			*/
+	/*	step 0 : хЕ▒щАЪшинхоЪуГХуВбуВдуГлуВТшзгцЮР	*/
+	/*	step 1 : хАЛхИешинхоЪуГХуВбуВдуГлуВТшзгцЮР	*/
 
     for (step=0; step<2; step ++) {
 
@@ -1211,7 +1211,7 @@ int	config_init(int argc,
 
 	    if (load_config == FALSE) continue;
 
-	    /* ╢ж─╠└▀─ъе╒ебедеыд╬е╒ебедеы╠╛ */
+	    /* хЕ▒щАЪшинхоЪуГХуВбуВдуГлуБоуГХуВбуВдуГлхРН */
 	    fname = filename_alloc_global_cfgname();
 	    alias = "Global Config File";
 
@@ -1221,7 +1221,7 @@ int	config_init(int argc,
 
 	    if (load_config == FALSE) continue;
 
-	    /* ╕─╩╠└▀─ъе╒ебедеыд╬е╒ебедеы╠╛ (е╟еге╣еп or е╞б╝е╫╠╛) */
+	    /* хАЛхИешинхоЪуГХуВбуВдуГлуБоуГХуВбуВдуГлхРН (уГЗуВгуВ╣уВп or уГЖуГ╝уГЧхРН) */
 	    if      (config_image.d[DRIVE_1]) fname = config_image.d[DRIVE_1];
 	    else if (config_image.d[DRIVE_2]) fname = config_image.d[DRIVE_2];
 	    else if (config_image.t[CLOAD])   fname = config_image.t[CLOAD];
@@ -1252,15 +1252,15 @@ int	config_init(int argc,
     set_verbose();
 
 
-	/* е╟еге╣епедесб╝е╕д╬д╜д╬┬╛д╬╛Ё╩єдЄе╗е├е╚ */
+	/* уГЗуВгуВ╣уВпуВдуГбуГ╝уВ╕уБоуБЭуБоф╗ЦуБоцГЕха▒уВТуВ╗уГГуГИ */
 
     for (i=0; i<NR_DRIVE; i++) {
-	config_image.n[i] --;		/* едесб╝е╕╚╓╣цд╧ 1╕║д║ды(0б┴д╦д╣ды) */
+	config_image.n[i] --;		/* уВдуГбуГ╝уВ╕чХкхП╖уБп 1ц╕ЫуБЪуВЛ(0уАЬуБлуБЩуВЛ) */
 	config_image.ro[i] = menu_readonly;
     }
 
 
-	/* ╕▀┤╣ROM╗╪─ъ╗■д╦бве╒ебедеыдмдвдыдле┴езе├еп */
+	/* ф║ТцПЫROMцМЗхоЪцЩВуБлуАБуГХуВбуВдуГлуБМуБВуВЛуБЛуГБуВзуГГуВп */
 
     if (file_compatrom) {
 	fname = filename_alloc_romname(file_compatrom);
@@ -1270,7 +1270,7 @@ int	config_init(int argc,
     }
 
 
-	/* │╞╝яе╟егеьепе╚еъд╬╔╜╝и (е╟е╨е├е░═╤) */
+	/* хРДчиоуГЗуВгуГмуВпуГИуГкуБошбичд║ (уГЗуГРуГГуВ░чФи) */
 
     if (verbose_proc) {
 	const char *d;
@@ -1294,10 +1294,10 @@ void	config_exit(void)
 	config_save(NULL);
     }
 
-    /* └▀─ъе╒ебедеыд╬е╟егеьепе╚еъ╠╛д╩д╔дЄ╕х╩╥д┼д▒ */
+    /* шинхоЪуГХуВбуВдуГлуБоуГЗуВгуГмуВпуГИуГкхРНуБкуБйуВТх╛МчЙЗуБеуБС */
     osd_file_config_exit();
 
-    /* XMAMEе╡ежеєе╔┤╪╧вд╬└▀─ъдЄ╕х╩╥╔╒д▒ */
+    /* XMAMEуВ╡уВжуГ│уГЙщЦвщАгуБошинхоЪуВТх╛МчЙЗф╗ШуБС */
     xmame_config_exit();
 }
 
@@ -1308,7 +1308,7 @@ void	config_exit(void)
 
 
 /***********************************************************************
- * └▀─ъд╬╩▌┬╕
+ * шинхоЪуБоф┐ЭхнШ
  *
  ************************************************************************/
 
@@ -1359,7 +1359,7 @@ static int save_bau(const struct T_CONFIG_TABLE *op, char opt_arg[255])
 
 static int save_ver(const struct T_CONFIG_TABLE *op, char opt_arg[255])
 {
-    /* ╩╤╣╣╗■д╬д▀╩▌┬╕д╣д┘днд└дмбве╣е╞б╝е╚е╗б╝е╓бжеэб╝е╔╗■дт╩▌┬╕д╡дьд╞д╖д▐джб─*/
+    /* хдЙцЫ┤цЩВуБоуБ┐ф┐ЭхнШуБЩуБ╣уБНуБауБМуАБуВ╣уГЖуГ╝уГИуВ╗уГ╝уГЦуГ╗уГнуГ╝уГЙцЩВуВВф┐ЭхнШуБХуВМуБжуБЧуБ╛уБЖтАж*/
     if ('0' <= set_version && set_version <= '9') {
 	opt_arg[0] = set_version;
 	opt_arg[1] = '\0';
@@ -1380,7 +1380,7 @@ static int save_key_sub(int type,
 {
     T_SAVEKEY_TABLE table_func[] =
     {
-	{ "",    &function_f[0],  },	/* е└е▀б╝ */
+	{ "",    &function_f[0],  },	/* уГАуГЯуГ╝ */
 	{ "f1",  &function_f[1],  },
 	{ "f2",  &function_f[2],  },
 	{ "f3",  &function_f[3],  },
@@ -1447,7 +1447,7 @@ static int save_key_sub(int type,
 
 	    if (*table[key].work) {
 
-		if (type == 0) {	/* е╒ебеєепе╖ечеєенб╝д╬д▀ */
+		if (type == 0) {	/* уГХуВбуГ│уВпуВ╖уГзуГ│уВнуГ╝уБоуБ┐ */
 		    for (j=0; j<COUNTOF(fn_index); j++) {
 			if (*table[key].work == fn_index[j].num) {
 			    strcpy(opt_arg, fn_index[j].str);
@@ -1513,7 +1513,7 @@ static void config_write(const char *opt_name, const char *opt_arg)
 int	config_save(const char *fname)
 {
     int i;
-    signed char saved_option[ OPT_GROUPS ];	/* └▀─ъ╜╨╬╧║╤д╬е░еыб╝е╫░ь═ў */
+    signed char saved_option[ OPT_GROUPS ];	/* шинхоЪхЗ║хКЫц╕ИуБоуВ░уГлуГ╝уГЧф╕Ашжз */
 
     const T_CONFIG_TABLE *op;
     int (*func)(const struct T_CONFIG_TABLE *, char *opt_arg);
@@ -1530,7 +1530,7 @@ int	config_save(const char *fname)
     int malloc_fname = FALSE;
 
 
-    /*** ░·┐Ї fname дм NULL д╩дщбв╢ж─╠└▀─ъе╒ебедеыд╬е╒ебедеы╠╛дЄ╗╚═╤ ***/
+    /*** х╝ХцХ░ fname уБМ NULL уБкуВЙуАБхЕ▒щАЪшинхоЪуГХуВбуВдуГлуБоуГХуВбуВдуГлхРНуВТф╜┐чФи ***/
 
     if (fname == NULL) {
 	fname = filename_alloc_global_cfgname();
@@ -1540,36 +1540,36 @@ int	config_save(const char *fname)
 	malloc_fname = TRUE;
     }
 
-    /*** └▀─ъе╒ебедеыдЄе╨е├епеве├е╫д╣ды ***/
+    /*** шинхоЪуГХуВбуВдуГлуВТуГРуГГуВпуВвуГГуГЧуБЩуВЛ ***/
 
     backup_ok = FALSE;
 
-    fp = osd_fopen(FTYPE_CFG, fname, "rb");	/* └▀─ъе╒ебедеыдЄ│лдп */
+    fp = osd_fopen(FTYPE_CFG, fname, "rb");	/* шинхоЪуГХуВбуВдуГлуВТщЦЛуБП */
     if (fp) {
-						/* е╨е├епеве├е╫е╒ебедеы╠╛└╕└о*/
+						/* уГРуГГуВпуВвуГГуГЧуГХуВбуВдуГлхРНчФЯцИР*/
 	int flen = strlen(fname);
 	int slen = strlen(CONFIG_SUFFIX);
 
-	fname_bak = malloc(flen + 10);			/* +10 д╧═╛╩мд╦ */
+	fname_bak = malloc(flen + 10);			/* +10 уБпф╜ЩхИЖуБл */
 	if (fname_bak) {
 
 	    strcpy(fname_bak, fname);
 
-	    /* fname_bak д╬╦Ў╚°дмбв CONFIG_SUFFIX д╩дщбвд╜дьдЄ║я╜№ */
+	    /* fname_bak уБоцЬлх░╛уБМуАБ CONFIG_SUFFIX уБкуВЙуАБуБЭуВМуВТхЙКщЩд */
 	    if ((flen > slen) &&
 		my_strcmp(&fname_bak[flen - slen], CONFIG_SUFFIX) == 0) {
 
 		fname_bak[flen - slen] = '\0';
 	    }
 
-	    /* fname_bak д╬╦Ў╚°д╧бв .bak */
+	    /* fname_bak уБоцЬлх░╛уБпуАБ .bak */
 	    strcat(fname_bak, ".bak");
 
-						/* е╨е├епеве├е╫е╒ебедеы│лдп */
+						/* уГРуГГуВпуВвуГГуГЧуГХуВбуВдуГлщЦЛуБП */
 	    fp_bak = osd_fopen(FTYPE_CFG, fname_bak, "wb");
 	    if (fp_bak) {
 		backup_ok = TRUE;
-						/* е│е╘б╝д╣ды */
+						/* уВ│уГФуГ╝уБЩуВЛ */
 		while ((i = osd_fgetc(fp)) != EOF) {
 		    if (osd_fputc(i, fp_bak) == EOF) {
 			backup_ok = FALSE;
@@ -1583,19 +1583,19 @@ int	config_save(const char *fname)
 
 	    if (backup_ok == FALSE) { free(fname_bak); }
 
-	    /* бжбжбж rename() дЄ╗╚джд█дждмддддд╬длбй
-	       д╚╗╫д├д┐д▒д╔бвеъе═б╝ер└шд╬е╒ебедеыдм┬╕║▀д╣ды╛ь╣чд╬╡є╞░дм
-	       ╜ш═¤╖╧░═┬╕дщд╖ддд╬д╟бвдфдсд╚ддд┐д█дждмдддддлбжбжбж */
+	    /* уГ╗уГ╗уГ╗ rename() уВТф╜┐уБЖуБ╗уБЖуБМуБДуБДуБоуБЛя╝Я
+	       уБицАЭуБгуБЯуБСуБйуАБуГкуГНуГ╝уГахЕИуБоуГХуВбуВдуГлуБМхнШхЬиуБЩуВЛха┤хРИуБоцМЩхЛХуБМ
+	       хЗжчРЖч│╗ф╛ЭхнШуВЙуБЧуБДуБоуБзуАБуВДуВБуБиуБДуБЯуБ╗уБЖуБМуБДуБДуБЛуГ╗уГ╗уГ╗ */
 	}
 	osd_fclose(fp);
 	fp = NULL;
     }
 
 
-    /*** е╨е├епеве├е╫└о╕∙╗■д╧бв└▀─ъе╒ебедеыдЄ┐╖╡м║ю└од╖бв└▀─ъдЄ░ь╔Їе│е╘б╝ ***/
-    /*** е╨е├епеве├е╫╝║╟╘╗■д╧бв└▀─ъе╒ебедеыд╧┤√┬╕д╬д▐д▐бв─╔╡н             ***/
+    /*** уГРуГГуВпуВвуГГуГЧцИРхКЯцЩВуБпуАБшинхоЪуГХуВбуВдуГлуВТцЦ░шжПф╜ЬцИРуБЧуАБшинхоЪуВТф╕АщГиуВ│уГФуГ╝ ***/
+    /*** уГРуГГуВпуВвуГГуГЧхд▒цХЧцЩВуБпуАБшинхоЪуГХуВбуВдуГлуБпцЧвхнШуБоуБ╛уБ╛уАБш┐╜шиШ             ***/
 
-    if (backup_ok) {				/* е╨е├епеве├е╫е╒ебедеы│лдп */
+    if (backup_ok) {				/* уГРуГГуВпуВвуГГуГЧуГХуВбуВдуГлщЦЛуБП */
 	fp_bak = osd_fopen(FTYPE_CFG, fname_bak, "r");
 	if (fp_bak == NULL) {
 	    backup_ok = FALSE;
@@ -1603,7 +1603,7 @@ int	config_save(const char *fname)
 	free(fname_bak);
     }
 
-    if (backup_ok) {				/* OKд╩дщ└▀─ъе╒ебедеы┐╖╡м║ю└о*/
+    if (backup_ok) {				/* OKуБкуВЙшинхоЪуГХуВбуВдуГлцЦ░шжПф╜ЬцИР*/
 	fp = osd_fopen(FTYPE_CFG, fname, "w");
 	if (fp == NULL) {
 	    osd_fclose(fp_bak);
@@ -1611,8 +1611,8 @@ int	config_save(const char *fname)
 	    return FALSE;
 	}
 
-	/* е╨е├епеве├е╫е╒ебедеыдлдщ└▀─ъе╒ебедеыд╦е│е╘б╝д╣дыбг
-	   д│д╬╗■бв╣╘╦Ўдм # AUTO д╟╜кды╣╘д╧е│е╘б╝д╖д╩дд */
+	/* уГРуГГуВпуВвуГГуГЧуГХуВбуВдуГлуБЛуВЙшинхоЪуГХуВбуВдуГлуБлуВ│уГФуГ╝уБЩуВЛуАВ
+	   уБУуБоцЩВуАБшбМцЬлуБМ # AUTO уБзч╡ВуВЛшбМуБпуВ│уГФуГ╝уБЧуБкуБД */
 
 	while (osd_fgets(line, MAX_RCFILE_LINE, fp_bak)) {
 	    int flen = strlen(line);
@@ -1627,12 +1627,12 @@ int	config_save(const char *fname)
 		if (line[flen-1] == '\n') { need_lf = FALSE; }
 		else                      { need_lf = TRUE; }
 	    }
-	    /* д│д╬д╪дєбвеиещб╝дЄе┴езе├епд╖д╞д╩ддд╛б─ */
+	    /* уБУуБоуБ╕уВУуАБуВиуГйуГ╝уВТуГБуВзуГГуВпуБЧуБжуБкуБДуБЮтАж */
 	}
 
 	osd_fclose(fp_bak);
 
-    } else {					/* NGд╩дщ└▀─ъе╒ебедеыд╧┤√┬╕д╟*/
+    } else {					/* NGуБкуВЙшинхоЪуГХуВбуВдуГлуБпцЧвхнШуБз*/
 	fp = osd_fopen(FTYPE_CFG, fname, "a");
 	if (fp == NULL) {
 	    if (malloc_fname) { free((void*)fname); }
@@ -1641,16 +1641,16 @@ int	config_save(const char *fname)
     }
 
 
-    /*** └▀─ъе╒ебедеыд╦бвеке╫е╖ечеєе╞б╝е╓еыд╬└▀─ъдЄ─╔╡нд╖д╞дддп ***/
+    /*** шинхоЪуГХуВбуВдуГлуБлуАБуВкуГЧуВ╖уГзуГ│уГЖуГ╝уГЦуГлуБошинхоЪуВТш┐╜шиШуБЧуБжуБДуБП ***/
 
     memset(saved_option, 0, sizeof(saved_option));
 
-    /* ║╟╕хдм▓■╣╘д╟д╩дд╛ь╣чд╧бв \n дЄ─╔▓├ (append╗■д╧е┴езе├епд╟днд╩ддб─) */
+    /* цЬАх╛МуБМцФ╣шбМуБзуБкуБДха┤хРИуБпуАБ \n уВТш┐╜хКа (appendцЩВуБпуГБуВзуГГуВпуБзуБНуБкуБДтАж) */
     if (need_lf) {
 	osd_fputs("\n", fp);
     }
 
-    /* д│д│длдщ─╔╡н│л╗╧ */
+    /* уБУуБУуБЛуВЙш┐╜шиШщЦЛхзЛ */
     sprintf(buf, "# The following settings are written by %s",
 						    Q_TITLE " ver " Q_VERSION);
     sprintf(line, "%-70s %s\n", buf, AUTO_SAVE_COMMENT);
@@ -1688,13 +1688,13 @@ int	config_save(const char *fname)
 	}
     }
 
-    /* д╚дъдвдид║д╥д╚╢ш└┌дъб─ */
+    /* уБиуВКуБВуБИуБЪуБ▓уБихМ║хИЗуВКтАж */
     sprintf(buf, "# ------------------------------");
     sprintf(line, "%-70s %s\n", buf, AUTO_SAVE_COMMENT);
     osd_fputs(line, fp);
 
 
-    /* д╡дщд╦бв─╔╡нд╣д┘дне╡ежеєе╔еке╫е╖ечеє└▀─ъдмдвдьд╨бв╜ш═¤ */
+    /* уБХуВЙуБлуАБш┐╜шиШуБЩуБ╣уБНуВ╡уВжуГ│уГЙуВкуГЧуВ╖уГзуГ│шинхоЪуБМуБВуВМуБ░уАБхЗжчРЖ */
     fp_config_write = fp;
     xmame_config_save_option(config_write);
 
@@ -1704,7 +1704,7 @@ int	config_save(const char *fname)
     if (malloc_fname) { free((void*)fname); }
 
 
-    /* е╣е╞б╝е┐е╣д╦╔╜╝и */
+    /* уВ╣уГЖуГ╝уВ┐уВ╣уБлшбичд║ */
     if (quasi88_is_exec()) {
 	status_message(1, STATUS_INFO_TIME, "Config-file saved");
     }

@@ -6,7 +6,7 @@
 #endif
 
 #ifndef	Q_VERSION
-#define	Q_VERSION	"0.6.4"
+#define	Q_VERSION	"0.6.5"
 #endif
 
 #ifndef	Q_COMMENT
@@ -17,7 +17,7 @@
 
 
 #ifndef	Q_COPYRIGHT
-#define	Q_COPYRIGHT		"(c) 1998-2013 S.Fukunaga"
+#define	Q_COPYRIGHT		"(c) 1998-2018 S.Fukunaga, R.Zumer"
 #endif
 
 #ifdef	USE_SOUND

@@ -1,6 +1,6 @@
 /************************************************************************/
 /*									*/
-/* µ’•¢•ª•Û•÷•È								*/
+/* ÈÄÜ„Ç¢„Çª„É≥„Éñ„É©								*/
 /*									*/
 /************************************************************************/
 
@@ -11,22 +11,22 @@
 
 
 /*
-  •™•⁄•È•Û•…§Œ∑ø
-     NOTHING	  § §∑	   XX		 §Ω§Œ§ﬁ§ﬁ…Ωº®
-     NUM_8	  8bit√Õ   XX nn	 nn §Ú16ø §«…Ωº®
-     NUM_16	  16bit√Õ  XX nn nn	 nn nn §Ú16ø §«…Ωº®
-     ADR_REL	  ¡Í¬–»÷√œ XX nn	 ¿‰¬–»÷√œ§Ú16ø §«…Ωº®
+  „Ç™„Éö„É©„É≥„Éâ„ÅÆÂûã
+     NOTHING	  „Å™„Åó	   XX		 „Åù„ÅÆ„Åæ„ÅæË°®Á§∫
+     NUM_8	  8bitÂÄ§   XX nn	 nn „Çí16ÈÄ≤„ÅßË°®Á§∫
+     NUM_16	  16bitÂÄ§  XX nn nn	 nn nn „Çí16ÈÄ≤„ÅßË°®Á§∫
+     ADR_REL	  Áõ∏ÂØæÁï™Âú∞ XX nn	 Áµ∂ÂØæÁï™Âú∞„Çí16ÈÄ≤„ÅßË°®Á§∫
      PREFIX
-       NOTHING	  § §∑	   XX XX	 §Ω§Œ§ﬁ§ﬁ…Ωº®
-       NUM_8	  8bit√Õ   XX XX nn	 nn §Ú16ø §«…Ωº®
-       NUM_16	  16bit√Õ  XX XX nn nn	 nn nn §Ú16ø §«…Ωº®
-       INDEX	  ª≤æ»	   XX XX nn	 nn §Ú 10ø §«…Ωº®
-       IDX_NUM	  ª≤æ»&√Õ  XX XX nn mm	 nn §Ú 10ø °¢mm §Ú16ø §«…Ωº®
-       UNEXIST	  Ã§º¬¡ı   XX XX	 XX XX §Ú16ø §«…Ωº®
-       SKIP	  Ã§º¬¡ı   XX		 XX §Ú16ø §«…Ωº®
+       NOTHING	  „Å™„Åó	   XX XX	 „Åù„ÅÆ„Åæ„ÅæË°®Á§∫
+       NUM_8	  8bitÂÄ§   XX XX nn	 nn „Çí16ÈÄ≤„ÅßË°®Á§∫
+       NUM_16	  16bitÂÄ§  XX XX nn nn	 nn nn „Çí16ÈÄ≤„ÅßË°®Á§∫
+       INDEX	  ÂèÇÁÖß	   XX XX nn	 nn „Çí 10ÈÄ≤„ÅßË°®Á§∫
+       IDX_NUM	  ÂèÇÁÖß&ÂÄ§  XX XX nn mm	 nn „Çí 10ÈÄ≤„ÄÅmm „Çí16ÈÄ≤„ÅßË°®Á§∫
+       UNEXIST	  Êú™ÂÆüË£Ö   XX XX	 XX XX „Çí16ÈÄ≤„ÅßË°®Á§∫
+       SKIP	  Êú™ÂÆüË£Ö   XX		 XX „Çí16ÈÄ≤„ÅßË°®Á§∫
        PREFIX
-         INDEX    ª≤æ»     XX XX nn XX	 nn §Ú 10ø §«…Ωº®
-	 UNEXIST  Ã§º¬¡ı   XX XX XX XX	 XX XX XX XX §Ú16ø §«…Ωº®
+         INDEX    ÂèÇÁÖß     XX XX nn XX	 nn „Çí 10ÈÄ≤„ÅßË°®Á§∫
+	 UNEXIST  Êú™ÂÆüË£Ö   XX XX XX XX	 XX XX XX XX „Çí16ÈÄ≤„ÅßË°®Á§∫
 */
 enum{
   OP_NOTHING,		/* XX		-> nothing	*/
@@ -1339,7 +1339,7 @@ static Mnemonics Instruction_FD_CB[256]=
 
 static 	void	printf_head( z80arch *z80, word pc, int num )
 {
-	/* •¢•…•Ï•π°ø•§•Û•π•»•È•Ø•∑•Á•Û•≥°º•…§Œ…Ωº® */
+	/* „Ç¢„Éâ„É¨„ÇπÔºè„Ç§„É≥„Çπ„Éà„É©„ÇØ„Ç∑„Éß„É≥„Ç≥„Éº„Éâ„ÅÆË°®Á§∫ */
 
   printf("%04X ",pc);
 
@@ -1473,7 +1473,7 @@ int	z80_line_disasm( z80arch *z80, word pc )
 
 
 
-#if 0	/* ver 0.5.x §ﬁ§«§Œ…Ωº®∑¡º∞ */
+#if 0	/* ver 0.5.x „Åæ„Åß„ÅÆË°®Á§∫ÂΩ¢Âºè */
 void	z80_debug( z80arch *z80, char *mes )
 {
   static char flags[8] = "SZ.H.PNC";
@@ -1500,7 +1500,7 @@ void	z80_debug( z80arch *z80, char *mes )
 
   fflush(stdout);
 }
-#else	/* ver 0.6.0 ∞ πﬂ§Œ…Ωº®∑¡º∞ */
+#else	/* ver 0.6.0 ‰ª•Èôç„ÅÆË°®Á§∫ÂΩ¢Âºè */
 void	z80_debug( z80arch *z80, char *mes )
 {
   static const char flags[8] = "SZ.H.PNC";

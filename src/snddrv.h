@@ -33,20 +33,20 @@ enum {
 
 
 
-/* ������ɷϥ��ץ������˥塼�����ѹ����뤿��ξ���ơ��֥�		*/
-/*	��˥塼�Ǥϡ����������ꤷ���ѿ��򥨥�ȥ�ˤ����ϲ�ǽ�Ȥʤ롣	*/
+/* サウンド系オプションをメニューから変更するための情報テーブル		*/
+/*	メニューでは、ここで設定した変数をエントリにて入力可能となる。	*/
 
 typedef enum {
-    SNDDRV_NULL = 0,			/* ��ü�ޡ���			*/
-    SNDDRV_INT,				/* �ѿ� work �� int��		*/
-    SNDDRV_FLOAT,			/* �ѿ� work �� float��		*/
+    SNDDRV_NULL = 0,			/* 終端マーク			*/
+    SNDDRV_INT,				/* 変数 work は int型		*/
+    SNDDRV_FLOAT,			/* 変数 work は float型		*/
 } SNDDRV_TYPE;
 
 typedef struct T_SNDDRV_CONFIG {
-    int		type;			/* SNDDRV_TYPE������		*/
-    char	*title;			/* ��˥塼�θ��Ф� (ASCII)	*/
-    void	*work;			/* �ѹ��оݤȤʤ��ѿ��Υݥ���	*/
-    double	low;			/* �ѹ���ǽ���ϰ�		*/
+    int		type;			/* SNDDRV_TYPE型参照		*/
+    char	*title;			/* メニューの見出し (ASCII)	*/
+    void	*work;			/* 変更対象となる変数のポインタ	*/
+    double	low;			/* 変更可能な範囲		*/
     double	high;			/*       (low <= *work <= high)	*/
 } T_SNDDRV_CONFIG;
 

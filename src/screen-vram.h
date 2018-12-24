@@ -15,84 +15,84 @@
 #endif
 
 /******************************************************************************
- *	VRAM / TEXT �Ρ��������褫�鹹�����줿��ʬ����������
+ *	VRAM / TEXT の、前回描画から更新された部分だけを、描画
  *****************************************************************************/
 #ifdef		VRAM2SCREEN_DIFF
 static	int	VRAM2SCREEN_DIFF(void)
 {
-    int x0 = COLUMNS-1, x1 = 0, y0 = ROWS-1, y1 = 0;	/* �����������ꥢ */
+    int x0 = COLUMNS-1, x1 = 0, y0 = ROWS-1, y1 = 0;	/* 更新したエリア */
     int i, j, k;
-    int changed_line;	/* ��������饤���ӥå�(0��CHARA_LINES-1)��ɽ�� */
+    int changed_line;	/* 更新するラインをビット(0〜CHARA_LINES-1)で表す */
 
     unsigned short text, *text_attr= &text_attr_buf[ text_attr_flipflop	  ][0];
     unsigned short old,	 *old_attr = &text_attr_buf[ text_attr_flipflop^1 ][0];
-    T_GRYPH fnt;				/* �ե���Ȥλ��� 1ʸ��ʬ   */
-    int	    fnt_idx;				/* �ե���Ȥλ��� ���Ȱ���  */
-    bit8    style = 0;				/* �ե���Ȥλ��� 8�ɥå�ʬ */
-    int	    tpal;				/* �ե���Ȥο�������	    */
-    TYPE    tcol;				/* �ե���Ȥο�		    */
+    T_GRYPH fnt;				/* フォントの字形 1文字分   */
+    int	    fnt_idx;				/* フォントの字形 参照位置  */
+    bit8    style = 0;				/* フォントの字形 8ドット分 */
+    int	    tpal;				/* フォントの色コード	    */
+    TYPE    tcol;				/* フォントの色		    */
     DIRTY_TYPE *up =
-	(DIRTY_TYPE *) &screen_dirty_flag[0];	/* VRAM�����ե饰�ؤΥݥ���*/
-    bit32 *src = main_vram4;			/* VRAM�ؤΥݥ���	     */
-    DST_DEFINE()				/* ���襨�ꥢ�ؤΥݥ���    */
-    WORK_DEFINE()				/* ������ɬ�פʥ��	     */
+	(DIRTY_TYPE *) &screen_dirty_flag[0];	/* VRAM更新フラグへのポインタ*/
+    bit32 *src = main_vram4;			/* VRAMへのポインタ	     */
+    DST_DEFINE()				/* 描画エリアへのポインタ    */
+    WORK_DEFINE()				/* 処理に必要なワーク	     */
 
-    /* 1ʸ��ñ�̤����褹�롣  �ԡ߷� ʬ���롼��	 (40��ʤ�2ʸ��ʬƱ���˽���) */
+    /* 1文字単位で描画する。  行×桁 分、ループ	 (40桁なら2文字分同時に処理) */
 
     for (i = 0; i < ROWS; i++) {/*===========================================*/
 
 	for (j = 0; j < COLUMNS; j++) {/*------------------------------------*/
 
-	    text = *text_attr;	text_attr += COLUMN_SKIP;  /* �ƥ����ȥ����� */
-	    old	 = *old_attr;	old_attr  += COLUMN_SKIP;  /* ��°�������   */
+	    text = *text_attr;	text_attr += COLUMN_SKIP;  /* テキストコード */
+	    old	 = *old_attr;	old_attr  += COLUMN_SKIP;  /* ・属性を取得   */
 
-	    if (text != old) {		    /* �ƥ����ȿ����԰��� ?    */
-		changed_line = ~(0);		/* yes 1ʸ��ʬ�������� */
+	    if (text != old) {		    /* テキスト新旧不一致 ?    */
+		changed_line = ~(0);		/* yes 1文字分強制更新 */
 	    }
-	    else {				/* no ��������饤���õ�� */
+	    else {				/* no 更新するラインを探す */
 		changed_line = 0;
 		for (k = 0; k < CHARA_LINES; k++) {
 		    if (up[ k * COLUMNS ]) { changed_line |= (1 << k); }
 		}
 	    }
 
-	    if (changed_line) {		    /* �����줫�Υ饤������� ? */
+	    if (changed_line) {		    /* いずれかのラインを描画 ? */
 		if (i<y0) y0=i; if (i>y1) y1=i; if (j<x0) x0=j; if (j>x1) x1=j;
 
-		get_font_gryph( text, &fnt, &tpal );  /* �ե���Ȥη������ */
+		get_font_gryph( text, &fnt, &tpal );  /* フォントの形を取得 */
 		tcol = COLOR_PIXEL( tpal );
 		fnt_idx = 0;
 
 		for (k = 0; k < CHARA_LINES; k++) {/*- - - - - - - - - - - - */
-						   /*1ʸ���Υ饤���ʬ,�롼��*/
+						   /*1文字のライン数分,ループ*/
 		    
-		    IF_LINE200_OR_EVEN_LINE()	/* 200LINE��400LINE����line��*/
-			style = fnt.b[ fnt_idx++ ]; /* �ե����8�ɥåȤ���� */
+		    IF_LINE200_OR_EVEN_LINE()	/* 200LINE／400LINE偶数line時*/
+			style = fnt.b[ fnt_idx++ ]; /* フォント8ドットを取得 */
 
-		    if (changed_line & (1 << k)) {  /* ���Υ饤������� ?    */
+		    if (changed_line & (1 << k)) {  /* このラインを描画 ?    */
 
-			if	  (style == 0xff) {	/* TEXT�� �Τߤ����� */
+			if	  (style == 0xff) {	/* TEXT部 のみを描画 */
 			    MASK_DOT();			/*		     */
-			} else if (style == 0x00) {	/* VRAM�� �Τߤ����� */
+			} else if (style == 0x00) {	/* VRAM部 のみを描画 */
 			    TRANS_DOT();		/*		     */
-			} else {			/* TEXT/VRAM�������� */
+			} else {			/* TEXT/VRAM合成描画 */
 			    STORE_DOT();		/*		     */
 			}				/*		     */
-			COPY_DOT();			/* �饤��� ������ */
+			COPY_DOT();			/* ラインの 隙間埋め */
 		    }
 
-		    DST_NEXT_LINE();		    /* ���Υ饤����֤˿ʤ�  */
+		    DST_NEXT_LINE();		    /* 次のライン位置に進む  */
 		}				/*- - - - - - - - - - - - - -*/
 
-		DST_RESTORE_LINE();		/* �饤����Ƭ���᤹	     */
+		DST_RESTORE_LINE();		/* ライン先頭に戻す	     */
 	    }
 
-	    up++;			    /* ����ʸ�����֤˿ʤ�	     */
+	    up++;			    /* 次の文字位置に進む	     */
 	    src += COLUMN_SKIP;
 	    DST_NEXT_CHARA();
 	}			       /*------------------------------------*/
 
-	up  += (CHARA_LINES - 1) * COLUMNS;	/* ���ιԤ���Ƭʸ�����֤˿ʤ�*/
+	up  += (CHARA_LINES - 1) * COLUMNS;	/* 次の行の先頭文字位置に進む*/
 	src += (CHARA_LINES - 1) * 80;
 	DST_NEXT_TOP_CHARA();
     }				/*===========================================*/
@@ -110,7 +110,7 @@ static	int	VRAM2SCREEN_DIFF(void)
 
 
 /******************************************************************************
- *	VRAM / TEXT ��������ʬ������
+ *	VRAM / TEXT の全画面分を、描画
  *****************************************************************************/
 #ifdef		VRAM2SCREEN_ALL
 static	int	VRAM2SCREEN_ALL(void)
@@ -121,24 +121,24 @@ static	int	VRAM2SCREEN_ALL(void)
 
     unsigned short text, *text_attr= &text_attr_buf[ text_attr_flipflop	  ][0];
 
-    T_GRYPH fnt;				/* �ե���Ȥλ��� 1ʸ��ʬ   */
-    int	    fnt_idx;				/* �ե���Ȥλ��� ���Ȱ���  */
-    bit8    style = 0;				/* �ե���Ȥλ��� 8�ɥå�ʬ */
-    int	    tpal;				/* �ե���Ȥο�������	    */
-    TYPE    tcol;				/* �ե���Ȥο�		    */
+    T_GRYPH fnt;				/* フォントの字形 1文字分   */
+    int	    fnt_idx;				/* フォントの字形 参照位置  */
+    bit8    style = 0;				/* フォントの字形 8ドット分 */
+    int	    tpal;				/* フォントの色コード	    */
+    TYPE    tcol;				/* フォントの色		    */
 
 
-    bit32 *src = main_vram4;			/* VRAM�ؤΥݥ���	     */
-    DST_DEFINE()				/* ���襨�ꥢ�ؤΥݥ���    */
-    WORK_DEFINE()				/* ������ɬ�פʥ��	     */
+    bit32 *src = main_vram4;			/* VRAMへのポインタ	     */
+    DST_DEFINE()				/* 描画エリアへのポインタ    */
+    WORK_DEFINE()				/* 処理に必要なワーク	     */
 
-    /* 1ʸ��ñ�̤����褹�롣  �ԡ߷� ʬ���롼��	 (40��ʤ�2ʸ��ʬƱ���˽���) */
+    /* 1文字単位で描画する。  行×桁 分、ループ	 (40桁なら2文字分同時に処理) */
 
     for (i = 0; i < ROWS; i++) {/*===========================================*/
 
 	for (j = 0; j < COLUMNS; j++) {/*------------------------------------*/
 
-	    text = *text_attr;	text_attr += COLUMN_SKIP;  /* �ƥ����ȥ����� */
+	    text = *text_attr;	text_attr += COLUMN_SKIP;  /* テキストコード */
 
 
 
@@ -151,44 +151,44 @@ static	int	VRAM2SCREEN_ALL(void)
 
 
 
-	    {				    /* ���ƤΥ饤������� */
+	    {				    /* 全てのラインを描画 */
 
 
-		get_font_gryph( text, &fnt, &tpal );  /* �ե���Ȥη������ */
+		get_font_gryph( text, &fnt, &tpal );  /* フォントの形を取得 */
 		tcol = COLOR_PIXEL( tpal );
 		fnt_idx = 0;
 
 		for (k = 0; k < CHARA_LINES; k++) {/*- - - - - - - - - - - - */
-						   /*1ʸ���Υ饤���ʬ,�롼��*/
+						   /*1文字のライン数分,ループ*/
 
-		    IF_LINE200_OR_EVEN_LINE()	/* 200LINE��400LINE����line��*/
-			style = fnt.b[ fnt_idx++ ]; /* �ե����8�ɥåȤ���� */
+		    IF_LINE200_OR_EVEN_LINE()	/* 200LINE／400LINE偶数line時*/
+			style = fnt.b[ fnt_idx++ ]; /* フォント8ドットを取得 */
 
-		    {				    /* �饤��ñ�̤�����	     */
+		    {				    /* ライン単位で描画	     */
 
-			if	  (style == 0xff) {	/* TEXT�� �Τߤ����� */
+			if	  (style == 0xff) {	/* TEXT部 のみを描画 */
 			    MASK_DOT();			/*		     */
-			} else if (style == 0x00) {	/* VRAM�� �Τߤ����� */
+			} else if (style == 0x00) {	/* VRAM部 のみを描画 */
 			    TRANS_DOT();		/*		     */
-			} else {			/* TEXT/VRAM�������� */
+			} else {			/* TEXT/VRAM合成描画 */
 			    STORE_DOT();		/*		     */
 			}				/*		     */
-			COPY_DOT();			/* �饤��� ������ */
+			COPY_DOT();			/* ラインの 隙間埋め */
 		    }
 
-		    DST_NEXT_LINE();		    /* ���Υ饤����֤˿ʤ�  */
+		    DST_NEXT_LINE();		    /* 次のライン位置に進む  */
 		}				/*- - - - - - - - - - - - - -*/
 
-		DST_RESTORE_LINE();		/* �饤����Ƭ���᤹	     */
+		DST_RESTORE_LINE();		/* ライン先頭に戻す	     */
 	    }
 
 
-					    /* ����ʸ�����֤˿ʤ�	     */
+					    /* 次の文字位置に進む	     */
 	    src += COLUMN_SKIP;
 	    DST_NEXT_CHARA();
 	}			       /*------------------------------------*/
 
-						/* ���ιԤ���Ƭʸ�����֤˿ʤ�*/
+						/* 次の行の先頭文字位置に進む*/
 	src += (CHARA_LINES - 1) * 80;
 	DST_NEXT_TOP_CHARA();
     }				/*===========================================*/

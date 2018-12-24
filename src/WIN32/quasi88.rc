@@ -70,6 +70,9 @@ QUASI88 MENU {
 		POPUP "Screen Size" {
 			MENUITEM "Normal size",		M_SET_SIZ_FULL
 			MENUITEM "Half size",		M_SET_SIZ_HALF
+#ifdef	SUPPORT_DOUBLE
+			MENUITEM "Double size",		M_SET_SIZ_DOUBLE
+#endif
 		}
 
 		MENUITEM "Use PCG-8100",		M_SET_PCG

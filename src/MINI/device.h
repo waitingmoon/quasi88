@@ -3,27 +3,27 @@
 
 
 /*
- *	��ͭ�Υ��󥯥롼�ɥե�����
+ *	固有のインクルードファイル
  */
 /* #include <XXXXX.h> */
 
 
 /*
- *	src/MINI/ �ʲ��ǤΥ������Х��ѿ�
+ *	src/MINI/ 以下でのグローバル変数
  */
 /* extern	int		global_variable; */
 
 
 
 /*
- *	src/MINI/ �ʲ��ǤΥ������Х��ѿ� (���ץ���������ǽ���ѿ�)
+ *	src/MINI/ 以下でのグローバル変数 (オプション設定可能な変数)
  */
 /* extern	int		global_options; */
 
 
 
 /*
- *	src/MINI/ �ʲ��ǤΥ������Х�ؿ�
+ *	src/MINI/ 以下でのグローバル関数
  */
 /* int mini_init(void); */
 /* int mini_exit(void); */

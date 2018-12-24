@@ -1,7 +1,7 @@
 /************************************************************************/
-/* SDL═╤ е╕ечеде╣е╞еге├еп╞■╬╧╜ш═¤					*/
+/* SDLчФи уВ╕уГзуВдуВ╣уГЖуВгуГГуВпхЕехКЫхЗжчРЖ					*/
 /*									*/
-/*	д│д╬е╒ебедеыд╧бв joystick.c длдщедеєепеыб╝е╔д╡дьд▐д╣		*/
+/*	уБУуБоуГХуВбуВдуГлуБпуАБ joystick.c уБЛуВЙуВдуГ│уВпуГлуГ╝уГЙуБХуВМуБ╛уБЩ		*/
 /*									*/
 /************************************************************************/
 #if	defined(JOY_SDL)
@@ -15,9 +15,9 @@
 #include "event.h"
 
 
-#define	JOY_MAX   	KEY88_PAD_MAX		/* е╕ечеде╣е╞еге├еп╛х╕┬(2╕─) */
+#define	JOY_MAX   	KEY88_PAD_MAX		/* уВ╕уГзуВдуВ╣уГЖуВгуГГуВпф╕КщЩР(2хАЛ) */
 
-#define	BUTTON_MAX	KEY88_PAD_BUTTON_MAX	/* е▄е┐еє╛х╕┬(8╕─)	     */
+#define	BUTTON_MAX	KEY88_PAD_BUTTON_MAX	/* уГЬуВ┐уГ│ф╕КщЩР(8хАЛ)	     */
 
 #define	AXIS_U		0x01
 #define	AXIS_D		0x02
@@ -26,18 +26,18 @@
 
 typedef struct {
 
-    SDL_Joystick *dev;		/* екб╝е╫еєд╖д┐е╕ечеде╣е╞еге├епд╬╣╜┬д┬╬ */
-    int		  num;		/* QUASI88 д╟д╬е╕ечеде╣е╞еге├еп╚╓╣ц 0б┴ */
+    SDL_Joystick *dev;		/* уВкуГ╝уГЧуГ│уБЧуБЯуВ╕уГзуВдуВ╣уГЖуВгуГГуВпуБоцзЛщАаф╜У */
+    int		  num;		/* QUASI88 уБзуБоуВ╕уГзуВдуВ╣уГЖуВгуГГуВпчХкхП╖ 0уАЬ */
 
-    int		  axis;			/* ╩¤╕■е▄е┐еє▓б▓╝╛ї┬╓		*/
-    int		  nr_button;		/* ═н╕·д╩е▄е┐еєд╬┐Ї		*/
-    Uint8	  button[ BUTTON_MAX ];	/* е▄е┐еєд╬▓б▓╝╛ї┬╓		*/
+    int		  axis;			/* цЦ╣хРСуГЬуВ┐уГ│цК╝ф╕ЛчК╢цЕЛ		*/
+    int		  nr_button;		/* цЬЙхК╣уБкуГЬуВ┐уГ│уБоцХ░		*/
+    Uint8	  button[ BUTTON_MAX ];	/* уГЬуВ┐уГ│уБоцК╝ф╕ЛчК╢цЕЛ		*/
 
 } T_JOY_INFO;
 
 static T_JOY_INFO joy_info[ JOY_MAX ];
 
-static	int	joystick_num;		/* екб╝е╫еєд╖д┐е╕ечеде╣е╞еге├епд╬┐Ї */
+static	int	joystick_num;		/* уВкуГ╝уГЧуГ│уБЧуБЯуВ╕уГзуВдуВ╣уГЖуВгуГГуВпуБоцХ░ */
 
 
 
@@ -47,7 +47,7 @@ void	joystick_init(void)
     SDL_Joystick *dev;
     int i, max, nr_button;
 
-    /* еяб╝еп╜щ┤№▓╜ */
+    /* уГпуГ╝уВпхИЭцЬЯхМЦ */
     joystick_num = 0;
 
     memset(joy_info, 0, sizeof(joy_info));
@@ -55,7 +55,7 @@ void	joystick_init(void)
 	joy_info[i].dev = NULL;
     }
 
-    /* е╕ечеде╣е╞еге├епе╡е╓е╖е╣е╞ер╜щ┤№▓╜ */
+    /* уВ╕уГзуВдуВ╣уГЖуВгуГГуВпуВ╡уГЦуВ╖уВ╣уГЖуГахИЭцЬЯхМЦ */
     if (verbose_proc) printf("Initializing joystick ... ");
 
     if (! SDL_WasInit(SDL_INIT_JOYSTICK)) {
@@ -65,15 +65,15 @@ void	joystick_init(void)
 	}
     }
 
-    /* е╕ечеде╣е╞еге├епд╬┐ЇдЄ─┤д┘д╞бве╟е╨еде╣екб╝е╫еє */
+    /* уВ╕уГзуВдуВ╣уГЖуВгуГГуВпуБоцХ░уВТшк┐уБ╣уБжуАБуГЗуГРуВдуВ╣уВкуГ╝уГЧуГ│ */
     max = SDL_NumJoysticks();
-    max = MIN(max, JOY_MAX);		/* еяб╝епд╬┐Їд└д▒бв═н╕· */
+    max = MIN(max, JOY_MAX);		/* уГпуГ╝уВпуБоцХ░уБауБСуАБцЬЙхК╣ */
 
     for (i=0; i<max; i++) {
-	dev = SDL_JoystickOpen(i);	/* i╚╓╠▄д╬е╕ечеде╣е╞еге├епдЄекб╝е╫еє */
+	dev = SDL_JoystickOpen(i);	/* iчХкчЫоуБоуВ╕уГзуВдуВ╣уГЖуВгуГГуВпуВТуВкуГ╝уГЧуГ│ */
 
 	if (dev) {
-	    /* е▄е┐еєд╬┐ЇдЄ─┤д┘ды */
+	    /* уГЬуВ┐уГ│уБоцХ░уВТшк┐уБ╣уВЛ */
 	    nr_button = SDL_JoystickNumButtons(dev);
 	    nr_button = MIN(nr_button, BUTTON_MAX);
 
@@ -83,7 +83,7 @@ void	joystick_init(void)
 	}
     }
 
-    if (joystick_num > 0) {			/* 1╕─░╩╛хекб╝е╫еєд╟днд┐дщ  */
+    if (joystick_num > 0) {			/* 1хАЛф╗еф╕КуВкуГ╝уГЧуГ│уБзуБНуБЯуВЙ  */
 	SDL_JoystickEventState(SDL_IGNORE);
     } else {
 	SDL_QuitSubSystem(SDL_INIT_JOYSTICK);

@@ -7,7 +7,7 @@
 #endif
 
 
-/* └▀─ъе╒ебедеы╠╛ */
+/* шинхоЪуГХуВбуВдуГлхРН */
 
 #ifndef	CONFIG_SUFFIX
 #define	CONFIG_SUFFIX		".prefs"
@@ -21,7 +21,7 @@
 #define	KEYCONF_FILENAME	"keyconf"
 #endif
 
-/* е╡е╣е┌еєе╔д╬е╒ебедеы╠╛ */
+/* уВ╡уВ╣уГЪуГ│уГЙуБоуГХуВбуВдуГлхРН */
 
 #ifndef	STATE_SUFFIX
 #define	STATE_SUFFIX		".sta"
@@ -31,13 +31,13 @@
 #define	STATE_FILENAME		"quasi88"
 #endif
 
-/* е╣е╩е├е╫е╖ече├е╚д╬е╒ебедеы╠╛(е┘б╝е╣) */
+/* уВ╣уГКуГГуГЧуВ╖уГзуГГуГИуБоуГХуВбуВдуГлхРН(уГЩуГ╝уВ╣) */
 
 #ifndef	SNAPSHOT_FILENAME
 #define	SNAPSHOT_FILENAME	"save"
 #endif
 
-/* е╡ежеєе╔╜╨╬╧д╬е╒ебедеы╠╛(е┘б╝е╣) */
+/* уВ╡уВжуГ│уГЙхЗ║хКЫуБоуГХуВбуВдуГлхРН(уГЩуГ╝уВ╣) */
 
 #ifndef	WAVEOUT_FILENAME
 #define	WAVEOUT_FILENAME	"wave"
@@ -45,7 +45,7 @@
 
 
 
-/* е╤е╣бже╒ебедеы╠╛д╬║╟┬ч─╣д╡ ? */
+/* уГСуВ╣уГ╗уГХуВбуВдуГлхРНуБоцЬАхдзщХ╖уБХ ? */
 #define	OSD_MAX_FILENAME	(255)
 
 

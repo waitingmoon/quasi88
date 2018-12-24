@@ -4,9 +4,9 @@
 
 
 typedef struct {
-    unsigned	char	blue;			/* B╠╠╡▒┼┘ (0б┴7/255)	*/
-    unsigned	char	red;			/* R╠╠╡▒┼┘ (0б┴7/255)	*/
-    unsigned 	char	green;			/* G╠╠╡▒┼┘ (0б┴7/255)	*/
+    unsigned	char	blue;			/* BщЭвш╝Эх║ж (0уАЬ7/255)	*/
+    unsigned	char	red;			/* RщЭвш╝Эх║ж (0уАЬ7/255)	*/
+    unsigned 	char	green;			/* GщЭвш╝Эх║ж (0уАЬ7/255)	*/
     unsigned 	char	padding;
 } PC88_PALETTE_T;
 
@@ -15,12 +15,12 @@ typedef struct {
  *	PC-88 Related
  */
 
-extern	PC88_PALETTE_T	vram_bg_palette;	/* ╟╪╖╩е╤еье├е╚	*/
-extern	PC88_PALETTE_T	vram_palette[8];	/* │╞╝яе╤еье├е╚	*/
+extern	PC88_PALETTE_T	vram_bg_palette;	/* шГМцЩпуГСуГмуГГуГИ	*/
+extern	PC88_PALETTE_T	vram_palette[8];	/* хРДчиоуГСуГмуГГуГИ	*/
 
 extern	byte	sys_ctrl;			/* OUT[30] SystemCtrl     */
 extern	byte	grph_ctrl;			/* OUT[31] GraphCtrl      */
-extern	byte	grph_pile;			/* OUT[53] ╜┼д═╣чдяд╗     */
+extern	byte	grph_pile;			/* OUT[53] щЗНуБнхРИуВПуБЫ     */
 
 #define	SYS_CTRL_80		(0x01)		/* TEXT COLUMN80 / COLUMN40*/
 #define	SYS_CTRL_MONO		(0x02)		/* TEXT MONO     / COLOR   */
@@ -32,7 +32,7 @@ extern	byte	grph_pile;			/* OUT[53] ╜┼д═╣чдяд╗     */
 #define GRPH_CTRL_COLOR		(0x10)		/* VRAM  COLOR   / MONO    */
 #define	GRPH_CTRL_25		(0x20)		/* TEXT  LINE25  / LINE20  */
 
-#define	GRPH_PILE_TEXT		(0x01)		/* ╜┼д═╣чдяд╗ ╚є╔╜╝и TEXT  */
+#define	GRPH_PILE_TEXT		(0x01)		/* щЗНуБнхРИуВПуБЫ щЭЮшбичд║ TEXT  */
 #define	GRPH_PILE_BLUE		(0x02)		/*		       B   */
 #define	GRPH_PILE_RED		(0x04)		/*		       R   */
 #define	GRPH_PILE_GREEN		(0x08)		/*		       G   */
@@ -40,18 +40,18 @@ extern	byte	grph_pile;			/* OUT[53] ╜┼д═╣чдяд╗     */
 
 
 /*
- *	╔┴▓ш╜ш═¤═╤еяб╝еп
+ *	цППчФ╗хЗжчРЖчФиуГпуГ╝уВп
  */
 
-	/* ╔┴▓ш║╣╩м┤╔═¤ */
+	/* цППчФ╗х╖охИЖчобчРЖ */
 
-extern	char	screen_dirty_flag[ 0x4000*2 ];	/* еседеє╬╬░ш ║╣╩м╣╣┐╖	*/
-extern	int	screen_dirty_all;		/* еседеє╬╬░ш ┴┤░ш╣╣┐╖	*/
-extern	int	screen_dirty_palette;		/* ┐з╛Ё╩є ╣╣┐╖		*/
-extern	int	screen_dirty_status;		/* е╣е╞б╝е┐е╣╬╬░ш ╣╣┐╖	*/
-extern	int	screen_dirty_status_hide;	/* е╣е╞б╝е┐е╣╬╬░ш ╛├╡ю	*/
-extern	int	screen_dirty_status_show;	/* е╣е╞б╝е┐е╣╬╬░ш ╜щ┤№▓╜*/
-extern	int	screen_dirty_frame;		/* ┴┤╬╬░ш ╣╣┐╖		*/
+extern	char	screen_dirty_flag[ 0x4000*2 ];	/* уГбуВдуГ│щаШхЯЯ х╖охИЖцЫ┤цЦ░	*/
+extern	int	screen_dirty_all;		/* уГбуВдуГ│щаШхЯЯ хЕихЯЯцЫ┤цЦ░	*/
+extern	int	screen_dirty_palette;		/* шЙ▓цГЕха▒ цЫ┤цЦ░		*/
+extern	int	screen_dirty_status;		/* уВ╣уГЖуГ╝уВ┐уВ╣щаШхЯЯ цЫ┤цЦ░	*/
+extern	int	screen_dirty_status_hide;	/* уВ╣уГЖуГ╝уВ┐уВ╣щаШхЯЯ ц╢ИхО╗	*/
+extern	int	screen_dirty_status_show;	/* уВ╣уГЖуГ╝уВ┐уВ╣щаШхЯЯ хИЭцЬЯхМЦ*/
+extern	int	screen_dirty_frame;		/* хЕищаШхЯЯ цЫ┤цЦ░		*/
 
 #define	screen_set_dirty_flag(x)	screen_dirty_flag[x] = 1
 #define	screen_set_dirty_all()		screen_dirty_all = TRUE
@@ -65,28 +65,28 @@ extern	int	screen_dirty_frame;		/* ┴┤╬╬░ш ╣╣┐╖		*/
 #define	screen_set_dirty_frame()	screen_dirty_frame = TRUE;
 
 
-	/* д╜д╬┬╛ */
+	/* уБЭуБоф╗Ц */
 
-extern	int	frameskip_rate;		/* ▓ш╠╠╔╜╝ид╬╣╣┐╖┤╓│╓		*/
-extern	int	monitor_analog;		/* еве╩еэе░ете╦е┐б╝		*/
-extern	int	use_auto_skip;		/* ╝л╞░е╒еьб╝ере╣ене├е╫		*/
+extern	int	frameskip_rate;		/* чФ╗щЭвшбичд║уБоцЫ┤цЦ░щЦУщЪФ		*/
+extern	int	monitor_analog;		/* уВвуГКуГнуВ░уГвуГЛуВ┐уГ╝		*/
+extern	int	use_auto_skip;		/* шЗкхЛХуГХуГмуГ╝уГауВ╣уВнуГГуГЧ		*/
 
 
 
 /*
- *	╔╜╝и└▀─ъ
+ *	шбичд║шинхоЪ
  */
 
 enum {
-    SCREEN_INTERLACE_NO = 0,		/* едеєе┐б╝еье╣╔╜╝ид╖д╩дд	*/
-    SCREEN_INTERLACE_YES = 1,		/* едеєе┐б╝еье╣╔╜╝ид╣ды		*/
-    SCREEN_INTERLACE_SKIP = -1		/* 1ещедеєдкдн╔╜╝ид╣ды		*/
+    SCREEN_INTERLACE_NO = 0,		/* уВдуГ│уВ┐уГ╝уГмуВ╣шбичд║уБЧуБкуБД	*/
+    SCREEN_INTERLACE_YES = 1,		/* уВдуГ│уВ┐уГ╝уГмуВ╣шбичд║уБЩуВЛ		*/
+    SCREEN_INTERLACE_SKIP = -1		/* 1уГйуВдуГ│уБКуБНшбичд║уБЩуВЛ		*/
 };
-extern	int	use_interlace;		/* едеєе┐б╝еьб╝е╣╔╜╝и		*/
+extern	int	use_interlace;		/* уВдуГ│уВ┐уГ╝уГмуГ╝уВ╣шбичд║		*/
 
-extern	int	use_half_interp;	/* ▓ш╠╠е╡еде║╚╛╩м╗■бв┐з╩ф┤╓д╣ды */
+extern	int	use_half_interp;	/* чФ╗щЭвуВ╡уВдуВ║хНКхИЖцЩВуАБшЙ▓шгЬщЦУуБЩуВЛ */
 
-enum {					/* ▓ш╠╠е╡еде║			*/
+enum {					/* чФ╗щЭвуВ╡уВдуВ║			*/
     SCREEN_SIZE_HALF,			/*		320 x 200	*/
     SCREEN_SIZE_FULL,			/*		640 x 400	*/
 #ifdef	SUPPORT_DOUBLE
@@ -94,16 +94,16 @@ enum {					/* ▓ш╠╠е╡еде║			*/
 #endif
     SCREEN_SIZE_END
 };
-extern	int	screen_size;		/* ▓ш╠╠е╡еде║╗╪─ъ		*/
+extern	int	screen_size;		/* чФ╗щЭвуВ╡уВдуВ║цМЗхоЪ		*/
 
-extern	int	use_fullscreen;		/* ┴┤▓ш╠╠╔╜╝и╗╪─ъ		*/
+extern	int	use_fullscreen;		/* хЕичФ╗щЭвшбичд║цМЗхоЪ		*/
 
-extern	double	mon_aspect;		/* ете╦е┐б╝д╬еве╣е┌епе╚╚ц	*/
+extern	double	mon_aspect;		/* уГвуГЛуВ┐уГ╝уБоуВвуВ╣уГЪуВпуГИцпФ	*/
 
-extern	int	status_fg;		/* е╣е╞б╝е┐е╣┴░╖╩┐з		*/
-extern	int	status_bg;		/* е╣е╞б╝е┐е╣╟╪╖╩┐з		*/
+extern	int	status_fg;		/* уВ╣уГЖуГ╝уВ┐уВ╣хЙНцЩпшЙ▓		*/
+extern	int	status_bg;		/* уВ╣уГЖуГ╝уВ┐уВ╣шГМцЩпшЙ▓		*/
 
-extern	int	show_status;		/* е╣е╞б╝е┐е╣╔╜╝и═н╠╡		*/
+extern	int	show_status;		/* уВ╣уГЖуГ╝уВ┐уВ╣шбичд║цЬЙчДб		*/
 
 
 /*
@@ -115,123 +115,123 @@ enum {
     HIDE_MOUSE = 1,
     AUTO_MOUSE = 2
 };
-extern	int	hide_mouse;		/* е▐еже╣дЄ▒гд╣длд╔дждл		*/
+extern	int	hide_mouse;		/* уГЮуВжуВ╣уВТщЪауБЩуБЛуБйуБЖуБЛ		*/
 enum {
     UNGRAB_MOUSE = 0,
     GRAB_MOUSE   = 1
 };
-extern	int	grab_mouse;		/* е░еще╓д╣дыдлд╔дждл		*/
+extern	int	grab_mouse;		/* уВ░уГйуГЦуБЩуВЛуБЛуБйуБЖуБЛ		*/
 
-extern	int	use_swcursor;		/* есе╦ехб╝└ь═╤елб╝е╜еы╔╜╝ид╣дыбй*/
-extern	int	now_swcursor;		/* ╕╜║▀└ь═╤елб╝е╜еы╔╜╝и├ц?	*/
+extern	int	use_swcursor;		/* уГбуГЛуГеуГ╝х░ВчФиуВлуГ╝уВ╜уГлшбичд║уБЩуВЛя╝Я*/
+extern	int	now_swcursor;		/* чП╛хЬих░ВчФиуВлуГ╝уВ╜уГлшбичд║ф╕н?	*/
 
 
 /*
- *	╔╜╝ие╟е╨еде╣═╤еяб╝еп
+ *	шбичд║уГЗуГРуВдуВ╣чФиуГпуГ╝уВп
  */
 
 #define	STATUS_HEIGHT	(20)
 
-extern	int	WIDTH;			/* ╔┴▓ше╨е├е╒еб▓ге╡еде║		*/
-extern	int	HEIGHT;			/* ╔┴▓ше╨е├е╒еб╜─е╡еде║		*/
-extern	int	DEPTH;			/* ┐зе╙е├е╚┐Ї	(8/16/32)	*/
-extern	int	SCREEN_W;		/* ▓ш╠╠▓ге╡еде║ (320/640/1280)	*/
-extern	int	SCREEN_H;		/* ▓ш╠╠╜─е╡еде║ (200/400/800)	*/
+extern	int	WIDTH;			/* цППчФ╗уГРуГГуГХуВбцикуВ╡уВдуВ║		*/
+extern	int	HEIGHT;			/* цППчФ╗уГРуГГуГХуВбч╕жуВ╡уВдуВ║		*/
+extern	int	DEPTH;			/* шЙ▓уГУуГГуГИцХ░	(8/16/32)	*/
+extern	int	SCREEN_W;		/* чФ╗щЭвцикуВ╡уВдуВ║ (320/640/1280)	*/
+extern	int	SCREEN_H;		/* чФ╗щЭвч╕жуВ╡уВдуВ║ (200/400/800)	*/
 
-extern	int	SCREEN_DX;		/* ежедеєе╔еж║╕╛хд╚бв		*/
-extern	int	SCREEN_DY;		/* ▓ш╠╠еиеъев║╕╛хд╚д╬еке╒е╗е├е╚	*/
+extern	int	SCREEN_DX;		/* уВжуВдуГ│уГЙуВжх╖жф╕КуБиуАБ		*/
+extern	int	SCREEN_DY;		/* чФ╗щЭвуВиуГкуВвх╖жф╕КуБиуБоуВкуГХуВ╗уГГуГИ	*/
 
-extern	char	*screen_buf;		/* ╔┴▓ше╨е├е╒еб└ш╞м		*/
-extern	char	*screen_start;		/* ▓ш╠╠└ш╞м			*/
+extern	char	*screen_buf;		/* цППчФ╗уГРуГГуГХуВбхЕИщан		*/
+extern	char	*screen_start;		/* чФ╗щЭвхЕИщан			*/
 
-extern	char	*status_buf;		/* е╣е╞б╝е┐е╣┴┤░ш └ш╞м		*/
-extern	char	*status_start[3];	/* е╣е╞б╝е┐е╣╔┴▓ш └ш╞м		*/
-extern	int	status_sx[3];		/* е╣е╞б╝е┐е╣╔┴▓ше╡еде║		*/
+extern	char	*status_buf;		/* уВ╣уГЖуГ╝уВ┐уВ╣хЕихЯЯ хЕИщан		*/
+extern	char	*status_start[3];	/* уВ╣уГЖуГ╝уВ┐уВ╣цППчФ╗ хЕИщан		*/
+extern	int	status_sx[3];		/* уВ╣уГЖуГ╝уВ┐уВ╣цППчФ╗уВ╡уВдуВ║		*/
 extern	int	status_sy[3];
 
 
 
 
-extern	Ulong	color_pixel[16];		/* ┐зе│б╝е╔		*/
-extern	Ulong	color_half_pixel[16][16];	/* ┐з╩ф┤░╗■д╬┐зе│б╝е╔	*/
-extern	Ulong	black_pixel;			/* ╣їд╬┐зе│б╝е╔		*/
-enum {						/* е╣е╞б╝е┐е╣д╦╗╚дж┐з	*/
-    STATUS_BG,					/*	╟╪╖╩┐з(╟Є)	*/
-    STATUS_FG,					/*	┴░╖╩┐з(╣ї)	*/
-    STATUS_BLACK,				/*	╣ї┐з		*/
-    STATUS_WHITE,				/*	╟Є┐з		*/
-    STATUS_RED,					/*	└╓┐з		*/
-    STATUS_GREEN,				/*	╬╨┐з		*/
+extern	Ulong	color_pixel[16];		/* шЙ▓уВ│уГ╝уГЙ		*/
+extern	Ulong	color_half_pixel[16][16];	/* шЙ▓шгЬхоМцЩВуБошЙ▓уВ│уГ╝уГЙ	*/
+extern	Ulong	black_pixel;			/* щ╗ТуБошЙ▓уВ│уГ╝уГЙ		*/
+enum {						/* уВ╣уГЖуГ╝уВ┐уВ╣уБлф╜┐уБЖшЙ▓	*/
+    STATUS_BG,					/*	шГМцЩпшЙ▓(чЩ╜)	*/
+    STATUS_FG,					/*	хЙНцЩпшЙ▓(щ╗Т)	*/
+    STATUS_BLACK,				/*	щ╗ТшЙ▓		*/
+    STATUS_WHITE,				/*	чЩ╜шЙ▓		*/
+    STATUS_RED,					/*	ш╡дшЙ▓		*/
+    STATUS_GREEN,				/*	ч╖СшЙ▓		*/
     STATUS_COLOR_END
 };
-extern	Ulong	status_pixel[STATUS_COLOR_END];	/* е╣е╞б╝е┐е╣д╬┐зе│б╝е╔	*/
+extern	Ulong	status_pixel[STATUS_COLOR_END];	/* уВ╣уГЖуГ╝уВ┐уВ╣уБошЙ▓уВ│уГ╝уГЙ	*/
 
 
 
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
                           WIDTH
-	 влибибибибибибибибибибибибибибибибибибибвк
-	игибибибибибибибибибибибибибибибибибибибибид вм
-	ив              вм                        ив ив
-	ив              ивSCREEN_DY               ив ив
-	ив              вн                        ив ив
-	иввлибибибибибвкигибибибибибибибибибид    ив ив
-	ив   SCREEN_DX  ив  вм              ив    ив ив
-	ив              иввлибибибибибибибвкив    ив ивHEIGHT
-	ив              ив  ив   SCREEN_W   ив    ив ив
-	ив              ив  ив              ив    ив ив
-	ив              ив  ивSCREEN_H      ив    ив ив
-	ив              ив  вн              ив    ив ив
-	ив              ижибибибибибибибибибие    ив ив
-	ив                                        ив вн
-	изибибибибибибииибибибибибибииибибибибибибий вм
-	иве╣е╞б╝е┐е╣0 иве╣е╞б╝е┐е╣1 иве╣е╞б╝е┐е╣2 ив ивSTATUS_HEIGHT
-	ижибибибибибибикибибибибибибикибибибибибибие вн
-	    е╣е╞б╝е┐е╣0б┴2д╬е╡еде║╚ц╬ид╧бв 1:3:1
+	 тЖРтФАтФАтФАтФАтФАтФАтФАтФАтФАтФАтФАтФАтФАтФАтФАтФАтФАтФАтФАтЖТ
+	тФМтФАтФАтФАтФАтФАтФАтФАтФАтФАтФАтФАтФАтФАтФАтФАтФАтФАтФАтФАтФАтФР тЖС
+	тФВ              тЖС                        тФВ тФВ
+	тФВ              тФВSCREEN_DY               тФВ тФВ
+	тФВ              тЖУ                        тФВ тФВ
+	тФВтЖРтФАтФАтФАтФАтФАтЖТтФМтФАтФАтФАтФАтФАтФАтФАтФАтФАтФР    тФВ тФВ
+	тФВ   SCREEN_DX  тФВ  тЖС              тФВ    тФВ тФВ
+	тФВ              тФВтЖРтФАтФАтФАтФАтФАтФАтФАтЖТтФВ    тФВ тФВHEIGHT
+	тФВ              тФВ  тФВ   SCREEN_W   тФВ    тФВ тФВ
+	тФВ              тФВ  тФВ              тФВ    тФВ тФВ
+	тФВ              тФВ  тФВSCREEN_H      тФВ    тФВ тФВ
+	тФВ              тФВ  тЖУ              тФВ    тФВ тФВ
+	тФВ              тФФтФАтФАтФАтФАтФАтФАтФАтФАтФАтФШ    тФВ тФВ
+	тФВ                                        тФВ тЖУ
+	тФЬтФАтФАтФАтФАтФАтФАтФмтФАтФАтФАтФАтФАтФАтФмтФАтФАтФАтФАтФАтФАтФд тЖС
+	тФВуВ╣уГЖуГ╝уВ┐уВ╣0 тФВуВ╣уГЖуГ╝уВ┐уВ╣1 тФВуВ╣уГЖуГ╝уВ┐уВ╣2 тФВ тФВSTATUS_HEIGHT
+	тФФтФАтФАтФАтФАтФАтФАтФ┤тФАтФАтФАтФАтФАтФАтФ┤тФАтФАтФАтФАтФАтФАтФШ тЖУ
+	    уВ╣уГЖуГ╝уВ┐уВ╣0уАЬ2уБоуВ╡уВдуВ║цпФчОЗуБпуАБ 1:3:1
 
-	screen_buf	╔┴▓ше╨е├е╒еб┴┤░шд╬бв└ш╞ме▌едеєе┐
-	WIDTH		╔┴▓ше╨е├е╒еб┴┤░шд╬бв▓ге╘епе╗еы┐Ї
-	HEIGHT		        б╖          ╜─е╘епе╗еы┐Ї
+	screen_buf	цППчФ╗уГРуГГуГХуВбхЕихЯЯуБоуАБхЕИщануГЭуВдуГ│уВ┐
+	WIDTH		цППчФ╗уГРуГГуГХуВбхЕихЯЯуБоуАБцикуГФуВпуВ╗уГлцХ░
+	HEIGHT		        уАГ          ч╕жуГФуВпуВ╗уГлцХ░
 
-	screen_size	▓ш╠╠е╡еде║
-	screen_start	▓ш╠╠е╨е├е╒ебд╬бв└ш╞ме▌едеєе┐
-	SCREEN_W	▓ш╠╠е╨е├е╒ебд╬бв▓ге╘епе╗еы┐Ї (320/640/1280)
-	SCREEN_H	      б╖        ╜─е╘епе╗еы┐Ї (200/400/800)
+	screen_size	чФ╗щЭвуВ╡уВдуВ║
+	screen_start	чФ╗щЭвуГРуГГуГХуВбуБоуАБхЕИщануГЭуВдуГ│уВ┐
+	SCREEN_W	чФ╗щЭвуГРуГГуГХуВбуБоуАБцикуГФуВпуВ╗уГлцХ░ (320/640/1280)
+	SCREEN_H	      уАГ        ч╕жуГФуВпуВ╗уГлцХ░ (200/400/800)
 
-	DEPTH		┐з┐╝┼┘ (е╨е├е╒ебд╬е╙е├е╚╔¤бв8/16/32)
+	DEPTH		шЙ▓ц╖▒х║ж (уГРуГГуГХуВбуБоуГУуГГуГИх╣ЕуАБ8/16/32)
 
-	status_buf	е╣е╞б╝е┐е╣е╨е├е╒еб┴┤░шд╬бв└ш╞ме▌едеєе┐
-	status_start[3]	е╣е╞б╝е┐е╣ 0б┴2 д╬е╨е├е╒ебд╬бв└ш╞ме▌едеєе┐
-	status_sx[3]		б╖		      ▓ге╘епе╗еы┐Ї
-	status_sy[3]		б╖		      ╜─е╘епе╗еы┐Ї
+	status_buf	уВ╣уГЖуГ╝уВ┐уВ╣уГРуГГуГХуВбхЕихЯЯуБоуАБхЕИщануГЭуВдуГ│уВ┐
+	status_start[3]	уВ╣уГЖуГ╝уВ┐уВ╣ 0уАЬ2 уБоуГРуГГуГХуВбуБоуАБхЕИщануГЭуВдуГ│уВ┐
+	status_sx[3]		уАГ		      цикуГФуВпуВ╗уГлцХ░
+	status_sy[3]		уАГ		      ч╕жуГФуВпуВ╗уГлцХ░
 
 
-	ви ежедеєе╔еж╔╜╝ид╬╛ь╣чбв
-		WIDTH * (HEIGHT + STATUS_HEIGHT) д╬е╡еде║д╟бв
-		ежедеєе╔еждЄ└╕└од╖д▐д╣бг
-			(е╣е╞б╝е┐е╣╚є╔╜╝ид╩дщбв WIDTH * HEIGHT)
+	тА╗ уВжуВдуГ│уГЙуВжшбичд║уБоха┤хРИуАБ
+		WIDTH * (HEIGHT + STATUS_HEIGHT) уБоуВ╡уВдуВ║уБзуАБ
+		уВжуВдуГ│уГЙуВжуВТчФЯцИРуБЧуБ╛уБЩуАВ
+			(уВ╣уГЖуГ╝уВ┐уВ╣щЭЮшбичд║уБкуВЙуАБ WIDTH * HEIGHT)
 
-	ви ┴┤▓ш╠╠╔╜╝ид╬╛ь╣чбв
-		SCREEN_SX * (SCREEN_SY + STATUS_HEIGHT) ░╩╛хд╬е╡еде║д╟
-		┴┤▓ш╠╠▓╜д╖д▐д╣бг
-			(е╣е╞б╝е┐е╣╚є╔╜╝ид╩дщбв▓╝д╬╔Ї╩мд╧╣їд╟┼╔дъд─д╓д╣)
+	тА╗ хЕичФ╗щЭвшбичд║уБоха┤хРИуАБ
+		SCREEN_SX * (SCREEN_SY + STATUS_HEIGHT) ф╗еф╕КуБоуВ╡уВдуВ║уБз
+		хЕичФ╗щЭвхМЦуБЧуБ╛уБЩуАВ
+			(уВ╣уГЖуГ╝уВ┐уВ╣щЭЮшбичд║уБкуВЙуАБф╕ЛуБощГихИЖуБпщ╗ТуБзхбЧуВКуБдуБ╢уБЩ)
 
    - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -*/
 
 /***********************************************************************
- * ▓ш╠╠╜ш═¤д╬╜щ┤№▓╜бж╜к╬╗
- *	screen_init()	▓ш╠╠дЄ└╕└од╣дыбг╡п╞░╗■д╦╕╞д╨дьдыбг
- *	screen_exit()	╕хдлд┐д┼д▒д╣дыбг╜к╬╗╗■д╦╕╞д╨дьдыбг
+ * чФ╗щЭвхЗжчРЖуБохИЭцЬЯхМЦуГ╗ч╡Вф║Ж
+ *	screen_init()	чФ╗щЭвуВТчФЯцИРуБЩуВЛуАВш╡╖хЛХцЩВуБлхС╝уБ░уВМуВЛуАВ
+ *	screen_exit()	х╛МуБЛуБЯуБеуБСуБЩуВЛуАВч╡Вф║ЖцЩВуБлхС╝уБ░уВМуВЛуАВ
  ************************************************************************/
 int	screen_init(void);
 void	screen_exit(void);
 
 
 /***********************************************************************
- * етб╝е╔└┌дъ┬╪ди╗■д╬бв│╞╝я║╞└▀─ъ
- *	┴┤еиеъевдЄ╢п└й╔┴▓шд╣ды╔м═╫дмдвдыд╬д╟бвд╜д╬╜р╚ўдЄд╣дыбг
- * 	grab_mouse бв hide_mouse д╩д╔д╦┤Ёд┼днбве▐еже╣д╬└▀─ъдЄд╣дыбг
- *	енб╝еъе╘б╝е╚дфбве╣е╞б╝е┐е╣дт└▀─ъд╣дыбг
+ * уГвуГ╝уГЙхИЗуВКцЫ┐уБИцЩВуБоуАБхРДчиохЖНшинхоЪ
+ *	хЕиуВиуГкуВвуВТх╝╖хИ╢цППчФ╗уБЩуВЛх┐ЕшжБуБМуБВуВЛуБоуБзуАБуБЭуБоц║ЦхВЩуВТуБЩуВЛуАВ
+ * 	grab_mouse уАБ hide_mouse уБкуБйуБлхЯ║уБеуБНуАБуГЮуВжуВ╣уБошинхоЪуВТуБЩуВЛуАВ
+ *	уВнуГ╝уГкуГФуГ╝уГИуВДуАБуВ╣уГЖуГ╝уВ┐уВ╣уВВшинхоЪуБЩуВЛуАВ
  ************************************************************************/
 void	screen_switch(void);
 
@@ -245,25 +245,25 @@ int	screen_attr_mouse_debug(void);
 
 
 /***********************************************************************
- * PC-8801д╬║╟╜к┼кд╩┐здЄ╝ш╞└д╣ды
+ * PC-8801уБоцЬАч╡ВчЪДуБкшЙ▓уВТхПЦх╛ЧуБЩуВЛ
  ************************************************************************/
 void	screen_get_emu_palette(PC88_PALETTE_T pal[16]);
 void	screen_get_menu_palette(PC88_PALETTE_T pal[16]);
 
 
 /***********************************************************************
- * ╔┴▓ш
+ * цППчФ╗
  ************************************************************************/
-void	screen_update(void);		/* ╔┴▓ш   (1/60sec╦ш)  */
-void	screen_update_immidiate(void);	/* ┬и╔┴▓ш (ете╦е┐б╝═╤) */
+void	screen_update(void);		/* цППчФ╗   (1/60secцпО)  */
+void	screen_update_immidiate(void);	/* хН│цППчФ╗ (уГвуГЛуВ┐уГ╝чФи) */
 
 
 /***********************************************************************
- * е╒еьб╝ере╣ене├е╫
+ * уГХуГмуГ╝уГауВ╣уВнуГГуГЧ
  ************************************************************************/
-void	frameskip_blink_reset(void);	/* ┼└╠╟╜ш═¤ ║╞╜щ┤№▓╜		*/
-void	frameskip_counter_reset(void);	/* е╒еьб╝ере╣ене├е╫ ║╞╜щ┤№▓╜	*/
-void	frameskip_check(int on_time);	/* е╒еьб╝ере╣ене├е╫ ╚╜─ъ	*/
+void	frameskip_blink_reset(void);	/* чВ╣ц╗ЕхЗжчРЖ хЖНхИЭцЬЯхМЦ		*/
+void	frameskip_counter_reset(void);	/* уГХуГмуГ╝уГауВ╣уВнуГГуГЧ хЖНхИЭцЬЯхМЦ	*/
+void	frameskip_check(int on_time);	/* уГХуГмуГ╝уГауВ╣уВнуГГуГЧ хИдхоЪ	*/
 
 int	quasi88_cfg_now_frameskip_rate(void);
 void	quasi88_cfg_set_frameskip_rate(int rate);
@@ -271,27 +271,27 @@ void	quasi88_cfg_set_frameskip_rate(int rate);
 
 
 /***********************************************************************
- * HALFе╡еде║╗■д╬┐з╩ф┤░д╬═н╕·бж╠╡╕·┤╪╧вд╬┤╪┐Ї
+ * HALFуВ╡уВдуВ║цЩВуБошЙ▓шгЬхоМуБоцЬЙхК╣уГ╗чДбхК╣щЦвщАгуБощЦвцХ░
  ***********************************************************************/
 int	quasi88_cfg_can_interp(void);
 int	quasi88_cfg_now_interp(void);
 void	quasi88_cfg_set_interp(int enable);
 
 /***********************************************************************
- * INTERLACEд╬└▀─ъ┤╪╧вд╬┤╪┐Ї
+ * INTERLACEуБошинхоЪщЦвщАгуБощЦвцХ░
  ***********************************************************************/
 int	quasi88_cfg_now_interlace(void);
 void	quasi88_cfg_set_interlace(int interlace_mode);
 
 /***********************************************************************
- * е╣е╞б╝е┐е╣╔╜╝и└▀─ъ┤╪╧вд╬┤╪┐Ї
+ * уВ╣уГЖуГ╝уВ┐уВ╣шбичд║шинхоЪщЦвщАгуБощЦвцХ░
  ***********************************************************************/
 int	quasi88_cfg_can_showstatus(void);
 int	quasi88_cfg_now_showstatus(void);
 void	quasi88_cfg_set_showstatus(int show);
 
 /***********************************************************************
- * ┴┤▓ш╠╠└▀─ъбж▓ш╠╠е╡еде║└▀─ъ┤╪╧вд╬┤╪┐Ї
+ * хЕичФ╗щЭвшинхоЪуГ╗чФ╗щЭвуВ╡уВдуВ║шинхоЪщЦвщАгуБощЦвцХ░
  ***********************************************************************/
 int	quasi88_cfg_can_fullscreen(void);
 int	quasi88_cfg_now_fullscreen(void);

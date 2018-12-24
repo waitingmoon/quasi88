@@ -3,19 +3,19 @@
 /*	Copyright (c) 1998-2012 Showzoh Fukunaga			*/
 /*	All rights reserved.						*/
 /*									*/
-/*	  ���Υ��եȤϡ�UNIX + X Window System �δĶ���ư��롢	*/
-/*	PC-8801 �Υ��ߥ�졼���Ǥ���					*/
+/*	  このソフトは、UNIX + X Window System の環境で動作する、	*/
+/*	PC-8801 のエミュレータです。					*/
 /*									*/
-/*	  ���Υ��եȤκ����ˤ����ꡢMarat Fayzullin���� fMSX��	*/
-/*	Nicola Salmoria�� (MAME/XMAME project) ��� MAME/XMAME��	*/
-/*	��ߤ������� PC6001V �Υ������򻲹ͤˤ����Ƥ�餤�ޤ�����	*/
+/*	  このソフトの作成にあたり、Marat Fayzullin氏作の fMSX、	*/
+/*	Nicola Salmoria氏 (MAME/XMAME project) 作の MAME/XMAME、	*/
+/*	ゆみたろ氏作の PC6001V のソースを参考にさせてもらいました。	*/
 /*									*/
-/*	�����ա�							*/
-/*	  ������ɥɥ饤�Фϡ�MAME/XMAME �Υ�������ή�Ѥ��Ƥ��ޤ���	*/
-/*	������ʬ�Υ�����������ϡ�MAME/XMAME �����ढ�뤤�ϥ�������	*/
-/*	���ܤ��Ƥ�������Ԥˤ���ޤ���					*/
-/*	  FM���������ͥ졼���ϡ�fmgen �Υ�������ή�Ѥ��Ƥ��ޤ���	*/
-/*	������ʬ�Υ�����������ϡ� cisc�� �ˤ���ޤ���		*/
+/*	＊注意＊							*/
+/*	  サウンドドライバは、MAME/XMAME のソースを流用しています。	*/
+/*	この部分のソースの著作権は、MAME/XMAME チームあるいはソースに	*/
+/*	記載してある著作者にあります。					*/
+/*	  FM音源ジェネレータは、fmgen のソースを流用しています。	*/
+/*	この部分のソースの著作権は、 cisc氏 にあります。		*/
 /*									*/
 /************************************************************************/
 
@@ -51,15 +51,15 @@
 #include "intr.h"
 
 
-int	verbose_level	= DEFAULT_VERBOSE;	/* ��Ĺ��٥�		*/
-int	verbose_proc    = FALSE;		/* �����οʹԾ�����ɽ��	*/
-int	verbose_z80	= FALSE;		/* Z80�������顼��ɽ��	*/
-int	verbose_io	= FALSE;		/* ̤����I/O��������ɽ��*/
-int	verbose_pio	= FALSE;		/* PIO ���������Ѥ�ɽ�� */
-int	verbose_fdc	= FALSE;		/* FD���᡼���۾�����	*/
-int	verbose_wait	= FALSE;		/* �������Ȼ��ΰ۾����� */
-int	verbose_suspend = FALSE;		/* �����ڥ�ɻ��ΰ۾����� */
-int	verbose_snd	= FALSE;		/* ������ɤΥ�å�����	*/
+int	verbose_level	= DEFAULT_VERBOSE;	/* 冗長レベル		*/
+int	verbose_proc    = FALSE;		/* 処理の進行状況の表示	*/
+int	verbose_z80	= FALSE;		/* Z80処理エラーを表示	*/
+int	verbose_io	= FALSE;		/* 未実装I/Oアクセス表示*/
+int	verbose_pio	= FALSE;		/* PIO の不正使用を表示 */
+int	verbose_fdc	= FALSE;		/* FDイメージ異常を報告	*/
+int	verbose_wait	= FALSE;		/* ウエイト時の異常を報告 */
+int	verbose_suspend = FALSE;		/* サスペンド時の異常を報告 */
+int	verbose_snd	= FALSE;		/* サウンドのメッセージ	*/
 
 static	void	imagefile_all_open(int stateload);
 static	void	imagefile_all_close(void);
@@ -67,7 +67,7 @@ static	void	status_override(void);
 
 /***********************************************************************
  *
- *			QUASI88 �ᥤ��ؿ�
+ *			QUASI88 メイン関数
  *
  ************************************************************************/
 void	quasi88(void)
@@ -77,23 +77,23 @@ void	quasi88(void)
     quasi88_stop(TRUE);
 }
 
-/* =========================== �ᥤ������ν���� ========================== */
+/* =========================== メイン処理の初期化 ========================== */
 
 #define	SET_PROC(n)	proc = n; if (verbose_proc) printf("\n"); fflush(NULL);
 static	int	proc = 0;
 
 void	quasi88_start(void)
 {
-    stateload_init();			/* ���ơ��ȥ����ɴ�Ϣ�����	*/
-    drive_init();			/* �ǥ���������Υ�������	*/
-    /* �� �����ϡ����ơ��ȥ����ɳ��ϤޤǤ˽�������Ƥ�������		*/
+    stateload_init();			/* ステートロード関連初期化	*/
+    drive_init();			/* ディスク制御のワーク初期化	*/
+    /* ↑ これらは、ステートロード開始までに初期化しておくこと		*/
 
     SET_PROC(1);
 
-					/* ���ߥ�졼���ѥ���γ���	*/
+					/* エミュレート用メモリの確保	*/
     if (memory_allocate() == FALSE) { quasi88_exit(-1); }
 
-    if (resume_flag) {			/* ���ơ��ȥ�����		*/
+    if (resume_flag) {			/* ステートロード		*/
 	SET_PROC(2);
 	if (stateload() == FALSE) {
 	    fprintf(stderr, "stateload: Failed ! (filename = %s)\n",
@@ -104,33 +104,33 @@ void	quasi88_start(void)
     }
     SET_PROC(3);
 
-					/* ����ե��å������ƥ�����	*/
+					/* グラフィックシステム初期化	*/
     if (screen_init() == FALSE) { quasi88_exit(-1); }
     SET_PROC(4);
 
-					/* �����ƥ।�٥�Ƚ����	*/
-    event_init();			/* (screen_init �θ�ǡ�)	*/
+					/* システムイベント初期化	*/
+    event_init();			/* (screen_init の後で！)	*/
 
-    					/* ������ɥɥ饤�н����	*/
+    					/* サウンドドライバ初期化	*/
     if (xmame_sound_start() == FALSE) {	quasi88_exit(-1); }
     SET_PROC(5);
 
-   					/* ���������ѥ����ޡ������	*/
+   					/* ウエイト用タイマー初期化	*/
     if (wait_vsync_init() == FALSE) { quasi88_exit(-1); }
     SET_PROC(6);
 
 
-    set_signal();			/* INT�����ʥ�ν���������	*/
+    set_signal();			/* INTシグナルの処理を設定	*/
 
-    imagefile_all_open(resume_flag);	/* ���᡼���ե���������Ƴ���	*/
+    imagefile_all_open(resume_flag);	/* イメージファイルを全て開く	*/
 
-    					/* ���ߥ��ѥ����缡�����	*/
+    					/* エミュ用ワークを順次初期化	*/
     pc88main_init((resume_flag) ? INIT_STATELOAD : INIT_POWERON);
     pc88sub_init ((resume_flag) ? INIT_STATELOAD : INIT_POWERON);
 
-    key_record_playback_init();		/* �������ϵ�Ͽ/���� �����	*/
+    key_record_playback_init();		/* キー入力記録/再生 初期化	*/
 
-    screen_snapshot_init();		/* ���ʥåץ���åȴ�Ϣ�����   */
+    screen_snapshot_init();		/* スナップショット関連初期化   */
 
 
     debuglog_init();
@@ -141,13 +141,13 @@ void	quasi88_start(void)
     if (verbose_proc) printf("Running QUASI88...\n");
 }
 
-/* ======================== �ᥤ������Υᥤ��롼�� ======================= */
+/* ======================== メイン処理のメインループ ======================= */
 
 void	quasi88_main(void)
 {
     for (;;) {
 
-	/* ��λ�α���������ޤǡ������֤��Ƥ�³���� */
+	/* 終了の応答があるまで、繰り返し呼び続ける */
 
 	if (quasi88_loop() == QUASI88_LOOP_EXIT) {
 	    break;
@@ -155,16 +155,16 @@ void	quasi88_main(void)
 
     }
 
-    /* quasi88_loop() �ϡ� 1�ե졼�� (VSYNC 1����ʬ��1/60��) �����ˡ�
-       QUASI88_LOOP_ONE ���֤��Ƥ��롣
-       ��������ͤ�Ƚ�Ǥ��ơ��ʤ�餫�ν�����ä��Ƥ�褤��
+    /* quasi88_loop() は、 1フレーム (VSYNC 1周期分≒1/60秒) おきに、
+       QUASI88_LOOP_ONE を返してくる。
+       この戻り値を判断して、なんらかの処理を加えてもよい。
 
-       �ޤ������������λ���� QUASI88_LOOP_BUSY ���֤��Ƥ��뤳�Ȥ⤢�뤬��
-       ���ξ��ϵ��ˤ����ˡ������֤��ƤӽФ���³�Ԥ��뤳�� */
+       また、内部処理の事情で QUASI88_LOOP_BUSY を返してくることもあるが、
+       この場合は気にせずに、繰り返し呼び出しを続行すること */
 
 }
 
-/* ========================== �ᥤ������θ����դ� ========================= */
+/* ========================== メイン処理の後片付け ========================= */
 
 void	quasi88_stop(int normal_exit)
 {
@@ -172,11 +172,11 @@ void	quasi88_stop(int normal_exit)
 	if (verbose_proc) printf("Shutting down.....\n");
     }
 
-    /* ���������ξ�硢verbose �ˤ��ܺ�ɽ�����ʤ���С����顼ɽ������ */
+    /* 初期化途中の場合、verbose による詳細表示がなければ、エラー表示する */
 #define ERR_DISP(n)	((proc == (n)) && (verbose_proc == 0))
 
     switch (proc) {
-    case 6:			/* ����� ����˽���äƤ��� */
+    case 6:			/* 初期化 正常に終わっている */
 	profiler_exit();
 	debuglog_exit();
 	screen_snapshot_exit();
@@ -187,48 +187,48 @@ void	quasi88_stop(int normal_exit)
 	wait_vsync_exit();
 	/* FALLTHROUGH */
 
-    case 5:			/* �����ޡ��ν������NG */
+    case 5:			/* タイマーの初期化でNG */
 	if (ERR_DISP(5)) printf("timer initialize failed!\n");
 	xmame_sound_stop();
 	/* FALLTHROUGH */
 
-    case 4:			/* ������ɤν������NG */
+    case 4:			/* サウンドの初期化でNG */
 	if (ERR_DISP(4)) printf("sound system initialize failed!\n");
 	event_exit();
 	screen_exit();
 	/* FALLTHROUGH */
 
-    case 3:			/* ����ե��å��ν������NG */
+    case 3:			/* グラフィックの初期化でNG */
 	if (ERR_DISP(3)) printf("graphic system initialize failed!\n");
 	/* FALLTHROUGH */
 
-    case 2:			/* ���ơ��ȥ����ɤ�NG */
+    case 2:			/* ステートロードでNG */
 	/* FALLTHROUGH */
 
-    case 1:			/* ����ν������NG */
+    case 1:			/* メモリの初期化でNG */
 	if (ERR_DISP(2)) printf("memory allocate failed!\n");
 	memory_free();
 	/* FALLTHROUGH */
 
-    case 0:			/* ��λ���� ���Ǥ˴�λ */
+    case 0:			/* 終了処理 すでに完了 */
 	break;
     }
 
-    proc = 0;	/* ���δؿ���³���ƸƤ�Ǥ�����̵���褦�ˡ����ꥢ���Ƥ��� */
+    proc = 0;	/* この関数を続けて呼んでも問題無いように、クリアしておく */
 }
 
 
 /***********************************************************************
- * QUASI88 ���潪λ�����ؿ�
- *	exit() ������˸Ƥܤ���
+ * QUASI88 途中終了処理関数
+ *	exit() の代わりに呼ぼう。
  ************************************************************************/
 
 #define	MAX_ATEXIT	(32)
 static	void (*exit_function[MAX_ATEXIT])(void);
 
 /*
- * �ؿ������ MAX_ATEXIT �ġ���Ͽ�Ǥ��롣��������Ͽ�����ؿ��ϡ�
- * quasi88_exit() ��ƤӽФ������ˡ���Ͽ������ȵս�ǡ��ƤӽФ���롣
+ * 関数を最大 MAX_ATEXIT 個、登録できる。ここで登録した関数は、
+ * quasi88_exit() を呼び出した時に、登録した順と逆順で、呼び出される。
  */
 void	quasi88_atexit(void (*function)(void))
 {
@@ -244,8 +244,8 @@ void	quasi88_atexit(void (*function)(void))
 }
 
 /*
- * quasi88 ������λ���롣
- * quasi88_atexit() ����Ͽ�����ؿ���ƤӽФ�����ˡ� exit() ����
+ * quasi88 を強制終了する。
+ * quasi88_atexit() で登録した関数を呼び出した後に、 exit() する
  */
 void	quasi88_exit(int status)
 {
@@ -268,16 +268,16 @@ void	quasi88_exit(int status)
 
 
 /***********************************************************************
- * QUASI88�ᥤ��롼������
- *	QUASI88_LOOP_EXIT ���֤�ޤǡ�̵�¤˸ƤӽФ����ȡ�
- * �����
- *	QUASI88_LOOP_EXIT �� ��λ��
- *	QUASI88_LOOP_ONE  �� 1�ե졼��в�� (�������Ȥ����Τʤ����1/60�ü���)
- *	QUASI88_LOOP_BUSY �� �嵭�ʳ��Ρ��ʤ�餫�Υ����ߥ�
+ * QUASI88メインループ制御
+ *	QUASI88_LOOP_EXIT が返るまで、無限に呼び出すこと。
+ * 戻り値
+ *	QUASI88_LOOP_EXIT … 終了時
+ *	QUASI88_LOOP_ONE  … 1フレーム経過時 (ウェイトが正確ならば約1/60秒周期)
+ *	QUASI88_LOOP_BUSY … 上記以外の、なんらかのタイミング
  ************************************************************************/
 int	quasi88_event_flags = EVENT_MODE_CHANGED;
-static	int mode	= EXEC;		/* ���ߤΥ⡼�� */
-static	int next_mode	= EXEC;		/* �⡼�������׵���Ρ����⡼�� */
+static	int mode	= EXEC;		/* 現在のモード */
+static	int next_mode	= EXEC;		/* モード切替要求時の、次モード */
 
 int	quasi88_loop(void)
 {
@@ -291,26 +291,26 @@ int	quasi88_loop(void)
 
     switch (step) {
 
-    /* ======================== ���˥������� ======================== */
+    /* ======================== イニシャル処理 ======================== */
     case INIT:
 	profiler_lapse( PROF_LAPSE_RESET );
 
-	/* �⡼���ѹ����ϡ�ɬ����������롣�⡼���ѹ��ե饰�򥯥ꥢ */
+	/* モード変更時は、必ずここに来る。モード変更フラグをクリア */
 	quasi88_event_flags &= ~EVENT_MODE_CHANGED;
 	mode = next_mode;
 
-	/* �㳰Ū�ʥ⡼���ѹ����ν��� */
+	/* 例外的なモード変更時の処理 */
 	switch (mode) {
 #ifndef	USE_MONITOR
-	case MONITOR:	/* ���ꤨ�ʤ����ɡ�ǰ�Τ��� */
+	case MONITOR:	/* ありえないけど、念のため */
 	    mode = PAUSE;
 	    break;
 #endif
-	case QUIT:	/* QUIT �ʤ顢�ᥤ��롼�׽�λ */
+	case QUIT:	/* QUIT なら、メインループ終了 */
 	    return FALSE;
 	}
 
-	/* �⡼���̥��˥������� */
+	/* モード別イニシャル処理 */
 	if (mode == EXEC) { xmame_sound_resume(); }
 	else              { xmame_sound_suspend();}
 
@@ -333,14 +333,14 @@ int	quasi88_loop(void)
 	wait_vsync_switch();
 
 
-	/* ���˥�����������λ�����顢MAIN ������ */
+	/* イニシャル処理が完了したら、MAIN に遷移 */
 	step = MAIN;
 
-	/* ���ܤ��뤿�ᡢ��ö�ؿ���ȴ���� (FALLTHROUGH�Ǥ⤤������) */
+	/* 遷移するため、一旦関数を抜ける (FALLTHROUGHでもいいけど) */
 	return QUASI88_LOOP_BUSY;
 
 
-    /* ======================== �ᥤ����� ======================== */
+    /* ======================== メイン処理 ======================== */
     case MAIN:
 	switch (mode) {
 
@@ -354,16 +354,16 @@ int	quasi88_loop(void)
 	case PAUSE:	pause_main();		break;
 	}
 
-	/* �⡼���ѹ���ȯ�����Ƥ����顢(WAIT���) INIT �����ܤ��� */
-	/* �����Ǥʤ���С�            (WAIT���) MAIN �����ܤ��� */
+	/* モード変更が発生していたら、(WAIT後に) INIT へ遷移する */
+	/* そうでなければ、            (WAIT後に) MAIN へ遷移する */
 	if (quasi88_event_flags & EVENT_MODE_CHANGED) {
 	    step_after_wait = INIT;
 	} else {
 	    step_after_wait = MAIN;
 	}
 
-	/* ���西���ߥ󥰤ʤ�Ф��������衣���θ� WAIT ��  */
-	/* �����Ǥʤ���С�                WAIT ���������� */
+	/* 描画タイミングならばここで描画。その後 WAIT へ  */
+	/* そうでなければ、                WAIT せずに遷移 */
 	if (quasi88_event_flags & EVENT_FRAME_UPDATE) {
 	    quasi88_event_flags &= ~EVENT_FRAME_UPDATE;
 	    screen_update();
@@ -372,16 +372,16 @@ int	quasi88_loop(void)
 	    step = step_after_wait;
 	}
 
-	/* ��˥������ܻ��佪λ���ϡ� WAIT ������¨���� INIT �� */
+	/* モニター遷移時や終了時は、 WAIT せずに即ちに INIT へ */
 	if (quasi88_event_flags & (EVENT_DEBUG | EVENT_QUIT)) {
 	    step = INIT;
 	}
 
-	/* ���ܤ��뤿�ᡢ��ö�ؿ���ȴ���� (WAIT����FALLTHROUGH�Ǥ⤤������) */
+	/* 遷移するため、一旦関数を抜ける (WAIT時はFALLTHROUGHでもいいけど) */
 	return QUASI88_LOOP_BUSY;
 
 
-    /* ======================== �������Ƚ��� ======================== */
+    /* ======================== ウェイト処理 ======================== */
     case WAIT:
 	stat = WAIT_JUST;
 
@@ -393,12 +393,12 @@ int	quasi88_loop(void)
 
 	case MENU:
 	case PAUSE:
-	    /* Esound �ξ�硢 MENU/PAUSE �Ǥ� stream ��ή���Ƥ����ʤ���
-	       ʣ����ư���ˡ� MENU/PAUSE ���Ƥʤ��ۤ��������Ǥʤ��ʤ롣
-	       �������Τޤޤ��ȡ����ߤβ���ή��äѤʤ��ˤʤ�Τǡ�
-	       ̵����ή���褦�ˤ��ʤ��ȡ� */
-	    xmame_sound_update();		/* ������ɽ��� */
-	    xmame_update_video_and_audio();	/* ������ɽ��� ����2 */
+	    /* Esound の場合、 MENU/PAUSE でも stream を流しておかないと
+	       複数起動時に、 MENU/PAUSE してないほうが音がでなくなる。
+	       が、このままだと、現在の音が流れっぱなしになるので、
+	       無音を流すようにしないと。 */
+	    xmame_sound_update();		/* サウンド出力 */
+	    xmame_update_video_and_audio();	/* サウンド出力 その2 */
 	    stat = wait_vsync_update();
 	    break;
 	}
@@ -406,34 +406,34 @@ int	quasi88_loop(void)
 	if (stat == WAIT_YET) { return QUASI88_LOOP_BUSY; }
 
 
-	/* �������Ȼ��֤򸵤ˡ��ե졼�ॹ���åפ�̵ͭ����� */
+	/* ウェイト時間を元に、フレームスキップの有無を決定 */
 	if (mode == EXEC) {
 	    frameskip_check((stat == WAIT_JUST) ? TRUE : FALSE);
 	}
 
-	/* �������Ƚ�������λ�����顢�� (INIT �� MAIN) ������ */
+	/* ウェイト処理が完了したら、次 (INIT か MAIN) に遷移 */
 	step = step_after_wait;
 	return QUASI88_LOOP_ONE;
     }
 
-    /* �����ˤ���ʤ� ! */
+    /* ここには来ない ! */
     return QUASI88_LOOP_EXIT;
 }
 
 
 
 /*======================================================================
- * QUASI88 �Υ⡼������
- *	�⡼�ɤȤ� QUASI88 �ξ��֤Τ��Ȥǡ� EXEC (�¹�)��PAUSE (������)��
- *	MENU (��˥塼����)�� MONITOR (���÷��ǥХå�)�� QUIT(��λ) �����롣
+ * QUASI88 のモード制御
+ *	モードとは QUASI88 の状態のことで、 EXEC (実行)、PAUSE (一時停止)、
+ *	MENU (メニュー画面)、 MONITOR (対話型デバッガ)、 QUIT(終了) がある。
  *======================================================================*/
-/* QUASI88�Υ⡼�ɤ����ꤹ�� */
+/* QUASI88のモードを設定する */
 static	void	set_mode(int newmode)
 {
     if (mode != newmode) {
 
-	if (mode == MENU) {		/* ��˥塼����¾�⡼�ɤ����ؤ� */
-	    q8tk_event_quit();		/* Q8TK �ν�λ��ɬ��            */
+	if (mode == MENU) {		/* メニューから他モードの切替は */
+	    q8tk_event_quit();		/* Q8TK の終了が必須            */
 	}
 
 	next_mode = newmode;
@@ -442,7 +442,7 @@ static	void	set_mode(int newmode)
     }
 }
 
-/* QUASI88�Υ⡼�ɤ��ڤ��ؤ��� */
+/* QUASI88のモードを切り替える */
 void	quasi88_exec(void)
 {
     set_mode(EXEC);
@@ -502,7 +502,7 @@ void	quasi88_quit(void)
     quasi88_event_flags |= EVENT_QUIT;
 }
 
-/* QUASI88�Υ⡼�ɤ�������� */
+/* QUASI88のモードを取得する */
 int	quasi88_is_exec(void)
 {
   return (mode == EXEC) ? TRUE : FALSE;
@@ -525,13 +525,13 @@ int	quasi88_is_monitor(void)
 
 
 /***********************************************************************
- *	Ŭ�ڤʰ��֤˰�ư����
+ *	適切な位置に移動せよ
  ************************************************************************/
 void	wait_vsync_switch(void)
 {
     long dt;
 
-    /* dt < 1000000us (1sec) �Ǥʤ��ȥ��� */
+    /* dt < 1000000us (1sec) でないとダメ */
     if (quasi88_is_exec()) {
 	dt = (long)((1000000.0 / (CONST_VSYNC_FREQ * wait_rate/100)));
 	wait_vsync_setup(dt, wait_by_sleep);
@@ -548,7 +548,7 @@ static	void	status_override(void)
 
     if (first_fime) {
 
-	/* EMU�⡼�ɤǵ�ư�������Τߡ����ơ�������ɽ�����Ѥ��� */
+	/* EMUモードで起動した場合のみ、ステータスの表示を変える */
 	if (mode == EXEC) {
 
 	    status_message(0, STATUS_INFO_TIME, Q_TITLE " " Q_VERSION);
@@ -568,21 +568,21 @@ static	void	status_override(void)
 
 
 /***********************************************************************
- *	�ǥХå���
+ *	デバッグ用
  ************************************************************************/
 #include "debug.c"
 
 
 
 /***********************************************************************
- *	��¿�ʴؿ�
+ *	雑多な関数
  ************************************************************************/
 #include "utility.c"
 
 
 
 /***********************************************************************
- *			�ե�����̾���桿����
+ *			ファイル名制御／管理
  ************************************************************************/
 #include "fname.c"
 
@@ -590,13 +590,13 @@ static	void	status_override(void)
 
 
 /***********************************************************************
- * �Ƽ�ư��ѥ�᡼�����ѹ�
- *	�����δؿ��ϡ����硼�ȥ��åȥ��������䡢�����¸���Υ��٥��
- *	�����ʤɤ���ƤӽФ���뤳�Ȥ� *���* ���ꤷ�Ƥ��롣
+ * 各種動作パラメータの変更
+ *	これらの関数は、ショートカットキー処理や、機種依存部のイベント
+ *	処理などから呼び出されることを *一応* 想定している。
  *
- *	��˥塼���̤�ɽ����˸ƤӽФ��ȡ���˥塼ɽ���ȿ����㤤��������
- *	�Τǡ���˥塼��ϸƤӽФ��ʤ��褦�ˡ����ߥ�¹���˸ƤӽФ��Τ�
- *	���ְ����������󡢤��ޤ�����
+ *	メニュー画面の表示中に呼び出すと、メニュー表示と食い違いが生じる
+ *	ので、メニュー中は呼び出さないように。エミュ実行中に呼び出すのが
+ *	一番安全。うーん、いまいち。
  *
  *	if( mode == EXEC ){
  *	    quasi88_disk_insert_and_reset( file, FALSE );
@@ -605,7 +605,7 @@ static	void	status_override(void)
  ************************************************************************/
 
 /***********************************************************************
- * QUASI88 ��ư��Υꥻ�åȽ����ؿ�
+ * QUASI88 起動中のリセット処理関数
  ************************************************************************/
 void	quasi88_get_reset_cfg(T_RESET_CFG *cfg)
 {
@@ -646,23 +646,23 @@ void	quasi88_reset(const T_RESET_CFG *cfg)
 	sound_board	= cfg->sound_board;
     }
 
-    /* ����κƳ��ݤ�ɬ�פʤ顢�������� */
+    /* メモリの再確保が必要なら、処理する */
     if (memory_allocate_additional() == FALSE) {
-	quasi88_exit(-1);	/* ���ԡ� */
+	quasi88_exit(-1);	/* 失敗！ */
     }
 
-    /* ������ɽ��ϤΥꥻ�å� */
+    /* サウンド出力のリセット */
     if (sb_changed == FALSE) {
 	xmame_sound_reset();
     } else {
-	menu_sound_restart(FALSE);	/* ������ɥɥ饤�Фκƽ���� */
+	menu_sound_restart(FALSE);	/* サウンドドライバの再初期化 */
     }
 
-    /* ����ν���� */
+    /* ワークの初期化 */
     pc88main_init(INIT_RESET);
     pc88sub_init(INIT_RESET);
 
-    /* FDC�ν���� */
+    /* FDCの初期化 */
     empty[0] = drive_check_empty(0);
     empty[1] = drive_check_empty(1);
     drive_reset();
@@ -679,43 +679,43 @@ void	quasi88_reset(const T_RESET_CFG *cfg)
 
 
 /***********************************************************************
- * QUASI88 ��ư��Υ��ơ��ȥ����ɽ����ؿ�
- *	TODO �����ǡ��ե�����̾���ꡩ
+ * QUASI88 起動中のステートロード処理関数
+ *	TODO 引数で、ファイル名指定？
  ************************************************************************/
 int	quasi88_stateload(int serial)
 {
     int now_board, success;
 
-    if (serial >= 0) {			/* Ϣ�ֻ��ꤢ�� (>=0) �ʤ� */
-	filename_set_state_serial(serial);	/* Ϣ�֤����ꤹ�� */
+    if (serial >= 0) {			/* 連番指定あり (>=0) なら */
+	filename_set_state_serial(serial);	/* 連番を設定する */
     }
 
     if (verbose_proc) printf("Stateload...start (%s)\n",filename_get_state());
 
-    if (stateload_check_file_exist() == FALSE) {	/* �ե�����ʤ� */
+    if (stateload_check_file_exist() == FALSE) {	/* ファイルなし */
 	if (quasi88_is_exec()) {
 	    status_message(1, STATUS_INFO_TIME, "State-Load file not found !");
-	} /* ��˥塼�Ǥϥ���������ɽ������Τǡ����ơ�����ɽ����̵���ˤ��� */
+	} /* メニューではダイアログ表示するので、ステータス表示は無しにする */
 
 	if (verbose_proc) printf("State-file not found\n");
 	return FALSE;
     }
 
 
-    pc88main_term();			/* ǰ�Τ��ᡢ�����λ���֤� */
+    pc88main_term();			/* 念のため、ワークを終了状態に */
     pc88sub_term();
-    imagefile_all_close();		/* ���᡼���ե�����������Ĥ��� */
+    imagefile_all_close();		/* イメージファイルを全て閉じる */
 
-    /*xmame_sound_reset();*/		/* ǰ�Τ��ᡢ������ɥꥻ�å� */
-    /*quasi88_reset();*/		/* ǰ�Τ��ᡢ������ꥻ�å� */
+    /*xmame_sound_reset();*/		/* 念のため、サウンドリセット */
+    /*quasi88_reset();*/		/* 念のため、全ワークリセット */
 
 
     now_board = sound_board;
 
-    success = stateload();		/* ���ơ��ȥ����ɼ¹� */
+    success = stateload();		/* ステートロード実行 */
 
-    if (now_board != sound_board) { 	/* ������ɥܡ��ɤ��Ѥ�ä��� */
-	menu_sound_restart(FALSE);	/* ������ɥɥ饤�Фκƽ���� */
+    if (now_board != sound_board) { 	/* サウンドボードが変わったら */
+	menu_sound_restart(FALSE);	/* サウンドドライバの再初期化 */
     }
 
     if (verbose_proc) {
@@ -724,16 +724,16 @@ int	quasi88_stateload(int serial)
     }
 
 
-    if (success) {			/* ���ơ��ȥ��������������顦���� */
+    if (success) {			/* ステートロード成功したら・・・ */
 
-	imagefile_all_open(TRUE);		/* ���᡼���ե���������Ƴ���*/
+	imagefile_all_open(TRUE);		/* イメージファイルを全て開く*/
 
 	pc88main_init(INIT_STATELOAD);
 	pc88sub_init(INIT_STATELOAD);
 
-    } else {				/* ���ơ��ȥ����ɼ��Ԥ����顦���� */
+    } else {				/* ステートロード失敗したら・・・ */
 
-	quasi88_reset(NULL);			/* �Ȥꤢ�����ꥻ�å� */
+	quasi88_reset(NULL);			/* とりあえずリセット */
     }
 
 
@@ -744,10 +744,10 @@ int	quasi88_stateload(int serial)
 	    status_message(1, STATUS_INFO_TIME, "State-Load Failed !  Reset done ...");
 	}
 
-	/* quasi88_loop ���������֤� INIT �ˤ��뤿�ᡢ�⡼���ѹ������Ȥ��� */
+	/* quasi88_loop の内部状態を INIT にするため、モード変更扱いとする */
 	quasi88_event_flags |= EVENT_MODE_CHANGED;
     }
-    /* ��˥塼�Ǥϥ���������ɽ������Τǡ����ơ�����ɽ����̵���ˤ��� */
+    /* メニューではダイアログ表示するので、ステータス表示は無しにする */
 
     return success;
 }
@@ -755,20 +755,20 @@ int	quasi88_stateload(int serial)
 
 
 /***********************************************************************
- * QUASI88 ��ư��Υ��ơ��ȥ����ֽ����ؿ�
- *	TODO �����ǡ��ե�����̾���ꡩ
+ * QUASI88 起動中のステートセーブ処理関数
+ *	TODO 引数で、ファイル名指定？
  ************************************************************************/
 int	quasi88_statesave(int serial)
 {
     int success;
 
-    if (serial >= 0) {			/* Ϣ�ֻ��ꤢ�� (>=0) �ʤ� */
-	filename_set_state_serial(serial);	/* Ϣ�֤����ꤹ�� */
+    if (serial >= 0) {			/* 連番指定あり (>=0) なら */
+	filename_set_state_serial(serial);	/* 連番を設定する */
     }
 
     if (verbose_proc) printf("Statesave...start (%s)\n",filename_get_state());
 
-    success = statesave();		/* ���ơ��ȥ����ּ¹� */
+    success = statesave();		/* ステートセーブ実行 */
 
     if (verbose_proc) {
 	if (success) printf("Statesave...done\n");
@@ -782,7 +782,7 @@ int	quasi88_statesave(int serial)
 	} else {
 	    status_message(1, STATUS_INFO_TIME, "State-Save Failed !");
 	}
-    }	/* ��˥塼�Ǥϥ���������ɽ������Τǡ����ơ�����ɽ����̵���ˤ��� */
+    }	/* メニューではダイアログ表示するので、ステータス表示は無しにする */
 
     return success;
 }
@@ -790,8 +790,8 @@ int	quasi88_statesave(int serial)
 
 
 /***********************************************************************
- * ���̥��ʥåץ���å���¸
- *	TODO �����ǡ��ե�����̾���ꡩ
+ * 画面スナップショット保存
+ *	TODO 引数で、ファイル名指定？
  ************************************************************************/
 int	quasi88_screen_snapshot(void)
 {
@@ -812,8 +812,8 @@ int	quasi88_screen_snapshot(void)
 
 
 /***********************************************************************
- * ������ɥǡ����Υե��������
- *	TODO �����ǡ��ե�����̾���ꡩ
+ * サウンドデータのファイル出力
+ *	TODO 引数で、ファイル名指定？
  ************************************************************************/
 int	quasi88_waveout(int start)
 {
@@ -842,8 +842,8 @@ int	quasi88_waveout(int start)
 
 
 /***********************************************************************
- * �ɥ�å�����ɥɥ��å�
- *	TODO ����ͤ�⤦�칩��
+ * ドラッグアンドドロップ
+ *	TODO 戻り値をもう一工夫
  ************************************************************************/
 int	quasi88_drag_and_drop(const char *filename)
 {
@@ -873,8 +873,8 @@ int	quasi88_drag_and_drop(const char *filename)
 
 
 /***********************************************************************
- * �������Ȥ���Ψ����
- * �������Ȥ�̵ͭ����
+ * ウェイトの比率設定
+ * ウェイトの有無設定
  ************************************************************************/
 int	quasi88_cfg_now_wait_rate(void)
 {
@@ -897,7 +897,7 @@ void	quasi88_cfg_set_wait_rate(int rate)
 	    sprintf(str, "WAIT  %4d[%%]", wait_rate);
 
 	    status_message(1, time, str);
-	    /* �� ���������ѹ������Τǡ�ɽ�����֤ϥ��������ܤˤʤ� */
+	    /* ↑ ウェイト変更したので、表示時間はウェイト倍になる */
 
 	    dt = (long)((1000000.0 / (CONST_VSYNC_FREQ * wait_rate / 100)));
 	    wait_vsync_setup(dt, wait_by_sleep);
@@ -923,7 +923,7 @@ void	quasi88_cfg_set_no_wait(int enable)
 	    else           sprintf(str, "WAIT  ON");
 
 	    status_message(1, time, str);
-	    /* �� �������Ȥʤ��ʤΤǡ�ɽ�����֤ϼºݤΤȤ������� */
+	    /* ↑ ウェイトなしなので、表示時間は実際のところ不定 */
 
 	    dt = (long)((1000000.0 / (CONST_VSYNC_FREQ * wait_rate / 100)));
 	    wait_vsync_setup(dt, wait_by_sleep);
@@ -934,12 +934,12 @@ void	quasi88_cfg_set_no_wait(int enable)
 
 
 /***********************************************************************
- * �ǥ��������᡼���ե���������
- *	��ξ�ɥ饤�֤�����
- *	������ɥ饤�֤�����
- *	��ȿ�Хɥ饤�֤Υ��᡼���ե����������
- *	��ξ�ɥ饤�ּ��Ф�
- *	������ɥ饤�ּ��Ф�
+ * ディスクイメージファイル設定
+ *	・両ドライブに挿入
+ *	・指定ドライブに挿入
+ *	・反対ドライブのイメージファイルを、挿入
+ *	・両ドライブ取り出し
+ *	・指定ドライブ取り出し
  ************************************************************************/
 int	quasi88_disk_insert_all(const char *filename, int ro)
 {
@@ -1050,11 +1050,11 @@ void	quasi88_disk_eject(int drv)
 }
 
 /***********************************************************************
- * �ǥ��������᡼���ե���������
- *	���ɥ饤�֤���Ū�˶��ξ��֤ˤ���
- *	���ɥ饤�֤Υ��᡼�����ѹ�����
- *	���ɥ饤�֤Υ��᡼�������Υ��᡼�����ѹ�����
- *	���ɥ饤�֤Υ��᡼���򼡤Υ��᡼�����ѹ�����
+ * ディスクイメージファイル設定
+ *	・ドライブを一時的に空の状態にする
+ *	・ドライブのイメージを変更する
+ *	・ドライブのイメージを前のイメージに変更する
+ *	・ドライブのイメージを次のイメージに変更する
  ************************************************************************/
 enum { TYPE_SELECT, TYPE_EMPTY, TYPE_NEXT, TYPE_PREV };
 
@@ -1125,12 +1125,12 @@ void	quasi88_disk_image_prev(int drv)
 
 
 /*======================================================================
- * �ơ��ץ��᡼���ե���������
- *		���������ѥơ��ץ��᡼���ե����륻�å�
- *		���������ѥơ��ץ��᡼���ե����봬���ᤷ
- *		���������ѥơ��ץ��᡼���ե������곰��
- *		���������ѥơ��ץ��᡼���ե����륻�å�
- *		���������ѥơ��ץ��᡼���ե������곰��
+ * テープイメージファイル設定
+ *		・ロード用テープイメージファイルセット
+ *		・ロード用テープイメージファイル巻き戻し
+ *		・ロード用テープイメージファイル取り外し
+ *		・セーブ用テープイメージファイルセット
+ *		・セーブ用テープイメージファイル取り外し
  *======================================================================*/
 int	quasi88_load_tape_insert(const char *filename)
 {
@@ -1181,13 +1181,13 @@ void	quasi88_save_tape_eject(void)
 }
 
 /*======================================================================
- * ���ꥢ�롦�ѥ��륤�᡼���ե���������
- *		�����ꥢ�������ѥե����륻�å�
- *		�����ꥢ�������ѥե������곰��
- *		�����ꥢ������ѥե����륻�å�
- *		�����ꥢ������ѥե������곰��
- *		���ץ�󥿽����ѥե����륻�å�
- *		���ץ�������ѥե����륻�å�
+ * シリアル・パラレルイメージファイル設定
+ *		・シリアル入力用ファイルセット
+ *		・シリアル入力用ファイル取り外し
+ *		・シリアル出力用ファイルセット
+ *		・シリアル出力用ファイル取り外し
+ *		・プリンタ出力用ファイルセット
+ *		・プリンタ入力用ファイルセット
  *======================================================================*/
 int	quasi88_serial_in_connect( const char *filename )
 {

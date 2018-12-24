@@ -1,6 +1,6 @@
 /************************************************************************/
 /*									*/
-/* ³ä¤ê¹ş¤ß¤Î¥¨¥ß¥å¥ì¡¼¥È						*/
+/* å‰²ã‚Šè¾¼ã¿ã®ã‚¨ãƒŸãƒ¥ãƒ¬ãƒ¼ãƒˆ						*/
 /*									*/
 /************************************************************************/
 
@@ -23,20 +23,20 @@
 
 
 
-int	intr_level;			/* OUT[E4] ³ä¤ê¹ş¤ß¥ì¥Ù¥ë	*/
-int	intr_priority;			/* OUT[E4] ³ä¤ê¹ş¤ßÍ¥ÀèÅÙ	*/
-int	intr_sio_enable;		/* OUT[E6] ³ä¤ê¹ş¤ß¥Ş¥¹¥¯ SIO	*/ 
-int	intr_vsync_enable;		/* OUT[E6] ³ä¤ê¹ş¤ß¥Ş¥¹¥¯ VSYNC	*/ 
-int	intr_rtc_enable;		/* OUT[E6] ³ä¤ê¹ş¤ß¥Ş¥¹¥¯ RTC	*/ 
+int	intr_level;			/* OUT[E4] å‰²ã‚Šè¾¼ã¿ãƒ¬ãƒ™ãƒ«	*/
+int	intr_priority;			/* OUT[E4] å‰²ã‚Šè¾¼ã¿å„ªå…ˆåº¦	*/
+int	intr_sio_enable;		/* OUT[E6] å‰²ã‚Šè¾¼ã¿ãƒã‚¹ã‚¯ SIO	*/ 
+int	intr_vsync_enable;		/* OUT[E6] å‰²ã‚Šè¾¼ã¿ãƒã‚¹ã‚¯ VSYNC	*/ 
+int	intr_rtc_enable;		/* OUT[E6] å‰²ã‚Šè¾¼ã¿ãƒã‚¹ã‚¯ RTC	*/ 
 
 
 
 double	cpu_clock_mhz   = DEFAULT_CPU_CLOCK_MHZ;   /* MAIN CPU Clock   [MHz] */
 double	sound_clock_mhz = DEFAULT_SOUND_CLOCK_MHZ; /* SOUND chip Clock [MHz] */
-double	vsync_freq_hz   = DEFAULT_VSYNC_FREQ_HZ;   /* VSYNC ³ä¹ş¼ş´ü   [Hz]  */
+double	vsync_freq_hz   = DEFAULT_VSYNC_FREQ_HZ;   /* VSYNC å‰²è¾¼å‘¨æœŸ   [Hz]  */
 
-int	wait_rate     = 100;			/* ¥¦¥¨¥¤¥ÈÄ´À° ÈæÎ¨    [%]  */
-int	wait_by_sleep = TRUE;			/* ¥¦¥¨¥¤¥ÈÄ´À°»ş sleep ¤¹¤ë */
+int	wait_rate     = 100;			/* ã‚¦ã‚¨ã‚¤ãƒˆèª¿æ•´ æ¯”ç‡    [%]  */
+int	wait_by_sleep = TRUE;			/* ã‚¦ã‚¨ã‚¤ãƒˆèª¿æ•´æ™‚ sleep ã™ã‚‹ */
 
 
 
@@ -44,24 +44,24 @@ int	wait_by_sleep = TRUE;			/* ¥¦¥¨¥¤¥ÈÄ´À°»ş sleep ¤¹¤ë */
 #define	SOUND_CLOCK_MHZ		sound_clock_mhz
 #define	VSYNC_FREQ_HZ		vsync_freq_hz
 
-#if 1			/* VSYNC³ä¤ê¹ş¤ß¤È VRTC¤Î¥¿¥¤¥ß¥ó¥°¤ò¤º¤é¤·¤Æ¤ß¤ë */
+#if 1			/* VSYNCå‰²ã‚Šè¾¼ã¿ã¨ VRTCã®ã‚¿ã‚¤ãƒŸãƒ³ã‚°ã‚’ãšã‚‰ã—ã¦ã¿ã‚‹ */
 
-/* 0.2¥é¥¤¥ó (30¥¹¥Æ¡¼¥È¤°¤é¤¤) ¤À¤±¤º¤é¤¹ ¡Ä¡Ä ¤Ê¤ó¤«°ã¤¦¡© */
+/* 0.2ãƒ©ã‚¤ãƒ³ (30ã‚¹ãƒ†ãƒ¼ãƒˆãã‚‰ã„) ã ã‘ãšã‚‰ã™ â€¦â€¦ ãªã‚“ã‹é•ã†ï¼Ÿ */
 
 #define	VRTC_TOP		((  47.8 ) /448.0)
 #define	VRTC_DISP		(( 400.0 ) /448.0)
 #define	VRTC_BOTTOM		((   0.2 ) /448.0)
 
-/* 7¥é¥¤¥ó¤º¤é¤¹?? ¤³¤ì¤â°ã¤¦¡© */
+/* 7ãƒ©ã‚¤ãƒ³ãšã‚‰ã™?? ã“ã‚Œã‚‚é•ã†ï¼Ÿ */
 /*
 #define	VRTC_TOP		((8 + 33)/448.0)
 #define	VRTC_DISP		(( 400 ) /448.0)
 #define	VRTC_BOTTOM		((  7  ) /448.0)
 */
 
-#else			/* °Ê²¼¤ÎÃÍ¤Ç ver0.6.0 °ÊÁ°¤Î¥¿¥¤¥ß¥ó¥°¤Ë¤Ê¤ë¤Ï¤º */
+#else			/* ä»¥ä¸‹ã®å€¤ã§ ver0.6.0 ä»¥å‰ã®ã‚¿ã‚¤ãƒŸãƒ³ã‚°ã«ãªã‚‹ã¯ãš */
 #define	VRTC_TOP		((  48 ) /448.0)
-#define	VRTC_DISP		(( 402 ) /448.0)	/* Ç°¤Î¤¿¤á +2 Í¾Ê¬¤Ë*/
+#define	VRTC_DISP		(( 402 ) /448.0)	/* å¿µã®ãŸã‚ +2 ä½™åˆ†ã«*/
 #define	VRTC_BOTTOM		((   0 ) /448.0)
 #endif
 
@@ -74,21 +74,21 @@ int	wait_by_sleep = TRUE;			/* ¥¦¥¨¥¤¥ÈÄ´À°»ş sleep ¤¹¤ë */
 
 /*****************************************************************************/
 
-int	state_of_cpu = 0;	/* ¥á¥¤¥óCPU¤¬½èÍı¤·¤¿¥¹¥Æ¡¼¥È¿ô	*/
-				/*	VSYNC³ä¹şÈ¯À¸»ş¤Ë½é´ü²½¤·¡¢     */
-				/*	main_INT_update() ¸Æ½Ğ»ş¤Ë²Ã»»	*/
-				/*	 (¤³¤Î´Ø¿ô¤ÏÉÔÄê´ü¤Ë¸Æ½Ğ¤µ¤ì¤ë)	*/
+int	state_of_cpu = 0;	/* ãƒ¡ã‚¤ãƒ³CPUãŒå‡¦ç†ã—ãŸã‚¹ãƒ†ãƒ¼ãƒˆæ•°	*/
+				/*	VSYNCå‰²è¾¼ç™ºç”Ÿæ™‚ã«åˆæœŸåŒ–ã—ã€     */
+				/*	main_INT_update() å‘¼å‡ºæ™‚ã«åŠ ç®—	*/
+				/*	 (ã“ã®é–¢æ•°ã¯ä¸å®šæœŸã«å‘¼å‡ºã•ã‚Œã‚‹)	*/
 				/*					*/
-				/*	VSYNCÈ¯À¸¤«¤é¸½»şÅÀËø¤Ë½èÍı¤·¤¿	*/
-				/*	Áí¥¹¥Æ¡¼¥È¿ô¤Ï¡¢°Ê²¼¤Î¼°¤Ë¤Ê¤ë¡£*/
+				/*	VSYNCç™ºç”Ÿã‹ã‚‰ç¾æ™‚ç‚¹è¿„ã«å‡¦ç†ã—ãŸ	*/
+				/*	ç·ã‚¹ãƒ†ãƒ¼ãƒˆæ•°ã¯ã€ä»¥ä¸‹ã®å¼ã«ãªã‚‹ã€‚*/
 				/*					*/
 				/*	state_of_cpu+z80main_cpu.state0 */
 
-int	state_of_vsync;		/* VSYNC 1¼ş´ü¤¢¤¿¤ê¤Î¥¹¥Æ¡¼¥È¿ô	*/
+int	state_of_vsync;		/* VSYNC 1å‘¨æœŸã‚ãŸã‚Šã®ã‚¹ãƒ†ãƒ¼ãƒˆæ•°	*/
 
-int	no_wait	      = FALSE;		/* ¥¦¥¨¥¤¥È¤Ê¤·			*/
+int	no_wait	      = FALSE;		/* ã‚¦ã‚¨ã‚¤ãƒˆãªã—			*/
 
-int	boost	= 1;			/* ¥Ö¡¼¥¹¥È			*/
+int	boost	= 1;			/* ãƒ–ãƒ¼ã‚¹ãƒˆ			*/
 int	boost_cnt;
 
 
@@ -100,7 +100,7 @@ static	int	rs232c_intr_timer;
 static	int	vsync_intr_base;
 static	int	vsync_intr_timer;
 
-	int	ctrl_vrtc      = 1;	/* VRTC (¿âÄ¾µ¢ÀşÃæ:1or3 / É½¼¨Ãæ:2) */
+	int	ctrl_vrtc      = 1;	/* VRTC (å‚ç›´å¸°ç·šä¸­:1or3 / è¡¨ç¤ºä¸­:2) */
 static	int	vrtc_base;
 static	int	vrtc_base2;
 static	int	vrtc_timer;
@@ -121,19 +121,19 @@ static	int	sd2_BRDY_intr_timer;
 static	int	sd2_EOS_intr_base;
 static	int	sd2_EOS_intr_timer;
 
-static	int	vsync_count;		/* test (·×Â¬ÍÑ) */
+static	int	vsync_count;		/* test (è¨ˆæ¸¬ç”¨) */
 
 
 
 
 /*------------------------------------------------------
- * ¥¿¥¤¥Ş¡¼³ä¤ê¹ş¤ß¥¨¥ß¥å¥ì¡¼¥È¤Î¥ï¡¼¥¯¤ò½é´ü²½
- *	VSYNC / VRTC / RTC         ¥ï¡¼¥¯¤Ïµ¯Æ°»ş¤Ë½é´ü²½
- *	RS232C / Timer-A / TImer-B ¥ï¡¼¥¯¤ÏÀßÄê»ş¤Ë½é´ü²½
+ * ã‚¿ã‚¤ãƒãƒ¼å‰²ã‚Šè¾¼ã¿ã‚¨ãƒŸãƒ¥ãƒ¬ãƒ¼ãƒˆã®ãƒ¯ãƒ¼ã‚¯ã‚’åˆæœŸåŒ–
+ *	VSYNC / VRTC / RTC         ãƒ¯ãƒ¼ã‚¯ã¯èµ·å‹•æ™‚ã«åˆæœŸåŒ–
+ *	RS232C / Timer-A / TImer-B ãƒ¯ãƒ¼ã‚¯ã¯è¨­å®šæ™‚ã«åˆæœŸåŒ–
  *------------------------------------------------------*/
 
 /*
- * ³ä¤ê¹ş¤ß¥ß¥å¥ì¡¼¥È½é´ü²½ ¡Ä Z80 ¤Îµ¯Æ°»ş¤Ë¸Æ¤Ö
+ * å‰²ã‚Šè¾¼ã¿ãƒŸãƒ¥ãƒ¬ãƒ¼ãƒˆåˆæœŸåŒ– â€¦ Z80 ã®èµ·å‹•æ™‚ã«å‘¼ã¶
  */
 static	void	interval_work_init_generic( void )
 {
@@ -152,7 +152,7 @@ static	void	interval_work_init_generic( void )
 
 
 /*
- * RS232C³ä¤ê¹ş¤ß¥¨¥ß¥å¥ì¡¼¥È½é´ü²½ ¡Ä Z80µ¯Æ°»ş¤Ë¸Æ¤Ö
+ * RS232Cå‰²ã‚Šè¾¼ã¿ã‚¨ãƒŸãƒ¥ãƒ¬ãƒ¼ãƒˆåˆæœŸåŒ– â€¦ Z80èµ·å‹•æ™‚ã«å‘¼ã¶
  */
 static	void	interval_work_init_RS232C( void )
 {
@@ -160,7 +160,7 @@ static	void	interval_work_init_RS232C( void )
 }
 
 /*
- * ¥µ¥¦¥ó¥É³ä¤ê¹ş¤ß¥¨¥ß¥å¥ì¡¼¥È½é´ü²½ ¡Ä Z80µ¯Æ°»ş¤Ë¸Æ¤Ö
+ * ã‚µã‚¦ãƒ³ãƒ‰å‰²ã‚Šè¾¼ã¿ã‚¨ãƒŸãƒ¥ãƒ¬ãƒ¼ãƒˆåˆæœŸåŒ– â€¦ Z80èµ·å‹•æ™‚ã«å‘¼ã¶
  */
 static	void	interval_work_init_TIMER_A( void )
 {
@@ -177,7 +177,7 @@ static	void	interval_work_init_TIMER_B( void )
 
 
 /*
- * Á´³ä¤ê¹ş¤ß¥¨¥ß¥å¥ì¡¼¥È½é´ü²½ ¡Ä Z80µ¯Æ°»ş¤ä¡¢¥¯¥í¥Ã¥¯ÊÑ¹¹»ş¤Ê¤É¤Ë¸Æ¤Ö
+ * å…¨å‰²ã‚Šè¾¼ã¿ã‚¨ãƒŸãƒ¥ãƒ¬ãƒ¼ãƒˆåˆæœŸåŒ– â€¦ Z80èµ·å‹•æ™‚ã‚„ã€ã‚¯ãƒ­ãƒƒã‚¯å¤‰æ›´æ™‚ãªã©ã«å‘¼ã¶
  */
 void	interval_work_init_all( void )
 {
@@ -190,7 +190,7 @@ void	interval_work_init_all( void )
 
 
 /*
- * RS232C³ä¤ê¹ş¤ß¥¨¥ß¥å¥ì¡¼¥ÈºÆ½é´ü²½ ¡Ä RS232C³ä¹şÀßÄê»ş¤Ë¸Æ¤Ö
+ * RS232Cå‰²ã‚Šè¾¼ã¿ã‚¨ãƒŸãƒ¥ãƒ¬ãƒ¼ãƒˆå†åˆæœŸåŒ– â€¦ RS232Cå‰²è¾¼è¨­å®šæ™‚ã«å‘¼ã¶
  */
 void	interval_work_set_RS232C( int bps, int framesize )
 {
@@ -224,10 +224,10 @@ void	boost_change( int new_val )
 
 
 /************************************************************************/
-/* ³ä¤ê¹ş¤ß¤Ë´Ø¤ï¤ë ¥µ¥¦¥ó¥É¥ì¥¸¥¹¥¿¹¹¿·»ş¤Î½èÍı			*/
+/* å‰²ã‚Šè¾¼ã¿ã«é–¢ã‚ã‚‹ ã‚µã‚¦ãƒ³ãƒ‰ãƒ¬ã‚¸ã‚¹ã‚¿æ›´æ–°æ™‚ã®å‡¦ç†			*/
 /************************************************************************/
 /*
- * ¥µ¥¦¥ó¥É¤Î¥¿¥¤¥Ş¥×¥ê¥»¥Ã¥ÈÃÍ ÊÑ¹¹»ş¤Ë¸Æ¤Ö
+ * ã‚µã‚¦ãƒ³ãƒ‰ã®ã‚¿ã‚¤ãƒãƒ—ãƒªã‚»ãƒƒãƒˆå€¤ å¤‰æ›´æ™‚ã«å‘¼ã¶
  */
 void	interval_work_set_TIMER_A( void )
 {
@@ -243,7 +243,7 @@ void	interval_work_set_TIMER_B( void )
 }
 
 /*
- * ¥µ¥¦¥ó¥É¤Î ³Æ¼ï¥Õ¥é¥° ¤ª¤è¤Ó ¥×¥ê¥¹¥±¡¼¥é¡¼ÃÍÊÑ¹¹»ş¤Ë¸Æ¤Ö
+ * ã‚µã‚¦ãƒ³ãƒ‰ã® å„ç¨®ãƒ•ãƒ©ã‚° ãŠã‚ˆã³ ãƒ—ãƒªã‚¹ã‚±ãƒ¼ãƒ©ãƒ¼å€¤å¤‰æ›´æ™‚ã«å‘¼ã¶
  */
 static	int	sound_flags_update     = 0;
 static	int	sound_prescaler_update = 0;
@@ -263,16 +263,16 @@ void	change_sound_prescaler( int new_prescaler )
 
 
 /*
- * ¥µ¥¦¥ó¥É¤Î¥×¥ê¥¹¥±¡¼¥é¡¼ÃÍ¡¦³Æ¼ï¥Õ¥é¥°ÊÑ¹¹»ş¤Îºİ¤Ë¡¢¥Õ¥é¥°¤ò½é´ü²½¤¹¤ë¡£
- *	³ä¤ê¹ş¤ß¹¹¿·¸å¤Ë¸Æ¤Ğ¤ì¤ë¡£
+ * ã‚µã‚¦ãƒ³ãƒ‰ã®ãƒ—ãƒªã‚¹ã‚±ãƒ¼ãƒ©ãƒ¼å€¤ãƒ»å„ç¨®ãƒ•ãƒ©ã‚°å¤‰æ›´æ™‚ã®éš›ã«ã€ãƒ•ãƒ©ã‚°ã‚’åˆæœŸåŒ–ã™ã‚‹ã€‚
+ *	å‰²ã‚Šè¾¼ã¿æ›´æ–°å¾Œã«å‘¼ã°ã‚Œã‚‹ã€‚
  */
 static	void	check_sound_parm_update( void )
 {
   byte data;
 
-  if( sound_prescaler_update ){		/* Ê¬¼ş ÊÑ¹¹¤¬¤¢¤Ã¤¿¤é		    */
-					/* ¥¿¥¤¥ŞÃÍ¤ò (ÊÑ¹¹¸å/ÊÑ¹¹Á°)ÇÜ¤·¤Æ */
-					/* ¥¿¥¤¥ŞÃÍ¤Î¤Ä¤¸¤Ä¤Ş¤ò¤¢¤ï¤»¤ë¡£   */
+  if( sound_prescaler_update ){		/* åˆ†å‘¨ å¤‰æ›´ãŒã‚ã£ãŸã‚‰		    */
+					/* ã‚¿ã‚¤ãƒå€¤ã‚’ (å¤‰æ›´å¾Œ/å¤‰æ›´å‰)å€ã—ã¦ */
+					/* ã‚¿ã‚¤ãƒå€¤ã®ã¤ã˜ã¤ã¾ã‚’ã‚ã‚ã›ã‚‹ã€‚   */
     sd_A_intr_base  = sd_A_intr_base  * sound_prescaler_update/sound_prescaler;
     sd_A_intr_timer = sd_A_intr_timer * sound_prescaler_update/sound_prescaler;
     sd_B_intr_base  = sd_B_intr_base  * sound_prescaler_update/sound_prescaler;
@@ -282,22 +282,22 @@ static	void	check_sound_parm_update( void )
   }
 
 
-  switch( sound_flags_update ){		/* ¥Õ¥é¥°ÊÑ¹¹¤¬¤¢¤Ã¤¿¤é¡¢¹¹¿· */
+  switch( sound_flags_update ){		/* ãƒ•ãƒ©ã‚°å¤‰æ›´ãŒã‚ã£ãŸã‚‰ã€æ›´æ–° */
 
   case 0x27:		/*---------------- RESET_B/A | ENABLE_B/A | LOAD_B/A */
     data = sound_reg[0x27];
 
-					/* LOAD¤ÎÎ©¤Á¾å¤¬¤ê¤Ë¡¢¥¿¥¤¥ŞÃÍ¹¹¿· */
+					/* LOADã®ç«‹ã¡ä¸ŠãŒã‚Šã«ã€ã‚¿ã‚¤ãƒå€¤æ›´æ–° */
     if( (sound_LOAD_A==0) && (data&0x01) ) sd_A_intr_timer = sd_A_intr_base;
     if( (sound_LOAD_B==0) && (data&0x02) ) sd_B_intr_timer = sd_B_intr_base;
     sound_LOAD_A = data & 0x01;
     sound_LOAD_B = data & 0x02;
 
-					/* ENABLE ¤òÊİÂ¸ */
+					/* ENABLE ã‚’ä¿å­˜ */
     sound_ENABLE_A = ( data & 0x04 ) ? 1 : 0;
     sound_ENABLE_B = ( data & 0x08 ) ? 1 : 0;
 
-					/* RESET ¤¬ 1 ¤Ê¤é¡¢¥Õ¥é¥°¥¯¥ê¥¢ */
+					/* RESET ãŒ 1 ãªã‚‰ã€ãƒ•ãƒ©ã‚°ã‚¯ãƒªã‚¢ */
     if( data & 0x10 ) sound_FLAG_A = 0;
     if( data & 0x20 ) sound_FLAG_B = 0;
     break;
@@ -338,7 +338,7 @@ static	void	check_sound_parm_update( void )
 
 
 /*
- * ¥µ¥¦¥ó¥É¥Ü¡¼¥ÉII´ØÏ¢
+ * ã‚µã‚¦ãƒ³ãƒ‰ãƒœãƒ¼ãƒ‰IIé–¢é€£
  */
 void	interval_work_set_BDRY( void )
 {
@@ -358,15 +358,15 @@ void	interval_work_set_EOS( int length )
 
 
 /************************************************************************/
-/* 1/60 sec ¤Î³ä¤ê¹ş¤ßËè¤Ë¹Ô¤Ê¤¦½èÍı					*/
+/* 1/60 sec ã®å‰²ã‚Šè¾¼ã¿æ¯ã«è¡Œãªã†å‡¦ç†					*/
 /************************************************************************/
 
-/* #define ¤À¤È¡¢VSYNC³«»Ï»ş¤ËÉ½¼¨¡¢#undef ¤À¤ÈVBLANK ½ªÎ»»ş¤ËÉ½¼¨ */
+/* #define ã ã¨ã€VSYNCé–‹å§‹æ™‚ã«è¡¨ç¤ºã€#undef ã ã¨VBLANK çµ‚äº†æ™‚ã«è¡¨ç¤º */
 #undef	DRAW_SCREEN_AT_VSYNC_START
 
 static	void	vsync( void )
 {
-  vsync_count++;			/* test (·×Â¬ÍÑ) */
+  vsync_count++;			/* test (è¨ˆæ¸¬ç”¨) */
 
   if( ++ boost_cnt >= boost ){
     boost_cnt = 0;
@@ -380,7 +380,7 @@ static	void	vsync( void )
 #endif
   }
 
-  SET_DMA_WAIT_COUNT();			/* DMA¾ÃÈñ¥µ¥¤¥¯¥ë¿ô¥»¥Ã¥È */
+  SET_DMA_WAIT_COUNT();			/* DMAæ¶ˆè²»ã‚µã‚¤ã‚¯ãƒ«æ•°ã‚»ãƒƒãƒˆ */
 
 
   state_of_cpu -= state_of_vsync;	/* (== vsync_intr_base) */
@@ -398,23 +398,23 @@ int	quasi88_info_vsync_count(void)
 
 static	void	set_INT_active( void )
 {
-  if( intr_level==0 ){				/* ¥ì¥Ù¥ëÀßÄê 0 */
-    z80main_cpu.INT_active = FALSE;		/*    ³ä¤ê¹ş¤ß¤Ï¼õ¤±ÉÕ¤±¤Ê¤¤ */
+  if( intr_level==0 ){				/* ãƒ¬ãƒ™ãƒ«è¨­å®š 0 */
+    z80main_cpu.INT_active = FALSE;		/*    å‰²ã‚Šè¾¼ã¿ã¯å—ã‘ä»˜ã‘ãªã„ */
   }
-  else if( intr_level>=1 &&			/* ¥ì¥Ù¥ëÀßÄê 1 */
-	 /*intr_sio_enable &&*/ RS232C_flag ){	/*    RS232S ¼õ¿® ³ä¤ê¹ş¤ß */
+  else if( intr_level>=1 &&			/* ãƒ¬ãƒ™ãƒ«è¨­å®š 1 */
+	 /*intr_sio_enable &&*/ RS232C_flag ){	/*    RS232S å—ä¿¡ å‰²ã‚Šè¾¼ã¿ */
     z80main_cpu.INT_active = TRUE;
   }
-  else if( intr_level>=2 &&			/* ¥ì¥Ù¥ëÀßÄê 2 */
-	 /*intr_vsync_enable &&*/ VSYNC_flag ){	/*    VSYNC ³ä¤ê¹ş¤ß */
+  else if( intr_level>=2 &&			/* ãƒ¬ãƒ™ãƒ«è¨­å®š 2 */
+	 /*intr_vsync_enable &&*/ VSYNC_flag ){	/*    VSYNC å‰²ã‚Šè¾¼ã¿ */
     z80main_cpu.INT_active = TRUE;
   }
-  else if( intr_level>=3 &&			/* ¥ì¥Ù¥ëÀßÄê 3 */
-	 /*intr_rtc_enable &&*/ RTC_flag ){	/*    1/600ÉÃ RTC ³ä¤ê¹ş¤ß */
+  else if( intr_level>=3 &&			/* ãƒ¬ãƒ™ãƒ«è¨­å®š 3 */
+	 /*intr_rtc_enable &&*/ RTC_flag ){	/*    1/600ç§’ RTC å‰²ã‚Šè¾¼ã¿ */
     z80main_cpu.INT_active = TRUE;
   }
-  else if( intr_level>=5 &&			/* ¥ì¥Ù¥ëÀßÄê 5 */
-	 /*intr_sound_enable &&*/ SOUND_flag ){	/*    SOUND TIMER ³ä¤ê¹ş¤ß */
+  else if( intr_level>=5 &&			/* ãƒ¬ãƒ™ãƒ«è¨­å®š 5 */
+	 /*intr_sound_enable &&*/ SOUND_flag ){	/*    SOUND TIMER å‰²ã‚Šè¾¼ã¿ */
     z80main_cpu.INT_active = TRUE;
   }
   else{
@@ -423,17 +423,17 @@ static	void	set_INT_active( void )
 }
 
 /*----------------------------------------------------------------------*/
-/* ³ä¤ê¹ş¤ß¤òÀ¸À®¤¹¤ë¡£¤ÈÆ±»ş¤Ë¡¢¼¡¤Î³ä¤ê¹ş¤ß¤Ş¤Ç¤Î¡¢ºÇ¾® state ¤â·×»»	*/
-/*	µ¢¤êÃÍ¤Ï¡¢Z80½èÍı¶¯À©½ªÎ»¤Î¥Õ¥é¥°(TRUE/FALSE)			*/
+/* å‰²ã‚Šè¾¼ã¿ã‚’ç”Ÿæˆã™ã‚‹ã€‚ã¨åŒæ™‚ã«ã€æ¬¡ã®å‰²ã‚Šè¾¼ã¿ã¾ã§ã®ã€æœ€å° state ã‚‚è¨ˆç®—	*/
+/*	å¸°ã‚Šå€¤ã¯ã€Z80å‡¦ç†å¼·åˆ¶çµ‚äº†ã®ãƒ•ãƒ©ã‚°(TRUE/FALSE)			*/
 /*----------------------------------------------------------------------*/
 void	main_INT_update( void )
 {
   int	SOUND_level_old = SOUND_level;
-  int	icount = rtc_intr_base;		/* ¼¡¤Î³ä¤ê¹ş¤ßÈ¯À¸¤Ş¤Ç¤ÎºÇ¾®state¿ô */
-					/* ¤È¤ê¤¢¤¨¤º¡¢RTC³ä¹ş¤Î¼ş´ü¤Ç½é´ü²½ */
+  int	icount = rtc_intr_base;		/* æ¬¡ã®å‰²ã‚Šè¾¼ã¿ç™ºç”Ÿã¾ã§ã®æœ€å°stateæ•° */
+					/* ã¨ã‚Šã‚ãˆãšã€RTCå‰²è¾¼ã®å‘¨æœŸã§åˆæœŸåŒ– */
 
 
-		/* -------- RS232C ³ä¤ê¹ş¤ß -------- */
+		/* -------- RS232C å‰²ã‚Šè¾¼ã¿ -------- */
 
   rs232c_intr_timer -= z80main_cpu.state0;
   if( rs232c_intr_timer < 0 ){
@@ -446,7 +446,7 @@ void	main_INT_update( void )
   icount = MIN( icount, rs232c_intr_timer );
 
 
-		/* -------- VSYNC ³ä¤ê¹ş¤ß -------- */
+		/* -------- VSYNC å‰²ã‚Šè¾¼ã¿ -------- */
 
   state_of_cpu += z80main_cpu.state0;
 
@@ -454,9 +454,9 @@ void	main_INT_update( void )
   if( vsync_intr_timer < 0 ){
     vsync_intr_timer += vsync_intr_base;
 
-    vsync();					/* ¥¦¥¨¥¤¥È¡¢É½¼¨¡¢ÆşÎÏ */
+    vsync();					/* ã‚¦ã‚¨ã‚¤ãƒˆã€è¡¨ç¤ºã€å…¥åŠ› */
     if( intr_vsync_enable )
-      VSYNC_flag = TRUE;			/* VSYNC³ä¤ê¹ş¤ß	*/
+      VSYNC_flag = TRUE;			/* VSYNCå‰²ã‚Šè¾¼ã¿	*/
 
     ctrl_vrtc  = 1;
     vrtc_timer = vrtc_base + z80main_cpu.state0;
@@ -464,10 +464,10 @@ void	main_INT_update( void )
   icount = MIN( icount, vsync_intr_timer );
 
 
-		/* -------- VRTC ½èÍı -------- */
+		/* -------- VRTC å‡¦ç† -------- */
 
-  if( ctrl_vrtc == 1 ){				/* VSYNC ¤«¤é °ìÄê»ş´Ö */
-    vrtc_timer -= z80main_cpu.state0;		/* ·Ğ²á¤Ç¡¢É½¼¨´ü´Ö¤Ø  */
+  if( ctrl_vrtc == 1 ){				/* VSYNC ã‹ã‚‰ ä¸€å®šæ™‚é–“ */
+    vrtc_timer -= z80main_cpu.state0;		/* çµŒéã§ã€è¡¨ç¤ºæœŸé–“ã¸  */
     if( vrtc_timer < 0 ){
       ctrl_vrtc = 2;
       vrtc_timer += vrtc_base2;
@@ -480,18 +480,18 @@ void	main_INT_update( void )
 #endif
     }
 
-  }else if( ctrl_vrtc == 2 ){			/* É½¼¨´ü´Ö¤«¤é°ìÄê»ş´Ö */
-    vrtc_timer -= z80main_cpu.state0;		/* ·Ğ²á¤Ç¡¢VBLANK´ü´Ö¤Ø */
+  }else if( ctrl_vrtc == 2 ){			/* è¡¨ç¤ºæœŸé–“ã‹ã‚‰ä¸€å®šæ™‚é–“ */
+    vrtc_timer -= z80main_cpu.state0;		/* çµŒéã§ã€VBLANKæœŸé–“ã¸ */
     if( vrtc_timer < 0 ){
       ctrl_vrtc = 3;
-      vrtc_timer = 0xffff; /* Ç°¤Î¤¿¤á */
+      vrtc_timer = 0xffff; /* å¿µã®ãŸã‚ */
     }
   }
 
   if( ctrl_vrtc < 3 ) icount = MIN( icount, vrtc_timer );
 
 
-		/* -------- RTC ³ä¤ê¹ş¤ß -------- */
+		/* -------- RTC å‰²ã‚Šè¾¼ã¿ -------- */
 
   rtc_intr_timer -= z80main_cpu.state0;
   if( rtc_intr_timer < 0 ){
@@ -502,7 +502,7 @@ void	main_INT_update( void )
   icount = MIN( icount, rtc_intr_timer );
 
 
-		/* -------- SOUND TIMER A ³ä¤ê¹ş¤ß -------- */
+		/* -------- SOUND TIMER A å‰²ã‚Šè¾¼ã¿ -------- */
 
   if( sound_LOAD_A ){
     sd_A_intr_timer -= z80main_cpu.state0;
@@ -518,7 +518,7 @@ void	main_INT_update( void )
   }
 
 
-		/* -------- SOUND TIMER B ³ä¤ê¹ş¤ß -------- */
+		/* -------- SOUND TIMER B å‰²ã‚Šè¾¼ã¿ -------- */
 
   if( sound_LOAD_B ){
     sd_B_intr_timer -= z80main_cpu.state0;
@@ -559,12 +559,12 @@ void	main_INT_update( void )
 
   }
 
-	/* ¥µ¥¦¥ó¥É¤Î¡¢³ä¤ê¹ş¤ß¤Ë´Ø¤ï¤ë¥ì¥¸¥¹¥¿¤¬ÊÑ¹¹¤µ¤ì¤Æ¤Ê¤¤¤«³ÎÇ§ */
-	/* ¹¹¿·¤µ¤ì¤Æ¤¿¤é¥Õ¥é¥°¤òÄ¾¤·¤Æ¡¢¥µ¥¦¥ó¥É³ä¤ê¹ş¤ß¤ÎÍ­Ìµ¤òÈ½ÃÇ */
+	/* ã‚µã‚¦ãƒ³ãƒ‰ã®ã€å‰²ã‚Šè¾¼ã¿ã«é–¢ã‚ã‚‹ãƒ¬ã‚¸ã‚¹ã‚¿ãŒå¤‰æ›´ã•ã‚Œã¦ãªã„ã‹ç¢ºèª */
+	/* æ›´æ–°ã•ã‚Œã¦ãŸã‚‰ãƒ•ãƒ©ã‚°ã‚’ç›´ã—ã¦ã€ã‚µã‚¦ãƒ³ãƒ‰å‰²ã‚Šè¾¼ã¿ã®æœ‰ç„¡ã‚’åˆ¤æ–­ */
 
   check_sound_parm_update();
 
-#if 0		/* ANDOROGYNUS ¤Î BGM ¤¬ÌÄ¤é¤Ê¤¤ ? */
+#if 0		/* ANDOROGYNUS ã® BGM ãŒé³´ã‚‰ãªã„ ? */
   if( ( sound_FLAG_A     && sound2_EN_TA   ) ||
       ( sound_FLAG_B     && sound2_EN_TB   ) ||
       ( sound2_FLAG_BRDY && sound2_EN_BRDY ) ||
@@ -580,7 +580,7 @@ void	main_INT_update( void )
     SOUND_flag = TRUE;
     SOUND_edge = FALSE;
   }
-#elif 1		/* ¤³¤ì¤Ê¤é OK ? */
+#elif 1		/* ã“ã‚Œãªã‚‰ OK ? */
   if( ( ( sound_FLAG_A     && sound2_EN_TA   ) ||
 	( sound_FLAG_B     && sound2_EN_TB   ) ||
 	( sound2_FLAG_BRDY && sound2_EN_BRDY ) ||
@@ -592,7 +592,7 @@ void	main_INT_update( void )
   if( (SOUND_level_old == FALSE) && SOUND_level ){
     SOUND_flag = TRUE;
   }
-#else		/* DRAGON ¤¬Æ°¤«¤Ê¤¤ ? */
+#else		/* DRAGON ãŒå‹•ã‹ãªã„ ? */
   if( ( ( sound_FLAG_A     && sound2_EN_TA   ) ||
 	( sound_FLAG_B     && sound2_EN_TB   ) ||
 	( sound2_FLAG_BRDY && sound2_EN_BRDY ) ||
@@ -604,17 +604,17 @@ void	main_INT_update( void )
 #endif
 
 
-	/* ³ä¤ê¹ş¤ßÈ¯À¸¤·¤¿¤é¡¢z80->INT_active ¤Ë¿¿¤ò¥»¥Ã¥È¤¹¤ë */
+	/* å‰²ã‚Šè¾¼ã¿ç™ºç”Ÿã—ãŸã‚‰ã€z80->INT_active ã«çœŸã‚’ã‚»ãƒƒãƒˆã™ã‚‹ */
 
   set_INT_active();
 
 
-	/* ¼¡¤Î³ä¤ê¹ş¤ßÈ¯À¸¤Ş¤Ç¤Î¡¢¥¹¥Æ¡¼¥È¿ô¤ò¥»¥Ã¥È */
+	/* æ¬¡ã®å‰²ã‚Šè¾¼ã¿ç™ºç”Ÿã¾ã§ã®ã€ã‚¹ãƒ†ãƒ¼ãƒˆæ•°ã‚’ã‚»ãƒƒãƒˆ */
 
   z80main_cpu.icount = icount;
 
 
-	/* ¥á¥Ë¥å¡¼¤Ø¤ÎÁ«°Ü¤Ê¤É¤Ï¡¢¤³¤³¤Ç³ÎÇ§ */
+	/* ãƒ¡ãƒ‹ãƒ¥ãƒ¼ã¸ã®é·ç§»ãªã©ã¯ã€ã“ã“ã§ç¢ºèª */
 
   if (quasi88_event_flags & EVENT_MODE_CHANGED) {
     CPU_BREAKOFF();
@@ -627,10 +627,10 @@ void	main_INT_update( void )
 
 
 /************************************************************************/
-/* ¥Ş¥¹¥«¥Ö¥ë³ä¤ê¹ş¤ß¥¨¥ß¥å¥ì¡¼¥È					*/
+/* ãƒã‚¹ã‚«ãƒ–ãƒ«å‰²ã‚Šè¾¼ã¿ã‚¨ãƒŸãƒ¥ãƒ¬ãƒ¼ãƒˆ					*/
 /************************************************************************/
 /*--------------------------------------*/
-/* ½é´ü²½ (Z80¥ê¥»¥Ã¥È»ş¤Ë¸Æ¤Ö)		*/
+/* åˆæœŸåŒ– (Z80ãƒªã‚»ãƒƒãƒˆæ™‚ã«å‘¼ã¶)		*/
 /*--------------------------------------*/
 void	main_INT_init( void )
 {
@@ -659,12 +659,12 @@ printf("B      %d\n",sd_B_intr_base);
 }
 
 /*----------------------------------------------*/
-/* ¥Á¥§¥Ã¥¯ (³ä¹şµö²Ä»ş 1¥¹¥Æ¥Ã¥×Ëè¤Ë¸Æ¤Ğ¤ì¤ë)	*/
+/* ãƒã‚§ãƒƒã‚¯ (å‰²è¾¼è¨±å¯æ™‚ 1ã‚¹ãƒ†ãƒƒãƒ—æ¯ã«å‘¼ã°ã‚Œã‚‹)	*/
 /*						*/
-/*	Ææ£±¡ËIM!=2 ¤Î»ş¤Ï³ä¤ê¹ş¤ß¤Ï¤É¤¦¤Ê¤ë¡©	*/
-/*	Ææ£²¡Ëintr_priority ¤¬¿¿¤Î»ş¤Ï¡¢	*/
-/*	      ³ä¤ê¹ş¤ß¾õÂÖ¤Ï¤É¤¦¤Ê¤ë¡©		*/
-/*		  (¸½¾õ¡¢Ìµ»ë)			*/
+/*	è¬ï¼‘ï¼‰IM!=2 ã®æ™‚ã¯å‰²ã‚Šè¾¼ã¿ã¯ã©ã†ãªã‚‹ï¼Ÿ	*/
+/*	è¬ï¼’ï¼‰intr_priority ãŒçœŸã®æ™‚ã¯ã€	*/
+/*	      å‰²ã‚Šè¾¼ã¿çŠ¶æ…‹ã¯ã©ã†ãªã‚‹ï¼Ÿ		*/
+/*		  (ç¾çŠ¶ã€ç„¡è¦–)			*/
 /*						*/
 /*----------------------------------------------*/
 int	main_INT_chk( void )
@@ -674,34 +674,34 @@ int	main_INT_chk( void )
   /*  if( z80main_cpu.IM!=2 ) return -1;*/
 
 
-  if( intr_level==0 ){				/* ¥ì¥Ù¥ëÀßÄê 0 */
-    {						/*    ³ä¤ê¹ş¤ß¤Ï¼õ¤±ÉÕ¤±¤Ê¤¤ */
+  if( intr_level==0 ){				/* ãƒ¬ãƒ™ãƒ«è¨­å®š 0 */
+    {						/*    å‰²ã‚Šè¾¼ã¿ã¯å—ã‘ä»˜ã‘ãªã„ */
       intr_no = -1;
     }
   }
-  else if( intr_level>=1 &&			/* ¥ì¥Ù¥ëÀßÄê 1 */
-	 /*intr_sio_enable &&*/ RS232C_flag ){	/*    RS232S ¼õ¿® ³ä¤ê¹ş¤ß */
+  else if( intr_level>=1 &&			/* ãƒ¬ãƒ™ãƒ«è¨­å®š 1 */
+	 /*intr_sio_enable &&*/ RS232C_flag ){	/*    RS232S å—ä¿¡ å‰²ã‚Šè¾¼ã¿ */
     RS232C_flag = FALSE;
     intr_no = 0;
   }
-  else if( intr_level>=2 &&			/* ¥ì¥Ù¥ëÀßÄê 2 */
-	 /*intr_vsync_enable &&*/ VSYNC_flag ){	/*    VSYNC ³ä¤ê¹ş¤ß */
+  else if( intr_level>=2 &&			/* ãƒ¬ãƒ™ãƒ«è¨­å®š 2 */
+	 /*intr_vsync_enable &&*/ VSYNC_flag ){	/*    VSYNC å‰²ã‚Šè¾¼ã¿ */
     VSYNC_flag = FALSE;
     intr_no = 1;
   }
-  else if( intr_level>=3 &&			/* ¥ì¥Ù¥ëÀßÄê 3 */
-	 /*intr_rtc_enable &&*/ RTC_flag ){	/*    1/600ÉÃ RTC ³ä¤ê¹ş¤ß */
+  else if( intr_level>=3 &&			/* ãƒ¬ãƒ™ãƒ«è¨­å®š 3 */
+	 /*intr_rtc_enable &&*/ RTC_flag ){	/*    1/600ç§’ RTC å‰²ã‚Šè¾¼ã¿ */
     RTC_flag = FALSE;
     intr_no = 2;
   }
-  else if( intr_level>=5 &&			/* ¥ì¥Ù¥ëÀßÄê 5 */
-	 /*intr_sound_enable &&*/ SOUND_flag ){	/*    SOUND TIMER ³ä¤ê¹ş¤ß */
+  else if( intr_level>=5 &&			/* ãƒ¬ãƒ™ãƒ«è¨­å®š 5 */
+	 /*intr_sound_enable &&*/ SOUND_flag ){	/*    SOUND TIMER å‰²ã‚Šè¾¼ã¿ */
     SOUND_flag = FALSE;
     intr_no = 4;
   }
 
-	/* ³ä¤ê¹ş¤ß¼õ¤±ÉÕ¤±¤¿¤é¡¢z80->INT_active ¤Ëµ¶¤ò¥»¥Ã¥È¤¹¤ë */
-	/* (¤Ş¤ÀÍ­¸ú¤Ê³ä¤ê¹ş¤ß¤¬»Ä¤Ã¤Æ¤¿¤é¡¢z80->INT_active ¤Ï¿¿) */
+	/* å‰²ã‚Šè¾¼ã¿å—ã‘ä»˜ã‘ãŸã‚‰ã€z80->INT_active ã«å½ã‚’ã‚»ãƒƒãƒˆã™ã‚‹ */
+	/* (ã¾ã æœ‰åŠ¹ãªå‰²ã‚Šè¾¼ã¿ãŒæ®‹ã£ã¦ãŸã‚‰ã€z80->INT_active ã¯çœŸ) */
 
   set_INT_active();
 
@@ -721,7 +721,7 @@ int	main_INT_chk( void )
 
 
 /***********************************************************************
- * ¥¹¥Æ¡¼¥È¥í¡¼¥É¡¿¥¹¥Æ¡¼¥È¥»¡¼¥Ö
+ * ã‚¹ãƒ†ãƒ¼ãƒˆãƒ­ãƒ¼ãƒ‰ï¼ã‚¹ãƒ†ãƒ¼ãƒˆã‚»ãƒ¼ãƒ–
  ************************************************************************/
 static	int	wait_by_sleep_dummy;
 static	int	wait_sleep_min_us_dummy;
@@ -826,7 +826,7 @@ int	stateload_intr( void )
 
   if( stateload_table( SID2, suspend_intr_work2 ) != STATE_OK ){
 
-    /* µì¥Ğ¡¼¥¸¥ç¥ó¤Ê¤é¡¢¤ß¤Î¤¬¤¹ */
+    /* æ—§ãƒãƒ¼ã‚¸ãƒ§ãƒ³ãªã‚‰ã€ã¿ã®ãŒã™ */
 
     printf( "stateload : Statefile is old. (ver 0.6.0?)\n" );
 /*  printf( "stateload : Header revision is %d\n", statefile_revision() );*/
@@ -837,7 +837,7 @@ int	stateload_intr( void )
 
   if( stateload_table( SID3, suspend_intr_work3 ) != STATE_OK ){
 
-    /* µì¥Ğ¡¼¥¸¥ç¥ó¤Ê¤é¡¢¤ß¤Î¤¬¤¹ */
+    /* æ—§ãƒãƒ¼ã‚¸ãƒ§ãƒ³ãªã‚‰ã€ã¿ã®ãŒã™ */
 
     printf( "stateload : Statefile is old. (ver 0.6.1?)\n" );
 
@@ -847,7 +847,7 @@ int	stateload_intr( void )
 
   if( stateload_table( SID4, suspend_intr_work4 ) != STATE_OK ){
 
-    /* µì¥Ğ¡¼¥¸¥ç¥ó¤Ê¤é¡¢¤ß¤Î¤¬¤¹ */
+    /* æ—§ãƒãƒ¼ã‚¸ãƒ§ãƒ³ãªã‚‰ã€ã¿ã®ãŒã™ */
 
     printf( "stateload : Statefile is old. (ver 0.6.2?)\n" );
 

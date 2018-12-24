@@ -1,13 +1,13 @@
 /***********************************************************************
- * ¥°¥é¥Õ¥£¥Ã¥¯½èÍı (¥·¥¹¥Æ¥à°ÍÂ¸)
+ * ã‚°ãƒ©ãƒ•ã‚£ãƒƒã‚¯å‡¦ç† (ã‚·ã‚¹ãƒ†ãƒ ä¾å­˜)
  *
- *	¾ÜºÙ¤Ï¡¢ graph.h »²¾È
+ *	è©³ç´°ã¯ã€ graph.h å‚ç…§
  ************************************************************************/
 
 /*----------------------------------------------------------------------*
- * Classic¥Ğ¡¼¥¸¥ç¥ó¤Î¥½¡¼¥¹¥³¡¼¥É¤ÎÂçÉôÊ¬¤Ï¡¢                          *
- * Koichi NISHIDA »á¤Î Classic iP6 PC-6001/mk2/6601 emulator ¤Î¥½¡¼¥¹¤ò *
- * »²¹Í¤Ë¤µ¤»¤Æ¤¤¤¿¤À¤­¤Ş¤·¤¿¡£                                         *
+ * Classicãƒãƒ¼ã‚¸ãƒ§ãƒ³ã®ã‚½ãƒ¼ã‚¹ã‚³ãƒ¼ãƒ‰ã®å¤§éƒ¨åˆ†ã¯ã€                          *
+ * Koichi NISHIDA æ°ã® Classic iP6 PC-6001/mk2/6601 emulator ã®ã‚½ãƒ¼ã‚¹ã‚’ *
+ * å‚è€ƒã«ã•ã›ã¦ã„ãŸã ãã¾ã—ãŸã€‚                                         *
  *                                                   (c) Koichi NISHIDA *
  *----------------------------------------------------------------------*/
 
@@ -23,7 +23,7 @@
 #endif
 
 
-/********************** ¥°¥í¡¼¥Ğ¥ëÊÑ¿ô **********************/
+/********************** ã‚°ãƒ­ãƒ¼ãƒãƒ«å¤‰æ•° **********************/
 
 // main window & graphic world
 WindowRef	macWin;
@@ -31,15 +31,15 @@ GWorldPtr	macGw;
 
 QDGlobals	macQd;
 
-int		mac_8bpp = TRUE;	/* Í¥ÀèÅª¤Ë¡¢256¿§¥â¡¼¥É¤ÇÆ°ºî¤µ¤»¤ë */
+int		mac_8bpp = TRUE;	/* å„ªå…ˆçš„ã«ã€256è‰²ãƒ¢ãƒ¼ãƒ‰ã§å‹•ä½œã•ã›ã‚‹ */
 
 
 /************************************************************************/
-/* ½é´üÉ½¼¨°ÌÃÖ¡¦¡¦¡¦¤é¤·¤¤ */
+/* åˆæœŸè¡¨ç¤ºä½ç½®ãƒ»ãƒ»ãƒ»ã‚‰ã—ã„ */
 #define WIN_X 20
 #define WIN_Y 60
 
-/* ¤³¤ì¤À¤±¤Î¿§¿ô¤ò»È¤¦ */
+/* ã“ã‚Œã ã‘ã®è‰²æ•°ã‚’ä½¿ã† */
 #define	ALL_COLORS	(24)
 
 // default palette
@@ -49,15 +49,15 @@ static int	nr_color_used;
 static void InitColor(void);
 
 
-static	T_GRAPH_SPEC	graph_spec;		/* ´ğËÜ¾ğÊó		*/
+static	T_GRAPH_SPEC	graph_spec;		/* åŸºæœ¬æƒ…å ±		*/
 
-static	int		graph_exist;		/* ¿¿¤Ç¡¢²èÌÌÀ¸À®ºÑ¤ß	*/
-static	T_GRAPH_INFO	graph_info;		/* ¤½¤Î»ş¤Î¡¢²èÌÌ¾ğÊó	*/
+static	int		graph_exist;		/* çœŸã§ã€ç”»é¢ç”Ÿæˆæ¸ˆã¿	*/
+static	T_GRAPH_INFO	graph_info;		/* ãã®æ™‚ã®ã€ç”»é¢æƒ…å ±	*/
 
 
 /************************************************************************
- *	CLASSIC¤Î½é´ü²½
- *	CLASSIC¤Î½ªÎ»
+ *	CLASSICã®åˆæœŸåŒ–
+ *	CLASSICã®çµ‚äº†
  ************************************************************************/
 static unsigned long displayOrigDepth;
 static unsigned long displayDepth;
@@ -82,8 +82,8 @@ void	mac_init(void)
 
     // depth check
 #ifdef	SUPPORT_16BPP
-    if (mac_8bpp) displayDepth = 8;	/* 256¿§¥â¡¼¥É  ¤«¤éÀè¤Ë¥Á¥§¥Ã¥¯¤¹¤ë */
-    else          displayDepth = 16;	/* 32000¿§¥â¡¼¥É¤«¤éÀè¤Ë¥Á¥§¥Ã¥¯¤¹¤ë */
+    if (mac_8bpp) displayDepth = 8;	/* 256è‰²ãƒ¢ãƒ¼ãƒ‰  ã‹ã‚‰å…ˆã«ãƒã‚§ãƒƒã‚¯ã™ã‚‹ */
+    else          displayDepth = 16;	/* 32000è‰²ãƒ¢ãƒ¼ãƒ‰ã‹ã‚‰å…ˆã«ãƒã‚§ãƒƒã‚¯ã™ã‚‹ */
     if (! HasDepth(GetMainDevice(), displayDepth, 1, 1)) {
 	if (displayDepth == 8) displayDepth = 16;
 	else                   displayDepth = 8;
@@ -119,7 +119,7 @@ void	mac_init(void)
 	if (! mac_create_menubar()) ExitToShell();
 #endif
 
-    /*¥­¡¼ÆşÎÏ¤òRoman¤Ë*/
+    /*ã‚­ãƒ¼å…¥åŠ›ã‚’Romanã«*/
     KeyScript(smKeyRoman);
 }
 
@@ -127,7 +127,7 @@ void	mac_init(void)
 
 void	mac_exit(void)
 {
-    /*¥­¡¼ÆşÎÏ¤ò¸µ¤ËÌá¤¹*/
+    /*ã‚­ãƒ¼å…¥åŠ›ã‚’å…ƒã«æˆ»ã™*/
     KeyScript(smKeySwapScript);
 
     SetDepth(GetMainDevice(), displayOrigDepth, 1, 1);
@@ -151,9 +151,9 @@ static unsigned long chkSysDepth(void)
 
 
 /************************************************************************
- *	¥°¥é¥Õ¥£¥Ã¥¯½èÍı¤Î½é´ü²½
- *	¥°¥é¥Õ¥£¥Ã¥¯½èÍı¤ÎÆ°ºî
- *	¥°¥é¥Õ¥£¥Ã¥¯½èÍı¤Î½ªÎ»
+ *	ã‚°ãƒ©ãƒ•ã‚£ãƒƒã‚¯å‡¦ç†ã®åˆæœŸåŒ–
+ *	ã‚°ãƒ©ãƒ•ã‚£ãƒƒã‚¯å‡¦ç†ã®å‹•ä½œ
+ *	ã‚°ãƒ©ãƒ•ã‚£ãƒƒã‚¯å‡¦ç†ã®çµ‚äº†
  ************************************************************************/
 
 const T_GRAPH_SPEC	*graph_init(void)
@@ -166,7 +166,7 @@ const T_GRAPH_SPEC	*graph_init(void)
     }
 
 
-    /* ²èÌÌ¥µ¥¤¥º¤ò¼èÆÀ¤¹¤ëÊıË¡¤Ï? */
+    /* ç”»é¢ã‚µã‚¤ã‚ºã‚’å–å¾—ã™ã‚‹æ–¹æ³•ã¯? */
     win_w = 10000;
     win_h = 10000;
     ful_w = 640;
@@ -187,7 +187,7 @@ const T_GRAPH_SPEC	*graph_init(void)
     // to get key up event
     SetEventMask(everyEvent);
 
-    /* ¥Ñ¥ì¥Ã¥È¤ò½é´ü²½¤¹¤ë */
+    /* ãƒ‘ãƒ¬ãƒƒãƒˆã‚’åˆæœŸåŒ–ã™ã‚‹ */
     if (verbose_proc) printf("  Color Initialized\n");
     InitColor();
 
@@ -206,7 +206,7 @@ const T_GRAPH_INFO	*graph_setup(int width, int height,
 {
     T_GRAPH_INFO *info = &graph_info;
 
-    /* aspect ¤ÏÌ¤»ÈÍÑ */
+    /* aspect ã¯æœªä½¿ç”¨ */
 
     if (verbose_proc){
 	if (graph_exist) printf("Re-Initializing Graphic System ... \n");
@@ -215,33 +215,33 @@ const T_GRAPH_INFO	*graph_setup(int width, int height,
 	else            printf("  Opening window ... ");
     }
 
-    if (graph_exist == FALSE) {			/* ½é²ó */
+    if (graph_exist == FALSE) {			/* åˆå› */
 	createWindow(width, height);
 	if (fullscreen) {
 	    toFullscreenMode(width, height);
 	}
-    } else {					/* 2²óÌÜ°Ê¹ß */
+    } else {					/* 2å›ç›®ä»¥é™ */
 	if (info->fullscreen) {
-	    if (fullscreen) {				/* FULL ¢ª FULL */
+	    if (fullscreen) {				/* FULL â†’ FULL */
 
 		toWindowMode();
 		createWindow(width, height);
 		toFullscreenMode(width, height);
 
-	    } else {					/* FULL ¢ª WIN */
+	    } else {					/* FULL â†’ WIN */
 		toWindowMode();
-		/* ¢­°ú¿ô¤¬Ä¾Á°¤Î toFullscreenMode ¤Î¤ÈÆ±¤¸¤Ê¤é½èÍıÉÔÍ×¡Ä */
+		/* â†“å¼•æ•°ãŒç›´å‰ã® toFullscreenMode ã®ã¨åŒã˜ãªã‚‰å‡¦ç†ä¸è¦â€¦ */
 		createWindow(width, height);
 	    }
 
 	} else {
-	    if (fullscreen) {				/* WIN ¢ª FULL */
+	    if (fullscreen) {				/* WIN â†’ FULL */
 
-		/* ¢­°ú¿ô¤¬Ä¾Á°¤Î createWindow ¤Î¤ÈÆ±¤¸¤Ê¤é½èÍıÉÔÍ×¡Ä */
+		/* â†“å¼•æ•°ãŒç›´å‰ã® createWindow ã®ã¨åŒã˜ãªã‚‰å‡¦ç†ä¸è¦â€¦ */
 		createWindow(width, height);
 		toFullscreenMode(width, height);
 
-	    } else {					/* WIN ¢ª WIN */
+	    } else {					/* WIN â†’ WIN */
 		createWindow(width, height);
 	    }
 	}
@@ -259,7 +259,7 @@ const T_GRAPH_INFO	*graph_setup(int width, int height,
     info->draw_finish	 = NULL;
     info->dont_frameskip = FALSE;
 
-    /* ½èÍı¤ÎÅÔÅÙ¡¢»ÈÍÑºÑ¤ß¤Î¿§¿ô¤ò½é´üÃÍ¤ËÌá¤¹ */
+    /* å‡¦ç†ã®éƒ½åº¦ã€ä½¿ç”¨æ¸ˆã¿ã®è‰²æ•°ã‚’åˆæœŸå€¤ã«æˆ»ã™ */
     nr_color_used = 1;
     return info;
 }
@@ -345,8 +345,8 @@ static void toWindowMode(void)
     pmh = GetGWorldPixMap(macGw);
 
     info->fullscreen    = FALSE;
-    /* info->width      = ;	toFullscreenMode ¤Ç	*/
-    /* info->height     = ;	ÀßÄê¤·¤¿¥µ¥¤¥º¤Ë¤Ê¤ë	*/
+    /* info->width      = ;	toFullscreenMode ã§	*/
+    /* info->height     = ;	è¨­å®šã—ãŸã‚µã‚¤ã‚ºã«ãªã‚‹	*/
     info->byte_per_line = ((**pmh).rowBytes & 0x3fff);
     info->buffer        = GetPixBaseAddr(pmh);
 
@@ -418,8 +418,8 @@ int	mac_is_fullscreen(void)
 
 
 /************************************************************************
- *	¿§¤Î³ÎÊİ
- *	¿§¤Î²òÊü
+ *	è‰²ã®ç¢ºä¿
+ *	è‰²ã®è§£æ”¾
  ************************************************************************/
 
 void	graph_add_color(const PC88_PALETTE_T color[],
@@ -443,7 +443,7 @@ void	graph_add_color(const PC88_PALETTE_T color[],
 	nr_color_used += nr_color;
 
 
-	/* ¤³¤Î½èÍı¤ÏËè²óÉ¬Í×¤Ê¤Î¤«¡© ¥Õ¥ë¥¹¥¯¥ê¡¼¥ó¤Ç¤ÏÉÔÍ×¤Ê¤Î¡© */
+	/* ã“ã®å‡¦ç†ã¯æ¯å›å¿…è¦ãªã®ã‹ï¼Ÿ ãƒ•ãƒ«ã‚¹ã‚¯ãƒªãƒ¼ãƒ³ã§ã¯ä¸è¦ãªã®ï¼Ÿ */
 	if (graph_exist &&
 	    graph_info.fullscreen == FALSE) {
 
@@ -459,7 +459,7 @@ void	graph_add_color(const PC88_PALETTE_T color[],
 	    (*ctab)->ctSeed = (*(*(*mainhd)->gdPMap)->pmTable)->ctSeed;
 	}
 
-	/* ¤³¤ì¤ÏÉ¬¿Ü¤Î¤è¤¦¤À¤¬¡¢²èÌÌ¤¬¤Á¤é¤Ä¤¯¡¦¡¦¡¦ */
+	/* ã“ã‚Œã¯å¿…é ˆã®ã‚ˆã†ã ãŒã€ç”»é¢ãŒã¡ã‚‰ã¤ããƒ»ãƒ»ãƒ» */
 	ActivatePalette(macWin);
 
     } else {
@@ -489,7 +489,7 @@ static void InitColor(void)
 	int i;
 	const int param[ALL_COLORS][3] = // {R,G,B}
 	{
-	    { 0x0000, 0x0000, 0x0000 },		/* Á´¿§ ¹õ¤Ç½é´ü²½ */
+	    { 0x0000, 0x0000, 0x0000 },		/* å…¨è‰² é»’ã§åˆæœŸåŒ– */
 	};
 
 	defPalette = NewPalette(ALL_COLORS + 1, NULL, pmTolerant + pmExplicit, 0);
@@ -498,7 +498,7 @@ static void InitColor(void)
 	rgb.red = rgb.green = rgb.blue = 255;
 	SetEntryColor(defPalette, 0, &rgb);		
 
-	/* ¤È¤ê¤¢¤¨¤º¡¢¥Ç¥Õ¥©¥ë¥È¤Î¿§¤òÄêµÁ */
+	/* ã¨ã‚Šã‚ãˆãšã€ãƒ‡ãƒ•ã‚©ãƒ«ãƒˆã®è‰²ã‚’å®šç¾© */
 	for (i=0; i<ALL_COLORS; i++) {
 	    rgb.red   = param[i][0];
 	    rgb.green = param[i][1];
@@ -509,7 +509,7 @@ static void InitColor(void)
 }
 
 /************************************************************************
- *	¥°¥é¥Õ¥£¥Ã¥¯¤Î¹¹¿·
+ *	ã‚°ãƒ©ãƒ•ã‚£ãƒƒã‚¯ã®æ›´æ–°
  ************************************************************************/
 
 static void draw(int x0, int y0, int x1, int y1);
@@ -560,8 +560,8 @@ void	mac_draw_immidiate(void)
 
 
 /************************************************************************
- *	¥¿¥¤¥È¥ë¤ÎÀßÄê
- *	Â°À­¤ÎÀßÄê
+ *	ã‚¿ã‚¤ãƒˆãƒ«ã®è¨­å®š
+ *	å±æ€§ã®è¨­å®š
  ************************************************************************/
 // Window title strings
 static Str255 wtitle;
@@ -580,7 +580,7 @@ void	graph_set_window_title(const char *title)
 
 void	graph_set_attribute(int mouse_show, int grab, int keyrepeat_on)
 {
-    /* ÀßÄê¤Î»ÅÊı¤¬¤ï¤«¤é¤Ê¤¤¡Ä */
+    /* è¨­å®šã®ä»•æ–¹ãŒã‚ã‹ã‚‰ãªã„â€¦ */
     (void)mouse_show;
     (void)grab;
     (void)keyrepeat_on;

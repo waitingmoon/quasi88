@@ -1,6 +1,6 @@
 /************************************************************************/
 /*									*/
-/* ¥µ¥¦¥ó¥É¤Î½èÍı							*/
+/* ã‚µã‚¦ãƒ³ãƒ‰ã®å‡¦ç†							*/
 /*									*/
 /************************************************************************/
 
@@ -19,77 +19,77 @@
 
 
 /*
- * ¥µ¥¦¥ó¥É¥Ü¡¼¥ÉII¤ÎÂĞ±ş¤Ï¤½¤¦¤È¤¦¤¤¤¤²Ã¸º¤Ç¤¹¡£
+ * ã‚µã‚¦ãƒ³ãƒ‰ãƒœãƒ¼ãƒ‰IIã®å¯¾å¿œã¯ãã†ã¨ã†ã„ã„åŠ æ¸›ã§ã™ã€‚
  */
 
 
-int	sound_board     = DEFAULT_SOUND;	/* ¥µ¥¦¥ó¥É¥Ü¡¼¥É	*/
-int	sound_port;				/* ¥µ¥¦¥ó¥É¥İ¡¼¥È¤Î¼ïÊÌ	*/
+int	sound_board     = DEFAULT_SOUND;	/* ã‚µã‚¦ãƒ³ãƒ‰ãƒœãƒ¼ãƒ‰	*/
+int	sound_port;				/* ã‚µã‚¦ãƒ³ãƒ‰ãƒãƒ¼ãƒˆã®ç¨®åˆ¥	*/
 
 
-int	intr_sound_enable = 0x00;	/* I/O[31] ³ä¤ê¹ş¤ß¥Ş¥¹¥¯ SOUND	*/ 
+int	intr_sound_enable = 0x00;	/* I/O[31] å‰²ã‚Šè¾¼ã¿ãƒã‚¹ã‚¯ SOUND	*/ 
 
 
-	/* ¥µ¥¦¥ó¥É¥Ü¡¼¥É I Éô */
+	/* ã‚µã‚¦ãƒ³ãƒ‰ãƒœãƒ¼ãƒ‰ I éƒ¨ */
 
-int	sound_ENABLE_A = FALSE;		/* TIMER A ³ä¹ş¤òµ¯¤³¤¹¤«¤É¤¦¤« */
-int	sound_ENABLE_B = FALSE;		/* TIMER B ³ä¹ş¤òµ¯¤³¤¹¤«¤É¤¦¤« */
+int	sound_ENABLE_A = FALSE;		/* TIMER A å‰²è¾¼ã‚’èµ·ã“ã™ã‹ã©ã†ã‹ */
+int	sound_ENABLE_B = FALSE;		/* TIMER B å‰²è¾¼ã‚’èµ·ã“ã™ã‹ã©ã†ã‹ */
 
-int	sound_LOAD_A = FALSE;		/* TIMER A ¤òÆ°¤«¤¹¤«¤É¤¦¤«	*/
-int	sound_LOAD_B = FALSE;		/* TIMER B ¤òÆ°¤«¤¹¤«¤É¤¦¤«	*/
+int	sound_LOAD_A = FALSE;		/* TIMER A ã‚’å‹•ã‹ã™ã‹ã©ã†ã‹	*/
+int	sound_LOAD_B = FALSE;		/* TIMER B ã‚’å‹•ã‹ã™ã‹ã©ã†ã‹	*/
 
-int	sound_FLAG_A = 0;		/* FLAG A ¤Î¾õÂÖ		*/
-int	sound_FLAG_B = 0;		/* FLAG B ¤Î¾õÂÖ		*/
+int	sound_FLAG_A = 0;		/* FLAG A ã®çŠ¶æ…‹		*/
+int	sound_FLAG_B = 0;		/* FLAG B ã®çŠ¶æ…‹		*/
 
-int	sound_TIMER_A = 0;	/* TIMER A ÀßÄê»ş´Ö reg[0x24¡Á0x25]	*/
-int	sound_TIMER_B = 0;	/* TIMER B ÀßÄê»ş´Ö reg[0x26]		*/
+int	sound_TIMER_A = 0;	/* TIMER A è¨­å®šæ™‚é–“ reg[0x24ã€œ0x25]	*/
+int	sound_TIMER_B = 0;	/* TIMER B è¨­å®šæ™‚é–“ reg[0x26]		*/
 
-int	sound_prescaler = 6;		/* 1/¥×¥ê¥¹¥±¡¼¥é¡¼ (2,3,6)	*/
-int	sound_prescaler_sel = 2;	/* ¥×¥ê¥¹¥±¡¼¥é¡¼ÀßÄê		*/
+int	sound_prescaler = 6;		/* 1/ãƒ—ãƒªã‚¹ã‚±ãƒ¼ãƒ©ãƒ¼ (2,3,6)	*/
+int	sound_prescaler_sel = 2;	/* ãƒ—ãƒªã‚¹ã‚±ãƒ¼ãƒ©ãƒ¼è¨­å®š		*/
 
-byte	sound_reg[0x100];		/* ¥µ¥¦¥ó¥É¥Ü¡¼¥É ¥ì¥¸¥¹¥¿	*/
+byte	sound_reg[0x100];		/* ã‚µã‚¦ãƒ³ãƒ‰ãƒœãƒ¼ãƒ‰ ãƒ¬ã‚¸ã‚¹ã‚¿	*/
 int	sound_reg_select = 0x00;
 
 
-	/* ¥µ¥¦¥ó¥É¥Ü¡¼¥É II Éô */
+	/* ã‚µã‚¦ãƒ³ãƒ‰ãƒœãƒ¼ãƒ‰ II éƒ¨ */
 
-int	sound2_MSK_TA   = FALSE;	/* TIMER A ³ä¤ê¹ş¤ß¥Ş¥¹¥¯	*/
-int	sound2_MSK_TB   = FALSE;	/* TIMER B ³ä¤ê¹ş¤ß¥Ş¥¹¥¯	*/
-int	sound2_MSK_EOS  = FALSE;	/* EOS     ³ä¤ê¹ş¤ß¥Ş¥¹¥¯	*/ 
-int	sound2_MSK_BRDY = FALSE;	/* BRDY    ³ä¤ê¹ş¤ß¥Ş¥¹¥¯	*/ 
-int	sound2_MSK_ZERO = FALSE;	/* ZERO    ³ä¤ê¹ş¤ß¥Ş¥¹¥¯	*/ 
+int	sound2_MSK_TA   = FALSE;	/* TIMER A å‰²ã‚Šè¾¼ã¿ãƒã‚¹ã‚¯	*/
+int	sound2_MSK_TB   = FALSE;	/* TIMER B å‰²ã‚Šè¾¼ã¿ãƒã‚¹ã‚¯	*/
+int	sound2_MSK_EOS  = FALSE;	/* EOS     å‰²ã‚Šè¾¼ã¿ãƒã‚¹ã‚¯	*/ 
+int	sound2_MSK_BRDY = FALSE;	/* BRDY    å‰²ã‚Šè¾¼ã¿ãƒã‚¹ã‚¯	*/ 
+int	sound2_MSK_ZERO = FALSE;	/* ZERO    å‰²ã‚Šè¾¼ã¿ãƒã‚¹ã‚¯	*/ 
 
-int	sound2_EN_TA   = 0x01;		/* TIMER A ³ä¤ê¹ş¤ßµö²Ä		*/
-int	sound2_EN_TB   = 0x02;		/* TIMER B ³ä¤ê¹ş¤ßµö²Ä		*/
-int	sound2_EN_EOS  = FALSE;		/* EOS     ³ä¤ê¹ş¤ßµö²Ä		*/
-int	sound2_EN_BRDY = FALSE;		/* BDRY    ³ä¤ê¹ş¤ßµö²Ä		*/
-int	sound2_EN_ZERO = FALSE;		/* ZERO    ³ä¤ê¹ş¤ßµö²Ä		*/
+int	sound2_EN_TA   = 0x01;		/* TIMER A å‰²ã‚Šè¾¼ã¿è¨±å¯		*/
+int	sound2_EN_TB   = 0x02;		/* TIMER B å‰²ã‚Šè¾¼ã¿è¨±å¯		*/
+int	sound2_EN_EOS  = FALSE;		/* EOS     å‰²ã‚Šè¾¼ã¿è¨±å¯		*/
+int	sound2_EN_BRDY = FALSE;		/* BDRY    å‰²ã‚Šè¾¼ã¿è¨±å¯		*/
+int	sound2_EN_ZERO = FALSE;		/* ZERO    å‰²ã‚Šè¾¼ã¿è¨±å¯		*/
 
-int	sound2_FLAG_EOS    = 0;		/* FLAG EOS  ¤Î¾õÂÖ		*/
-int	sound2_FLAG_BRDY   = 0;		/* FLAG BRDY ¤Î¾õÂÖ		*/
-int	sound2_FLAG_ZERO   = 0;		/* FLAG ZERO ¤Î¾õÂÖ		*/
-int	sound2_FLAG_PCMBSY = 0;		/* FLAG PCMBSY ¤Î¾õÂÖ		*/
+int	sound2_FLAG_EOS    = 0;		/* FLAG EOS  ã®çŠ¶æ…‹		*/
+int	sound2_FLAG_BRDY   = 0;		/* FLAG BRDY ã®çŠ¶æ…‹		*/
+int	sound2_FLAG_ZERO   = 0;		/* FLAG ZERO ã®çŠ¶æ…‹		*/
+int	sound2_FLAG_PCMBSY = 0;		/* FLAG PCMBSY ã®çŠ¶æ…‹		*/
 
 
 
-byte	sound2_reg[0x100];		/* ¥µ¥¦¥ó¥É¥Ü¡¼¥ÉII ¥ì¥¸¥¹¥¿	*/
+byte	sound2_reg[0x100];		/* ã‚µã‚¦ãƒ³ãƒ‰ãƒœãƒ¼ãƒ‰II ãƒ¬ã‚¸ã‚¹ã‚¿	*/
 int	sound2_reg_select = 0x00;
 
 
-	/* ¥µ¥¦¥ó¥É¥Ü¡¼¥É II  ADPCM Éô */
+	/* ã‚µã‚¦ãƒ³ãƒ‰ãƒœãƒ¼ãƒ‰ II  ADPCM éƒ¨ */
 
-	byte	*sound2_adpcm = NULL;	/* ADPCMÍÑ DRAM (256KB)		*/
+	byte	*sound2_adpcm = NULL;	/* ADPCMç”¨ DRAM (256KB)		*/
 
-static	int	sound2_mem       = 0;	/* ADPCM ¥á¥â¥ê 1:¥¢¥¯¥»¥¹²ÄÇ½	*/
-static	int	sound2_rec       = 0;	/* ADPCM        1:Ï¿²» 0:ºÆÀ¸	*/
-	int	sound2_repeat    = 0;	/* ADPCM ¥ê¥Ô¡¼¥È¥×¥ì¥¤		*/
-static	int	sound2_mem_size  = 5;	/* ADPCM ¤Î¥á¥â¥êÃ±°Ì 5 or 2	*/
-static	int	sound2_record_intr_base = 1;/* ADPCM Ï¿²»³ä¤ê¹ş¤ß¥ì¡¼¥È	*/
-static	int	sound2_replay_intr_base = 1;/* ADPCM ºÆÀ¸³ä¤ê¹ş¤ß¥ì¡¼¥È	*/
-static	int	sound2_start_addr = 0;	/* ADPCM ¥¹¥¿¡¼¥È¥¢¥É¥ì¥¹	*/
-static	int	sound2_stop_addr  = 0;	/* ADPCM ¥¹¥È¥Ã¥×¥¢¥É¥ì¥¹	*/
-static	int	sound2_limit_addr = 0;	/* ADPCM ¥ê¥ß¥Ã¥È¥¢¥É¥ì¥¹	*/
-static	int	sound2_read_dummy = 2;	/* ADPCM ¥ê¡¼¥É»ş¥À¥ß¡¼¥«¥¦¥ó¥¿	*/
+static	int	sound2_mem       = 0;	/* ADPCM ãƒ¡ãƒ¢ãƒª 1:ã‚¢ã‚¯ã‚»ã‚¹å¯èƒ½	*/
+static	int	sound2_rec       = 0;	/* ADPCM        1:éŒ²éŸ³ 0:å†ç”Ÿ	*/
+	int	sound2_repeat    = 0;	/* ADPCM ãƒªãƒ”ãƒ¼ãƒˆãƒ—ãƒ¬ã‚¤		*/
+static	int	sound2_mem_size  = 5;	/* ADPCM ã®ãƒ¡ãƒ¢ãƒªå˜ä½ 5 or 2	*/
+static	int	sound2_record_intr_base = 1;/* ADPCM éŒ²éŸ³å‰²ã‚Šè¾¼ã¿ãƒ¬ãƒ¼ãƒˆ	*/
+static	int	sound2_replay_intr_base = 1;/* ADPCM å†ç”Ÿå‰²ã‚Šè¾¼ã¿ãƒ¬ãƒ¼ãƒˆ	*/
+static	int	sound2_start_addr = 0;	/* ADPCM ã‚¹ã‚¿ãƒ¼ãƒˆã‚¢ãƒ‰ãƒ¬ã‚¹	*/
+static	int	sound2_stop_addr  = 0;	/* ADPCM ã‚¹ãƒˆãƒƒãƒ—ã‚¢ãƒ‰ãƒ¬ã‚¹	*/
+static	int	sound2_limit_addr = 0;	/* ADPCM ãƒªãƒŸãƒƒãƒˆã‚¢ãƒ‰ãƒ¬ã‚¹	*/
+static	int	sound2_read_dummy = 2;	/* ADPCM ãƒªãƒ¼ãƒ‰æ™‚ãƒ€ãƒŸãƒ¼ã‚«ã‚¦ãƒ³ã‚¿	*/
 
 enum AdpcmStat{
   ADPCM_HALT,
@@ -99,24 +99,24 @@ enum AdpcmStat{
   ADPCM_READ,
   EndofAdpcmStat
 };
-static	int	sound2_stat = 0;	/* ADPCM ¤Î¾õÂÖ			*/
+static	int	sound2_stat = 0;	/* ADPCM ã®çŠ¶æ…‹			*/
 
-static	int	sound2_data_addr   = 0;	/* ADPCM ½èÍıÃæ¤Î¥¢¥É¥ì¥¹	*/
-	int	sound2_intr_base   = 1;	/* ADPCM ³ä¤ê¹ş¤ß¥ì¡¼¥È		*/
-static	int	sound2_counter     = 0;	/* ADPCM ºÆÀ¸Ï¿²»¥«¥¦¥ó¥¿	*/
+static	int	sound2_data_addr   = 0;	/* ADPCM å‡¦ç†ä¸­ã®ã‚¢ãƒ‰ãƒ¬ã‚¹	*/
+	int	sound2_intr_base   = 1;	/* ADPCM å‰²ã‚Šè¾¼ã¿ãƒ¬ãƒ¼ãƒˆ		*/
+static	int	sound2_counter     = 0;	/* ADPCM å†ç”ŸéŒ²éŸ³ã‚«ã‚¦ãƒ³ã‚¿	*/
 static	int	sound2_counter_old = 0;
 
-	int	sound2_notice_EOS  = FALSE;	/* EOS¥Á¥§¥Ã¥¯¤ÎÍ×ÉÔÍ×	*/
+	int	sound2_notice_EOS  = FALSE;	/* EOSãƒã‚§ãƒƒã‚¯ã®è¦ä¸è¦	*/
 
-static	int	sound2_delay = 0;	/* ¥Õ¥é¥°¤ÎÃÙ¤ì			*/
+static	int	sound2_delay = 0;	/* ãƒ•ãƒ©ã‚°ã®é…ã‚Œ			*/
 
 
-/* BEEP´ØÏ¢¡£¼êº¢¤ÊÄêµÁ¾ì½ê¤¬¤Ê¤¤¡Ä */
+/* BEEPé–¢é€£ã€‚æ‰‹é ƒãªå®šç¾©å ´æ‰€ãŒãªã„â€¦ */
 
-int	use_cmdsing = TRUE;		/* ¿¿¤Ç¡¢CMD SINGÍ­¸ú		*/
+int	use_cmdsing = TRUE;		/* çœŸã§ã€CMD SINGæœ‰åŠ¹		*/
 
 /********************************************************/
-/* SOUND ½é´ü²½						*/
+/* SOUND åˆæœŸåŒ–						*/
 /********************************************************/
 void	sound_board_init( void )
 {
@@ -133,7 +133,7 @@ void	sound_board_init( void )
   sound_reg[0x26]=0;
   sound_reg[0x27]=0;
 */
-  sound_reg[0x29]=0x03;		/* ¤³¤¤¤Ä¤À¤±¤Ï 0x00 ¤À¤È¤Ş¤º¤¤¤Î¤Ç¤Ï¡Ä */
+  sound_reg[0x29]=0x03;		/* ã“ã„ã¤ã ã‘ã¯ 0x00 ã ã¨ã¾ãšã„ã®ã§ã¯â€¦ */
 
   sound_ENABLE_A = FALSE;
   sound_ENABLE_B = FALSE;
@@ -170,11 +170,11 @@ void	sound_board_init( void )
 
 
 /************************************************************************/
-/* ¥µ¥¦¥ó¥É¥Ü¡¼¥ÉÉô							*/
+/* ã‚µã‚¦ãƒ³ãƒ‰ãƒœãƒ¼ãƒ‰éƒ¨							*/
 /************************************************************************/
 
 /********************************************************/
-/* ¥Ç¡¼¥¿¤òÆş½ĞÎÏ¤¹¤ë¥ì¥¸¥¹¥¿¤Î»ØÄê			*/
+/* ãƒ‡ãƒ¼ã‚¿ã‚’å…¥å‡ºåŠ›ã™ã‚‹ãƒ¬ã‚¸ã‚¹ã‚¿ã®æŒ‡å®š			*/
 /********************************************************/
 void	sound_out_reg( byte data )
 {
@@ -184,7 +184,7 @@ void	sound_out_reg( byte data )
 }
 
 /********************************************************/
-/* ¥Ç¡¼¥¿¤ò»ØÄê¤·¤¿¥ì¥¸¥¹¥¿¤Ë½ĞÎÏ			*/
+/* ãƒ‡ãƒ¼ã‚¿ã‚’æŒ‡å®šã—ãŸãƒ¬ã‚¸ã‚¹ã‚¿ã«å‡ºåŠ›			*/
 /********************************************************/
 void	sound_out_data( byte data )
 {
@@ -250,30 +250,30 @@ void	sound_out_data( byte data )
 
 
 /********************************************************/
-/* ¥µ¥¦¥ó¥É¤Î¥¹¥Æ¡¼¥¿¥¹¤òÆşÎÏ				*/
+/* ã‚µã‚¦ãƒ³ãƒ‰ã®ã‚¹ãƒ†ãƒ¼ã‚¿ã‚¹ã‚’å…¥åŠ›				*/
 /********************************************************/
 byte	sound_in_status( void )
 {
   xmame_dev_sound_in_status();
 
-  return ( sound_FLAG_B << 1 ) | sound_FLAG_A;	/* ¾ï¤Ë ready */
+  return ( sound_FLAG_B << 1 ) | sound_FLAG_A;	/* å¸¸ã« ready */
 
 }
 
 /********************************************************/
-/* »ØÄê¤·¤¿¥ì¥¸¥¹¥¿¤ÎÆâÍÆ¤òÆşÎÏ				*/
-/*	flag ¤¬ ¿¿¤Ê¤é¡¢¤Ä¤Í¤Ë SOUND BORD II °·¤¤	*/
-/*	flag ¤¬ µ¶¤Ê¤é¡¢È½ÊÌ				*/
+/* æŒ‡å®šã—ãŸãƒ¬ã‚¸ã‚¹ã‚¿ã®å†…å®¹ã‚’å…¥åŠ›				*/
+/*	flag ãŒ çœŸãªã‚‰ã€ã¤ã­ã« SOUND BORD II æ‰±ã„	*/
+/*	flag ãŒ å½ãªã‚‰ã€åˆ¤åˆ¥				*/
 /********************************************************/
 byte	sound_in_data( int always_sound_II )
 {
   xmame_dev_sound_in_data();
 
-  if      ( sound_reg_select < 0x10 ){		/* 0x00¡Á0x0f ¤Ï¥ê¡¼¥É²Ä */
+  if      ( sound_reg_select < 0x10 ){		/* 0x00ã€œ0x0f ã¯ãƒªãƒ¼ãƒ‰å¯ */
 
     return sound_reg[ sound_reg_select ];
 
-  }else if( sound_reg_select == 0xff ){		/* 0xff ¤Ï¡¢SD/SD II ¤ÎÈ½Äê */
+  }else if( sound_reg_select == 0xff ){		/* 0xff ã¯ã€SD/SD II ã®åˆ¤å®š */
 
     if( always_sound_II ) return 0x01;
     else{
@@ -281,7 +281,7 @@ byte	sound_in_data( int always_sound_II )
       else                             return 0x00;
     }
 
-  }else{					/* ¤½¤ÎÂ¾¤ÏÆÉ¤á¤Ê¤¤ */
+  }else{					/* ãã®ä»–ã¯èª­ã‚ãªã„ */
 
     return 0x00;
 
@@ -294,11 +294,11 @@ byte	sound_in_data( int always_sound_II )
 
 
 /************************************************************************/
-/* ¥µ¥¦¥ó¥É¥Ü¡¼¥ÉIIÉô	(¤«¤Ê¤ê¤¤¤¤²Ã¸º)				*/
+/* ã‚µã‚¦ãƒ³ãƒ‰ãƒœãƒ¼ãƒ‰IIéƒ¨	(ã‹ãªã‚Šã„ã„åŠ æ¸›)				*/
 /************************************************************************/
 
 /********************************************************/
-/* ¥Ç¡¼¥¿¤òÆş½ĞÎÏ¤¹¤ë¥ì¥¸¥¹¥¿¤Î»ØÄê			*/
+/* ãƒ‡ãƒ¼ã‚¿ã‚’å…¥å‡ºåŠ›ã™ã‚‹ãƒ¬ã‚¸ã‚¹ã‚¿ã®æŒ‡å®š			*/
 /********************************************************/
 void	sound2_out_reg( byte data )
 {
@@ -308,7 +308,7 @@ void	sound2_out_reg( byte data )
 }
 
 /********************************************************/
-/* ¥Ç¡¼¥¿¤ò»ØÄê¤·¤¿¥ì¥¸¥¹¥¿¤Ë½ĞÎÏ			*/
+/* ãƒ‡ãƒ¼ã‚¿ã‚’æŒ‡å®šã—ãŸãƒ¬ã‚¸ã‚¹ã‚¿ã«å‡ºåŠ›			*/
 /********************************************************/
 void	sound2_out_data( byte data )
 {
@@ -327,18 +327,18 @@ printf("%02x %02x\n",(int)sound2_reg_select,(int)data);
 */
 
   switch( sound2_reg_select ){
-  case 0x00:					/* ¥³¥ó¥È¥í¡¼¥ë 1 */
+  case 0x00:					/* ã‚³ãƒ³ãƒˆãƒ­ãƒ¼ãƒ« 1 */
     sound2_repeat = data & 0x10;
     sound2_mem    = data & 0x20;
     sound2_rec    = data & 0x40;
 
-    if( sound2_FLAG_PCMBSY ){			/* ADPCMÆ°ºîÃæ */
+    if( sound2_FLAG_PCMBSY ){			/* ADPCMå‹•ä½œä¸­ */
       if( !sound2_mem ) sound2_FLAG_PCMBSY = 0;
-    }else{					/* ÈóÆ°ºîÃæ    */
+    }else{					/* éå‹•ä½œä¸­    */
 
       if( sound2_mem ){
 
-	if( data & 0x80 ){				/* Ï¿²»ºÆÀ¸ */
+	if( data & 0x80 ){				/* éŒ²éŸ³å†ç”Ÿ */
 
 	  if( sound2_rec ){
 	    sound2_stat = ADPCM_RECORD;
@@ -374,7 +374,7 @@ printf("%02x %02x\n",(int)sound2_reg_select,(int)data);
 #undef E
 #undef L
 	  sound2_FLAG_PCMBSY = 1;
-	}else{						/* ÆÉ¤ß½ñ¤­ */
+	}else{						/* èª­ã¿æ›¸ã */
 	  if( sound2_rec ){
 	    sound2_stat = ADPCM_WRITE;
 	    /* if( !sound2_MSK_BRDY ) sound2_FLAG_BRDY = 1; */
@@ -387,18 +387,18 @@ printf("%02x %02x\n",(int)sound2_reg_select,(int)data);
 	}
       }
     }
-    if( data & 0x01 ){					/* ¥ê¥»¥Ã¥È */
+    if( data & 0x01 ){					/* ãƒªã‚»ãƒƒãƒˆ */
       sound2_repeat = 0;
       sound2_FLAG_PCMBSY = 0;
     }
     if( !sound2_mem ) sound2_stat = ADPCM_HALT;
     break;
 
-  case 0x01:					/* ¥³¥ó¥È¥í¡¼¥ë 2 */
+  case 0x01:					/* ã‚³ãƒ³ãƒˆãƒ­ãƒ¼ãƒ« 2 */
     sound2_mem_size = (data & 0x02) ? 5 : 2;
     break;
 
-  case 0x02:					/* ¥¹¥¿¡¼¥È¥¢¥É¥ì¥¹ */
+  case 0x02:					/* ã‚¹ã‚¿ãƒ¼ãƒˆã‚¢ãƒ‰ãƒ¬ã‚¹ */
   case 0x03:
     sound2_start_addr  = ((int)sound2_reg[ 0x03 ] << 8) | sound2_reg[ 0x02 ];
     sound2_start_addr  = (sound2_start_addr << sound2_mem_size);
@@ -406,14 +406,14 @@ printf("%02x %02x\n",(int)sound2_reg_select,(int)data);
     sound2_data_addr = sound2_start_addr;
     break;
 
-  case 0x04:					/* ¥¹¥È¥Ã¥×¥¢¥É¥ì¥¹ */
+  case 0x04:					/* ã‚¹ãƒˆãƒƒãƒ—ã‚¢ãƒ‰ãƒ¬ã‚¹ */
   case 0x05:
     sound2_stop_addr  = ((int)sound2_reg[ 0x05 ] << 8) | sound2_reg[ 0x04 ];
     sound2_stop_addr  = ((sound2_stop_addr+1) << sound2_mem_size ) -1;
     sound2_stop_addr &= 0x3ffff;
     break;
 
-  case 0x08:					/* ¥Ç¡¼¥¿½ñ¤­¹ş¤ß */
+  case 0x08:					/* ãƒ‡ãƒ¼ã‚¿æ›¸ãè¾¼ã¿ */
     if( sound2_stat==ADPCM_WRITE ){
 #if 0
       if( sound2_data_addr != sound2_stop_addr ){
@@ -451,14 +451,14 @@ printf("%02x %02x\n",(int)sound2_reg_select,(int)data);
     }
     break;
 
-  case 0x0c:					/* ¥ê¥ß¥Ã¥È¥¢¥É¥ì¥¹ */
+  case 0x0c:					/* ãƒªãƒŸãƒƒãƒˆã‚¢ãƒ‰ãƒ¬ã‚¹ */
   case 0x0d:
     sound2_limit_addr  = ((int)sound2_reg[ 0x0d ] << 8) | sound2_reg[ 0x0c ];
     sound2_limit_addr  = ((sound2_limit_addr+1)<< sound2_mem_size ) -1;
     sound2_limit_addr &= 0x3ffff;
     break;
 
-  case 0x06:					/* ¥×¥ê¥¹¥±¡¼¥ë */
+  case 0x06:					/* ãƒ—ãƒªã‚¹ã‚±ãƒ¼ãƒ« */
   case 0x07:
     wk = (((int)sound2_reg[ 0x07 ]&0x07) << 8) | sound2_reg[ 0x06 ];
     wk &= 0x7ff;
@@ -466,14 +466,14 @@ printf("%02x %02x\n",(int)sound2_reg_select,(int)data);
     sound2_record_intr_base = wk;
     break;
 
-  case 0x09:					/* ¥Ç¥ë¥¿-N */
+  case 0x09:					/* ãƒ‡ãƒ«ã‚¿-N */
   case 0x0a:
     wk = ((int)sound2_reg[ 0x0a ] << 8) | sound2_reg[ 0x09 ];
     if( wk==0 ) wk = 0x10000;
     sound2_replay_intr_base = 72 * 65536 / wk;
     break;
 
-  case 0x10:					/* ³ä¤ê¹ş¤ß¥Õ¥é¥°À©¸æ */
+  case 0x10:					/* å‰²ã‚Šè¾¼ã¿ãƒ•ãƒ©ã‚°åˆ¶å¾¡ */
     change_sound_flags( 0x10 );
     break;
   }
@@ -481,7 +481,7 @@ printf("%02x %02x\n",(int)sound2_reg_select,(int)data);
 
 
 /********************************************************/
-/* ¥µ¥¦¥ó¥É¥Ü¡¼¥ÉII¤Î¥¹¥Æ¡¼¥¿¥¹ÆşÎÏ			*/
+/* ã‚µã‚¦ãƒ³ãƒ‰ãƒœãƒ¼ãƒ‰IIã®ã‚¹ãƒ†ãƒ¼ã‚¿ã‚¹å…¥åŠ›			*/
 /********************************************************/
 byte	sound2_in_status( void )
 {
@@ -496,7 +496,7 @@ byte	sound2_in_status( void )
     if( !sound2_MSK_EOS ) sound2_FLAG_EOS = 1;	      
   }
 
-  /* sound2_FLAG_ZERO ¤ÎÀ¸À®ÊıË¡¤¬¤ï¤«¤é¤ó */
+  /* sound2_FLAG_ZERO ã®ç”Ÿæˆæ–¹æ³•ãŒã‚ã‹ã‚‰ã‚“ */
 
   return ( sound2_FLAG_PCMBSY << 5 ) | ( sound2_FLAG_ZERO << 4 ) |
          ( sound2_FLAG_BRDY << 3 ) | ( sound2_FLAG_EOS << 2 ) |
@@ -504,7 +504,7 @@ byte	sound2_in_status( void )
 }
 
 /********************************************************/
-/* »ØÄê¤·¤¿¥ì¥¸¥¹¥¿¤ÎÆâÍÆ¤òÆşÎÏ				*/
+/* æŒ‡å®šã—ãŸãƒ¬ã‚¸ã‚¹ã‚¿ã®å†…å®¹ã‚’å…¥åŠ›				*/
 /********************************************************/
 byte	sound2_in_data( void )
 {
@@ -512,7 +512,7 @@ byte	sound2_in_data( void )
 
   xmame_dev_sound2_in_data();
 
-  if( sound2_reg_select==0x08 ){		/* ¥Ç¡¼¥¿ÆÉ¤ß½Ğ¤· */
+  if( sound2_reg_select==0x08 ){		/* ãƒ‡ãƒ¼ã‚¿èª­ã¿å‡ºã— */
 
     if( sound2_stat==ADPCM_READ ){
       if( sound2_read_dummy ){
@@ -546,7 +546,7 @@ byte	sound2_in_data( void )
 
 
 /***********************************************************************
- * ¥¹¥Æ¡¼¥È¥í¡¼¥É¡¿¥¹¥Æ¡¼¥È¥»¡¼¥Ö
+ * ã‚¹ãƒ†ãƒ¼ãƒˆãƒ­ãƒ¼ãƒ‰ï¼ã‚¹ãƒ†ãƒ¼ãƒˆã‚»ãƒ¼ãƒ–
  ************************************************************************/
 
 #define	SID	"SND "
@@ -559,7 +559,7 @@ static	T_SUSPEND_W	suspend_sound_work[] =
   { TYPE_256,	sound2_reg,	},
 
   { TYPE_INT,	&sound_board,		},
-  { TYPE_INT,	&sound_port,		},	/* ºÆ½é´ü²½¤¹¤ë¤Î¤ÇÉÔÍ×¤À¤¬ */
+  { TYPE_INT,	&sound_port,		},	/* å†åˆæœŸåŒ–ã™ã‚‹ã®ã§ä¸è¦ã ãŒ */
 
   { TYPE_INT,	&intr_sound_enable,	},
   { TYPE_INT,	&sound_ENABLE_A,	},
@@ -645,7 +645,7 @@ int	stateload_sound( void )
 
   if( stateload_table( SID2, suspend_sound_work2 ) != STATE_OK ){
 
-    /* µì¥Ğ¡¼¥¸¥ç¥ó¤Ê¤é¡¢¤ß¤Î¤¬¤¹ */
+    /* æ—§ãƒãƒ¼ã‚¸ãƒ§ãƒ³ãªã‚‰ã€ã¿ã®ãŒã™ */
 
     printf( "stateload : Statefile is old. (ver 0.6.0 or 1?)\n" );
 
@@ -656,7 +656,7 @@ int	stateload_sound( void )
 
   if( stateload_table( SID3, suspend_sound_work3 ) != STATE_OK ){
 
-    /* µì¥Ğ¡¼¥¸¥ç¥ó¤Ê¤é¡¢¤ß¤Î¤¬¤¹ */
+    /* æ—§ãƒãƒ¼ã‚¸ãƒ§ãƒ³ãªã‚‰ã€ã¿ã®ãŒã™ */
 
     printf( "stateload : Statefile is old. (ver 0.6.0, 1, 2 or 3?)\n" );
   }
@@ -683,8 +683,8 @@ int	stateload_sound( void )
 
 void	sound_output_after_stateload( void )
 {
-  /* ¥ì¥¸¥å¡¼¥à¸å¤ÎºÆ½é´ü²½ */
-  /* ¤³¤ó¤Ê¤ó¤Ç¤¦¤Ş¤¯¤¤¤¯¤Î¤«¡©¡©¡© */
+  /* ãƒ¬ã‚¸ãƒ¥ãƒ¼ãƒ å¾Œã®å†åˆæœŸåŒ– */
+  /* ã“ã‚“ãªã‚“ã§ã†ã¾ãã„ãã®ã‹ï¼Ÿï¼Ÿï¼Ÿ */
   
   const int (*addr)[2];
   int size;
@@ -723,7 +723,7 @@ void	sound_output_after_stateload( void )
     { 0xa8, 0xaa },
     { 0xac, 0xae },
     { 0xb0, 0xb2 },
-  /*{ 0xb4, 0xb6 },*/		/* ¤³¤Î¥ì¥¸¥¹¥¿¤ò resume ¤µ¤»¤ë¤È²»¤¬ÊÑ */
+  /*{ 0xb4, 0xb6 },*/		/* ã“ã®ãƒ¬ã‚¸ã‚¹ã‚¿ã‚’ resume ã•ã›ã‚‹ã¨éŸ³ãŒå¤‰ */
   };
   static const int addr_2608_2[][2] = {
     { 0x01, 0x10 },
@@ -752,7 +752,7 @@ void	sound_output_after_stateload( void )
       int fvol = xmame_cfg_get_mixer_volume( XMAME_MIXER_FM );
       int bvol = xmame_cfg_get_mixer_volume( XMAME_MIXER_BEEP );
 
-	/* ¥ß¥å¡¼¥È */
+	/* ãƒŸãƒ¥ãƒ¼ãƒˆ */
 
       xmame_cfg_set_mastervolume( 0 );
       xmame_cfg_set_mixer_volume( XMAME_MIXER_PSG,  0 );
@@ -761,7 +761,7 @@ void	sound_output_after_stateload( void )
     }
 #endif
 
-	/* ¥µ¥¦¥ó¥É ¥ì¥¸¥¹¥¿½ĞÎÏ (É¬Í×¤Ê¥İ¡¼¥È¤Î¤ß) */
+	/* ã‚µã‚¦ãƒ³ãƒ‰ ãƒ¬ã‚¸ã‚¹ã‚¿å‡ºåŠ› (å¿…è¦ãªãƒãƒ¼ãƒˆã®ã¿) */
 
     switch( sound_prescaler_sel ){
     case 0:
@@ -817,7 +817,7 @@ void	sound_output_after_stateload( void )
     }
 
 #if 0
-	/* ²»ÎÌÉüµ¢ */
+	/* éŸ³é‡å¾©å¸° */
     {
       xmame_cfg_set_mastervolume( vol );
       xmame_cfg_set_mixer_volume( XMAME_MIXER_PSG,  pvol );

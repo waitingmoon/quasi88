@@ -1,7 +1,7 @@
 /***********************************************************************
- * •§•Ÿ•Û•»ΩËÕ˝ (•∑•π•∆•‡∞Õ¬∏)
+ * „Ç§„Éô„É≥„ÉàÂá¶ÁêÜ („Ç∑„Çπ„ÉÜ„É†‰æùÂ≠ò)
  *
- *	æ‹∫Ÿ§œ°¢ event.h ª≤æ»
+ *	Ë©≥Á¥∞„ÅØ„ÄÅ event.h ÂèÇÁÖß
  ************************************************************************/
 
 #include <gdk/gdkkeysyms.h>
@@ -14,65 +14,65 @@
 
 
 
-int	gtksys_get_focus;		/* ∏Ω∫ﬂ°¢•’•©°º•´•π§¢§Í§´§…§¶§´	*/
+int	gtksys_get_focus;		/* ÁèæÂú®„ÄÅ„Éï„Ç©„Éº„Ç´„Çπ„ÅÇ„Çä„Åã„Å©„ÅÜ„Åã	*/
 
 
 /*==========================================================================
- * •≠°º«€ŒÛ§À§ƒ§§§∆
+ * „Ç≠„ÉºÈÖçÂàó„Å´„Å§„ÅÑ„Å¶
  *
- *  §»§Í§¢§®§∫°¢106•≠°º•‹°º•…∑Ë§·¬«§¡§«∫Ó¿Æ
+ *  „Å®„Çä„ÅÇ„Åà„Åö„ÄÅ106„Ç≠„Éº„Éú„Éº„ÉâÊ±∫„ÇÅÊâì„Å°„Åß‰ΩúÊàê
  *===========================================================================*/
 
-/* •Ω•’•»•¶•ß•¢NumLock §Ú•™•Û§∑§ø∫›§Œ°¢•≠°º•–•§•Û•«•£•Û•∞ —ππ•∆°º•÷•Î */
+/* „ÇΩ„Éï„Éà„Ç¶„Çß„Ç¢NumLock „Çí„Ç™„É≥„Åó„ÅüÈöõ„ÅÆ„ÄÅ„Ç≠„Éº„Éê„Ç§„É≥„Éá„Ç£„É≥„Ç∞Â§âÊõ¥„ÉÜ„Éº„Éñ„É´ */
 
 typedef struct {
     int		type;		/* KEYCODE_INVALID / SYM / SCAN		*/
-    int		code;		/* •≠°º•∑•Û•‹•Î°¢§ §§§∑°¢•π•≠•„•Û•≥°º•…	*/
-    int		new_key88;	/* NumLock ON ª˛§Œ QUASI88•≠°º•≥°º•…	*/
-    int		org_key88;	/* NumLock OFFª˛§Œ QUASI88•≠°º•≥°º•…	*/
+    int		code;		/* „Ç≠„Éº„Ç∑„É≥„Éú„É´„ÄÅ„Å™„ÅÑ„Åó„ÄÅ„Çπ„Ç≠„É£„É≥„Ç≥„Éº„Éâ	*/
+    int		new_key88;	/* NumLock ON ÊôÇ„ÅÆ QUASI88„Ç≠„Éº„Ç≥„Éº„Éâ	*/
+    int		org_key88;	/* NumLock OFFÊôÇ„ÅÆ QUASI88„Ç≠„Éº„Ç≥„Éº„Éâ	*/
 } T_BINDING;
 
 
-/* •≠°º•–•§•Û•«•£•Û•∞§Ú•«•’•©•Î•»(ΩÈ¥¸√Õ)§´§È —ππ§π§Î∫›§Œ°¢•∆°º•÷•Î */
+/* „Ç≠„Éº„Éê„Ç§„É≥„Éá„Ç£„É≥„Ç∞„Çí„Éá„Éï„Ç©„É´„Éà(ÂàùÊúüÂÄ§)„Åã„ÇâÂ§âÊõ¥„Åô„ÇãÈöõ„ÅÆ„ÄÅ„ÉÜ„Éº„Éñ„É´ */
 
 typedef struct {
     int		type;		/* KEYCODE_INVALID / SYM / SCAN		*/
-    int		code;		/* •≠°º•∑•Û•‹•Î°¢§ §§§∑°¢•π•≠•„•Û•≥°º•…	*/
-    int		key88;		/*  —ππ§π§Î QUASI88•≠°º•≥°º•…           */
+    int		code;		/* „Ç≠„Éº„Ç∑„É≥„Éú„É´„ÄÅ„Å™„ÅÑ„Åó„ÄÅ„Çπ„Ç≠„É£„É≥„Ç≥„Éº„Éâ	*/
+    int		key88;		/* Â§âÊõ¥„Åô„Çã QUASI88„Ç≠„Éº„Ç≥„Éº„Éâ           */
 } T_REMAPPING;
 
 
-/* GDK §Œ keysym §Ú 0°¡511 §Œ»œ∞œ§À¥›§·§Î */
+/* GDK „ÅÆ keysym „Çí 0„Äú511 „ÅÆÁØÑÂõ≤„Å´‰∏∏„ÇÅ„Çã */
 
 #define	LOCAL_KEYSYM(ks)						    \
-	((((ks) & 0xff00) == 0xff00)			/* µ°«Ω•≠°º */	    \
+	((((ks) & 0xff00) == 0xff00)			/* Ê©üËÉΩ„Ç≠„Éº */	    \
 		? (((ks) & 0x00ff) | 0x100)				    \
-		: ((((ks) & 0xff00) == 0x0000)		/*  ∏ª˙•≠°º */	    \
+		: ((((ks) & 0xff00) == 0x0000)		/* ÊñáÂ≠ó„Ç≠„Éº */	    \
 					? (ks) : 0))
 
 /*----------------------------------------------------------------------
- * GDK §Œ keyval §Ú QUASI88 §Œ •≠°º•≥°º•…§À —¥π§π§Î•∆°º•÷•Î
- *	 ∏ª˙•≠°º §» µ°«Ω•≠°º §Œ•≠°º•∑•Û•‹•Î§Œ§ﬂ°£
+ * GDK „ÅÆ keyval „Çí QUASI88 „ÅÆ „Ç≠„Éº„Ç≥„Éº„Éâ„Å´Â§âÊèõ„Åô„Çã„ÉÜ„Éº„Éñ„É´
+ *	ÊñáÂ≠ó„Ç≠„Éº „Å® Ê©üËÉΩ„Ç≠„Éº „ÅÆ„Ç≠„Éº„Ç∑„É≥„Éú„É´„ÅÆ„Åø„ÄÇ
  *
- *	•≠°º•∑•Û•‹•Î GDK_xxx §¨≤°§µ§Ï§ø§È°¢ 
- *	keysym2key88[ GDK_xxx ] §¨≤°§µ§Ï§ø§»§π§Î°£
+ *	„Ç≠„Éº„Ç∑„É≥„Éú„É´ GDK_xxx „ÅåÊäº„Åï„Çå„Åü„Çâ„ÄÅ 
+ *	keysym2key88[ GDK_xxx ] „ÅåÊäº„Åï„Çå„Åü„Å®„Åô„Çã„ÄÇ
  *
- *	keysym2key88[] §À§œ°¢ KEY88_xxx §Ú•ª•√•»§∑§∆§™§Ø°£
- *	ΩÈ¥¸√Õ§œ keysym2key88_default[] §»∆±§∏
+ *	keysym2key88[] „Å´„ÅØ„ÄÅ KEY88_xxx „Çí„Çª„ÉÉ„Éà„Åó„Å¶„Åä„Åè„ÄÇ
+ *	ÂàùÊúüÂÄ§„ÅØ keysym2key88_default[] „Å®Âêå„Åò
  *----------------------------------------------------------------------*/
 static int keysym2key88[ 256 + 256 ];
 
  
 
 /*----------------------------------------------------------------------
- * •Ω•’•»•¶•ß•¢ NumLock •™•Ûª˛§Œ •≠°º•≥°º•… —¥πæ Û
+ * „ÇΩ„Éï„Éà„Ç¶„Çß„Ç¢ NumLock „Ç™„É≥ÊôÇ„ÅÆ „Ç≠„Éº„Ç≥„Éº„ÉâÂ§âÊèõÊÉÖÂ†±
  *
- *	binding[].code (GDK §Œ keyval) §¨≤°§µ§Ï§ø§È°¢
- *	binding[].new_key88 (KEY88_xxx) §¨≤°§µ§Ï§ø§≥§»§À§π§Î°£
+ *	binding[].code (GDK „ÅÆ keyval) „ÅåÊäº„Åï„Çå„Åü„Çâ„ÄÅ
+ *	binding[].new_key88 (KEY88_xxx) „ÅåÊäº„Åï„Çå„Åü„Åì„Å®„Å´„Åô„Çã„ÄÇ
  *
- *	•Ω•’•»•¶•ß•¢ NumLock •™•Ûª˛§œ°¢§≥§Œæ Û§À§∑§ø§¨§√§∆°¢
- *	keysym2key88[] °¢ keycode2key88[] §ÚΩÒ§≠¥π§®§Î°£
- *	 —ππ§«§≠§Î•≠°º§Œ∏ƒøÙ§œ°¢64∏ƒ§ﬁ§« (§≥§Ï§¿§±§¢§Ï§–§§§§§¿§Ì§¶)
+ *	„ÇΩ„Éï„Éà„Ç¶„Çß„Ç¢ NumLock „Ç™„É≥ÊôÇ„ÅØ„ÄÅ„Åì„ÅÆÊÉÖÂ†±„Å´„Åó„Åü„Åå„Å£„Å¶„ÄÅ
+ *	keysym2key88[] „ÄÅ keycode2key88[] „ÇíÊõ∏„ÅçÊèõ„Åà„Çã„ÄÇ
+ *	Â§âÊõ¥„Åß„Åç„Çã„Ç≠„Éº„ÅÆÂÄãÊï∞„ÅØ„ÄÅ64ÂÄã„Åæ„Åß („Åì„Çå„Å†„Åë„ÅÇ„Çå„Å∞„ÅÑ„ÅÑ„Å†„Çç„ÅÜ)
  *----------------------------------------------------------------------*/
 static T_BINDING binding[ 64 ];
 
@@ -81,13 +81,13 @@ static T_BINDING binding[ 64 ];
 
 
 /*----------------------------------------------------------------------
- * GDK_xxx ¢™ KEY88_xxx  —¥π•∆°º•÷•Î (•«•’•©•Î•»)
+ * GDK_xxx ‚Üí KEY88_xxx Â§âÊèõ„ÉÜ„Éº„Éñ„É´ („Éá„Éï„Ç©„É´„Éà)
  *----------------------------------------------------------------------*/
 
 static const int keysym2key88_default[ 256 + 256 ] =
 {
   /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -*/
-  /*  ∏ª˙•≠°º						0x0000°¡0x00FF	*/
+  /* ÊñáÂ≠ó„Ç≠„Éº						0x0000„Äú0x00FF	*/
   /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -*/
 
   0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
@@ -206,14 +206,14 @@ static const int keysym2key88_default[ 256 + 256 ] =
 
 
   /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -*/
-  /* µ°«Ω•≠°º						0xFF00°¡0xFFFF	*/
+  /* Ê©üËÉΩ„Ç≠„Éº						0xFF00„Äú0xFFFF	*/
   /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -*/
 
   0, 0, 0, 0, 0, 0, 0, 0,
   KEY88_BS,		/*	GDK_BackSpace		0xFF08	   */
   KEY88_TAB,		/*	GDK_Tab			0xFF09	   */
-  KEY88_RETURN,		/*	GDK_Linefeed		0xFF0A	Ãµ */
-  KEY88_HOME,		/*	GDK_Clear		0xFF0B	Ãµ */
+  KEY88_RETURN,		/*	GDK_Linefeed		0xFF0A	ÁÑ° */
+  KEY88_HOME,		/*	GDK_Clear		0xFF0B	ÁÑ° */
   0,
   KEY88_RETURNL,	/*	GDK_Return		0xFF0D	   */
   0, 0,
@@ -227,30 +227,30 @@ static const int keysym2key88_default[ 256 + 256 ] =
   KEY88_ESC, 		/*	GDK_Escape		0xFF1B	   */
   0, 0, 0, 0,
 
-  0,			/*	GDK_Multi_key		0xFF20	Ãµ */
+  0,			/*	GDK_Multi_key		0xFF20	ÁÑ° */
   0,			/*	GDK_Kanji		0xFF21	   */
   KEY88_KETTEI,		/*	GDK_Muhenkan		0xFF22	   */
   KEY88_HENKAN,		/*	GDK_Henkan_Mode		0xFF23	   */
   KEY88_KANA,		/*	GDK_Romaji		0xFF24     */
-  0,			/*	GDK_Hiragana		0xFF25  Ãµ */
-  0,			/*	GDK_Katakana		0xFF26  Ãµ */
+  0,			/*	GDK_Hiragana		0xFF25  ÁÑ° */
+  0,			/*	GDK_Katakana		0xFF26  ÁÑ° */
   KEY88_KANA,		/*	GDK_Hiragana_Katakana	0xFF27	   */
-  0,			/*	GDK_Zenkaku		0xFF28  Ãµ */
-  0,			/*	GDK_Hankaku		0xFF29  Ãµ */
+  0,			/*	GDK_Zenkaku		0xFF28  ÁÑ° */
+  0,			/*	GDK_Hankaku		0xFF29  ÁÑ° */
   KEY88_ZENKAKU,	/*	GDK_Zenkaku_Hankaku	0xFF2A	   */
-  0,			/*	GDK_Touroku		0xFF2B  Ãµ */
-  0,			/*	GDK_Massyo		0xFF2C  Ãµ */
-  KEY88_KANA,		/*	GDK_Kana_Lock		0xFF2D	Ãµ */
-  KEY88_KANA,		/*	GDK_Kana_Shift		0xFF2E  Ãµ */
-  0,			/*	GDK_Eisu_Shift		0xFF2F  Ãµ */
+  0,			/*	GDK_Touroku		0xFF2B  ÁÑ° */
+  0,			/*	GDK_Massyo		0xFF2C  ÁÑ° */
+  KEY88_KANA,		/*	GDK_Kana_Lock		0xFF2D	ÁÑ° */
+  KEY88_KANA,		/*	GDK_Kana_Shift		0xFF2E  ÁÑ° */
+  0,			/*	GDK_Eisu_Shift		0xFF2F  ÁÑ° */
 
   KEY88_CAPS,		/*	GDK_Eisu_toggle		0xFF30     */
   0, 0, 0, 0, 0, 0,
-  0,			/*	GDK_Kanji_Bangou	0xFF37  Ãµ */
+  0,			/*	GDK_Kanji_Bangou	0xFF37  ÁÑ° */
   0, 0, 0, 0,
-  0,			/*	GDK_SingleCandidate	0xFF3C	Ãµ */
-  0,			/*	GDK_Zen_Koho		0xFF3D	Ãµ */
-  0,			/*	GDK_Mae_Koho		0xFF3E	Ãµ */
+  0,			/*	GDK_SingleCandidate	0xFF3C	ÁÑ° */
+  0,			/*	GDK_Zen_Koho		0xFF3D	ÁÑ° */
+  0,			/*	GDK_Mae_Koho		0xFF3E	ÁÑ° */
   0,
 
   0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
@@ -263,20 +263,20 @@ static const int keysym2key88_default[ 256 + 256 ] =
   KEY88_ROLLDOWN,	/*	GDK_Prior		0xFF55	   */
   KEY88_ROLLUP,		/*	GDK_Next		0xFF56	   */
   KEY88_HELP,		/*	GDK_End			0xFF57	   */
-  0,			/*	GDK_Begin		0xFF58	Ãµ */
+  0,			/*	GDK_Begin		0xFF58	ÁÑ° */
   0, 0, 0, 0, 0, 0, 0,
 
-  0,			/*	GDK_Select		0xFF60	Ãµ */
+  0,			/*	GDK_Select		0xFF60	ÁÑ° */
   KEY88_COPY,		/*	GDK_Print		0xFF61	   */
   KEY88_COPY,		/*	GDK_Execute		0xFF62	   */
   KEY88_INS, 		/*	GDK_Insert		0xFF63	   */
   0,
-  0,			/*	GDK_Undo		0xFF65	Ãµ */
-  0,			/*	GDK_Redo		0xFF66	Ãµ */
+  0,			/*	GDK_Undo		0xFF65	ÁÑ° */
+  0,			/*	GDK_Redo		0xFF66	ÁÑ° */
   0,			/*	GDK_Menu		0xFF67	   */
-  0,			/*	GDK_Find		0xFF68	Ãµ */
-  0,			/*	GDK_Cancel		0xFF69	Ãµ */
-  KEY88_HELP,		/*	GDK_Help		0xFF6A	Ãµ */
+  0,			/*	GDK_Find		0xFF68	ÁÑ° */
+  0,			/*	GDK_Cancel		0xFF69	ÁÑ° */
+  KEY88_HELP,		/*	GDK_Help		0xFF6A	ÁÑ° */
   KEY88_STOP,		/*	GDK_Break		0xFF6B	   */
   0, 0, 0, 0,
 
@@ -284,18 +284,18 @@ static const int keysym2key88_default[ 256 + 256 ] =
   KEY88_HENKAN,		/*	GDK_Mode_switch		0xFF7E	   */
   0,			/*	GDK_Num_Lock		0xFF7F	   */
 
-  KEY88_SPACE,		/*	GDK_KP_Space		0xFF80	Ãµ */
+  KEY88_SPACE,		/*	GDK_KP_Space		0xFF80	ÁÑ° */
   0, 0, 0, 0, 0, 0, 0, 0,
-  KEY88_TAB,		/*	GDK_KP_Tab		0xFF89	Ãµ */
+  KEY88_TAB,		/*	GDK_KP_Tab		0xFF89	ÁÑ° */
   0, 0, 0,
   KEY88_RETURNR,	/*	GDK_KP_Enter		0xFF8D	   */
   0, 0,
 
   0,
-  KEY88_F1,		/*	GDK_KP_F1		0xFF91	Ãµ */
-  KEY88_F2,		/*	GDK_KP_F2		0xFF92	Ãµ */
-  KEY88_F3,		/*	GDK_KP_F3		0xFF93	Ãµ */
-  KEY88_F4,		/*	GDK_KP_F4		0xFF94	Ãµ */
+  KEY88_F1,		/*	GDK_KP_F1		0xFF91	ÁÑ° */
+  KEY88_F2,		/*	GDK_KP_F2		0xFF92	ÁÑ° */
+  KEY88_F3,		/*	GDK_KP_F3		0xFF93	ÁÑ° */
+  KEY88_F4,		/*	GDK_KP_F4		0xFF94	ÁÑ° */
   KEY88_KP_7,		/*	GDK_KP_Home		0xFF95	   */
   KEY88_KP_4,		/*	GDK_KP_Left		0xFF96	   */
   KEY88_KP_8,		/*	GDK_KP_Up		0xFF97	   */
@@ -311,7 +311,7 @@ static const int keysym2key88_default[ 256 + 256 ] =
   0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
   KEY88_KP_MULTIPLY,	/*	GDK_KP_Multiply		0xFFAA	   */
   KEY88_KP_ADD,		/*	GDK_KP_Add		0xFFAB	   */
-  KEY88_KP_COMMA,	/*	GDK_KP_Separator	0xFFAC	Ãµ */
+  KEY88_KP_COMMA,	/*	GDK_KP_Separator	0xFFAC	ÁÑ° */
   KEY88_KP_SUB,		/*	GDK_KP_Subtract		0xFFAD	   */
   KEY88_KP_PERIOD,	/*	GDK_KP_Decimal		0xFFAE	   */
   KEY88_KP_DIVIDE,	/*	GDK_KP_Divide		0xFFAF	   */
@@ -327,7 +327,7 @@ static const int keysym2key88_default[ 256 + 256 ] =
   KEY88_KP_8,		/*	GDK_KP_8		0xFFB8	   */
   KEY88_KP_9,		/*	GDK_KP_9		0xFFB9	   */
   0, 0, 0,
-  KEY88_KP_EQUAL,	/*	GDK_KP_Equal		0xFFBD	Ãµ */
+  KEY88_KP_EQUAL,	/*	GDK_KP_Equal		0xFFBD	ÁÑ° */
   KEY88_F1,		/*	GDK_F1			0xFFBE	   */
   KEY88_F2,		/*	GDK_F2			0xFFBF	   */
 
@@ -341,45 +341,45 @@ static const int keysym2key88_default[ 256 + 256 ] =
   KEY88_F10,		/*	GDK_F10			0xFFC7	   */
   KEY88_F11,		/*	GDK_F11			0xFFC8	   */
   KEY88_F12,		/*	GDK_F12			0xFFC9	   */
-  KEY88_F13,		/*	GDK_F13			0xFFCA	Ãµ */
-  KEY88_F14,		/*	GDK_F14			0xFFCB	Ãµ */
-  KEY88_F15,		/*	GDK_F15			0xFFCC	Ãµ */
-  KEY88_F16,		/*	GDK_F16			0xFFCD	Ãµ */
-  KEY88_F17,		/*	GDK_F17			0xFFCE	Ãµ */
-  KEY88_F18,		/*	GDK_F18			0xFFCF	Ãµ */
+  KEY88_F13,		/*	GDK_F13			0xFFCA	ÁÑ° */
+  KEY88_F14,		/*	GDK_F14			0xFFCB	ÁÑ° */
+  KEY88_F15,		/*	GDK_F15			0xFFCC	ÁÑ° */
+  KEY88_F16,		/*	GDK_F16			0xFFCD	ÁÑ° */
+  KEY88_F17,		/*	GDK_F17			0xFFCE	ÁÑ° */
+  KEY88_F18,		/*	GDK_F18			0xFFCF	ÁÑ° */
 
-  KEY88_F19,		/*	GDK_F19			0xFFD0	Ãµ */
-  KEY88_F20,		/*	GDK_F20			0xFFD1	Ãµ */
-  0,			/*	GDK_F21			0xFFD2	Ãµ */
-  0,			/*	GDK_F22			0xFFD3	Ãµ */
-  0,			/*	GDK_F23			0xFFD4	Ãµ */
-  0,			/*	GDK_F24			0xFFD5	Ãµ */
-  0,			/*	GDK_F25			0xFFD6	Ãµ */
-  0,			/*	GDK_F26			0xFFD7	Ãµ */
-  0,			/*	GDK_F27			0xFFD8	Ãµ */
-  0,			/*	GDK_F28			0xFFD9	Ãµ */
-  0,			/*	GDK_F29			0xFFDA	Ãµ */
-  0,			/*	GDK_F30			0xFFDB	Ãµ */
-  0,			/*	GDK_F31			0xFFDC	Ãµ */
-  0,			/*	GDK_F32			0xFFDD	Ãµ */
-  0,			/*	GDK_F33			0xFFDE	Ãµ */
-  0,			/*	GDK_F34			0xFFDF	Ãµ */
+  KEY88_F19,		/*	GDK_F19			0xFFD0	ÁÑ° */
+  KEY88_F20,		/*	GDK_F20			0xFFD1	ÁÑ° */
+  0,			/*	GDK_F21			0xFFD2	ÁÑ° */
+  0,			/*	GDK_F22			0xFFD3	ÁÑ° */
+  0,			/*	GDK_F23			0xFFD4	ÁÑ° */
+  0,			/*	GDK_F24			0xFFD5	ÁÑ° */
+  0,			/*	GDK_F25			0xFFD6	ÁÑ° */
+  0,			/*	GDK_F26			0xFFD7	ÁÑ° */
+  0,			/*	GDK_F27			0xFFD8	ÁÑ° */
+  0,			/*	GDK_F28			0xFFD9	ÁÑ° */
+  0,			/*	GDK_F29			0xFFDA	ÁÑ° */
+  0,			/*	GDK_F30			0xFFDB	ÁÑ° */
+  0,			/*	GDK_F31			0xFFDC	ÁÑ° */
+  0,			/*	GDK_F32			0xFFDD	ÁÑ° */
+  0,			/*	GDK_F33			0xFFDE	ÁÑ° */
+  0,			/*	GDK_F34			0xFFDF	ÁÑ° */
 
-  0,			/*	GDK_F35			0xFFE0	Ãµ */
+  0,			/*	GDK_F35			0xFFE0	ÁÑ° */
   KEY88_SHIFTL,		/*	GDK_Shift_L		0xFFE1	   */
   KEY88_SHIFTR,		/*	GDK_Shift_R		0xFFE2	   */
   KEY88_CTRL,		/*	GDK_Control_L		0xFFE3	   */
   KEY88_CTRL,		/*	GDK_Control_R		0xFFE4	   */
   KEY88_CAPS,		/*	GDK_Caps_Lock		0xFFE5	   */
-  KEY88_CAPS,		/*	GDK_Shift_Lock		0xFFE6	Ãµ */
+  KEY88_CAPS,		/*	GDK_Shift_Lock		0xFFE6	ÁÑ° */
   KEY88_GRAPH,		/*	GDK_Meta_L		0xFFE7	   */
   KEY88_GRAPH,		/*	GDK_Meta_R		0xFFE8	   */
   KEY88_GRAPH,		/*	GDK_Alt_L		0xFFE9	   */
   KEY88_GRAPH,		/*	GDK_Alt_R		0xFFEA	   */
   0,			/*	GDK_Super_L		0xFFEB	   */
   0,			/*	GDK_Super_R		0xFFEC	   */
-  0,			/*	GDK_Hyper_L		0xFFED	Ãµ */
-  0,			/*	GDK_Hyper_R		0xFFEE	Ãµ */
+  0,			/*	GDK_Hyper_L		0xFFED	ÁÑ° */
+  0,			/*	GDK_Hyper_R		0xFFEE	ÁÑ° */
   0,
 
   0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
@@ -390,7 +390,7 @@ static const int keysym2key88_default[ 256 + 256 ] =
 
 
 /*----------------------------------------------------------------------
- * •Ω•’•»•¶•ß•¢ NumLock •™•Ûª˛§Œ •≠°º•≥°º•… —¥πæ Û (•«•’•©•Î•»)
+ * „ÇΩ„Éï„Éà„Ç¶„Çß„Ç¢ NumLock „Ç™„É≥ÊôÇ„ÅÆ „Ç≠„Éº„Ç≥„Éº„ÉâÂ§âÊèõÊÉÖÂ†± („Éá„Éï„Ç©„É´„Éà)
  *----------------------------------------------------------------------*/
 
 static const T_BINDING binding_default[] =
@@ -442,13 +442,13 @@ static const T_BINDING binding_default[] =
 
 
 /******************************************************************************
- * •§•Ÿ•Û•»•œ•Û•…•Í•Û•∞
+ * „Ç§„Éô„É≥„Éà„Éè„É≥„Éâ„É™„É≥„Ç∞
  *
- *	1/60ÀË§À∏∆§”Ω–§µ§Ï§Î°£
+ *	1/60ÊØé„Å´Âëº„Å≥Âá∫„Åï„Çå„Çã„ÄÇ
  *****************************************************************************/
 
 /*
- * §≥§Ï§œ µØ∆∞ª˛§À1≤Û§¿§±∏∆§–§Ï§Î
+ * „Åì„Çå„ÅØ Ëµ∑ÂãïÊôÇ„Å´1Âõû„Å†„ÅëÂëº„Å∞„Çå„Çã
  */
 void	event_init(void)
 {
@@ -456,7 +456,7 @@ void	event_init(void)
     const T_BINDING   *bin;
     int i;
 
-    /* •≠°º•ﬁ•√•‘•Û•∞ΩÈ¥¸≤Ω */
+    /* „Ç≠„Éº„Éû„ÉÉ„Éî„É≥„Ç∞ÂàùÊúüÂåñ */
 
     memset(keysym2key88, 0, sizeof(keysym2key88));
     memset(binding, 0, sizeof(binding));
@@ -467,7 +467,7 @@ void	event_init(void)
 	   binding_default, sizeof(binding_default));
 
 
-    /* •Ω•’•»•¶•ß•¢NumLock ª˛§Œ•≠°º∫π§∑¬ÿ§®§ŒΩ‡»˜ */
+    /* „ÇΩ„Éï„Éà„Ç¶„Çß„Ç¢NumLock ÊôÇ„ÅÆ„Ç≠„ÉºÂ∑Æ„ÅóÊõø„Åà„ÅÆÊ∫ñÂÇô */
 
     for (i = 0; i < COUNTOF(binding); i++) {
 
@@ -485,14 +485,14 @@ void	event_init(void)
 
 
 /*
- * ÃÛ 1/60 ÀË§À∏∆§–§Ï§Î
+ * Á¥Ñ 1/60 ÊØé„Å´Âëº„Å∞„Çå„Çã
  */
 void	event_update(void)
 {
 }
 
 /*
- * §≥§Ï§œ Ω™Œªª˛§À1≤Û§¿§±∏∆§–§Ï§Î
+ * „Åì„Çå„ÅØ ÁµÇ‰∫ÜÊôÇ„Å´1Âõû„Å†„ÅëÂëº„Å∞„Çå„Çã
  */
 void	event_exit(void)
 {
@@ -502,7 +502,7 @@ void	event_exit(void)
 
 
 /***********************************************************************
- * ∏Ω∫ﬂ§Œ•ﬁ•¶•π∫¬…∏ºË∆¿¥ÿøÙ
+ * ÁèæÂú®„ÅÆ„Éû„Ç¶„ÇπÂ∫ßÊ®ôÂèñÂæóÈñ¢Êï∞
  *
  ************************************************************************/
 
@@ -537,7 +537,7 @@ void	event_get_mouse_pos(int *x, int *y)
 
 
 /******************************************************************************
- * •Ω•’•»•¶•ß•¢ NumLock Õ≠∏˙°øÃµ∏˙
+ * „ÇΩ„Éï„Éà„Ç¶„Çß„Ç¢ NumLock ÊúâÂäπÔºèÁÑ°Âäπ
  *
  *****************************************************************************/
 
@@ -570,7 +570,7 @@ void	event_numlock_off(void){ numlock_setup(FALSE); }
 
 
 /******************************************************************************
- * •®•ﬂ•Â•Ï°º•»°ø•·•À•Â°º°ø•›°º•∫°ø•‚•À•ø°º•‚°º•… §Œ ≥´ªœª˛§ŒΩËÕ˝
+ * „Ç®„Éü„É•„É¨„Éº„ÉàÔºè„É°„Éã„É•„ÉºÔºè„Éù„Éº„Ç∫Ôºè„É¢„Éã„Çø„Éº„É¢„Éº„Éâ „ÅÆ ÈñãÂßãÊôÇ„ÅÆÂá¶ÁêÜ
  *
  *****************************************************************************/
 
@@ -589,7 +589,7 @@ void	event_switch(void)
 
 
 /******************************************************************************
- * •∏•Á•§•π•∆•£•√•Ø
+ * „Ç∏„Éß„Ç§„Çπ„ÉÜ„Ç£„ÉÉ„ÇØ
  *
  *****************************************************************************/
 
@@ -614,7 +614,7 @@ static gboolean buttonrelease_event(GtkWidget *, GdkEventButton *, gpointer);
 static gboolean motionnotify_event(GtkWidget *, GdkEventMotion *, gpointer);
 
 
-/* •·•§•Û•¶•§•Û•…•¶§Œ•∑•∞• •Î§Ú¿ﬂƒÍ */
+/* „É°„Ç§„É≥„Ç¶„Ç§„É≥„Éâ„Ç¶„ÅÆ„Ç∑„Ç∞„Éä„É´„ÇíË®≠ÂÆö */
 void	gtksys_set_signal_frame(GtkWidget *widget)
 {
     gtk_signal_connect(GTK_OBJECT(widget), "destroy",
@@ -638,7 +638,7 @@ void	gtksys_set_signal_frame(GtkWidget *widget)
 			  GDK_KEY_RELEASE_MASK);
 }
 
-/* •…•Ì°º•§•Û•∞•®•Í•¢§Œ•∑•∞• •Î§Ú¿ﬂƒÍ */
+/* „Éâ„É≠„Éº„Ç§„É≥„Ç∞„Ç®„É™„Ç¢„ÅÆ„Ç∑„Ç∞„Éä„É´„ÇíË®≠ÂÆö */
 void	gtksys_set_signal_view(GtkWidget *widget)
 {
     gtk_signal_connect(GTK_OBJECT(widget), "expose_event",
@@ -671,8 +671,8 @@ void	gtksys_set_signal_view(GtkWidget *widget)
 static gboolean destroy_event(GtkWidget *widget, gpointer data)
 {
     quasi88_quit();
-    return TRUE;		/* TRUE °ƒ •§•Ÿ•Û•»ΩËÕ˝§œ§≥§Ï§«Ω™§Ô§Í */
-				/* FALSE °ƒ •§•Ÿ•Û•»§Úº°§À≈¡«≈§µ§ª§Î */
+    return TRUE;		/* TRUE ‚Ä¶ „Ç§„Éô„É≥„ÉàÂá¶ÁêÜ„ÅØ„Åì„Çå„ÅßÁµÇ„Çè„Çä */
+				/* FALSE ‚Ä¶ „Ç§„Éô„É≥„Éà„ÇíÊ¨°„Å´‰ºùÊí≠„Åï„Åõ„Çã */
 }
 
 static gboolean focusin_event(GtkWidget *widget, GdkEventFocus *event,
@@ -710,11 +710,11 @@ static void key_event(guint keysym, int is_pressed)
 
     if (quasi88_is_exec()) {
 
-	if ((keysym & 0xff00) == 0xff00) {		/* µ°«Ω•≠°º */
+	if ((keysym & 0xff00) == 0xff00) {		/* Ê©üËÉΩ„Ç≠„Éº */
 
 	    key88 = keysym2key88[ (keysym & 0x00ff) | 0x100 ];
 
-	} else if ((keysym & 0xff00) == 0x0000) {	/*  ∏ª˙•≠°º */
+	} else if ((keysym & 0xff00) == 0x0000) {	/* ÊñáÂ≠ó„Ç≠„Éº */
 
 	    key88 = keysym2key88[ (keysym) ];
 
@@ -730,11 +730,11 @@ static void key_event(guint keysym, int is_pressed)
 
     } else {
 
-	if ((keysym & 0xff00) == 0xff00) {		/* µ°«Ω•≠°º */
+	if ((keysym & 0xff00) == 0xff00) {		/* Ê©üËÉΩ„Ç≠„Éº */
 
 	    key88 = keysym2key88[ (keysym & 0x00ff) | 0x100 ];
 
-	} else if ((keysym & 0xff00) == 0x0000) {	/*  ∏ª˙•≠°º */
+	} else if ((keysym & 0xff00) == 0x0000) {	/* ÊñáÂ≠ó„Ç≠„Éº */
 
 	    key88 = keysym;
 

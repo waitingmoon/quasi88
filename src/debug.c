@@ -1,10 +1,10 @@
 /************************************************************************/
-/*	�ǥХå���							*/
+/*	デバッグ用							*/
 /************************************************************************/
 
 
 /*----------------------------------------------------------------------
- *	�ǥХå��� printf
+ *	デバッグ用 printf
  *----------------------------------------------------------------------*/
 #ifdef	DEBUGPRINTF
 #include <stdarg.h>
@@ -21,12 +21,12 @@ void	debugprintf(const char *format, ...)
 #endif
 
 /*----------------------------------------------------------------------
- *	�ǥХå��� ����
+ *	デバッグ用 ログ
  *----------------------------------------------------------------------*/
-int	pio_debug = 0;			/* ���ʤ顢�ե��������		*/
-int	fdc_debug = 0;			/* ���ʤ顢�ե��������		*/
-int	main_debug = 0;			/* ���ʤ顢�ե��������		*/
-int	sub_debug = 0;			/* ���ʤ顢�ե��������		*/
+int	pio_debug = 0;			/* 真なら、ファイル出力		*/
+int	fdc_debug = 0;			/* 真なら、ファイル出力		*/
+int	main_debug = 0;			/* 真なら、ファイル出力		*/
+int	sub_debug = 0;			/* 真なら、ファイル出力		*/
 
 #ifdef	DEBUGLOG
 #include <stdarg.h>
@@ -88,53 +88,53 @@ void	logz80( const char *format, ... )
 #endif
 
 /*----------------------------------------------------------------------
- *	�������� ��ַ�¬
+ *	処理時間 区間計測
  *----------------------------------------------------------------------*/
 int	debug_profiler;			/*
-					  bit0: ��֥�åפ�ե��������
-					  bit1: ��λ���˶�֥�å�ʿ��ɽ��
-					  bit2: 1��������������ɽ��
+					  bit0: 区間ラップをファイル出力
+					  bit1: 終了時に区間ラップ平均表示
+					  bit2: 1秒毎に描画状況を表示
 					*/
 
 #ifdef	PROFILER
 #ifdef  HAVE_GETTIMEOFDAY
 #include <sys/time.h>		/* gettimeofday */
 
-/* ������ˡ
-   �� ��ư���ˡ� -profiler ���ץ�����Ĥ���ȡ����Υ��������������
+/* 使用方法
+   ※ 起動時に、 -profiler オプションをつけると、このログが生成される
 
-   profiler_init();			�ǽ��1������ƤӽФ�
-   profiler_exit();			�Ǹ��1������ƤӽФ�
+   profiler_init();			最初に1回だけ呼び出す
+   profiler_exit();			最後に1回だけ呼び出す
 
 
-   profiler_lapse(PROF_LAPSE_RESET);	�ǽ��RESET������������Τ�
-	��
-   profiler_lapse(PROF_LAPSE_CPU);	RESETľ��Ϥʤˤ⤷�ʤ�
-	��
-   profiler_lapse(PROF_LAPSE_SND);	CPU�������ޤǤλ��֤��¬
-	��
-   profiler_lapse(PROF_LAPSE_AUDIO);	SND�������ޤǤλ��֤��¬
-	��
-   profiler_lapse(PROF_LAPSE_INPUT);	AUDIO�������ޤǤλ��֤��¬
-	��
-   profiler_lapse(PROF_LAPSE_CPU2);	INPUT�������ޤǤλ��֤��¬
-	��
-   profiler_lapse(PROF_LAPSE_BLIT);	CPU2�������ޤǤλ��֤��¬
-	��
-   profiler_lapse(PROF_LAPSE_VIDEO);	BLIT�������ޤǤλ��֤��¬
-	��
-   profiler_lapse(PROF_LAPSE_IDLE);	VIDEO�������ޤǤλ��֤��¬
-	��
-   profiler_lapse(PROF_LAPSE_RESET);	IDLE�������ޤǤλ��֤��¬
-					�����RESET�������ޤǤλ��֤��¬
-	��
-   profiler_lapse(PROF_LAPSE_CPU);	RESETľ��Ϥʤˤ⤷�ʤ�
-	��
-	��
+   profiler_lapse(PROF_LAPSE_RESET);	最初のRESETは内部初期化のみ
+	…
+   profiler_lapse(PROF_LAPSE_CPU);	RESET直後はなにもしない
+	…
+   profiler_lapse(PROF_LAPSE_SND);	CPU〜ここまでの時間を計測
+	…
+   profiler_lapse(PROF_LAPSE_AUDIO);	SND〜ここまでの時間を計測
+	…
+   profiler_lapse(PROF_LAPSE_INPUT);	AUDIO〜ここまでの時間を計測
+	…
+   profiler_lapse(PROF_LAPSE_CPU2);	INPUT〜ここまでの時間を計測
+	…
+   profiler_lapse(PROF_LAPSE_BLIT);	CPU2〜ここまでの時間を計測
+	…
+   profiler_lapse(PROF_LAPSE_VIDEO);	BLIT〜ここまでの時間を計測
+	…
+   profiler_lapse(PROF_LAPSE_IDLE);	VIDEO〜ここまでの時間を計測
+	…
+   profiler_lapse(PROF_LAPSE_RESET);	IDLE〜ここまでの時間を計測
+					前回のRESET〜ここまでの時間を計測
+	…
+   profiler_lapse(PROF_LAPSE_CPU);	RESET直後はなにもしない
+	…
+	…
    profiler_lapse(PROF_LAPSE_RESET);	
-	��
-   profiler_lapse(PROF_LAPSE_RESET);	RESET��Ϣ³������������������Τ�
-	��
+	…
+   profiler_lapse(PROF_LAPSE_RESET);	RESETが連続した場合は内部初期化のみ
+	…
 */
 
 static const char *prof_label[PROF_LAPSE_END] = {
@@ -149,12 +149,12 @@ static const char *prof_label[PROF_LAPSE_END] = {
     "IDLE",		/* PROF_LAPSE_IDLE	*/
 };
 static FILE		*prof_lap_fp;
-static struct timeval	prof_lap_reset_t0;	/* ���� RESET �ƤӽФ����� */
-static struct timeval	prof_lap_t0;		/* ����ƤӽФ����� */
-static int              prof_lap_type;		/* ����ƤӽФ����� */
-static struct {					/* �߷׾��� */
-    struct timeval all;				/* �߷׻��� */
-    int            count;			/* �߷ײ�� */
+static struct timeval	prof_lap_reset_t0;	/* 前回 RESET 呼び出し時刻 */
+static struct timeval	prof_lap_t0;		/* 前回呼び出し時刻 */
+static int              prof_lap_type;		/* 前回呼び出し種類 */
+static struct {					/* 累計情報 */
+    struct timeval all;				/* 累計時間 */
+    int            count;			/* 累計回数 */
 }	prof_lap[PROF_LAPSE_END];
 
 void	profiler_init(void)
@@ -182,16 +182,16 @@ void	profiler_lapse(int type)
 
 	if (prof_lap_type == PROF_LAPSE_RESET) {
 	    if (type      == PROF_LAPSE_RESET) {
-		/* RESET ��Ϣ³�ǸƤӽФ��줿��� (�ʤ������) �ϡ������ */
+		/* RESET が連続で呼び出された場合 (ないし初回) は、初期化 */
 		prof_lap_reset_t0 = t1;
 
 	    } else {   /* != PROF_LAPSE_RESET */
-		/* RESET �μ��� RESET �ʳ����ƤӽФ��줿�顢�ʤˤ⤷�ʤ� */
+		/* RESET の次に RESET 以外が呼び出されたら、なにもしない */
 		/* DO NOTHING */
 	    }
 	} else {
 	    {
-		/* ľ���� profiler_lapse �ƤӽФ�����ηв���� */
+		/* 直前の profiler_lapse 呼び出しからの経過時間 */
 		dt.tv_sec  = t1.tv_sec  - prof_lap_t0.tv_sec;
 		dt.tv_usec = t1.tv_usec - prof_lap_t0.tv_usec;
 		if (dt.tv_usec < 0) {
@@ -199,7 +199,7 @@ void	profiler_lapse(int type)
 		    dt.tv_usec += 1000000;
 		}
 
-		/* �в�����߷פˡ��û����Ƥ��� */
+		/* 経過時間累計に、加算していく */
 		prof_lap[ prof_lap_type ].all.tv_sec  += dt.tv_sec;
 		prof_lap[ prof_lap_type ].all.tv_usec += dt.tv_usec;
 		if (prof_lap[ prof_lap_type ].all.tv_usec >= 1000000) {
@@ -208,14 +208,14 @@ void	profiler_lapse(int type)
 		}
 		prof_lap[ prof_lap_type ].count ++;
 
-		/* dt ɽ�� */
+		/* dt 表示 */
 		if ((debug_profiler & 1) && prof_lap_fp)
 		    fprintf(prof_lap_fp, "%-13s%6ld\n",
 			    prof_label[ prof_lap_type ], dt.tv_usec);
 	    }
 
 	    if (type == PROF_LAPSE_RESET) {
-		/* ����� PROF_LAPSE_RESET �ƤӽФ�����ηв���� */
+		/* 前回の PROF_LAPSE_RESET 呼び出しからの経過時間 */
 		dt.tv_sec  = t1.tv_sec  - prof_lap_reset_t0.tv_sec;
 		dt.tv_usec = t1.tv_usec - prof_lap_reset_t0.tv_usec;
 		if (dt.tv_usec < 0) {
@@ -224,7 +224,7 @@ void	profiler_lapse(int type)
 		}
 		prof_lap_reset_t0 = t1;
 
-		/* �в�����߷פˡ��û����Ƥ��� */
+		/* 経過時間累計に、加算していく */
 		prof_lap[ type ].all.tv_sec  += dt.tv_sec;
 		prof_lap[ type ].all.tv_usec += dt.tv_usec;
 		if (prof_lap[ type ].all.tv_usec >= 1000000) {
@@ -233,7 +233,7 @@ void	profiler_lapse(int type)
 		}
 		prof_lap[ type ].count ++;
 
-		/* dt ɽ�� */
+		/* dt 表示 */
 		if ((debug_profiler & 1) && prof_lap_fp)
 		    fprintf(prof_lap_fp, "%-13s%6ld\n",
 			    prof_label[ type ], dt.tv_usec);
@@ -271,9 +271,9 @@ void	profiler_exit(void)
 }
 
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -*/
-/* ����¾�λ�¿�ʡ����ַ�¬�ǥХå��ؿ� */
+/* その他の雑多な、時間計測デバッグ関数 */
 
-/* 1970/01/01 ������ÿ��� usec ��ɽ�� */
+/* 1970/01/01 からの秒数を usec で表示 */
 void	profiler_current_time(void)
 {
     struct timeval tv;
@@ -283,7 +283,7 @@ void	profiler_current_time(void)
 }
 
 
-/* profiler_watch_start �� profiler_watch_stop �ޤǤλ��֤� usec ��ɽ��  */
+/* profiler_watch_start 〜 profiler_watch_stop までの時間を usec で表示  */
 static struct timeval watch_t0;
 void	profiler_watch_start(void)
 {
@@ -323,10 +323,10 @@ void	profiler_video_output(int timing, int skip, int drawn)
     if (debug_profiler & 4) {
 	if (timing) {
 	    if (skip == FALSE) {
-		if (drawn) printf("@"); /* ���������η�̡�������ɬ�פ��ä� */
-		else       printf("o"); /* ���������η�̡����������פ��ä� */
-	    } else         printf("-"); /* ���֤��ʤ��Τǡ������åפ���     */
-	} else             printf(" "); /* ����ϡ������������ʤ��ä�       */
+		if (drawn) printf("@"); /* 画像処理の結果、更新が必要だった */
+		else       printf("o"); /* 画像処理の結果、更新は不要だった */
+	    } else         printf("-"); /* 時間がないので、スキップした     */
+	} else             printf(" "); /* 今回は、画像処理しなかった       */
 
 	if (++n > 56){
 	    n=0;

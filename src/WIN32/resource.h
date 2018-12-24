@@ -58,6 +58,7 @@
 #define	M_SET_SIZ		20600
 #define	M_SET_SIZ_FULL		20601
 #define	M_SET_SIZ_HALF		20602
+#define	M_SET_SIZ_DOUBLE	20603
 
 #define	M_SET_PCG		20700
 

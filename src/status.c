@@ -1,6 +1,6 @@
 /************************************************************************/
 /*									*/
-/* ���ơ���������ɽ�� (FDDɽ�����ۤ���å�����ɽ��)			*/
+/* ステータス部の表示 (FDD表示、ほかメッセージ表示)			*/
 /*									*/
 /************************************************************************/
 
@@ -24,14 +24,14 @@
 
 /*---------------------------------------------------------------------------*/
 
-int	status_imagename	= FALSE;	/* ���᡼��̾ɽ��̵ͭ */
+int	status_imagename	= FALSE;	/* イメージ名表示有無 */
 
 
 #define	STATUS_LENGTH	(48)
 
 /*
- * ɽ�����륹�ơ������Υ��᡼���ѥХåե�
- *	�Хåե���8�ɥåȥե����48ʸ��ʬ���뤬���ºݤ�ɽ���Ϥ�äȾ�����
+ * 表示するステータスのイメージ用バッファ
+ *	バッファは8ドットフォント48文字分あるが、実際の表示はもっと小さい
  */
 #define	PIXMAP_WIDTH	(STATUS_LENGTH * 8)
 #define	PIXMAP_HEIGHT	(16)
@@ -40,62 +40,62 @@ static	byte	pixmap[3][ PIXMAP_WIDTH * PIXMAP_HEIGHT ];
 
 
 
-/* �ºݤ�ɽ�������ϡ��ʲ��Υ�����ͳ���ơ�
-   ɽ�����륹�ơ������Υ��᡼���ѥХåե��ȡ����Υ�������������� */
+/* 実際の表示処理は、以下のワークを経由して、
+   表示するステータスのイメージ用バッファと、そのサイズを取得する */
 
-T_STATUS_INFO	status_info[3];			/* ���ơ��������᡼�� */
+T_STATUS_INFO	status_info[3];			/* ステータスイメージ */
 
 /*---------------------------------------------------------------------------*/
 
 /*
- * ��������ʥ��
+ * ローカルなワーク
  */
 enum {
-    STATUS_DISP_MSG,		/* ʸ����ɽ��				*/
-    STATUS_DISP_MODE,		/* BASIC�⡼��ɽ��			*/
-    STATUS_DISP_FDD,		/* FDD����ɽ��			*/
-    STATUS_DISP_TIMEUP		/* ���»��֤Ĥ�ʸ����ɽ��		*/
+    STATUS_DISP_MSG,		/* 文字列表示				*/
+    STATUS_DISP_MODE,		/* BASICモード表示			*/
+    STATUS_DISP_FDD,		/* FDDランプ表示			*/
+    STATUS_DISP_TIMEUP		/* 制限時間つき文字列表示		*/
 };
 
 static struct {
-    int  dirty;			/* ����ɽ����ɬ�פ���			*/
+    int  dirty;			/* 真で表示の必要あり			*/
 
-    int  disp;			/* ����ɽ�����Ƥ�������			*/
+    int  disp;			/* 現在表示している内容			*/
 				/*	STATUS_DISP_XXX			*/
 
-    int  timer;			/* STATUS_DISP_TIMEUP �Υ����ޡ�	*/
-    int  timeup_disp;		/* �����ॢ�å׸��ɽ������		*/
+    int  timer;			/* STATUS_DISP_TIMEUP のタイマー	*/
+    int  timeup_disp;		/* タイムアップ後の表示内容		*/
 
-    char msg[STATUS_LENGTH + 1];/* STATUS_DISP_MSG  ��ɽ������ +1��'\0'	*/
-    int  mode;			/* STATUS_DISP_MODE ��ɽ������		*/
-    int  fdd;			/* STATUS_DISP_FDD  ��ɽ������		*/
+    char msg[STATUS_LENGTH + 1];/* STATUS_DISP_MSG  の表示内容 +1は'\0'	*/
+    int  mode;			/* STATUS_DISP_MODE の表示内容		*/
+    int  fdd;			/* STATUS_DISP_FDD  の表示内容		*/
 
-    int  default_disp;		/* �ǥե���Ȥ�ɽ������			*/
-				/*	��¦ �� STATUS_DISP_MODE	*/
-				/*	��� �� STATUS_DISP_MSG		*/
-				/*	��¦ �� STATUS_DISP_FDD		*/
+    int  default_disp;		/* デフォルトの表示内容			*/
+				/*	左側 ： STATUS_DISP_MODE	*/
+				/*	中央 ： STATUS_DISP_MSG		*/
+				/*	右側 ： STATUS_DISP_FDD		*/
 } status_wk[3];
 
 
 /*
- * ��������ʥե����
+ * ローカルなフォント
  */
 enum {
   FNT_START = 0xe0-1,
 
-  FNT_2__1,  FNT_2__2,  FNT_2__3,	/* �ɥ饤��2 */
+  FNT_2__1,  FNT_2__2,  FNT_2__3,	/* ドライブ2 */
   FNT_2D_1,  FNT_2D_2,  FNT_2D_3,
 
-  FNT_1__1,  FNT_1__2,  FNT_1__3,	/* �ɥ饤��1 */
+  FNT_1__1,  FNT_1__2,  FNT_1__3,	/* ドライブ1 */
   FNT_1D_1,  FNT_1D_2,  FNT_1D_3,
 
-  FNT_T__1,  FNT_T__2,  FNT_T__3,	/* �ơ��� */
+  FNT_T__1,  FNT_T__2,  FNT_T__3,	/* テープ */
   FNT_TR_1,  FNT_TR_2,  FNT_TR_3,
   FNT_TW_1,  FNT_TW_2,  FNT_TW_3,
 
   FNT_CAP_1, FNT_CAP_2,			/* CAPS     */
-  FNT_KAN_1, FNT_KAN_2,			/* ����     */
-  FNT_RMJ_1, FNT_RMJ_2,			/* �����޻� */
+  FNT_KAN_1, FNT_KAN_2,			/* カナ     */
+  FNT_RMJ_1, FNT_RMJ_2,			/* ローマ字 */
   FNT_NUM_1, FNT_NUM_2,			/* NUMlock  */
 
   FNT_END
@@ -113,7 +113,7 @@ static	const	byte	status_font[ 0x20 ][ 8*16 ] =
 #define G	STATUS_GREEN
 
 
-  {				/* �ɥ饤��2(��¦) ���������ݡ� */
+  {				/* ドライブ2(左側) 消灯：左−− */
     X,X,X,X,X,X,X,X,
     X,X,X,X,X,X,X,X,
     X,X,X,X,X,W,W,W,
@@ -131,7 +131,7 @@ static	const	byte	status_font[ 0x20 ][ 8*16 ] =
     X,X,X,X,X,X,X,X,
     X,X,X,X,X,X,X,X,
   },
-  {				/* �ɥ饤��2(��¦) ����������� */
+  {				/* ドライブ2(左側) 消灯：−中− */
     X,X,X,X,X,X,X,X,
     X,X,X,X,X,X,X,X,
     W,W,W,W,W,W,W,W,
@@ -149,7 +149,7 @@ static	const	byte	status_font[ 0x20 ][ 8*16 ] =
     X,X,X,X,X,X,X,X,
     X,X,X,X,X,X,X,X,
   },
-  {				/* �ɥ饤��2(��¦) �������ݡݱ� */
+  {				/* ドライブ2(左側) 消灯：−−右 */
     X,X,X,X,X,X,X,X,
     X,X,X,X,X,X,X,X,
     W,W,W,W,W,W,W,X,
@@ -167,7 +167,7 @@ static	const	byte	status_font[ 0x20 ][ 8*16 ] =
     X,X,X,X,X,X,X,X,
     X,X,X,X,X,X,X,X,
   },
-  {				/* �ɥ饤��2(��¦) ���������ݡ� */
+  {				/* ドライブ2(左側) 点灯：左−− */
     X,X,X,X,X,X,X,X,
     X,X,X,X,X,X,X,X,
     X,X,X,X,X,W,W,W,
@@ -185,7 +185,7 @@ static	const	byte	status_font[ 0x20 ][ 8*16 ] =
     X,X,X,X,X,X,X,X,
     X,X,X,X,X,X,X,X,
   },
-  {				/* �ɥ饤��2(��¦) ����������� */
+  {				/* ドライブ2(左側) 点灯：−中− */
     X,X,X,X,X,X,X,X,
     X,X,X,X,X,X,X,X,
     W,W,W,W,W,W,W,W,
@@ -203,7 +203,7 @@ static	const	byte	status_font[ 0x20 ][ 8*16 ] =
     X,X,X,X,X,X,X,X,
     X,X,X,X,X,X,X,X,
   },
-  {				/* �ɥ饤��2(��¦) �������ݡݱ� */
+  {				/* ドライブ2(左側) 点灯：−−右 */
     X,X,X,X,X,X,X,X,
     X,X,X,X,X,X,X,X,
     W,W,W,W,W,W,W,X,
@@ -221,7 +221,7 @@ static	const	byte	status_font[ 0x20 ][ 8*16 ] =
     X,X,X,X,X,X,X,X,
     X,X,X,X,X,X,X,X,
   },
-  {				/* �ɥ饤��1(��¦) ���������ݡ� */
+  {				/* ドライブ1(右側) 消灯：左−− */
     X,X,X,X,X,X,X,X,
     X,X,X,X,X,X,X,X,
     X,W,W,W,W,W,W,W,
@@ -239,7 +239,7 @@ static	const	byte	status_font[ 0x20 ][ 8*16 ] =
     X,X,X,X,X,X,X,X,
     X,X,X,X,X,X,X,X,
   },
-  {				/* �ɥ饤��1(��¦) ����������� */
+  {				/* ドライブ1(右側) 消灯：−中− */
     X,X,X,X,X,X,X,X,
     X,X,X,X,X,X,X,X,
     W,W,W,W,W,W,W,W,
@@ -257,7 +257,7 @@ static	const	byte	status_font[ 0x20 ][ 8*16 ] =
     X,X,X,X,X,X,X,X,
     X,X,X,X,X,X,X,X,
   },
-  {				/* �ɥ饤��1(��¦) �������ݡݱ� */
+  {				/* ドライブ1(右側) 消灯：−−右 */
     X,X,X,X,X,X,X,X,
     X,X,X,X,X,X,X,X,
     W,W,W,X,X,X,X,X,
@@ -275,7 +275,7 @@ static	const	byte	status_font[ 0x20 ][ 8*16 ] =
     X,X,X,X,X,X,X,X,
     X,X,X,X,X,X,X,X,
   },
-  {				/* �ɥ饤��1(��¦) ���������ݡ� */
+  {				/* ドライブ1(右側) 点灯：左−− */
     X,X,X,X,X,X,X,X,
     X,X,X,X,X,X,X,X,
     X,W,W,W,W,W,W,W,
@@ -293,7 +293,7 @@ static	const	byte	status_font[ 0x20 ][ 8*16 ] =
     X,X,X,X,X,X,X,X,
     X,X,X,X,X,X,X,X,
   },
-  {				/* �ɥ饤��1(��¦) ����������� */
+  {				/* ドライブ1(右側) 点灯：−中− */
     X,X,X,X,X,X,X,X,
     X,X,X,X,X,X,X,X,
     W,W,W,W,W,W,W,W,
@@ -311,7 +311,7 @@ static	const	byte	status_font[ 0x20 ][ 8*16 ] =
     X,X,X,X,X,X,X,X,
     X,X,X,X,X,X,X,X,
   },
-  {				/* �ɥ饤��1(��¦) �������ݡݱ� */
+  {				/* ドライブ1(右側) 点灯：−−右 */
     X,X,X,X,X,X,X,X,
     X,X,X,X,X,X,X,X,
     W,W,W,X,X,X,X,X,
@@ -329,7 +329,7 @@ static	const	byte	status_font[ 0x20 ][ 8*16 ] =
     X,X,X,X,X,X,X,X,
     X,X,X,X,X,X,X,X,
   },
-  {				/* �ơ��� ���ꡧ���ݡ� */
+  {				/* テープ あり：左−− */
     X,X,X,X,X,X,X,X,
     X,W,W,W,W,W,W,W,
     X,W,F,F,F,F,F,F,
@@ -347,7 +347,7 @@ static	const	byte	status_font[ 0x20 ][ 8*16 ] =
     X,W,W,W,W,W,W,W,
     X,X,X,X,X,X,X,X,
   },
-  {				/* �ơ��� ���ꡧ����� */
+  {				/* テープ あり：−中− */
     X,X,X,X,X,X,X,X,
     W,W,W,W,W,W,W,W,
     F,F,F,F,F,F,F,F,
@@ -365,7 +365,7 @@ static	const	byte	status_font[ 0x20 ][ 8*16 ] =
     W,W,W,W,W,W,W,W,
     X,X,X,X,X,X,X,X,
   },
-  {				/* �ơ��� ���ꡧ�ݡݱ� */
+  {				/* テープ あり：−−右 */
     X,X,X,X,X,X,X,X,
     W,W,W,W,W,W,W,X,
     F,F,F,F,F,F,W,X,
@@ -383,7 +383,7 @@ static	const	byte	status_font[ 0x20 ][ 8*16 ] =
     W,W,W,W,W,W,W,X,
     X,X,X,X,X,X,X,X,
   },
-  {				/* �ơ��� ���������ݡ� */
+  {				/* テープ 再生：左−− */
     X,X,X,X,X,X,X,X,
     X,W,W,W,W,W,W,W,
     X,W,X,X,X,X,X,X,
@@ -401,7 +401,7 @@ static	const	byte	status_font[ 0x20 ][ 8*16 ] =
     X,W,W,W,W,W,W,W,
     X,X,X,X,X,X,X,X,
   },
-  {				/* �ơ��� ����������� */
+  {				/* テープ 再生：−中− */
     X,X,X,X,X,X,X,X,
     W,W,W,W,W,W,W,W,
     X,X,X,X,X,X,X,X,
@@ -419,7 +419,7 @@ static	const	byte	status_font[ 0x20 ][ 8*16 ] =
     W,W,W,W,W,W,W,W,
     X,X,X,X,X,X,X,X,
   },
-  {				/* �ơ��� �������ݡݱ� */
+  {				/* テープ 再生：−−右 */
     X,X,X,X,X,X,X,X,
     W,W,W,W,W,W,W,X,
     X,X,X,X,X,X,W,X,
@@ -437,7 +437,7 @@ static	const	byte	status_font[ 0x20 ][ 8*16 ] =
     W,W,W,W,W,W,W,X,
     X,X,X,X,X,X,X,X,
   },
-  {				/* �ơ��� Ͽ�������ݡ� */
+  {				/* テープ 録音：左−− */
     X,X,X,X,X,X,X,X,
     X,W,W,W,W,W,W,W,
     X,W,X,X,X,X,X,X,
@@ -455,7 +455,7 @@ static	const	byte	status_font[ 0x20 ][ 8*16 ] =
     X,W,W,W,W,W,W,W,
     X,X,X,X,X,X,X,X,
   },
-  {				/* �ơ��� Ͽ��������� */
+  {				/* テープ 録音：−中− */
     X,X,X,X,X,X,X,X,
     W,W,W,W,W,W,W,W,
     X,X,X,X,X,X,X,X,
@@ -473,7 +473,7 @@ static	const	byte	status_font[ 0x20 ][ 8*16 ] =
     W,W,W,W,W,W,W,W,
     X,X,X,X,X,X,X,X,
   },
-  {				/* �ơ��� Ͽ�����ݡݱ� */
+  {				/* テープ 録音：−−右 */
     X,X,X,X,X,X,X,X,
     W,W,W,W,W,W,W,X,
     X,X,X,X,X,X,W,X,
@@ -494,7 +494,7 @@ static	const	byte	status_font[ 0x20 ][ 8*16 ] =
 
 
 
-  {				/* CAPS������ */
+  {				/* CAPS：左− */
     X,X,X,X,X,X,X,X,
     X,X,X,X,X,X,X,X,
     X,X,X,X,X,X,X,X,
@@ -512,7 +512,7 @@ static	const	byte	status_font[ 0x20 ][ 8*16 ] =
     X,X,X,X,X,F,F,F,
     X,X,X,X,X,X,X,X,
   },
-  {				/* CAPS���ݱ�  */
+  {				/* CAPS：−右  */
     X,X,X,X,X,X,X,X,
     X,X,X,X,X,X,X,X,
     X,X,X,X,X,X,X,X,
@@ -530,7 +530,7 @@ static	const	byte	status_font[ 0x20 ][ 8*16 ] =
     F,F,F,F,F,F,F,X,
     X,X,X,X,X,X,X,X,
   },
-  {				/* ���ʡ����� */
+  {				/* カナ：左− */
     X,X,X,X,X,X,X,X,
     X,X,X,X,X,X,X,X,
     X,X,X,X,X,X,X,X,
@@ -548,7 +548,7 @@ static	const	byte	status_font[ 0x20 ][ 8*16 ] =
     X,X,X,X,X,F,F,F,
     X,X,X,X,X,X,X,X,
   },
-  {				/* ���ʡ��ݱ�  */
+  {				/* カナ：−右  */
     X,X,X,X,X,X,X,X,
     X,X,X,X,X,X,X,X,
     X,X,X,X,X,X,X,X,
@@ -566,7 +566,7 @@ static	const	byte	status_font[ 0x20 ][ 8*16 ] =
     F,F,F,F,F,F,F,X,
     X,X,X,X,X,X,X,X,
   },
-  {				/* �����޻�������  */
+  {				/* ローマ字：左−  */
     X,X,X,X,X,X,X,X,
     X,X,X,X,X,X,X,X,
     X,X,X,X,X,X,X,X,
@@ -584,7 +584,7 @@ static	const	byte	status_font[ 0x20 ][ 8*16 ] =
     X,X,X,X,X,F,F,F,
     X,X,X,X,X,X,X,X,
   },
-  {				/* �����޻����ݱ� */
+  {				/* ローマ字：−右 */
     X,X,X,X,X,X,X,X,
     X,X,X,X,X,X,X,X,
     X,X,X,X,X,X,X,X,
@@ -602,7 +602,7 @@ static	const	byte	status_font[ 0x20 ][ 8*16 ] =
     F,F,F,F,F,F,F,X,
     X,X,X,X,X,X,X,X,
   },
-  {				/* ����������  */
+  {				/* 数字：左−  */
     X,X,X,X,X,X,X,X,
     X,X,X,X,X,X,X,X,
     X,X,X,X,X,X,X,X,
@@ -620,7 +620,7 @@ static	const	byte	status_font[ 0x20 ][ 8*16 ] =
     X,X,X,X,X,F,F,F,
     X,X,X,X,X,X,X,X,
   },
-  {				/* �������ݱ�  */
+  {				/* 数字：−右  */
     X,X,X,X,X,X,X,X,
     X,X,X,X,X,X,X,X,
     X,X,X,X,X,X,X,X,
@@ -653,7 +653,7 @@ static	const	byte	status_font[ 0x20 ][ 8*16 ] =
 
 
 /*
- * ʸ����򥹥ơ������Υ��᡼���ѥХåե� (status_info) ��ž��
+ * 文字列をステータスのイメージ用バッファ (status_info) に転送
  */
 static	void	status_puts(int pos, const char *str)
 {
@@ -672,9 +672,9 @@ static	void	status_puts(int pos, const char *str)
 
 	    if (c < 0xe0) {
 
-		if (has_kanji_rom && 			/* ����ROM���� */
+		if (has_kanji_rom && 			/* 漢字ROMあり */
 		    ((0x20 <= c && c <= 0x7f) ||	/* ASCII    */
-		     (0xa0 <= c && c <= 0xdf))) {	/* �������� */
+		     (0xa0 <= c && c <= 0xdf))) {	/* カタカナ */
 		    p = &kanji_rom[0][ c*8 ][0];
 		    h16 = TRUE;
 		} else {
@@ -689,7 +689,7 @@ static	void	status_puts(int pos, const char *str)
 		    if (h16 || j&1) p++;
 		}
 
-	    } else {		/* 0xe0��0xff �� ��������ʥե���Ȥ���� */
+	    } else {		/* 0xe0〜0xff は ローカルなフォントを使用 */
 
 		p = &status_font[ (c-0xe0) ][0];
 		for (j=0; j<16; j++) {
@@ -709,9 +709,9 @@ static	void	status_puts(int pos, const char *str)
 
 
 
-#if 0	/* ���ơ���������Ǥ�դβ�����ɽ���������ʤä��顢�ͤ��褦 */
+#if 0	/* ステータス部に任意の画像を表示したくなったら、考えよう */
 /*
- * �ԥå����ޥåפ򥹥ơ������Υ��᡼���ѥХåե���ž��
+ * ピックスマップをステータスのイメージ用バッファに転送
  */
 static	void	status_bitmap(int pos, const byte bitmap[], int size)
 {
@@ -728,7 +728,7 @@ static	void	status_bitmap(int pos, const byte bitmap[], int size)
 
 
 /***************************************************************************
- * ���ơ������ط��Υ���������
+ * ステータス関係のワーク類を初期化
  ****************************************************************************/
 void	status_init(void)
 {
@@ -758,13 +758,13 @@ void	status_init(void)
 
 
 /***************************************************************************
- * ���ơ�����ɽ������ɽ�����ؤκݤΡ�����ƽ����
+ * ステータス表示・非表示切替の際の、ワーク再初期化
  ****************************************************************************/
 void	status_setup(int show)
 {
     int i;
-    if (show) {						/* ɽ������ʤ�  */
-	for (i=0; i<3; i++) status_wk[i].dirty = TRUE;	/* ����ե饰ON  */
+    if (show) {						/* 表示するなら  */
+	for (i=0; i<3; i++) status_wk[i].dirty = TRUE;	/* 描画フラグON  */
     }
 }
 
@@ -772,16 +772,16 @@ void	status_setup(int show)
 
 
 /***************************************************************************
- * ���ơ������˥�å�����(ʸ����)ɽ����
- * (���Υ�å�������ǥե���ȤȤ���)
- *	msg	ɽ������ǥե���Ȥ�ʸ����
- *		NULL �ξ��ϡ���������Ƥ�ɽ�����롣
- *		(��������� �� ��:BASIC�⡼�� / ��:���� / ��:FDD����)
+ * ステータスにメッセージ(文字列)表示。
+ * (このメッセージをデフォルトとする)
+ *	msg	表示するデフォルトの文字列
+ *		NULL の場合は、既定の内容を表示する。
+ *		(既定の内容 … 左:BASICモード / 中:空白 / 右:FDD状態)
  ****************************************************************************/
 static const char *status_get_filename(void);
 void	status_message_default(int pos, const char *msg)
 {
-    if (msg) {			/* ��å��������ꤢ���� */
+    if (msg) {			/* メッセージ指定ある場合 */
 
 	status_puts(pos, msg);
 	status_wk[ pos ].dirty = TRUE;
@@ -792,7 +792,7 @@ void	status_message_default(int pos, const char *msg)
 	status_wk[ pos ].msg[0] = '\0';
 	strncat(status_wk[ pos ].msg, msg, STATUS_LENGTH);
 
-    } else {			/* NULL ����ꤵ�줿��� */
+    } else {			/* NULL を指定された場合 */
 
 	switch (status_wk[ pos ].default_disp) {
 
@@ -828,10 +828,10 @@ void	status_message_default(int pos, const char *msg)
 
 
 /***************************************************************************
- * ���ơ������˥�å�����(ʸ����)ɽ����
- * (������ַв�ǡ��ǥե���ȤΥ�å��������᤹)
- *	frames	ɽ��������֡� 0 �ʤ顢 msg �˴ط��ʤ��ǥե����ɽ���Ȥʤ�
- *	msg	ɽ������ʸ����NULL�ʤ顢����Ȥ���
+ * ステータスにメッセージ(文字列)表示。
+ * (一定時間経過で、デフォルトのメッセージに戻す)
+ *	frames	表示する時間。 0 なら、 msg に関係なくデフォルト表示となる
+ *	msg	表示する文字列。NULLなら、空白とする
  ****************************************************************************/
 void	status_message(int pos, int frames, const char *msg)
 {
@@ -853,12 +853,12 @@ void	status_message(int pos, int frames, const char *msg)
 
 
 /***************************************************************************
- * ���ơ�����ɽ���ѤΥ��᡼���򹹿�
- *	ɽ�����᡼���Υԥå����ޥåפ� status_info ��ž�����롣
- *	���� force �� ���ξ��ϡ����󤫤��Ѳ��Τ��ä����ơ������Τ߹���
- *	     force �� ���ξ��ϡ�����ξ��֤Ȥϴؤ�餺���ơ������򹹿�
- *	����ͤϡ��ºݤ˹����������ơ������ֹ椬���ӥå� 0��2 ��
- *		  ���åȤ���롣(�ӥåȤ� 1 �ʤ餽�Υ��ơ������Ϲ���)
+ * ステータス表示用のイメージを更新
+ *	表示イメージのピックスマップを status_info に転送する。
+ *	引数 force が 偽の場合は、前回から変化のあったステータスのみ更新
+ *	     force が 真の場合は、前回の状態とは関わらずステータスを更新
+ *	戻り値は、実際に更新したステータス番号が、ビット 0〜2 に
+ *		  セットされる。(ビットが 1 ならそのステータスは更新)
  ****************************************************************************/
 
 static void status_mode(int pos)
@@ -889,7 +889,7 @@ static void status_mode(int pos)
     if ((key_scan[0x08] & 0x20) == 0) mode += 16;
     if (numlock_emu) mode += 32;
 
-    if (status_wk[pos].mode != mode) {		/* ����ѹ�������ɽ������ */
+    if (status_wk[pos].mode != mode) {		/* ワーク変更したら表示更新 */
 	status_wk[pos].mode = mode;
 
 	strcpy((char *)buf, mode_str[ mode & 0x7 ]);
@@ -921,15 +921,15 @@ static void status_fdd(int pos)
     byte *p, buf[16];
     int fdd = 0;	/* bit :  ....  tape tape drv2 drv1 */
 
-    if (! get_drive_ready(0)) { fdd |= 1 << 0; }	/* FDD 1: ����ON */
-    if (! get_drive_ready(1)) { fdd |= 1 << 1; }	/* FDD 2: ����ON */
-    /* drive_check_empty(n) �ǥǥ�������̵ͭ��狼�뤱�ɡ� */
+    if (! get_drive_ready(0)) { fdd |= 1 << 0; }	/* FDD 1: ランプON */
+    if (! get_drive_ready(1)) { fdd |= 1 << 1; }	/* FDD 2: ランプON */
+    /* drive_check_empty(n) でディスクの有無もわかるけど… */
 
     if      (tape_writing()) fdd |= (3 << 2);
     else if (tape_reading()) fdd |= (2 << 2);
     else if (tape_exist())   fdd |= (1 << 2);
 
-    if (status_wk[pos].fdd != fdd) {		/* ����ѹ�������ɽ������ */
+    if (status_wk[pos].fdd != fdd) {		/* ワーク変更したら表示更新 */
 	status_wk[pos].fdd = fdd;
 
 	p = buf;
@@ -1017,7 +1017,7 @@ static const char *status_get_filename(void)
 
 
 /*
- *	VSYNC��˸ƤӽФ�
+ *	VSYNC毎に呼び出す
  */
 void	status_update(void)
 {
@@ -1025,9 +1025,9 @@ void	status_update(void)
 
     for (i = 0; i < 3; i++) {
 
-	if (status_wk[i].disp == STATUS_DISP_TIMEUP) {	/* �����ޡ�������� */
-	    if (--status_wk[i].timer < 0) {		/* �����ॢ���Ȥ�   */
-		switch (status_wk[i].timeup_disp) {	/* ɽ�����Ƥ��ѹ�   */
+	if (status_wk[i].disp == STATUS_DISP_TIMEUP) {	/* タイマー指定時は */
+	    if (--status_wk[i].timer < 0) {		/* タイムアウトで   */
+		switch (status_wk[i].timeup_disp) {	/* 表示内容を変更   */
 
 		case STATUS_DISP_MSG:
 		    status_puts(i, status_wk[i].msg);
@@ -1052,7 +1052,7 @@ void	status_update(void)
 	case STATUS_DISP_FDD:	status_fdd(i);		break;
 	}
 
-	if (status_wk[i].dirty) {		/* ��̡�ɽ�����Ƥ��Ѳ����� */
+	if (status_wk[i].dirty) {		/* 結果、表示内容に変化あり */
 	    status_wk[i].dirty = FALSE;
 	    screen_dirty_status |= 1 << i;
 	}

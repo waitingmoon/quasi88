@@ -2,20 +2,20 @@
 #define STATUS_H_INCLUDED
 
 
-extern	int	status_imagename;		/* ¥¤¥á¡¼¥¸Ì¾É½¼¨Í­Ìµ */
+extern	int	status_imagename;		/* ã‚¤ãƒ¡ãƒ¼ã‚¸åè¡¨ç¤ºæœ‰ç„¡ */
 
 
 typedef struct {
-    byte	*pixmap;	/* ¥¹¥Æ¡¼¥¿¥¹¤Î¥¤¥á¡¼¥¸ÍÑ¥Ğ¥Ã¥Õ¥¡ */
-    int		w;		/* ¥¤¥á¡¼¥¸É½¼¨¥µ¥¤¥º Éı 0¡Á	  */
-    int		h;		/*                    ¹â          */
+    byte	*pixmap;	/* ã‚¹ãƒ†ãƒ¼ã‚¿ã‚¹ã®ã‚¤ãƒ¡ãƒ¼ã‚¸ç”¨ãƒãƒƒãƒ•ã‚¡ */
+    int		w;		/* ã‚¤ãƒ¡ãƒ¼ã‚¸è¡¨ç¤ºã‚µã‚¤ã‚º å¹… 0ã€œ	  */
+    int		h;		/*                    é«˜          */
 } T_STATUS_INFO;
 
 extern	T_STATUS_INFO	status_info[3];
 
 
-#define	STATUS_INFO_TIME	(55 * 3)	/* É¸½à¤ÎÉ½¼¨»ş´Ö Ìó3ÉÃ */
-#define	STATUS_WARN_TIME	(55 * 10)	/* ·Ù¹ğ¤ÎÉ½¼¨»ş´Ö Ìó10ÉÃ */
+#define	STATUS_INFO_TIME	(55 * 3)	/* æ¨™æº–ã®è¡¨ç¤ºæ™‚é–“ ç´„3ç§’ */
+#define	STATUS_WARN_TIME	(55 * 10)	/* è­¦å‘Šã®è¡¨ç¤ºæ™‚é–“ ç´„10ç§’ */
 
 
 void	status_init(void);

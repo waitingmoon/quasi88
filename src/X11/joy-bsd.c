@@ -1,7 +1,7 @@
 /************************************************************************/
-/* BSD-USBÍÑ ¥¸¥ç¥¤¥¹¥Æ¥£¥Ã¥¯ÆþÎÏ½èÍý					*/
+/* BSD-USBç”¨ ã‚¸ãƒ§ã‚¤ã‚¹ãƒ†ã‚£ãƒƒã‚¯å…¥åŠ›å‡¦ç†					*/
 /*									*/
-/*	¤³¤Î¥Õ¥¡¥¤¥ë¤Ï¡¢ joystick.c ¤«¤é¥¤¥ó¥¯¥ë¡¼¥É¤µ¤ì¤Þ¤¹		*/
+/*	ã“ã®ãƒ•ã‚¡ã‚¤ãƒ«ã¯ã€ joystick.c ã‹ã‚‰ã‚¤ãƒ³ã‚¯ãƒ«ãƒ¼ãƒ‰ã•ã‚Œã¾ã™		*/
 /*									*/
 /************************************************************************/
 #if	defined(JOY_BSD_USB)
@@ -45,9 +45,9 @@
 
 
 
-#define	JOY_MAX   	KEY88_PAD_MAX		/* ¥¸¥ç¥¤¥¹¥Æ¥£¥Ã¥¯¾å¸Â(2¸Ä) */
+#define	JOY_MAX   	KEY88_PAD_MAX		/* ã‚¸ãƒ§ã‚¤ã‚¹ãƒ†ã‚£ãƒƒã‚¯ä¸Šé™(2å€‹) */
 
-#define	BUTTON_MAX	KEY88_PAD_BUTTON_MAX	/* ¥Ü¥¿¥ó¾å¸Â(8¸Ä)	     */
+#define	BUTTON_MAX	KEY88_PAD_BUTTON_MAX	/* ãƒœã‚¿ãƒ³ä¸Šé™(8å€‹)	     */
 #define	ITEM_X		(BUTTON_MAX +0)
 #define	ITEM_Y		(BUTTON_MAX +1)
 #define	ITEM_MAX	(BUTTON_MAX +2)
@@ -59,13 +59,13 @@
 
 typedef struct {
 
-    int			fd;			/* -1 ¤ÇÌ¤»ÈÍÑ */
+    int			fd;			/* -1 ã§æœªä½¿ç”¨ */
     char		*buf;
     int			size;
 
-    int			num;	/* QUASI88 ¤Ç¤Î¥¸¥ç¥¤¥¹¥Æ¥£¥Ã¥¯ÈÖ¹æ 0¡Á */
-    int			axis;			/* Êý¸þ¥Ü¥¿¥ó²¡²¼¾õÂÖ	*/
-    int			nr_button;		/* Í­¸ú¤Ê¥Ü¥¿¥ó¤Î¿ô	*/
+    int			num;	/* QUASI88 ã§ã®ã‚¸ãƒ§ã‚¤ã‚¹ãƒ†ã‚£ãƒƒã‚¯ç•ªå· 0ã€œ */
+    int			axis;			/* æ–¹å‘ãƒœã‚¿ãƒ³æŠ¼ä¸‹çŠ¶æ…‹	*/
+    int			nr_button;		/* æœ‰åŠ¹ãªãƒœã‚¿ãƒ³ã®æ•°	*/
 
     struct {
 	struct hid_item	*hitem;
@@ -78,7 +78,7 @@ typedef struct {
 
 static T_JOY_INFO joy_info[ JOY_MAX ];
 
-static	int	joystick_num;		/* ¥ª¡¼¥×¥ó¤·¤¿¥¸¥ç¥¤¥¹¥Æ¥£¥Ã¥¯¤Î¿ô */
+static	int	joystick_num;		/* ã‚ªãƒ¼ãƒ—ãƒ³ã—ãŸã‚¸ãƒ§ã‚¤ã‚¹ãƒ†ã‚£ãƒƒã‚¯ã®æ•° */
 
 
 
@@ -94,7 +94,7 @@ static int set_item(T_JOY_INFO *joy, int idx, struct hid_item *hitem)
 
     joy->item[idx].val = 0;
     joy->item[idx].adj = (hitem->logical_maximum - hitem->logical_minimum) / 2;
-    joy->item[idx].border = joy->item[idx].adj * 50 / 100;	/* ïçÃÍ 50% */
+    joy->item[idx].border = joy->item[idx].adj * 50 / 100;	/* é–¾å€¤ 50% */
 
     /*printf("%d, %d %d\n", idx, joy->item[idx].adj, joy->item[idx].border);*/
 
@@ -357,7 +357,7 @@ void	joystick_update(void)
 
 		    joy->axis = now;
 
-		} else { /* ¥Ü¥¿¥ó */
+		} else { /* ãƒœã‚¿ãƒ³ */
 
 		    if (joy->item[j].val != val) {
 			quasi88_pad(KEY88_PAD1_A + j + offset, (val));

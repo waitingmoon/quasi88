@@ -1,6 +1,6 @@
 /************************************************************************/
 /*									*/
-/* ≤ËÃÃ§Œ…Ωº®		16bpp						*/
+/* ÁîªÈù¢„ÅÆË°®Á§∫		16bpp						*/
 /*									*/
 /************************************************************************/
 
@@ -30,15 +30,15 @@
 #define BLACK			(TYPE) black_pixel
 
 /*===========================================================================
- * ≈˘«‹•µ•§•∫
+ * Á≠âÂÄç„Çµ„Ç§„Ç∫
  *===========================================================================*/
 
 /*----------------------------------------------------------------------
- *			°¸ 200•È•§•Û			…∏Ω‡
+ *			‚óè 200„É©„Ç§„É≥			Ê®ôÊ∫ñ
  *----------------------------------------------------------------------*/
 #define NORMAL
 
-#define COLOR						/* •´•È°º640x200 */
+#define COLOR						/* „Ç´„É©„Éº640x200 */
 #define		TEXT_WIDTH	80
 #define		TEXT_HEIGHT		25
 #define		VRAM2SCREEN_DIFF		v2s_dif_C80x25_F_N_16
@@ -61,7 +61,7 @@
 #include					"screen-vram-full.h"
 #undef	COLOR
 
-#define MONO						/* «Úπı	 640x200 */
+#define MONO						/* ÁôΩÈªí	 640x200 */
 #define		TEXT_WIDTH	80
 #define		TEXT_HEIGHT		25
 #define		VRAM2SCREEN_DIFF		v2s_dif_M80x25_F_N_16
@@ -84,7 +84,7 @@
 #include					"screen-vram-full.h"
 #undef	MONO
 
-#define UNDISP						/* »Û…Ωº®640x200 */
+#define UNDISP						/* ÈùûË°®Á§∫640x200 */
 #define		TEXT_WIDTH	80
 #define		TEXT_HEIGHT		25
 #define		VRAM2SCREEN_DIFF		v2s_dif_U80x25_F_N_16
@@ -109,11 +109,11 @@
 
 #undef	NORMAL
 /*----------------------------------------------------------------------
- *			°¸ 200•È•§•Û			•È•§•Û•π•≠•√•◊
+ *			‚óè 200„É©„Ç§„É≥			„É©„Ç§„É≥„Çπ„Ç≠„ÉÉ„Éó
  *----------------------------------------------------------------------*/
 #define SKIPLINE
 
-#define COLOR						/* •´•È°º640x200 */
+#define COLOR						/* „Ç´„É©„Éº640x200 */
 #define		TEXT_WIDTH	80
 #define		TEXT_HEIGHT		25
 #define		VRAM2SCREEN_DIFF		v2s_dif_C80x25_F_S_16
@@ -136,7 +136,7 @@
 #include					"screen-vram-full.h"
 #undef	COLOR
 
-#define MONO						/* «Úπı	 640x200 */
+#define MONO						/* ÁôΩÈªí	 640x200 */
 #define		TEXT_WIDTH	80
 #define		TEXT_HEIGHT		25
 #define		VRAM2SCREEN_DIFF		v2s_dif_M80x25_F_S_16
@@ -159,7 +159,7 @@
 #include					"screen-vram-full.h"
 #undef	MONO
 
-#define UNDISP						/* »Û…Ωº®640x200 */
+#define UNDISP						/* ÈùûË°®Á§∫640x200 */
 #define		TEXT_WIDTH	80
 #define		TEXT_HEIGHT		25
 #define		VRAM2SCREEN_DIFF		v2s_dif_U80x25_F_S_16
@@ -184,11 +184,11 @@
 
 #undef	SKIPLINE
 /*----------------------------------------------------------------------
- *			°¸ 200•È•§•Û			•§•Û•ø°º•Ï°º•π
+ *			‚óè 200„É©„Ç§„É≥			„Ç§„É≥„Çø„Éº„É¨„Éº„Çπ
  *----------------------------------------------------------------------*/
 #define INTERLACE
 
-#define COLOR						/* •´•È°º640x200 */
+#define COLOR						/* „Ç´„É©„Éº640x200 */
 #define		TEXT_WIDTH	80
 #define		TEXT_HEIGHT		25
 #define		VRAM2SCREEN_DIFF		v2s_dif_C80x25_F_I_16
@@ -211,7 +211,7 @@
 #include					"screen-vram-full.h"
 #undef	COLOR
 
-#define MONO						/* «Úπı	 640x200 */
+#define MONO						/* ÁôΩÈªí	 640x200 */
 #define		TEXT_WIDTH	80
 #define		TEXT_HEIGHT		25
 #define		VRAM2SCREEN_DIFF		v2s_dif_M80x25_F_I_16
@@ -234,7 +234,7 @@
 #include					"screen-vram-full.h"
 #undef	MONO
 
-#define UNDISP						/* »Û…Ωº®640x200 */
+#define UNDISP						/* ÈùûË°®Á§∫640x200 */
 #define		TEXT_WIDTH	80
 #define		TEXT_HEIGHT		25
 #define		VRAM2SCREEN_DIFF		v2s_dif_U80x25_F_I_16
@@ -259,9 +259,9 @@
 
 #undef	INTERLACE
 /*----------------------------------------------------------------------
- *			°¸ 400•È•§•Û			…∏Ω‡
+ *			‚óè 400„É©„Ç§„É≥			Ê®ôÊ∫ñ
  *----------------------------------------------------------------------*/
-#define HIRESO						/* «Úπı	 640x400 */
+#define HIRESO						/* ÁôΩÈªí	 640x400 */
 
 #define		TEXT_WIDTH	80
 #define		TEXT_HEIGHT		25
@@ -287,15 +287,15 @@
 #undef	HIRESO
 
 /*===========================================================================
- * »æ ¨•µ•§•∫
+ * ÂçäÂàÜ„Çµ„Ç§„Ç∫
  *===========================================================================*/
 
 /*----------------------------------------------------------------------
- *			°¸ 200•È•§•Û			…∏Ω‡
+ *			‚óè 200„É©„Ç§„É≥			Ê®ôÊ∫ñ
  *----------------------------------------------------------------------*/
 #define NORMAL
 
-#define COLOR						/* •´•È°º640x200 */
+#define COLOR						/* „Ç´„É©„Éº640x200 */
 #define		TEXT_WIDTH	80
 #define		TEXT_HEIGHT		25
 #define		VRAM2SCREEN_DIFF		v2s_dif_C80x25_H_N_16
@@ -318,7 +318,7 @@
 #include					"screen-vram-half.h"
 #undef	COLOR
 
-#define MONO						/* «Úπı	 640x200 */
+#define MONO						/* ÁôΩÈªí	 640x200 */
 #define		TEXT_WIDTH	80
 #define		TEXT_HEIGHT		25
 #define		VRAM2SCREEN_DIFF		v2s_dif_M80x25_H_N_16
@@ -341,7 +341,7 @@
 #include					"screen-vram-half.h"
 #undef	MONO
 
-#define UNDISP						/* »Û…Ωº®640x200 */
+#define UNDISP						/* ÈùûË°®Á§∫640x200 */
 
 #define		TEXT_WIDTH	80
 #define		TEXT_HEIGHT		25
@@ -367,11 +367,11 @@
 
 #undef	NORMAL
 /*----------------------------------------------------------------------
- *			°¸ 200•È•§•Û			øß ‰¥∞
+ *			‚óè 200„É©„Ç§„É≥			Ëâ≤Ë£úÂÆå
  *----------------------------------------------------------------------*/
 #define INTERPOLATE
 
-#define COLOR						/* •´•È°º640x200 */
+#define COLOR						/* „Ç´„É©„Éº640x200 */
 #define		TEXT_WIDTH	80
 #define		TEXT_HEIGHT		25
 #define		VRAM2SCREEN_DIFF		v2s_dif_C80x25_H_P_16
@@ -394,7 +394,7 @@
 #include					"screen-vram-half.h"
 #undef	COLOR
 
-#define MONO						/* «Úπı	 640x200 */
+#define MONO						/* ÁôΩÈªí	 640x200 */
 #define		TEXT_WIDTH	80
 #define		TEXT_HEIGHT		25
 #define		VRAM2SCREEN_DIFF		v2s_dif_M80x25_H_P_16
@@ -417,7 +417,7 @@
 #include					"screen-vram-half.h"
 #undef	MONO
 
-#define UNDISP						/* »Û…Ωº®640x200 */
+#define UNDISP						/* ÈùûË°®Á§∫640x200 */
 #define		TEXT_WIDTH	80
 #define		TEXT_HEIGHT		25
 #define		VRAM2SCREEN_DIFF		v2s_dif_U80x25_H_P_16
@@ -442,9 +442,9 @@
 
 #undef	INTERPOLATE
 /*----------------------------------------------------------------------
- *			°¸ 400•È•§•Û			…∏Ω‡
+ *			‚óè 400„É©„Ç§„É≥			Ê®ôÊ∫ñ
  *----------------------------------------------------------------------*/
-#define HIRESO						/* «Úπı	 640x400 */
+#define HIRESO						/* ÁôΩÈªí	 640x400 */
 
 #define		TEXT_WIDTH	80
 #define		TEXT_HEIGHT		25
@@ -470,15 +470,15 @@
 #undef	HIRESO
 
 /*===========================================================================
- * ∆Û«‹•µ•§•∫
+ * ‰∫åÂÄç„Çµ„Ç§„Ç∫
  *===========================================================================*/
 #ifdef	SUPPORT_DOUBLE
 /*----------------------------------------------------------------------
- *			°¸ 200•È•§•Û			…∏Ω‡
+ *			‚óè 200„É©„Ç§„É≥			Ê®ôÊ∫ñ
  *----------------------------------------------------------------------*/
 #define NORMAL
 
-#define COLOR						/* •´•È°º640x200 */
+#define COLOR						/* „Ç´„É©„Éº640x200 */
 #define		TEXT_WIDTH	80
 #define		TEXT_HEIGHT		25
 #define		VRAM2SCREEN_DIFF		v2s_dif_C80x25_D_N_16
@@ -501,7 +501,7 @@
 #include					"screen-vram-double.h"
 #undef	COLOR
 
-#define MONO						/* «Úπı	 640x200 */
+#define MONO						/* ÁôΩÈªí	 640x200 */
 #define		TEXT_WIDTH	80
 #define		TEXT_HEIGHT		25
 #define		VRAM2SCREEN_DIFF		v2s_dif_M80x25_D_N_16
@@ -524,7 +524,7 @@
 #include					"screen-vram-double.h"
 #undef	MONO
 
-#define UNDISP						/* »Û…Ωº®640x200 */
+#define UNDISP						/* ÈùûË°®Á§∫640x200 */
 #define		TEXT_WIDTH	80
 #define		TEXT_HEIGHT		25
 #define		VRAM2SCREEN_DIFF		v2s_dif_U80x25_D_N_16
@@ -549,11 +549,11 @@
 
 #undef	NORMAL
 /*----------------------------------------------------------------------
- *			°¸ 200•È•§•Û			•È•§•Û•π•≠•√•◊
+ *			‚óè 200„É©„Ç§„É≥			„É©„Ç§„É≥„Çπ„Ç≠„ÉÉ„Éó
  *----------------------------------------------------------------------*/
 #define SKIPLINE
 
-#define COLOR						/* •´•È°º640x200 */
+#define COLOR						/* „Ç´„É©„Éº640x200 */
 #define		TEXT_WIDTH	80
 #define		TEXT_HEIGHT		25
 #define		VRAM2SCREEN_DIFF		v2s_dif_C80x25_D_S_16
@@ -576,7 +576,7 @@
 #include					"screen-vram-double.h"
 #undef	COLOR
 
-#define MONO						/* «Úπı	 640x200 */
+#define MONO						/* ÁôΩÈªí	 640x200 */
 #define		TEXT_WIDTH	80
 #define		TEXT_HEIGHT		25
 #define		VRAM2SCREEN_DIFF		v2s_dif_M80x25_D_S_16
@@ -599,7 +599,7 @@
 #include					"screen-vram-double.h"
 #undef	MONO
 
-#define UNDISP						/* »Û…Ωº®640x200 */
+#define UNDISP						/* ÈùûË°®Á§∫640x200 */
 #define		TEXT_WIDTH	80
 #define		TEXT_HEIGHT		25
 #define		VRAM2SCREEN_DIFF		v2s_dif_U80x25_D_S_16
@@ -624,11 +624,11 @@
 
 #undef	SKIPLINE
 /*----------------------------------------------------------------------
- *			°¸ 200•È•§•Û			•§•Û•ø°º•Ï°º•π
+ *			‚óè 200„É©„Ç§„É≥			„Ç§„É≥„Çø„Éº„É¨„Éº„Çπ
  *----------------------------------------------------------------------*/
 #define INTERLACE
 
-#define COLOR						/* •´•È°º640x200 */
+#define COLOR						/* „Ç´„É©„Éº640x200 */
 #define		TEXT_WIDTH	80
 #define		TEXT_HEIGHT		25
 #define		VRAM2SCREEN_DIFF		v2s_dif_C80x25_D_I_16
@@ -651,7 +651,7 @@
 #include					"screen-vram-double.h"
 #undef	COLOR
 
-#define MONO						/* «Úπı	 640x200 */
+#define MONO						/* ÁôΩÈªí	 640x200 */
 #define		TEXT_WIDTH	80
 #define		TEXT_HEIGHT		25
 #define		VRAM2SCREEN_DIFF		v2s_dif_M80x25_D_I_16
@@ -674,7 +674,7 @@
 #include					"screen-vram-double.h"
 #undef	MONO
 
-#define UNDISP						/* »Û…Ωº®640x200 */
+#define UNDISP						/* ÈùûË°®Á§∫640x200 */
 #define		TEXT_WIDTH	80
 #define		TEXT_HEIGHT		25
 #define		VRAM2SCREEN_DIFF		v2s_dif_U80x25_D_I_16
@@ -699,9 +699,9 @@
 
 #undef	INTERLACE
 /*----------------------------------------------------------------------
- *			°¸ 400•È•§•Û			…∏Ω‡
+ *			‚óè 400„É©„Ç§„É≥			Ê®ôÊ∫ñ
  *----------------------------------------------------------------------*/
-#define HIRESO						/* «Úπı	 640x400 */
+#define HIRESO						/* ÁôΩÈªí	 640x400 */
 
 #define		TEXT_WIDTH	80
 #define		TEXT_HEIGHT		25
@@ -730,15 +730,15 @@
 
 #define	DIRECT
 /*===========================================================================
- * ≈˘«‹•µ•§•∫
+ * Á≠âÂÄç„Çµ„Ç§„Ç∫
  *===========================================================================*/
 
 /*----------------------------------------------------------------------
- *			°¸ 200•È•§•Û			…∏Ω‡
+ *			‚óè 200„É©„Ç§„É≥			Ê®ôÊ∫ñ
  *----------------------------------------------------------------------*/
 #define NORMAL
 
-#define COLOR						/* •´•È°º640x200 */
+#define COLOR						/* „Ç´„É©„Éº640x200 */
 #define		TEXT_WIDTH	80
 #define		TEXT_HEIGHT		25
 #define		VRAM2SCREEN_DIFF		v2s_dif_C80x25_F_N_16_d
@@ -761,7 +761,7 @@
 #include					"screen-vram-full.h"
 #undef	COLOR
 
-#define MONO						/* «Úπı	 640x200 */
+#define MONO						/* ÁôΩÈªí	 640x200 */
 #define		TEXT_WIDTH	80
 #define		TEXT_HEIGHT		25
 #define		VRAM2SCREEN_DIFF		v2s_dif_M80x25_F_N_16_d
@@ -784,7 +784,7 @@
 #include					"screen-vram-full.h"
 #undef	MONO
 
-#define UNDISP						/* »Û…Ωº®640x200 */
+#define UNDISP						/* ÈùûË°®Á§∫640x200 */
 #define		TEXT_WIDTH	80
 #define		TEXT_HEIGHT		25
 #define		VRAM2SCREEN_DIFF		v2s_dif_U80x25_F_N_16_d
@@ -810,15 +810,15 @@
 #undef	NORMAL
 
 /*===========================================================================
- * ∆Û«‹•µ•§•∫
+ * ‰∫åÂÄç„Çµ„Ç§„Ç∫
  *===========================================================================*/
 #ifdef	SUPPORT_DOUBLE
 /*----------------------------------------------------------------------
- *			°¸ 200•È•§•Û			…∏Ω‡
+ *			‚óè 200„É©„Ç§„É≥			Ê®ôÊ∫ñ
  *----------------------------------------------------------------------*/
 #define NORMAL
 
-#define COLOR						/* •´•È°º640x200 */
+#define COLOR						/* „Ç´„É©„Éº640x200 */
 #define		TEXT_WIDTH	80
 #define		TEXT_HEIGHT		25
 #define		VRAM2SCREEN_DIFF		v2s_dif_C80x25_D_N_16_d
@@ -841,7 +841,7 @@
 #include					"screen-vram-double.h"
 #undef	COLOR
 
-#define MONO						/* «Úπı	 640x200 */
+#define MONO						/* ÁôΩÈªí	 640x200 */
 #define		TEXT_WIDTH	80
 #define		TEXT_HEIGHT		25
 #define		VRAM2SCREEN_DIFF		v2s_dif_M80x25_D_N_16_d
@@ -864,7 +864,7 @@
 #include					"screen-vram-double.h"
 #undef	MONO
 
-#define UNDISP						/* »Û…Ωº®640x200 */
+#define UNDISP						/* ÈùûË°®Á§∫640x200 */
 #define		TEXT_WIDTH	80
 #define		TEXT_HEIGHT		25
 #define		VRAM2SCREEN_DIFF		v2s_dif_U80x25_D_N_16_d
@@ -889,11 +889,11 @@
 
 #undef	NORMAL
 /*----------------------------------------------------------------------
- *			°¸ 200•È•§•Û			•È•§•Û•π•≠•√•◊
+ *			‚óè 200„É©„Ç§„É≥			„É©„Ç§„É≥„Çπ„Ç≠„ÉÉ„Éó
  *----------------------------------------------------------------------*/
 #define SKIPLINE
 
-#define COLOR						/* •´•È°º640x200 */
+#define COLOR						/* „Ç´„É©„Éº640x200 */
 #define		TEXT_WIDTH	80
 #define		TEXT_HEIGHT		25
 #define		VRAM2SCREEN_DIFF		v2s_dif_C80x25_D_S_16_d
@@ -916,7 +916,7 @@
 #include					"screen-vram-double.h"
 #undef	COLOR
 
-#define MONO						/* «Úπı	 640x200 */
+#define MONO						/* ÁôΩÈªí	 640x200 */
 #define		TEXT_WIDTH	80
 #define		TEXT_HEIGHT		25
 #define		VRAM2SCREEN_DIFF		v2s_dif_M80x25_D_S_16_d
@@ -939,7 +939,7 @@
 #include					"screen-vram-double.h"
 #undef	MONO
 
-#define UNDISP						/* »Û…Ωº®640x200 */
+#define UNDISP						/* ÈùûË°®Á§∫640x200 */
 #define		TEXT_WIDTH	80
 #define		TEXT_HEIGHT		25
 #define		VRAM2SCREEN_DIFF		v2s_dif_U80x25_D_S_16_d
@@ -964,11 +964,11 @@
 
 #undef	SKIPLINE
 /*----------------------------------------------------------------------
- *			°¸ 200•È•§•Û			•§•Û•ø°º•Ï°º•π
+ *			‚óè 200„É©„Ç§„É≥			„Ç§„É≥„Çø„Éº„É¨„Éº„Çπ
  *----------------------------------------------------------------------*/
 #define INTERLACE
 
-#define COLOR						/* •´•È°º640x200 */
+#define COLOR						/* „Ç´„É©„Éº640x200 */
 #define		TEXT_WIDTH	80
 #define		TEXT_HEIGHT		25
 #define		VRAM2SCREEN_DIFF		v2s_dif_C80x25_D_I_16_d
@@ -991,7 +991,7 @@
 #include					"screen-vram-double.h"
 #undef	COLOR
 
-#define MONO						/* «Úπı	 640x200 */
+#define MONO						/* ÁôΩÈªí	 640x200 */
 #define		TEXT_WIDTH	80
 #define		TEXT_HEIGHT		25
 #define		VRAM2SCREEN_DIFF		v2s_dif_M80x25_D_I_16_d
@@ -1014,7 +1014,7 @@
 #include					"screen-vram-double.h"
 #undef	MONO
 
-#define UNDISP						/* »Û…Ωº®640x200 */
+#define UNDISP						/* ÈùûË°®Á§∫640x200 */
 #define		TEXT_WIDTH	80
 #define		TEXT_HEIGHT		25
 #define		VRAM2SCREEN_DIFF		v2s_dif_U80x25_D_I_16_d
@@ -1039,9 +1039,9 @@
 
 #undef	INTERLACE
 /*----------------------------------------------------------------------
- *			°¸ 400•È•§•Û			…∏Ω‡
+ *			‚óè 400„É©„Ç§„É≥			Ê®ôÊ∫ñ
  *----------------------------------------------------------------------*/
-#define HIRESO						/* «Úπı	 640x400 */
+#define HIRESO						/* ÁôΩÈªí	 640x400 */
 
 #define		TEXT_WIDTH	80
 #define		TEXT_HEIGHT		25
@@ -1070,7 +1070,7 @@
 
 
 /*===========================================================================
- * ≤ËÃÃæ√µÓ
+ * ÁîªÈù¢Ê∂àÂéª
  *===========================================================================*/
 
 #define		SCREEN_BUF_INIT			screen_buf_init_16
@@ -1078,7 +1078,7 @@
 
 
 /*===========================================================================
- * •·•À•Â°º≤ËÃÃ
+ * „É°„Éã„É•„ÉºÁîªÈù¢
  *===========================================================================*/
 
 #define		MENU2SCREEN			menu2screen_F_N_16
@@ -1097,7 +1097,7 @@
 
 
 /*===========================================================================
- * •π•∆°º•ø•π
+ * „Çπ„ÉÜ„Éº„Çø„Çπ
  *===========================================================================*/
 
 #define		STATUS2SCREEN			status2screen_16
@@ -1120,7 +1120,7 @@
 
 
 /* ========================================================================= */
-/* ≈˘«‹•µ•§•∫ - …∏Ω‡ */
+/* Á≠âÂÄç„Çµ„Ç§„Ç∫ - Ê®ôÊ∫ñ */
 
 int (*vram2screen_list_F_N_16[4][4][2])(void) =
 {
@@ -1150,7 +1150,7 @@ int (*vram2screen_list_F_N_16[4][4][2])(void) =
     },
 };
 
-/* ≈˘«‹•µ•§•∫ - •π•≠•√•◊•È•§•Û */
+/* Á≠âÂÄç„Çµ„Ç§„Ç∫ - „Çπ„Ç≠„ÉÉ„Éó„É©„Ç§„É≥ */
 
 int (*vram2screen_list_F_S_16[4][4][2])(void) =
 {
@@ -1180,7 +1180,7 @@ int (*vram2screen_list_F_S_16[4][4][2])(void) =
     },
 };
 
-/* ≈˘«‹•µ•§•∫ - •§•Û•ø°º•Ï°º•π */
+/* Á≠âÂÄç„Çµ„Ç§„Ç∫ - „Ç§„É≥„Çø„Éº„É¨„Éº„Çπ */
 
 int (*vram2screen_list_F_I_16[4][4][2])(void) =
 {
@@ -1211,7 +1211,7 @@ int (*vram2screen_list_F_I_16[4][4][2])(void) =
 };
 
 /* ========================================================================= */
-/* »æ ¨•µ•§•∫ - …∏Ω‡ */
+/* ÂçäÂàÜ„Çµ„Ç§„Ç∫ - Ê®ôÊ∫ñ */
 
 int (*vram2screen_list_H_N_16[4][4][2])(void) =
 {
@@ -1241,7 +1241,7 @@ int (*vram2screen_list_H_N_16[4][4][2])(void) =
     },
 };
 
-/* »æ ¨•µ•§•∫ - øß ‰¥∞ */
+/* ÂçäÂàÜ„Çµ„Ç§„Ç∫ - Ëâ≤Ë£úÂÆå */
 
 int (*vram2screen_list_H_P_16[4][4][2])(void) =
 {
@@ -1273,7 +1273,7 @@ int (*vram2screen_list_H_P_16[4][4][2])(void) =
 
 /* ========================================================================= */
 #ifdef	SUPPORT_DOUBLE
-/* ∆Û«‹•µ•§•∫ - …∏Ω‡ */
+/* ‰∫åÂÄç„Çµ„Ç§„Ç∫ - Ê®ôÊ∫ñ */
 
 int (*vram2screen_list_D_N_16[4][4][2])(void) =
 {
@@ -1303,7 +1303,7 @@ int (*vram2screen_list_D_N_16[4][4][2])(void) =
     },
 };
 
-/* ∆Û«‹•µ•§•∫ - •π•≠•√•◊•È•§•Û */
+/* ‰∫åÂÄç„Çµ„Ç§„Ç∫ - „Çπ„Ç≠„ÉÉ„Éó„É©„Ç§„É≥ */
 
 int (*vram2screen_list_D_S_16[4][4][2])(void) =
 {
@@ -1333,7 +1333,7 @@ int (*vram2screen_list_D_S_16[4][4][2])(void) =
     },
 };
 
-/* ∆Û«‹•µ•§•∫ - •§•Û•ø°º•Ï°º•π */
+/* ‰∫åÂÄç„Çµ„Ç§„Ç∫ - „Ç§„É≥„Çø„Éº„É¨„Éº„Çπ */
 
 int (*vram2screen_list_D_I_16[4][4][2])(void) =
 {
@@ -1365,7 +1365,7 @@ int (*vram2screen_list_D_I_16[4][4][2])(void) =
 #endif	/* SUPPORT_DOUBLE */
 
 /* ------------------------------------------------------------------------- */
-/* ≈˘«‹•µ•§•∫ - …∏Ω‡ */
+/* Á≠âÂÄç„Çµ„Ç§„Ç∫ - Ê®ôÊ∫ñ */
 
 int (*vram2screen_list_F_N_16_d[4][4][2])(void) =
 {
@@ -1396,7 +1396,7 @@ int (*vram2screen_list_F_N_16_d[4][4][2])(void) =
 };
 
 #ifdef	SUPPORT_DOUBLE
-/* ∆Û«‹•µ•§•∫ - …∏Ω‡ */
+/* ‰∫åÂÄç„Çµ„Ç§„Ç∫ - Ê®ôÊ∫ñ */
 
 int (*vram2screen_list_D_N_16_d[4][4][2])(void) =
 {
@@ -1426,7 +1426,7 @@ int (*vram2screen_list_D_N_16_d[4][4][2])(void) =
     },
 };
 
-/* ∆Û«‹•µ•§•∫ - •π•≠•√•◊•È•§•Û */
+/* ‰∫åÂÄç„Çµ„Ç§„Ç∫ - „Çπ„Ç≠„ÉÉ„Éó„É©„Ç§„É≥ */
 
 int (*vram2screen_list_D_S_16_d[4][4][2])(void) =
 {
@@ -1456,7 +1456,7 @@ int (*vram2screen_list_D_S_16_d[4][4][2])(void) =
     },
 };
 
-/* ∆Û«‹•µ•§•∫ - •§•Û•ø°º•Ï°º•π */
+/* ‰∫åÂÄç„Çµ„Ç§„Ç∫ - „Ç§„É≥„Çø„Éº„É¨„Éº„Çπ */
 
 int (*vram2screen_list_D_I_16_d[4][4][2])(void) =
 {

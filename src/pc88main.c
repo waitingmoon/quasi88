@@ -1,6 +1,6 @@
 /************************************************************************/
 /*									*/
-/* PC8801 ¥á¥¤¥ó¥·¥¹¥Æ¥à(ËÜÂÎÂ¦)					*/
+/* PC8801 ãƒ¡ã‚¤ãƒ³ã‚·ã‚¹ãƒ†ãƒ (æœ¬ä½“å´)					*/
 /*									*/
 /************************************************************************/
 
@@ -32,108 +32,108 @@
 
 
 
-static	OSD_FILE *fp_so = NULL;		/* ¥·¥ê¥¢¥ë½ĞÎÏÍÑfp		*/
-static	OSD_FILE *fp_si = NULL;		/*	   ÆşÎÏÍÑfp		*/
-static	OSD_FILE *fp_to = NULL;		/* ¥Æ¡¼¥×½ĞÎÏÍÑ  fp		*/
-static	OSD_FILE *fp_ti = NULL;		/*       ÆşÎÏÍÑ  fp		*/
-static	OSD_FILE *fp_prn= NULL;		/* ¥×¥ê¥ó¥¿½ĞÎÏÍÑfp		*/
+static	OSD_FILE *fp_so = NULL;		/* ã‚·ãƒªã‚¢ãƒ«å‡ºåŠ›ç”¨fp		*/
+static	OSD_FILE *fp_si = NULL;		/*	   å…¥åŠ›ç”¨fp		*/
+static	OSD_FILE *fp_to = NULL;		/* ãƒ†ãƒ¼ãƒ—å‡ºåŠ›ç”¨  fp		*/
+static	OSD_FILE *fp_ti = NULL;		/*       å…¥åŠ›ç”¨  fp		*/
+static	OSD_FILE *fp_prn= NULL;		/* ãƒ—ãƒªãƒ³ã‚¿å‡ºåŠ›ç”¨fp		*/
 
 
 
 
-int	boot_basic     =DEFAULT_BASIC;	/* µ¯Æ°»ş¤Î BASIC¥â¡¼¥É		*/
-int	boot_dipsw     =DEFAULT_DIPSW;	/* µ¯Æ°»ş¤Î¥Ç¥£¥Ã¥×ÀßÄê		*/
-int	boot_from_rom  =DEFAULT_BOOT;	/* µ¯Æ°¥Ç¥Ğ¥¤¥¹¤ÎÀßÄê		*/
-int	boot_clock_4mhz=DEFAULT_CLOCK;	/* µ¯Æ°»ş¤Î CPU¥¯¥í¥Ã¥¯		*/
+int	boot_basic     =DEFAULT_BASIC;	/* èµ·å‹•æ™‚ã® BASICãƒ¢ãƒ¼ãƒ‰		*/
+int	boot_dipsw     =DEFAULT_DIPSW;	/* èµ·å‹•æ™‚ã®ãƒ‡ã‚£ãƒƒãƒ—è¨­å®š		*/
+int	boot_from_rom  =DEFAULT_BOOT;	/* èµ·å‹•ãƒ‡ãƒã‚¤ã‚¹ã®è¨­å®š		*/
+int	boot_clock_4mhz=DEFAULT_CLOCK;	/* èµ·å‹•æ™‚ã® CPUã‚¯ãƒ­ãƒƒã‚¯		*/
 
-int	monitor_15k    =0x00;		/* 15k ¥â¥Ë¥¿¡¼ 2:Yes 0:No	*/
+int	monitor_15k    =0x00;		/* 15k ãƒ¢ãƒ‹ã‚¿ãƒ¼ 2:Yes 0:No	*/
 
 z80arch	z80main_cpu;			/* Z80 CPU ( main system )	*/
 
-int	high_mode;			/* ¹âÂ®¥â¡¼¥É 1:Yes 0:No	*/
+int	high_mode;			/* é«˜é€Ÿãƒ¢ãƒ¼ãƒ‰ 1:Yes 0:No	*/
 
 
-static	byte	dipsw_1;		/* IN[30] ¥Ç¥£¥Ã¥×¥¹¥¤¥Ã¥Á 1	*/
-static	byte	dipsw_2;		/* IN[31] ¥Ç¥£¥Ã¥×¥¹¥¤¥Ã¥Á 2	*/
-static	byte	ctrl_boot;		/* IN[40] ¥Ç¥£¥¹¥¯¥Ö¡¼¥È¾ğÊó	*/
-static	byte	cpu_clock;		/* IN[6E] CPU ¥¯¥í¥Ã¥¯		*/
+static	byte	dipsw_1;		/* IN[30] ãƒ‡ã‚£ãƒƒãƒ—ã‚¹ã‚¤ãƒƒãƒ 1	*/
+static	byte	dipsw_2;		/* IN[31] ãƒ‡ã‚£ãƒƒãƒ—ã‚¹ã‚¤ãƒƒãƒ 2	*/
+static	byte	ctrl_boot;		/* IN[40] ãƒ‡ã‚£ã‚¹ã‚¯ãƒ–ãƒ¼ãƒˆæƒ…å ±	*/
+static	byte	cpu_clock;		/* IN[6E] CPU ã‚¯ãƒ­ãƒƒã‚¯		*/
 
-int	memory_bank;			/* OUT[5C-5F] IN[5C] ¥á¥â¥ê¥Ğ¥ó¥¯*/
+int	memory_bank;			/* OUT[5C-5F] IN[5C] ãƒ¡ãƒ¢ãƒªãƒãƒ³ã‚¯*/
 
-static	byte	common_out_data;	/* OUT[10] PRT/»ş·×		*/
-byte	misc_ctrl;			/* I/O[32] ³Æ¼ïCtrl		*/
+static	byte	common_out_data;	/* OUT[10] PRT/æ™‚è¨ˆ		*/
+byte	misc_ctrl;			/* I/O[32] å„ç¨®Ctrl		*/
 byte	ALU1_ctrl;			/* OUT[34] ALU Ctrl 1		*/
 byte	ALU2_ctrl;			/* OUT[35] ALU Ctrl 2		*/
-byte	ctrl_signal;			/* OUT[40] ¥³¥ó¥È¥í¡¼¥ë¿®¹æ½ĞÎÏÃÍÊİÂ¸*/
-byte	baudrate_sw = DEFAULT_BAUDRATE;	/* I/O[6F] ¥Ü¡¼¥ì¡¼¥È		*/
-word	window_offset;			/* I/O[70] WINDOW ¥ª¥Õ¥»¥Ã¥È	*/
-byte	ext_rom_bank;			/* I/O[71] ³ÈÄ¥ROM BANK		*/
-byte	ext_ram_ctrl;			/* I/O[E2] ³ÈÄ¥RAMÀ©¸æ		*/
-byte	ext_ram_bank;			/* I/O[E3] ³ÈÄ¥RAM¥»¥ì¥¯¥È	*/
+byte	ctrl_signal;			/* OUT[40] ã‚³ãƒ³ãƒˆãƒ­ãƒ¼ãƒ«ä¿¡å·å‡ºåŠ›å€¤ä¿å­˜*/
+byte	baudrate_sw = DEFAULT_BAUDRATE;	/* I/O[6F] ãƒœãƒ¼ãƒ¬ãƒ¼ãƒˆ		*/
+word	window_offset;			/* I/O[70] WINDOW ã‚ªãƒ•ã‚»ãƒƒãƒˆ	*/
+byte	ext_rom_bank;			/* I/O[71] æ‹¡å¼µROM BANK		*/
+byte	ext_ram_ctrl;			/* I/O[E2] æ‹¡å¼µRAMåˆ¶å¾¡		*/
+byte	ext_ram_bank;			/* I/O[E3] æ‹¡å¼µRAMã‚»ãƒ¬ã‚¯ãƒˆ	*/
 
-static	pair	kanji1_addr;		/* OUT[E8-E9] ´Á»úROM(Âè1) ADDR	*/
-static	pair	kanji2_addr;		/* OUT[EC-ED] ´Á»úROM(Âè2) ADDR	*/
+static	pair	kanji1_addr;		/* OUT[E8-E9] æ¼¢å­—ROM(ç¬¬1) ADDR	*/
+static	pair	kanji2_addr;		/* OUT[EC-ED] æ¼¢å­—ROM(ç¬¬2) ADDR	*/
 
-byte	jisho_rom_bank;			/* OUT[F0] ¼­½ñROM¥»¥ì¥¯¥È	*/
-byte	jisho_rom_ctrl;			/* OUT[F1] ¼­½ñROM¥Ğ¥ó¥¯	*/
+byte	jisho_rom_bank;			/* OUT[F0] è¾æ›¸ROMã‚»ãƒ¬ã‚¯ãƒˆ	*/
+byte	jisho_rom_ctrl;			/* OUT[F1] è¾æ›¸ROMãƒãƒ³ã‚¯	*/
 
 
-int	calendar_stop = FALSE;		/* »ş·×Ää»ß¥Õ¥é¥°		*/
-static	char	calendar_data[7] =	/* »ş·×Ää»ß»ş¹ï (Ç¯·îÆüÍË»şÊ¬ÉÃ)*/
+int	calendar_stop = FALSE;		/* æ™‚è¨ˆåœæ­¢ãƒ•ãƒ©ã‚°		*/
+static	char	calendar_data[7] =	/* æ™‚è¨ˆåœæ­¢æ™‚åˆ» (å¹´æœˆæ—¥æ›œæ™‚åˆ†ç§’)*/
 { 85, 0, 1, 0, 0, 0, 0, };
 
 
-int	cmt_speed = 0;			/* ¥Æ¡¼¥×Â®ÅÙ(BPS)¡¢ 0¤Ï¼«Æ°	*/
-int	cmt_intr  = TRUE;		/* ¿¿¤Ç¡¢¥Æ¡¼¥×ÆÉ¹ş¤Ë³ä¹ş»ÈÍÑ	*/
-int	cmt_wait  = TRUE;		/* ¿¿¤Ç¡¢¥Æ¡¼¥×ÆÉ¹ş¥¦¥§¥¤¥È¤¢¤ê	*/
+int	cmt_speed = 0;			/* ãƒ†ãƒ¼ãƒ—é€Ÿåº¦(BPS)ã€ 0ã¯è‡ªå‹•	*/
+int	cmt_intr  = TRUE;		/* çœŸã§ã€ãƒ†ãƒ¼ãƒ—èª­è¾¼ã«å‰²è¾¼ä½¿ç”¨	*/
+int	cmt_wait  = TRUE;		/* çœŸã§ã€ãƒ†ãƒ¼ãƒ—èª­è¾¼ã‚¦ã‚§ã‚¤ãƒˆã‚ã‚Š	*/
 
 
-int	highspeed_mode = FALSE;		/* ¿¿¤Ç¡¢¹âÂ® BASIC ½èÍı¤¢¤ê 	*/
+int	highspeed_mode = FALSE;		/* çœŸã§ã€é«˜é€Ÿ BASIC å‡¦ç†ã‚ã‚Š 	*/
 
 
-int	use_siomouse = FALSE;		/* ¿¿¤Ç¡¢¥·¥ê¥¢¥ë¥Ş¥¦¥¹¤¢¤ê	*/
+int	use_siomouse = FALSE;		/* çœŸã§ã€ã‚·ãƒªã‚¢ãƒ«ãƒã‚¦ã‚¹ã‚ã‚Š	*/
 
 
-/* °Ê²¼¤Ï¥Æ¡¼¥×¥¤¥á¡¼¥¸¤Î¥Õ¥¡¥¤¥ë°ÍÂ¸¾ğÊó¤Ê¤Î¤Ç¡¢¥¹¥Æ¡¼¥È¥»¡¼¥Ö¤·¤Ê¤¤ */
+/* ä»¥ä¸‹ã¯ãƒ†ãƒ¼ãƒ—ã‚¤ãƒ¡ãƒ¼ã‚¸ã®ãƒ•ã‚¡ã‚¤ãƒ«ä¾å­˜æƒ…å ±ãªã®ã§ã€ã‚¹ãƒ†ãƒ¼ãƒˆã‚»ãƒ¼ãƒ–ã—ãªã„ */
 
-static	int	cmt_is_t88;		/* ¿¿¡ÄT88¡¢µ¶¡ÄCMT		*/
-static	int	cmt_block_size;		/* ¥Ç¡¼¥¿¥¿¥°Æâ¤Î¥µ¥¤¥º(T88)	*/
-static	long	cmt_size;		/* ¥¤¥á¡¼¥¸¤Î¥µ¥¤¥º		*/
-static	int	cmt_EOF = FALSE;	/* ¿¿¤Ç¡¢¥Æ¡¼¥×ÆşÎÏ EOF   	*/
-static	int	com_EOF = FALSE;	/* ¿¿¤Ç¡¢¥·¥ê¥¢¥ëÆşÎÏ EOF 	*/
-static	long	com_size;		/* ¥¤¥á¡¼¥¸¤Î¥µ¥¤¥º		*/
+static	int	cmt_is_t88;		/* çœŸâ€¦T88ã€å½â€¦CMT		*/
+static	int	cmt_block_size;		/* ãƒ‡ãƒ¼ã‚¿ã‚¿ã‚°å†…ã®ã‚µã‚¤ã‚º(T88)	*/
+static	long	cmt_size;		/* ã‚¤ãƒ¡ãƒ¼ã‚¸ã®ã‚µã‚¤ã‚º		*/
+static	int	cmt_EOF = FALSE;	/* çœŸã§ã€ãƒ†ãƒ¼ãƒ—å…¥åŠ› EOF   	*/
+static	int	com_EOF = FALSE;	/* çœŸã§ã€ã‚·ãƒªã‚¢ãƒ«å…¥åŠ› EOF 	*/
+static	long	com_size;		/* ã‚¤ãƒ¡ãƒ¼ã‚¸ã®ã‚µã‚¤ã‚º		*/
 
 
-static byte sio_in_data( void );	/* IN[20] RS232CÆşÎÏ (¥Ç¡¼¥¿)	*/
-static byte sio_in_status( void );	/* IN[21] RS232CÆşÎÏ (À©¸æ)	*/
-static byte in_ctrl_signal( void );	/* IN[40] ¥³¥ó¥È¥í¡¼¥ë¿®¹æÆşÎÏ	*/
+static byte sio_in_data( void );	/* IN[20] RS232Cå…¥åŠ› (ãƒ‡ãƒ¼ã‚¿)	*/
+static byte sio_in_status( void );	/* IN[21] RS232Cå…¥åŠ› (åˆ¶å¾¡)	*/
+static byte in_ctrl_signal( void );	/* IN[40] ã‚³ãƒ³ãƒˆãƒ­ãƒ¼ãƒ«ä¿¡å·å…¥åŠ›	*/
 
-static void sio_out_data( byte );	/* OUT[20] RS232C½ĞÎÏ (¥Ç¡¼¥¿)	*/
-static void sio_out_command( byte );	/* OUT[21] RS232C½ĞÎÏ (¥³¥Ş¥ó¥É)*/
-static void out_ctrl_signal( byte );	/* OUT[40] ¥³¥ó¥È¥í¡¼¥ë¿®¹æ½ĞÎÏ	*/
+static void sio_out_data( byte );	/* OUT[20] RS232Cå‡ºåŠ› (ãƒ‡ãƒ¼ã‚¿)	*/
+static void sio_out_command( byte );	/* OUT[21] RS232Cå‡ºåŠ› (ã‚³ãƒãƒ³ãƒ‰)*/
+static void out_ctrl_signal( byte );	/* OUT[40] ã‚³ãƒ³ãƒˆãƒ­ãƒ¼ãƒ«ä¿¡å·å‡ºåŠ›	*/
 
 static void sio_tape_highspeed_load( void );
 static void sio_set_intr_base( void );
 static void sio_check_cmt_error( void );
 
-#define	sio_tape_readable()	(fp_ti && !cmt_EOF)	/* ¥Æ¡¼¥×ÆÉ¹ş²Ä¡©   */
-#define	sio_tape_writable()	(fp_to)			/* ¥Æ¡¼¥×½ñ¹ş²Ä¡©   */
-#define	sio_serial_readable()	(fp_si && !com_EOF)	/* ¥·¥ê¥¢¥ëÆÉ¹ş²Ä¡© */
-#define	sio_serial_writable()	(fp_so)			/* ¥·¥ê¥¢¥ë½ñ¹ş²Ä¡© */
+#define	sio_tape_readable()	(fp_ti && !cmt_EOF)	/* ãƒ†ãƒ¼ãƒ—èª­è¾¼å¯ï¼Ÿ   */
+#define	sio_tape_writable()	(fp_to)			/* ãƒ†ãƒ¼ãƒ—æ›¸è¾¼å¯ï¼Ÿ   */
+#define	sio_serial_readable()	(fp_si && !com_EOF)	/* ã‚·ãƒªã‚¢ãƒ«èª­è¾¼å¯ï¼Ÿ */
+#define	sio_serial_writable()	(fp_so)			/* ã‚·ãƒªã‚¢ãƒ«æ›¸è¾¼å¯ï¼Ÿ */
 
 
 /************************************************************************/
-/* ¥á¥â¥ê¥¦¥§¥¤¥È							*/
+/* ãƒ¡ãƒ¢ãƒªã‚¦ã‚§ã‚¤ãƒˆ							*/
 /************************************************************************/
 /*
- * ¤Ş¤À¤Á¤ã¤ó¤ÈÂĞ±ş¤¹¤ë¤Î¤ÏÀè¤Ë¤Ê¤ê¤½¤¦¤Ç¤¹¤¬¡¢¤È¤ê¤¢¤¨¤º
+ * ã¾ã ã¡ã‚ƒã‚“ã¨å¯¾å¿œã™ã‚‹ã®ã¯å…ˆã«ãªã‚Šãã†ã§ã™ãŒã€ã¨ã‚Šã‚ãˆãš
  *
- *	ÄãÂ®¥â¡¼¥É¤Ç¤Î M1 ¥¦¥§¥¤¥È (¥Õ¥§¥Ã¥ÁËè¤Ë 1¥¹¥Æ¡¼¥È? )
- *	ÄãÂ®¥â¡¼¥É¤Ç¤Î DMA¤Î¥¦¥§¥¤¥È ( 1¥Ğ¥¤¥È9¥¹¥Æ¡¼¥È? ¤ò VSYNCËè? )
- *	¹âÂ®¥â¡¼¥É¤Ç¡¢¹âÂ®RAM¤Ç¤Î M1 ¥¦¥§¥¤¥È (¥Õ¥§¥Ã¥ÁËè¤Ë 1¥¹¥Æ¡¼¥È? )
- *	¥µ¥Ö¥·¥¹¥Æ¥à¤Ç¤Î M1 ¥¦¥§¥¤¥È (¥Õ¥§¥Ã¥ÁËè¤Ë 1¥¹¥Æ¡¼¥È? )
+ *	ä½é€Ÿãƒ¢ãƒ¼ãƒ‰ã§ã® M1 ã‚¦ã‚§ã‚¤ãƒˆ (ãƒ•ã‚§ãƒƒãƒæ¯ã« 1ã‚¹ãƒ†ãƒ¼ãƒˆ? )
+ *	ä½é€Ÿãƒ¢ãƒ¼ãƒ‰ã§ã® DMAã®ã‚¦ã‚§ã‚¤ãƒˆ ( 1ãƒã‚¤ãƒˆ9ã‚¹ãƒ†ãƒ¼ãƒˆ? ã‚’ VSYNCæ¯? )
+ *	é«˜é€Ÿãƒ¢ãƒ¼ãƒ‰ã§ã€é«˜é€ŸRAMã§ã® M1 ã‚¦ã‚§ã‚¤ãƒˆ (ãƒ•ã‚§ãƒƒãƒæ¯ã« 1ã‚¹ãƒ†ãƒ¼ãƒˆ? )
+ *	ã‚µãƒ–ã‚·ã‚¹ãƒ†ãƒ ã§ã® M1 ã‚¦ã‚§ã‚¤ãƒˆ (ãƒ•ã‚§ãƒƒãƒæ¯ã« 1ã‚¹ãƒ†ãƒ¼ãƒˆ? )
  *
- * ¤¢¤¿¤ê¤òÅ¬Åö¤ËÆş¤ì¤Æ¤ß¤ë¤³¤È¤Ë¤·¤Ş¤¹¡£
+ * ã‚ãŸã‚Šã‚’é©å½“ã«å…¥ã‚Œã¦ã¿ã‚‹ã“ã¨ã«ã—ã¾ã™ã€‚
  */
 
 #define	DMA_WAIT	(9)
@@ -175,20 +175,20 @@ static	void	pcg_out_addr_high( byte addr )
 
 
 /************************************************************************/
-/* ¹âÂ® BASIC ¥â¡¼¥É							*/
+/* é«˜é€Ÿ BASIC ãƒ¢ãƒ¼ãƒ‰							*/
 /************************************************************************/
 /*
- * ¹âÂ® BASIC ½èÍı¤Ï¡¢peach»á¤Ë¤è¤êÄó¶¡¤µ¤ì¤Ş¤·¤¿¡£
+ * é«˜é€Ÿ BASIC å‡¦ç†ã¯ã€peachæ°ã«ã‚ˆã‚Šæä¾›ã•ã‚Œã¾ã—ãŸã€‚
  */
 
 static	word	ret_addr = 0xffff;
 static	int	hs_icount = 0;
 
-	int highspeed_flag = FALSE;	/* ¸½ºß¡¢¹âÂ®BASIC ½èÍıÃæ	*/
-static	int highspeed_n88rom = FALSE;	/* MAIN-ROM ¥Ğ¥ó¥¯ÁªÂò»ş¡¢¿¿	*/
-					/* (¤³¤Î»ş¡¢¹âÂ®BASIC ½èÍı²ÄÇ½)	*/
+	int highspeed_flag = FALSE;	/* ç¾åœ¨ã€é«˜é€ŸBASIC å‡¦ç†ä¸­	*/
+static	int highspeed_n88rom = FALSE;	/* MAIN-ROM ãƒãƒ³ã‚¯é¸æŠæ™‚ã€çœŸ	*/
+					/* (ã“ã®æ™‚ã€é«˜é€ŸBASIC å‡¦ç†å¯èƒ½)	*/
 
-/* ¹âÂ® BASIC ¥â¡¼¥É¤ËÆş¤ë¤È¤­¤Î¥¢¥É¥ì¥¹ (BIOS°ÍÂ¸¤«¤â?) */
+/* é«˜é€Ÿ BASIC ãƒ¢ãƒ¼ãƒ‰ã«å…¥ã‚‹ã¨ãã®ã‚¢ãƒ‰ãƒ¬ã‚¹ (BIOSä¾å­˜ã‹ã‚‚?) */
 word highspeed_routine[] = {
     0x6e9a,			/* PSET   */
     0x6eae,			/* LINE   */
@@ -202,12 +202,12 @@ word highspeed_routine[] = {
 
 
 /************************************************************************/
-/* ¥á¥â¥ê¥¢¥¯¥»¥¹							*/
-/*					special thanks	³Ş¾¾·ò°ì¤µ¤ó	*/
-/*							peach ¤µ¤ó	*/
+/* ãƒ¡ãƒ¢ãƒªã‚¢ã‚¯ã‚»ã‚¹							*/
+/*					special thanks	ç¬ æ¾å¥ä¸€ã•ã‚“	*/
+/*							peach ã•ã‚“	*/
 /************************************************************************/
 /*
-   ¥á¥¤¥ó¥á¥â¥ê¤Ï¥Ğ¥ó¥¯ÀÚ¤êÂØ¤¨¤Ë¤è¤Ã¤Æ¡¢°Ê²¼¤Î¤è¤¦¤Ë¥Ş¥Ã¥Ô¥ó¥°¤µ¤ì¤ë¡£
+   ãƒ¡ã‚¤ãƒ³ãƒ¡ãƒ¢ãƒªã¯ãƒãƒ³ã‚¯åˆ‡ã‚Šæ›¿ãˆã«ã‚ˆã£ã¦ã€ä»¥ä¸‹ã®ã‚ˆã†ã«ãƒãƒƒãƒ”ãƒ³ã‚°ã•ã‚Œã‚‹ã€‚
 
    0000	+------++------+				+------+ +------+
 	|      ||      |				|      | |      |+
@@ -224,58 +224,58 @@ word highspeed_routine[] = {
 	|      |
    C000	+      +	+------++------++------+                 +------+
 	|      |	|      ||      ||      |		 |      |+
-	|      |	| VRAM || VRAM || VRAM |		 | ¼­½ñ ||
+	|      |	| VRAM || VRAM || VRAM |		 | è¾æ›¸ ||
    F000	+      ++------+|   B  ||   R  ||   G  |		 | ROM  ||
 	|      || High ||      ||      ||      |		 | (x32)||
    FFFF	+------++------++------++------++------+		 +------+|
 								  +------+
-   ¤Ä¤Ş¤ê¡¢Âç¤­¤¯Ê¬¤±¤ë¤È¡¢°Ê²¼¤Î6¤Ä¤Î¥¨¥ê¥¢¤ËÊ¬¤±¤é¤ì¤ë¡£
+   ã¤ã¾ã‚Šã€å¤§ããåˆ†ã‘ã‚‹ã¨ã€ä»¥ä¸‹ã®6ã¤ã®ã‚¨ãƒªã‚¢ã«åˆ†ã‘ã‚‰ã‚Œã‚‹ã€‚
 
-	0000H¡Á5FFFH	MAIN RAM / MAIN ROM / N-BASIC ROM / ³ÈÄ¥RAM
-	6000H¡Á7FFFH	MAIN RAM / MAIN ROM / ³ÈÄ¥ROM / N-BASIC ROM / ³ÈÄ¥RAM
-	8000H¡Á83FFH	MAIN RAM / ¥¦¥¤¥ó¥É¥¦
-	8400H¡ÁBFFFH	MAIN RAM
-	C000H¡ÁEFFFH	MAIN RAM / VRAM / ¼­½ñROM
-	F000H¡ÁFFFFH	MAIN RAM / ¹âÂ®RAM / VRAM / ¼­½ñROM
+	0000Hã€œ5FFFH	MAIN RAM / MAIN ROM / N-BASIC ROM / æ‹¡å¼µRAM
+	6000Hã€œ7FFFH	MAIN RAM / MAIN ROM / æ‹¡å¼µROM / N-BASIC ROM / æ‹¡å¼µRAM
+	8000Hã€œ83FFH	MAIN RAM / ã‚¦ã‚¤ãƒ³ãƒ‰ã‚¦
+	8400Hã€œBFFFH	MAIN RAM
+	C000Hã€œEFFFH	MAIN RAM / VRAM / è¾æ›¸ROM
+	F000Hã€œFFFFH	MAIN RAM / é«˜é€ŸRAM / VRAM / è¾æ›¸ROM
 
-   ¥Ğ¥ó¥¯ÀÚ¤êÂØ¤¨¤ò¹Ô¤Ê¤Ã¤¿»ş¤Ë¡¢³Æ¡¹¤Î¥¨¥ê¥¢¤¬¤É¤Î¥Ğ¥ó¥¯¤Ë³ä¤êÅö¤Æ¤é¤ì¤¿¤Î¤«
-   ¤ò¥Á¥§¥Ã¥¯¤·¡¢¼Âºİ¤Î¥á¥â¥ê¥¢¥¯¥»¥¹¤Ï¤½¤Î³ä¤êÅö¤Æ¾ğÊó¤Ë¤è¤ê¹Ô¤Ê¤¦¡£
+   ãƒãƒ³ã‚¯åˆ‡ã‚Šæ›¿ãˆã‚’è¡Œãªã£ãŸæ™‚ã«ã€å„ã€…ã®ã‚¨ãƒªã‚¢ãŒã©ã®ãƒãƒ³ã‚¯ã«å‰²ã‚Šå½“ã¦ã‚‰ã‚ŒãŸã®ã‹
+   ã‚’ãƒã‚§ãƒƒã‚¯ã—ã€å®Ÿéš›ã®ãƒ¡ãƒ¢ãƒªã‚¢ã‚¯ã‚»ã‚¹ã¯ãã®å‰²ã‚Šå½“ã¦æƒ…å ±ã«ã‚ˆã‚Šè¡Œãªã†ã€‚
 
 
-   Ãí)
-   H¥â¡¼¥É¤Ë¤ª¤¤¤Æ¤Ï¡¢ 0xf000 ¡Á 0xffff ÈÖÃÏ¤ò°Ê²¼¤Î¤è¤¦¤Ë¥¨¥ß¥å¥ì¡¼¥È¤¹¤ë¡£
+   æ³¨)
+   Hãƒ¢ãƒ¼ãƒ‰ã«ãŠã„ã¦ã¯ã€ 0xf000 ã€œ 0xffff ç•ªåœ°ã‚’ä»¥ä¸‹ã®ã‚ˆã†ã«ã‚¨ãƒŸãƒ¥ãƒ¬ãƒ¼ãƒˆã™ã‚‹ã€‚
 
-	¹âÂ®RAM¤Ï    main_ram[ 0xf000 ¡Á 0xffff ]      ¤ò»È¤¦
-	¥á¥¤¥óRAM¤Ï  main_high_ram[ 0x0000 ¡Á 0x0fff ] ¤ò»È¤¦
+	é«˜é€ŸRAMã¯    main_ram[ 0xf000 ã€œ 0xffff ]      ã‚’ä½¿ã†
+	ãƒ¡ã‚¤ãƒ³RAMã¯  main_high_ram[ 0x0000 ã€œ 0x0fff ] ã‚’ä½¿ã†
 
-   ¤³¤ì¤Ë¤è¤ê¡¢¥Æ¥­¥¹¥ÈÉ½¼¨½èÍı¤Ï¾ï¤Ë main_ram ¤ò»²¾È¤¹¤ì¤Ğ¤è¤¤¤³¤È¤Ë¤Ê¤ë¡£
+   ã“ã‚Œã«ã‚ˆã‚Šã€ãƒ†ã‚­ã‚¹ãƒˆè¡¨ç¤ºå‡¦ç†ã¯å¸¸ã« main_ram ã‚’å‚ç…§ã™ã‚Œã°ã‚ˆã„ã“ã¨ã«ãªã‚‹ã€‚
 */
 
 
-static	byte	*read_mem_0000_5fff;	/* ¥á¥¤¥ó¥á¥â¥ê ¥ê¡¼¥É¥İ¥¤¥ó¥¿	*/
+static	byte	*read_mem_0000_5fff;	/* ãƒ¡ã‚¤ãƒ³ãƒ¡ãƒ¢ãƒª ãƒªãƒ¼ãƒ‰ãƒã‚¤ãƒ³ã‚¿	*/
 static	byte	*read_mem_6000_7fff;
 static	byte	*read_mem_8000_83ff;
 static	byte	*read_mem_c000_efff;
 static	byte	*read_mem_f000_ffff;
 
-static	byte	*write_mem_0000_7fff;	/* ¥á¥¤¥ó¥á¥â¥ê ¥é¥¤¥È¥İ¥¤¥ó¥¿	*/
+static	byte	*write_mem_0000_7fff;	/* ãƒ¡ã‚¤ãƒ³ãƒ¡ãƒ¢ãƒª ãƒ©ã‚¤ãƒˆãƒã‚¤ãƒ³ã‚¿	*/
 static	byte	*write_mem_8000_83ff;
 static	byte	*write_mem_c000_efff;
 static	byte	*write_mem_f000_ffff;
 
 /*------------------------------------------------------*/
-/* address : 0x0000 ¡Á 0x7fff ¤Î ¥á¥â¥ê³ä¤êÅö¤Æ		*/
+/* address : 0x0000 ã€œ 0x7fff ã® ãƒ¡ãƒ¢ãƒªå‰²ã‚Šå½“ã¦		*/
 /*		ext_ram_ctrl, ext_ram_bank, grph_ctrl,	*/
-/*		ext_rom_bank, misc_ctrl ¤Ë¤è¤êÊÑ²½	*/
+/*		ext_rom_bank, misc_ctrl ã«ã‚ˆã‚Šå¤‰åŒ–	*/
 /*------------------------------------------------------*/
 #if 1
 INLINE	void	main_memory_mapping_0000_7fff( void )
 {
-  highspeed_n88rom = FALSE;	/* ¥Ç¥Õ¥©¥ë¥È */
+  highspeed_n88rom = FALSE;	/* ãƒ‡ãƒ•ã‚©ãƒ«ãƒˆ */
 
   switch( ext_ram_ctrl ){
 
-  case 0x00:					/* ³ÈÄ¥RAM RWÉÔ²Ä */
+  case 0x00:					/* æ‹¡å¼µRAM RWä¸å¯ */
     if( grph_ctrl&GRPH_CTRL_64RAM ){			/* 64KB RAM mode */
       read_mem_0000_5fff  = &main_ram[ 0x0000 ];
       read_mem_6000_7fff  = &main_ram[ 0x6000 ];
@@ -286,10 +286,10 @@ INLINE	void	main_memory_mapping_0000_7fff( void )
 	read_mem_6000_7fff = &main_rom_n[ 0x6000 ];
       }else{							/*N88 BASIC*/
 	read_mem_0000_5fff = &main_rom[ 0x0000 ];
-	if( ext_rom_bank&EXT_ROM_NOT ){				/* ÄÌ¾ïROM */
+	if( ext_rom_bank&EXT_ROM_NOT ){				/* é€šå¸¸ROM */
 	  read_mem_6000_7fff = &main_rom[ 0x6000 ];
 	  highspeed_n88rom = TRUE;
-	}else{							/* ³ÈÄ¥ROM */
+	}else{							/* æ‹¡å¼µROM */
 	  read_mem_6000_7fff = &main_rom_ext[ misc_ctrl&MISC_CTRL_EBANK ][0];
 	}
       }
@@ -297,7 +297,7 @@ INLINE	void	main_memory_mapping_0000_7fff( void )
     }
     break;
 
-  case 0x01:					/* ³ÈÄ¥RAM R²Ä WÉÔ²Ä */
+  case 0x01:					/* æ‹¡å¼µRAM Rå¯ Wä¸å¯ */
     if( ext_ram_bank < use_extram*4 ){
       read_mem_0000_5fff = &ext_ram[ ext_ram_bank ][ 0x0000 ];
       read_mem_6000_7fff = &ext_ram[ ext_ram_bank ][ 0x6000 ];
@@ -308,7 +308,7 @@ INLINE	void	main_memory_mapping_0000_7fff( void )
     write_mem_0000_7fff = &main_ram[ 0x0000 ];
     break;
 
-  case 0x10:					/* ³ÈÄ¥RAM RÉÔ²Ä W²Ä  */
+  case 0x10:					/* æ‹¡å¼µRAM Rä¸å¯ Wå¯  */
 		/* buf fix by peach (thanks!) */
     if( grph_ctrl&GRPH_CTRL_64RAM ){			/* 64KB RAM mode */
       read_mem_0000_5fff  = &main_ram[ 0x0000 ];
@@ -319,10 +319,10 @@ INLINE	void	main_memory_mapping_0000_7fff( void )
 	read_mem_6000_7fff = &main_rom_n[ 0x6000 ];
       }else{							/*N88 BASIC*/
 	read_mem_0000_5fff = &main_rom[ 0x0000 ];
-	if( ext_rom_bank&EXT_ROM_NOT ){				/* ÄÌ¾ïROM */
+	if( ext_rom_bank&EXT_ROM_NOT ){				/* é€šå¸¸ROM */
 	  read_mem_6000_7fff = &main_rom[ 0x6000 ];
 	  highspeed_n88rom = TRUE;
-	}else{							/* ³ÈÄ¥ROM */
+	}else{							/* æ‹¡å¼µROM */
 	  read_mem_6000_7fff = &main_rom_ext[ misc_ctrl&MISC_CTRL_EBANK ][0];
 	}
       }
@@ -334,7 +334,7 @@ INLINE	void	main_memory_mapping_0000_7fff( void )
     }
     break;
 
-  case 0x11:					/* ³ÈÄ¥RAM RW²Ä */
+  case 0x11:					/* æ‹¡å¼µRAM RWå¯ */
     if( ext_ram_bank < use_extram*4 ){
       read_mem_0000_5fff  = &ext_ram[ ext_ram_bank ][ 0x0000 ];
       read_mem_6000_7fff  = &ext_ram[ ext_ram_bank ][ 0x6000 ];
@@ -348,13 +348,13 @@ INLINE	void	main_memory_mapping_0000_7fff( void )
   }
 }
 
-#else	/* ¤³¤¦¡¢¤¹¤Ã¤­¤ê¤µ¤»¤ë¤Û¤¦¤¬¤¤¤¤¡© */
+#else	/* ã“ã†ã€ã™ã£ãã‚Šã•ã›ã‚‹ã»ã†ãŒã„ã„ï¼Ÿ */
 
 INLINE	void	main_memory_mapping_0000_7fff( void )
 {
-  highspeed_n88rom = FALSE;	/* ¥Ç¥Õ¥©¥ë¥È */
+  highspeed_n88rom = FALSE;	/* ãƒ‡ãƒ•ã‚©ãƒ«ãƒˆ */
 
-	/* ¥ê¡¼¥É¤Ï¡¢»ØÄê¤·¤¿¥Ğ¥ó¥¯¤Ë±ş¤¸¤¿¥á¥â¥ê¤«¤é */
+	/* ãƒªãƒ¼ãƒ‰ã¯ã€æŒ‡å®šã—ãŸãƒãƒ³ã‚¯ã«å¿œã˜ãŸãƒ¡ãƒ¢ãƒªã‹ã‚‰ */
 
 				/* buf fix by peach (thanks!) */
   if( grph_ctrl&GRPH_CTRL_64RAM ){			/* 64KB RAM mode */
@@ -366,31 +366,31 @@ INLINE	void	main_memory_mapping_0000_7fff( void )
       read_mem_6000_7fff = &main_rom_n[ 0x6000 ];
     }else{							/*N88 BASIC*/
       read_mem_0000_5fff = &main_rom[ 0x0000 ];
-      if( ext_rom_bank&EXT_ROM_NOT ){				/* ÄÌ¾ïROM */
+      if( ext_rom_bank&EXT_ROM_NOT ){				/* é€šå¸¸ROM */
 	read_mem_6000_7fff = &main_rom[ 0x6000 ];
 	highspeed_n88rom = TRUE;
-      }else{							/* ³ÈÄ¥ROM */
+      }else{							/* æ‹¡å¼µROM */
 	read_mem_6000_7fff = &main_rom_ext[ misc_ctrl&MISC_CTRL_EBANK ][0];
       }
     }
   }
 
-	/* ¥é¥¤¥È¤Ï¡¢¾ï¤Ë¥á¥¤¥óRAM ¤Ø */
+	/* ãƒ©ã‚¤ãƒˆã¯ã€å¸¸ã«ãƒ¡ã‚¤ãƒ³RAM ã¸ */
 
   write_mem_0000_7fff = &main_ram[ 0x0000 ];
 
 
 
-	/* ³ÈÄ¥RAM¤Ø¤Î¥¢¥¯¥»¥¹»ØÄê¤¬¤¢¤ì¤Ğ¡¢³ÈÄ¥RAM¤ò¥ê¡¼¥É¡¦¥é¥¤¥È¤¹¤ë */
+	/* æ‹¡å¼µRAMã¸ã®ã‚¢ã‚¯ã‚»ã‚¹æŒ‡å®šãŒã‚ã‚Œã°ã€æ‹¡å¼µRAMã‚’ãƒªãƒ¼ãƒ‰ãƒ»ãƒ©ã‚¤ãƒˆã™ã‚‹ */
 
-  if( ext_ram_ctrl & 0x01 ){				/* ³ÈÄ¥RAM R²Ä */
+  if( ext_ram_ctrl & 0x01 ){				/* æ‹¡å¼µRAM Rå¯ */
     if( ext_ram_bank < use_extram*4 ){
       read_mem_0000_5fff = &ext_ram[ ext_ram_bank ][ 0x0000 ];
       read_mem_6000_7fff = &ext_ram[ ext_ram_bank ][ 0x6000 ];
     }
   }
 
-  if( ext_ram_ctrl & 0x10 ){				/* ³ÈÄ¥RAM W²Ä */
+  if( ext_ram_ctrl & 0x10 ){				/* æ‹¡å¼µRAM Wå¯ */
     if( ext_ram_bank < use_extram*4 ){
       write_mem_0000_7fff = &ext_ram[ ext_ram_bank ][ 0x0000 ];
     }
@@ -400,8 +400,8 @@ INLINE	void	main_memory_mapping_0000_7fff( void )
 
 
 /*------------------------------------------------------*/
-/* address : 0x8000 ¡Á 0x83ff ¤Î ¥á¥â¥ê³ä¤êÅö¤Æ		*/
-/*		grph_ctrl, window_offset ¤Ë¤è¤êÊÑ²½	*/
+/* address : 0x8000 ã€œ 0x83ff ã® ãƒ¡ãƒ¢ãƒªå‰²ã‚Šå½“ã¦		*/
+/*		grph_ctrl, window_offset ã«ã‚ˆã‚Šå¤‰åŒ–	*/
 /*------------------------------------------------------*/
 INLINE	void	main_memory_mapping_8000_83ff( void )
 {
@@ -429,9 +429,9 @@ INLINE	void	main_memory_mapping_8000_83ff( void )
 
 
 /*------------------------------------------------------*/
-/* address : 0xc000 ¡Á 0xffff ¤Î ¥á¥â¥ê³ä¤êÅö¤Æ		*/
+/* address : 0xc000 ã€œ 0xffff ã® ãƒ¡ãƒ¢ãƒªå‰²ã‚Šå½“ã¦		*/
 /*		jisho_rom_ctrl, jisho_rom_bank, 	*/
-/*		misc_ctrl ¤Ë¤è¤êÊÑ²½			*/
+/*		misc_ctrl ã«ã‚ˆã‚Šå¤‰åŒ–			*/
 /*------------------------------------------------------*/
 INLINE	void	main_memory_mapping_c000_ffff( void )
 {
@@ -461,11 +461,11 @@ INLINE	void	main_memory_mapping_c000_ffff( void )
 
 
 /*------------------------------------------------------*/
-/* address : 0xc000 ¡Á 0xffff ¤Î ¥á¥¤¥ó¢«¢ªVARMÀÚ¤êÂØ¤¨	*/
+/* address : 0xc000 ã€œ 0xffff ã® ãƒ¡ã‚¤ãƒ³â†â†’VARMåˆ‡ã‚Šæ›¿ãˆ	*/
 /*		misc_ctrl, ALU2_ctrl,			*/
-/*		memory_bank ¤Ë¤è¤êÊÑ²½			*/
+/*		memory_bank ã«ã‚ˆã‚Šå¤‰åŒ–			*/
 /*------------------------------------------------------*/
-static	int	vram_access_way;	/* vram ¥¢¥¯¥»¥¹¤ÎÊıË¡	*/
+static	int	vram_access_way;	/* vram ã‚¢ã‚¯ã‚»ã‚¹ã®æ–¹æ³•	*/
 enum VramAccessWay{
   VRAM_ACCESS_BANK,
   VRAM_ACCESS_ALU,
@@ -475,20 +475,20 @@ enum VramAccessWay{
 
 INLINE	void	main_memory_vram_mapping( void )
 {
-  if( misc_ctrl & MISC_CTRL_EVRAM ){		/* ³ÈÄ¥¥¢¥¯¥»¥¹¥â¡¼¥É */
+  if( misc_ctrl & MISC_CTRL_EVRAM ){		/* æ‹¡å¼µã‚¢ã‚¯ã‚»ã‚¹ãƒ¢ãƒ¼ãƒ‰ */
 
-    /* ¥ï¡¼¥É¥é¥´¥ó¤Ç»ÈÍÑ (port 35H ¤ÎÊı¤Ï¤¤¤é¤Ê¤¤¤«¤â¡Ä) by peach */
+    /* ãƒ¯ãƒ¼ãƒ‰ãƒ©ã‚´ãƒ³ã§ä½¿ç”¨ (port 35H ã®æ–¹ã¯ã„ã‚‰ãªã„ã‹ã‚‚â€¦) by peach */
     memory_bank = MEMORY_BANK_MAIN;
 
-    if( ALU2_ctrl & ALU2_CTRL_VACCESS ){		/* VRAM³ÈÄ¥¥¢¥¯¥»¥¹ */
+    if( ALU2_ctrl & ALU2_CTRL_VACCESS ){		/* VRAMæ‹¡å¼µã‚¢ã‚¯ã‚»ã‚¹ */
       vram_access_way = VRAM_ACCESS_ALU;
-    }else{						/* MAIN RAM¥¢¥¯¥»¥¹ */
+    }else{						/* MAIN RAMã‚¢ã‚¯ã‚»ã‚¹ */
       vram_access_way = VRAM_NOT_ACCESS;
     }
-  }else{					/* ÆÈÎ©¥¢¥¯¥»¥¹¥â¡¼¥É */
-    if( memory_bank == MEMORY_BANK_MAIN ){		/* MAIN RAM¥¢¥¯¥»¥¹ */
+  }else{					/* ç‹¬ç«‹ã‚¢ã‚¯ã‚»ã‚¹ãƒ¢ãƒ¼ãƒ‰ */
+    if( memory_bank == MEMORY_BANK_MAIN ){		/* MAIN RAMã‚¢ã‚¯ã‚»ã‚¹ */
       vram_access_way = VRAM_NOT_ACCESS;
-    }else{						/* VRAM¥¢¥¯¥»¥¹     */
+    }else{						/* VRAMã‚¢ã‚¯ã‚»ã‚¹     */
       vram_access_way = VRAM_ACCESS_BANK;
     }
   }
@@ -498,7 +498,7 @@ INLINE	void	main_memory_vram_mapping( void )
 
 
 /*------------------------------*/
-/* ÄÌ¾ï¤Î£Ö£Ò£Á£Í¥ê¡¼¥É		*/
+/* é€šå¸¸ã®ï¼¶ï¼²ï¼¡ï¼­ãƒªãƒ¼ãƒ‰		*/
 /*------------------------------*/
 INLINE	byte	vram_read( word addr )
 {
@@ -506,7 +506,7 @@ INLINE	byte	vram_read( word addr )
 }
 
 /*------------------------------*/
-/* ÄÌ¾ï¤Î£Ö£Ò£Á£Í¥é¥¤¥È		*/
+/* é€šå¸¸ã®ï¼¶ï¼²ï¼¡ï¼­ãƒ©ã‚¤ãƒˆ		*/
 /*------------------------------*/
 INLINE	void	vram_write( word addr, byte data )
 {
@@ -516,7 +516,7 @@ INLINE	void	vram_write( word addr, byte data )
 }
 
 /*------------------------------*/
-/* £Á£Ì£Õ¤ò²ğ¤·¤¿£Ö£Ò£Á£Í¥ê¡¼¥É	*/
+/* ï¼¡ï¼¬ï¼µã‚’ä»‹ã—ãŸï¼¶ï¼²ï¼¡ï¼­ãƒªãƒ¼ãƒ‰	*/
 /*------------------------------*/
 typedef	union {
   bit8		c[4];
@@ -555,7 +555,7 @@ INLINE	byte	ALU_read( word addr )
 }
 
 /*------------------------------*/
-/* £Á£Ì£Õ¤ò²ğ¤·¤¿£Ö£Ò£Á£Í¥é¥¤¥È	*/
+/* ï¼¡ï¼¬ï¼µã‚’ä»‹ã—ãŸï¼¶ï¼²ï¼¡ï¼­ãƒ©ã‚¤ãƒˆ	*/
 /*------------------------------*/
 INLINE	void	ALU_write( word addr, byte data )
 {
@@ -594,37 +594,37 @@ INLINE	void	ALU_write( word addr, byte data )
 
 
 /*----------------------*/
-/*    ¥Õ¥§¥Ã¥Á		*/
+/*    ãƒ•ã‚§ãƒƒãƒ		*/
 /*----------------------*/
 
 byte	main_fetch( word addr )
 {
 
-  /* ¤«¤Ê¤êÅ¬Åö¤Ê¡¢¥á¥â¥ê¥¦¥§¥¤¥È½èÍı */
+  /* ã‹ãªã‚Šé©å½“ãªã€ãƒ¡ãƒ¢ãƒªã‚¦ã‚§ã‚¤ãƒˆå‡¦ç† */
 
   if( memory_wait ){
 
-    if( high_mode == FALSE ){		/* ÄãÂ®¥â¡¼¥É¤Î¾ì¹ç */
+    if( high_mode == FALSE ){		/* ä½é€Ÿãƒ¢ãƒ¼ãƒ‰ã®å ´åˆ */
 
-      z80main_cpu.state0 += 1;			/* M1¥µ¥¤¥¯¥ë¥¦¥§¥¤¥È */
+      z80main_cpu.state0 += 1;			/* M1ã‚µã‚¤ã‚¯ãƒ«ã‚¦ã‚§ã‚¤ãƒˆ */
 
-      if( dma_wait_count ){			/* DMA¥¦¥§¥¤¥È¤¬¤¢¤ì¤Ğ    */
-	dma_wait_count --;			/* ¤¹¤³¤·¤º¤Ä²Ã»»¤·¤Æ¤¤¤¯ */
+      if( dma_wait_count ){			/* DMAã‚¦ã‚§ã‚¤ãƒˆãŒã‚ã‚Œã°    */
+	dma_wait_count --;			/* ã™ã“ã—ãšã¤åŠ ç®—ã—ã¦ã„ã */
 	z80main_cpu.state0 += DMA_WAIT;
       }
 
-    }else{				/* ¹âÂ®¥â¡¼¥É¤Î¾ì¹ç */
+    }else{				/* é«˜é€Ÿãƒ¢ãƒ¼ãƒ‰ã®å ´åˆ */
 
-      if( addr>=0xf000 && mem_wait_highram ){	/* ¹âÂ®RAM¤Î¥Õ¥§¥Ã¥Á¤Ï */
-	z80main_cpu.state0 += 1;		/* M1¥µ¥¤¥¯¥ë¥¦¥§¥¤¥È  */
+      if( addr>=0xf000 && mem_wait_highram ){	/* é«˜é€ŸRAMã®ãƒ•ã‚§ãƒƒãƒã¯ */
+	z80main_cpu.state0 += 1;		/* M1ã‚µã‚¤ã‚¯ãƒ«ã‚¦ã‚§ã‚¤ãƒˆ  */
       }
     }
 
-    /* VRAM¥¢¥¯¥»¥¹»ş¤È¤«¡¢8MHz»ş¤Î¥¦¥§¥¤¥È¤â¤¢¤ë¤±¤ÉÌ¤¼ÂÁõ */
+    /* VRAMã‚¢ã‚¯ã‚»ã‚¹æ™‚ã¨ã‹ã€8MHzæ™‚ã®ã‚¦ã‚§ã‚¤ãƒˆã‚‚ã‚ã‚‹ã‘ã©æœªå®Ÿè£… */
   }
 
 
-  /* ¹âÂ® BASIC ¥â¡¼¥É */		/* peach»áÄó¶¡ */
+  /* é«˜é€Ÿ BASIC ãƒ¢ãƒ¼ãƒ‰ */		/* peachæ°æä¾› */
 
   if (highspeed_mode){
     if (!(highspeed_flag) && highspeed_n88rom) {
@@ -651,7 +651,7 @@ byte	main_fetch( word addr )
     }
   }
 
-  /* ¥á¥â¥ê¥ê¡¼¥É */
+  /* ãƒ¡ãƒ¢ãƒªãƒªãƒ¼ãƒ‰ */
 
   if     ( addr < 0x6000 ) return  read_mem_0000_5fff[ addr ];
   else if( addr < 0x8000 ) return  read_mem_6000_7fff[ addr & 0x1fff ];
@@ -676,7 +676,7 @@ byte	main_fetch( word addr )
 }
 
 /*----------------------*/
-/*    ¥á¥â¥ê¡¦¥ê¡¼¥É	*/
+/*    ãƒ¡ãƒ¢ãƒªãƒ»ãƒªãƒ¼ãƒ‰	*/
 /*----------------------*/
 byte	main_mem_read( word addr )
 {
@@ -703,7 +703,7 @@ byte	main_mem_read( word addr )
 }
 
 /*----------------------*/
-/*     ¥á¥â¥ê¡¦¥é¥¤¥È	*/
+/*     ãƒ¡ãƒ¢ãƒªãƒ»ãƒ©ã‚¤ãƒˆ	*/
 /*----------------------*/
 void	main_mem_write( word addr, byte data )
 {
@@ -733,11 +733,11 @@ void	main_mem_write( word addr, byte data )
 
 
 /************************************************************************/
-/* £É¡¿£Ï¥İ¡¼¥È¥¢¥¯¥»¥¹							*/
+/* ï¼©ï¼ï¼¯ãƒãƒ¼ãƒˆã‚¢ã‚¯ã‚»ã‚¹							*/
 /************************************************************************/
 
 /*----------------------*/
-/*    ¥İ¡¼¥È¡¦¥é¥¤¥È	*/
+/*    ãƒãƒ¼ãƒˆãƒ»ãƒ©ã‚¤ãƒˆ	*/
 /*----------------------*/
 
 void	main_io_out( byte port, byte data )
@@ -747,7 +747,7 @@ void	main_io_out( byte port, byte data )
 
   switch( port ){
 
-	/* ¹âÂ®¥Æ¡¼¥×¥í¡¼¥É / PCG */
+	/* é«˜é€Ÿãƒ†ãƒ¼ãƒ—ãƒ­ãƒ¼ãƒ‰ / PCG */
   case 0x00:
     /*if( use_pcg )*/
       pcg_out_data( data );
@@ -770,38 +770,38 @@ void	main_io_out( byte port, byte data )
   case 0x0d:
   case 0x0e:
   case 0x0f:
-    /* PCG ¤Î¥µ¥¦¥ó¥É½ĞÎÏ¤Î¥İ¡¼¥È¤é¤·¤¤ */
+    /* PCG ã®ã‚µã‚¦ãƒ³ãƒ‰å‡ºåŠ›ã®ãƒãƒ¼ãƒˆã‚‰ã—ã„ */
     return;
 
 
-	/* ¥×¥ê¥ó¥¿½ĞÎÏ¡¿¥«¥ì¥ó¥À¥¯¥í¥Ã¥¯ ½ĞÎÏ¥Ç¡¼¥¿ */
+	/* ãƒ—ãƒªãƒ³ã‚¿å‡ºåŠ›ï¼ã‚«ãƒ¬ãƒ³ãƒ€ã‚¯ãƒ­ãƒƒã‚¯ å‡ºåŠ›ãƒ‡ãƒ¼ã‚¿ */
   case 0x10:
     common_out_data = data;
     return;
 
 
-	/* RS-232C¡¿CMT ½ĞÎÏ¥Ç¡¼¥¿ */
+	/* RS-232Cï¼CMT å‡ºåŠ›ãƒ‡ãƒ¼ã‚¿ */
   case 0x20:
     sio_out_data( data );
     return;
 
-	/* RS-232C¡¿CMT À©¸æ¥³¥Ş¥ó¥É */
+	/* RS-232Cï¼CMT åˆ¶å¾¡ã‚³ãƒãƒ³ãƒ‰ */
   case 0x21:
     sio_out_command( data );
     return;
 
 
-	/* ¥·¥¹¥Æ¥à¥³¥ó¥È¥í¡¼¥ë½ĞÎÏ */
+	/* ã‚·ã‚¹ãƒ†ãƒ ã‚³ãƒ³ãƒˆãƒ­ãƒ¼ãƒ«å‡ºåŠ› */
   case 0x30:
-    if( (sys_ctrl^data) & (SYS_CTRL_80) ){	/* SYS_CTRL_MONO ¤ÏÌµ»ë */
-      screen_set_dirty_all();			/* (¥Æ¥­¥¹¥È¤Î¥«¥é¡¼¤Ï  */
-    }						/*  CRTCÀßÄê¤Ë¤Æ·èÄê)   */
+    if( (sys_ctrl^data) & (SYS_CTRL_80) ){	/* SYS_CTRL_MONO ã¯ç„¡è¦– */
+      screen_set_dirty_all();			/* (ãƒ†ã‚­ã‚¹ãƒˆã®ã‚«ãƒ©ãƒ¼ã¯  */
+    }						/*  CRTCè¨­å®šã«ã¦æ±ºå®š)   */
 
     if( sio_tape_readable() ){
       if( (sys_ctrl & 0x08) && !(data & 0x08) ) sio_check_cmt_error();
     }
 
-    /* ¥«¥»¥Ã¥È¥â¡¼¥¿¡¼¥ê¥ì¡¼²» */
+    /* ã‚«ã‚»ãƒƒãƒˆãƒ¢ãƒ¼ã‚¿ãƒ¼ãƒªãƒ¬ãƒ¼éŸ³ */
     if ((~sys_ctrl &  data) & 0x08) { xmame_dev_sample_motoron();  }
     if (( sys_ctrl & ~data) & 0x08) { xmame_dev_sample_motoroff(); }
 
@@ -814,11 +814,11 @@ printf("CMT %02x, %s: Motor %s: CDS %d\n",data,
 */
     return;
 
-	/* ¥°¥é¥Õ¥£¥Ã¥¯¥³¥ó¥È¥í¡¼¥ë½ĞÎÏ */
+	/* ã‚°ãƒ©ãƒ•ã‚£ãƒƒã‚¯ã‚³ãƒ³ãƒˆãƒ­ãƒ¼ãƒ«å‡ºåŠ› */
   case 0x31:
     chg = grph_ctrl ^ data;
 
-		/* GRPH_CTRL_25 ¤ÏÌµ»ë (¥Æ¥­¥¹¥È25¹Ô¤Ï CRTCÀßÄê¤Ë¤Æ·èÄê) */
+		/* GRPH_CTRL_25 ã¯ç„¡è¦– (ãƒ†ã‚­ã‚¹ãƒˆ25è¡Œã¯ CRTCè¨­å®šã«ã¦æ±ºå®š) */
     if( chg & (GRPH_CTRL_200|GRPH_CTRL_VDISP|GRPH_CTRL_COLOR) ){
       screen_set_dirty_all();
 
@@ -827,7 +827,7 @@ printf("CMT %02x, %s: Motor %s: CDS %d\n",data,
       }
     }
 
-    /* M88 ¤Ç¤Ï¤³¤¦¤Ê¤Ã¤Æ¤ë¡© (peach) */
+    /* M88 ã§ã¯ã“ã†ãªã£ã¦ã‚‹ï¼Ÿ (peach) */
     /*if (chg & (GRPH_CTRL_64RAM|GRPH_CTRL_N))*/
     /*grph_ctrl = data & (GRPH_CTRL_64RAM|GRPH_CTRL_N);*/
     /*else grph_ctrl = data;*/
@@ -838,7 +838,7 @@ printf("CMT %02x, %s: Motor %s: CDS %d\n",data,
     main_memory_mapping_8000_83ff();
     return;
 
-	/* ³Æ¼ïÀßÄêÆş½ĞÎÏ */
+	/* å„ç¨®è¨­å®šå…¥å‡ºåŠ› */
   case 0x32:
     chg = misc_ctrl ^ data;
     if( chg & MISC_CTRL_ANALOG ){
@@ -856,7 +856,7 @@ printf("CMT %02x, %s: Motor %s: CDS %d\n",data,
     return;
 
 
-	/* ³ÈÄ¥VRAMÀ©¸æ */
+	/* æ‹¡å¼µVRAMåˆ¶å¾¡ */
   case 0x34:
     ALU1_ctrl = data;
     return;
@@ -864,7 +864,7 @@ printf("CMT %02x, %s: Motor %s: CDS %d\n",data,
     ALU2_ctrl = data;
     set_ALU_comp();
 
-    /* ¥¯¥ê¥à¥¾¥ó£³¤ä¥ï¡¼¥É¥é¥´¥ó,STAR TRADER¤Ê¤É¤Ç»ÈÍÑ */
+    /* ã‚¯ãƒªãƒ ã‚¾ãƒ³ï¼“ã‚„ãƒ¯ãƒ¼ãƒ‰ãƒ©ã‚´ãƒ³,STAR TRADERãªã©ã§ä½¿ç”¨ */
     if (data & ALU2_CTRL_VACCESS) memory_bank = MEMORY_BANK_MAIN;
 					/* bug fix by peach (thanks!) */
 
@@ -872,13 +872,13 @@ printf("CMT %02x, %s: Motor %s: CDS %d\n",data,
     return;
 
 
-	/* ¥³¥ó¥È¥í¡¼¥ë¿®¹æ½ĞÎÏ */
+	/* ã‚³ãƒ³ãƒˆãƒ­ãƒ¼ãƒ«ä¿¡å·å‡ºåŠ› */
   case 0x40:
     out_ctrl_signal( data );
     return;
 
 
-	/* ¥µ¥¦¥ó¥É½ĞÎÏ */
+	/* ã‚µã‚¦ãƒ³ãƒ‰å‡ºåŠ› */
   case 0x44:
     if( sound_port & SD_PORT_44_45 ) sound_out_reg( data );
     return;
@@ -893,7 +893,7 @@ printf("CMT %02x, %s: Motor %s: CDS %d\n",data,
     return;
 
 
-    	/* CRTC½ĞÎÏ */
+    	/* CRTCå‡ºåŠ› */
   case 0x50:
     crtc_out_parameter( data );
 /*printf("CRTC PARM %02x\n",data);*/
@@ -903,7 +903,7 @@ printf("CMT %02x, %s: Motor %s: CDS %d\n",data,
 /*printf("CRTC CMD %02x\n",data);*/
     return;
 
-	/* ÇØ·Ê¿§¡Ê¥Ç¥¸¥¿¥ë¡Ë*/
+	/* èƒŒæ™¯è‰²ï¼ˆãƒ‡ã‚¸ã‚¿ãƒ«ï¼‰*/
   case 0x52:
     if( data&0x1 ) new_pal.blue  = 7;
     else           new_pal.blue  = 0;
@@ -922,17 +922,17 @@ printf("CMT %02x, %s: Motor %s: CDS %d\n",data,
     }
     return;
 
-	/* ²èÌÌ½Å¤Í¹ç¤ï¤» */
+	/* ç”»é¢é‡ã­åˆã‚ã› */
   case 0x53:
     grph_pile = data;
     set_text_display();
     screen_set_dirty_all();
     return;
 
-	/* ¥Ñ¥ì¥Ã¥ÈÀßÄê */
+	/* ãƒ‘ãƒ¬ãƒƒãƒˆè¨­å®š */
   case 0x54:
     if( (data & 0x80) &&
-	(misc_ctrl & MISC_CTRL_ANALOG) ){	/* ¥¢¥Ê¥í¥°¥â¡¼¥É */
+	(misc_ctrl & MISC_CTRL_ANALOG) ){	/* ã‚¢ãƒŠãƒ­ã‚°ãƒ¢ãƒ¼ãƒ‰ */
       if( (data & 0x40) == 0 ){
 	new_pal.blue  = (data     ) & 0x07;
 	new_pal.red   = (data >> 3) & 0x07;
@@ -961,7 +961,7 @@ printf("CMT %02x, %s: Motor %s: CDS %d\n",data,
   case 0x5a:
   case 0x5b:
 /*printf("PAL %02xH %02x\n",port,data );*/
-    if( ! (misc_ctrl&MISC_CTRL_ANALOG) ){	/* ¥Ç¥¸¥¿¥ë¥â¡¼¥É */
+    if( ! (misc_ctrl&MISC_CTRL_ANALOG) ){	/* ãƒ‡ã‚¸ã‚¿ãƒ«ãƒ¢ãƒ¼ãƒ‰ */
 
       if( data&0x1 ) new_pal.blue  = 7;
       else           new_pal.blue  = 0;
@@ -970,7 +970,7 @@ printf("CMT %02x, %s: Motor %s: CDS %d\n",data,
       if( data&0x4 ) new_pal.green = 7;
       else           new_pal.green = 0;
 
-    }else{					/* ¥¢¥Ê¥í¥°¥â¡¼¥É */
+    }else{					/* ã‚¢ãƒŠãƒ­ã‚°ãƒ¢ãƒ¼ãƒ‰ */
       if( (data & 0x40) == 0 ){
 	new_pal.blue  = (data      ) & 0x07;
 	new_pal.red   = (data >> 3 ) & 0x07;
@@ -993,7 +993,7 @@ printf("CMT %02x, %s: Motor %s: CDS %d\n",data,
     return;
 
     
-	/* ¥á¥â¥ê¥Ğ¥ó¥¯ÀÚÂØ¤¨ */
+	/* ãƒ¡ãƒ¢ãƒªãƒãƒ³ã‚¯åˆ‡æ›¿ãˆ */
   case 0x5c:
     memory_bank = MEMORY_BANK_GRAM0;
     main_memory_vram_mapping();
@@ -1011,7 +1011,7 @@ printf("CMT %02x, %s: Motor %s: CDS %d\n",data,
     main_memory_vram_mapping();
     return;
 
-	/* DMAC½ĞÎÏ */
+	/* DMACå‡ºåŠ› */
 
   case 0x60:
   case 0x62:
@@ -1033,25 +1033,25 @@ printf("CMT %02x, %s: Motor %s: CDS %d\n",data,
     return;
 
 
-	/* ¥Ü¡¼¥ì¡¼¥È */
+	/* ãƒœãƒ¼ãƒ¬ãƒ¼ãƒˆ */
   case 0x6f:
-    if( ROM_VERSION >= '8' ) baudrate_sw = data;	/* FH/MH °Ê¹ß¤ËÂĞ±ş */
+    if( ROM_VERSION >= '8' ) baudrate_sw = data;	/* FH/MH ä»¥é™ã«å¯¾å¿œ */
     return;
 
 
-	/* Window ¥ª¥Õ¥»¥Ã¥È¥¢¥É¥ì¥¹Æş½ĞÎÏ */
+	/* Window ã‚ªãƒ•ã‚»ãƒƒãƒˆã‚¢ãƒ‰ãƒ¬ã‚¹å…¥å‡ºåŠ› */
   case 0x70:
     window_offset = (word)data << 8;
     main_memory_mapping_8000_83ff();
     return;
 
-	/* ³ÈÄ¥ ROM ¥Ğ¥ó¥¯ */
+	/* æ‹¡å¼µ ROM ãƒãƒ³ã‚¯ */
   case 0x71:
     ext_rom_bank = data;
     main_memory_mapping_0000_7fff();
     return;
 
-	/* Window ¥ª¥Õ¥»¥Ã¥È¥¢¥É¥ì¥¹ ¥¤¥ó¥¯¥ê¥á¥ó¥È */
+	/* Window ã‚ªãƒ•ã‚»ãƒƒãƒˆã‚¢ãƒ‰ãƒ¬ã‚¹ ã‚¤ãƒ³ã‚¯ãƒªãƒ¡ãƒ³ãƒˆ */
 
   case 0x78:
     window_offset += 0x100;
@@ -1060,7 +1060,7 @@ printf("CMT %02x, %s: Motor %s: CDS %d\n",data,
 
 
 
-	/* ¥µ¥¦¥ó¥É½ĞÎÏ(¥ª¥×¥·¥ç¥ó) */
+	/* ã‚µã‚¦ãƒ³ãƒ‰å‡ºåŠ›(ã‚ªãƒ—ã‚·ãƒ§ãƒ³) */
   case 0xa8:
     if( sound_port & SD_PORT_A8_AD ){
       sound_out_reg( data );
@@ -1090,7 +1090,7 @@ printf("CMT %02x, %s: Motor %s: CDS %d\n",data,
     return;
 
 
-	/* ³ÈÄ¥ RAM À©¸æ */
+	/* æ‹¡å¼µ RAM åˆ¶å¾¡ */
   case 0xe2:
     if( use_extram ){
       ext_ram_ctrl = data & 0x11;
@@ -1100,29 +1100,29 @@ printf("CMT %02x, %s: Motor %s: CDS %d\n",data,
   case 0xe3:
 /*printf("OUT E3 <=  %02X\n",data);*/
     if( use_extram ){
-      if( linear_ext_ram ){		/* ½ĞÎÏÃÍ¤ÎÄÌ¤ê¤Ë¥Ğ¥ó¥¯¤ò³ä¤ê¿¶¤ë */
+      if( linear_ext_ram ){		/* å‡ºåŠ›å€¤ã®é€šã‚Šã«ãƒãƒ³ã‚¯ã‚’å‰²ã‚ŠæŒ¯ã‚‹ */
 	ext_ram_bank = data;
-      }else{				/* ¼Âµ¡¤Ã¤İ¤¯(?)¥Ğ¥ó¥¯¤ò³ä¤ê¿¶¤ë */
+      }else{				/* å®Ÿæ©Ÿã£ã½ã(?)ãƒãƒ³ã‚¯ã‚’å‰²ã‚ŠæŒ¯ã‚‹ */
 	ext_ram_bank = 0xff;
-	if (use_extram <= 4) {				/* 128KB*4°Ê²¼ */
+	if (use_extram <= 4) {				/* 128KB*4ä»¥ä¸‹ */
 	    if ((data & 0x0f) < use_extram * 4) {
 		ext_ram_bank = data & 0x0f;
 	    }
 	} else if (use_extram == 8) {			/* 1MB */
-	    /* ÀßÄê 00-07h, 10-17h, 20-27h, 30-37h ¤È¤¹¤ë */
+	    /* è¨­å®š 00-07h, 10-17h, 20-27h, 30-37h ã¨ã™ã‚‹ */
 	    if ((data & 0xc8) == 0x00) {
 		ext_ram_bank = ((data & 0x30) >> 1) | (data & 0x07);
 	    }
-	} else if (use_extram <= 10) {			/* 1MB + 128KB*2°Ê²¼ */
-	    /* ÀßÄê 08-0Fh, 18-1Fh, 28-2Fh, 38-3Fh ¤È¤¹¤ë */
+	} else if (use_extram <= 10) {			/* 1MB + 128KB*2ä»¥ä¸‹ */
+	    /* è¨­å®š 08-0Fh, 18-1Fh, 28-2Fh, 38-3Fh ã¨ã™ã‚‹ */
 	    if ((data & 0xc8) == 0x08) {
 		ext_ram_bank = ((data & 0x30) >> 1) | (data & 0x07);
 	    } else if ((data & 0x0f) < (use_extram - 8) * 4) {
 		ext_ram_bank = (data & 0x0f) + 0x20;
 	    }
 	} else if (use_extram == 16) {			/* 2MB */
-	    /* ÀßÄê 08-0Fh, 18-1Fh, 28-2Fh, 38-3Fh ¤È¤¹¤ë */
-	    /* ÀßÄê 48-4Fh, 58-5Fh, 68-6Fh, 78-7Fh ¤È¤¹¤ë */
+	    /* è¨­å®š 08-0Fh, 18-1Fh, 28-2Fh, 38-3Fh ã¨ã™ã‚‹ */
+	    /* è¨­å®š 48-4Fh, 58-5Fh, 68-6Fh, 78-7Fh ã¨ã™ã‚‹ */
 	    if ((data & 0x88) == 0x08) {
 		ext_ram_bank = ((data & 0x70) >> 1) | (data & 0x07);
 	    }
@@ -1133,7 +1133,7 @@ printf("CMT %02x, %s: Motor %s: CDS %d\n",data,
     return;
 
 
-	/* ³ä¤ê¹ş¤ß¥ì¥Ù¥ë¤ÎÀßÄê */
+	/* å‰²ã‚Šè¾¼ã¿ãƒ¬ãƒ™ãƒ«ã®è¨­å®š */
   case 0xe4:
     intr_priority = data & 0x08;
     if( intr_priority ) intr_level = 7;
@@ -1141,12 +1141,12 @@ printf("CMT %02x, %s: Motor %s: CDS %d\n",data,
     if( highspeed_flag == FALSE ){
       CPU_REFRESH_INTERRUPT();
 
-      /* 'ASHEÂĞºö¡Ä¡Ä */	/* thanks! peach */
+      /* 'ASHEå¯¾ç­–â€¦â€¦ */	/* thanks! peach */
       z80main_cpu.skip_intr_chk = TRUE;
     }
     return;
 
-	/* ³ä¤ê¹ş¤ß¥Ş¥¹¥¯ */
+	/* å‰²ã‚Šè¾¼ã¿ãƒã‚¹ã‚¯ */
   case 0xe6:
     intr_sio_enable   = data & INTERRUPT_MASK_SIO;
     intr_vsync_enable = data & INTERRUPT_MASK_VSYNC;
@@ -1160,7 +1160,7 @@ printf("CMT %02x, %s: Motor %s: CDS %d\n",data,
     return;
 
 
-	/* ´Á»ú£Ò£Ï£Í ¥¢¥É¥ì¥¹ÀßÄê */
+	/* æ¼¢å­—ï¼²ï¼¯ï¼­ ã‚¢ãƒ‰ãƒ¬ã‚¹è¨­å®š */
   case 0xe8:
     kanji1_addr.B.l = data;
     return;
@@ -1180,7 +1180,7 @@ printf("CMT %02x, %s: Motor %s: CDS %d\n",data,
     return;
 
 
-	/* ¼­½ñROM¤ÎÀßÄê */
+	/* è¾æ›¸ROMã®è¨­å®š */
 
   case 0xf0:
     if( use_jisho_rom ){
@@ -1195,7 +1195,7 @@ printf("CMT %02x, %s: Motor %s: CDS %d\n",data,
     }
     return;
 
-	/* £Ğ£É£Ï */
+	/* ï¼°ï¼©ï¼¯ */
 
   case 0xfc:
     logpio(" %02x-->\n",data);
@@ -1216,7 +1216,7 @@ printf("CMT %02x, %s: Motor %s: CDS %d\n",data,
 
 
 
-	/* ¤½¤ÎÂ¾¤Î¥İ¡¼¥È */
+	/* ãã®ä»–ã®ãƒãƒ¼ãƒˆ */
 
   case 0x90:  case 0x91:  case 0x92:  case 0x93:	/* CD-ROM */
   case 0x94:  case 0x95:  case 0x96:  case 0x97:
@@ -1253,13 +1253,13 @@ printf("CMT %02x, %s: Motor %s: CDS %d\n",data,
 }
 
 /*----------------------*/
-/*    ¥İ¡¼¥È¡¦¥ê¡¼¥É	*/
+/*    ãƒãƒ¼ãƒˆãƒ»ãƒªãƒ¼ãƒ‰	*/
 /*----------------------*/
 byte	main_io_in( byte port )
 {
   switch( port ){
 
-	/* ¥­¡¼¥Ü¡¼¥É */
+	/* ã‚­ãƒ¼ãƒœãƒ¼ãƒ‰ */
   case 0x00:
   case 0x01:
   case 0x02:
@@ -1276,8 +1276,8 @@ byte	main_io_in( byte port )
   case 0x0d:
   case 0x0e:
   case 0x0f:
-    disk_ex_drv = 0;		/* ¥­¡¼ÆşÎÏ¤Ç¥ê¥»¥Ã¥È */
-#ifdef	USE_KEYBOARD_BUG				/* peach»áÄó¶¡ */
+    disk_ex_drv = 0;		/* ã‚­ãƒ¼å…¥åŠ›ã§ãƒªã‚»ãƒƒãƒˆ */
+#ifdef	USE_KEYBOARD_BUG				/* peachæ°æä¾› */
     {
       int i;
       byte mkey, mkey_old;
@@ -1287,7 +1287,7 @@ byte	main_io_in( byte port )
 	mkey_old = mkey;
 	for (i = 0; i < 0x10; i++) {
 	  if (i != port && key_scan[i] != 0xff) {
-	    /* [SHIFT],[CTRL],[GRAPH],[¥«¥Ê]¤Ë¤ÏÅ¬ÍÑ¤·¤Ê¤¤ */
+	    /* [SHIFT],[CTRL],[GRAPH],[ã‚«ãƒŠ]ã«ã¯é©ç”¨ã—ãªã„ */
 	    if ((i == 0x08 && (mkey | key_scan[i] | 0xf0) != 0xff) ||
 		(i != 0x08 && (mkey | key_scan[i])        != 0xff))
 	      mkey &= key_scan[i];
@@ -1301,34 +1301,34 @@ byte	main_io_in( byte port )
 #endif
 
 
-	/* RS-232C¡¿CMT ÆşÎÏ¥Ç¡¼¥¿ */
+	/* RS-232Cï¼CMT å…¥åŠ›ãƒ‡ãƒ¼ã‚¿ */
   case 0x20:
     return sio_in_data();
 
 
-	/* RS-232C/CMT À©¸æ */
+	/* RS-232C/CMT åˆ¶å¾¡ */
   case 0x21:
     return sio_in_status();
 
 
-	/* ¥Ç¥£¥Ã¥×¥¹¥¤¥Ã¥ÁÆşÎÏ */
+	/* ãƒ‡ã‚£ãƒƒãƒ—ã‚¹ã‚¤ãƒƒãƒå…¥åŠ› */
 
   case 0x30:
     return dipsw_1 | 0xc0;
   case 0x31:
     return dipsw_2;
 
-	/* ³Æ¼ïÀßÄêÆşÎÏ */
+	/* å„ç¨®è¨­å®šå…¥åŠ› */
   case 0x32:
     return misc_ctrl;
 
-	/* ¥³¥ó¥È¥í¡¼¥ë¿®¹æÆşÎÏ */
+	/* ã‚³ãƒ³ãƒˆãƒ­ãƒ¼ãƒ«ä¿¡å·å…¥åŠ› */
   case 0x40:
     return in_ctrl_signal() | 0xc0 | 0x04;
  /* return in_ctrl_signal() | 0xc0;*/
 
 
-	/* ¥µ¥¦¥ó¥ÉÆşÎÏ */
+	/* ã‚µã‚¦ãƒ³ãƒ‰å…¥åŠ› */
 	
   case 0x44:
     if( sound_port & SD_PORT_44_45 ) return sound_in_status( );
@@ -1344,7 +1344,7 @@ byte	main_io_in( byte port )
     else                             return 0xff;
 
 
-    	/* CRTCÆşÎÏ */
+    	/* CRTCå…¥åŠ› */
   case 0x50:
 /*printf("READ CRTC parm\n");*/
     return crtc_in_parameter( );
@@ -1353,12 +1353,12 @@ byte	main_io_in( byte port )
     return crtc_in_status( );
 
 
-	/* ¥á¥â¥ê¥Ğ¥ó¥¯ */
+	/* ãƒ¡ãƒ¢ãƒªãƒãƒ³ã‚¯ */
   case 0x5c:
     return (1<<memory_bank) | 0xf8;
 
 
-	/* DMACÆşÎÏ */
+	/* DMACå…¥åŠ› */
 
   case 0x60:
   case 0x62:
@@ -1377,51 +1377,51 @@ byte	main_io_in( byte port )
     return dmac_in_status( );
 
 
-	/* CPU ¥¯¥í¥Ã¥¯ */
+	/* CPU ã‚¯ãƒ­ãƒƒã‚¯ */
   case 0x6e:
-    if( ROM_VERSION >= '8' ) return cpu_clock | 0x10;	/* FH/MH °Ê¹ß¤ËÂĞ±ş */
+    if( ROM_VERSION >= '8' ) return cpu_clock | 0x10;	/* FH/MH ä»¥é™ã«å¯¾å¿œ */
     else		     return 0xff;
 
 
-	/* ¥Ü¡¼¥ì¡¼¥È */
+	/* ãƒœãƒ¼ãƒ¬ãƒ¼ãƒˆ */
   case 0x6f:
-    if( ROM_VERSION >= '8' ) return baudrate_sw | 0xf0;	/* FH/MH °Ê¹ß¤ËÂĞ±ş */
+    if( ROM_VERSION >= '8' ) return baudrate_sw | 0xf0;	/* FH/MH ä»¥é™ã«å¯¾å¿œ */
     else		     return 0xff;
 
 
-	/* Window ¥ª¥Õ¥»¥Ã¥È¥¢¥É¥ì¥¹Æş½ĞÎÏ */
+	/* Window ã‚ªãƒ•ã‚»ãƒƒãƒˆã‚¢ãƒ‰ãƒ¬ã‚¹å…¥å‡ºåŠ› */
   case 0x70:
     return window_offset >> 8;
 
 
-	/* ³ÈÄ¥ ROM ¥Ğ¥ó¥¯ */
+	/* æ‹¡å¼µ ROM ãƒãƒ³ã‚¯ */
   case 0x71:
     return ext_rom_bank;
 
 
-	/* ³ÈÄ¥ RAM À©¸æ */
+	/* æ‹¡å¼µ RAM åˆ¶å¾¡ */
   case 0xe2:
     if( use_extram ) return ~ext_ram_ctrl | 0xee;
     return 0xff;
   case 0xe3:
-    if( linear_ext_ram ){		/* ½ĞÎÏÃÍ¤ÎÄÌ¤ê¤Ë¥Ğ¥ó¥¯¤ò³ä¤ê¿¶¤Ã¤¿ */
+    if( linear_ext_ram ){		/* å‡ºåŠ›å€¤ã®é€šã‚Šã«ãƒãƒ³ã‚¯ã‚’å‰²ã‚ŠæŒ¯ã£ãŸ */
       if( use_extram &&
 	(ext_ram_bank < use_extram*4) ) return ext_ram_bank;
       return 0xff;
-    }else{				/* ¼Âµ¡¤Ã¤İ¤¯(?)¥Ğ¥ó¥¯¤ò³ä¤ê¿¶¤Ã¤¿ */
+    }else{				/* å®Ÿæ©Ÿã£ã½ã(?)ãƒãƒ³ã‚¯ã‚’å‰²ã‚ŠæŒ¯ã£ãŸ */
 	byte ret = 0xff;
 	if (use_extram && (ext_ram_bank != 0xff)) {
-	    if (use_extram <= 4) {			/* 128KB*4°Ê²¼ */
+	    if (use_extram <= 4) {			/* 128KB*4ä»¥ä¸‹ */
 		ret = (ext_ram_bank | 0xf0);
 	    } else if (use_extram == 8) {		/* 1MB */
-		/* ÀßÄê 00-07h, 10-17h, 20-27h, 30-37h ¤È¤¹¤ë */
+		/* è¨­å®š 00-07h, 10-17h, 20-27h, 30-37h ã¨ã™ã‚‹ */
 		if (ext_ram_bank < 8) {
 		    ret = (ext_ram_bank | 0xf0);
 		} else {
 		    ret = ((ext_ram_bank & 0x18) << 1) | (ext_ram_bank & 0x07);
 		}
-	    } else if (use_extram <= 10) {		/* 1MB + 128KB*2°Ê²¼ */
-		/* ÀßÄê 08-0Fh, 18-1Fh, 28-2Fh, 38-3Fh ¤È¤¹¤ë */
+	    } else if (use_extram <= 10) {		/* 1MB + 128KB*2ä»¥ä¸‹ */
+		/* è¨­å®š 08-0Fh, 18-1Fh, 28-2Fh, 38-3Fh ã¨ã™ã‚‹ */
 		if (ext_ram_bank < 0x20) {
 		    ret = ((ext_ram_bank & 0x18) << 1) | 0x08 |
 							 (ext_ram_bank & 0x07);
@@ -1429,8 +1429,8 @@ byte	main_io_in( byte port )
 		    ret = ((ext_ram_bank - 0x20) | 0xf0);
 		}
 	    } else if (use_extram == 16) {		/* 2MB */
-		/* ÀßÄê 08-0Fh, 18-1Fh, 28-2Fh, 38-3Fh ¤È¤¹¤ë */
-		/* ÀßÄê 48-4Fh, 58-5Fh, 68-6Fh, 78-7Fh ¤È¤¹¤ë */
+		/* è¨­å®š 08-0Fh, 18-1Fh, 28-2Fh, 38-3Fh ã¨ã™ã‚‹ */
+		/* è¨­å®š 48-4Fh, 58-5Fh, 68-6Fh, 78-7Fh ã¨ã™ã‚‹ */
 		ret = ((ext_ram_bank & 0x38) << 1) | 0x08 |
 							(ext_ram_bank & 0x07);
 	    }
@@ -1440,7 +1440,7 @@ byte	main_io_in( byte port )
     }
 
 
-	/* ¥µ¥¦¥ó¥ÉÆşÎÏ(¥ª¥×¥·¥ç¥ó) */
+	/* ã‚µã‚¦ãƒ³ãƒ‰å…¥åŠ›(ã‚ªãƒ—ã‚·ãƒ§ãƒ³) */
   case 0xa8:
     if( sound_port & SD_PORT_A8_AD ) return sound_in_status( );
     else                             return 0xff;
@@ -1459,7 +1459,7 @@ byte	main_io_in( byte port )
 
 
 
-	/* ´Á»ú£Ò£Ï£Í ¥Õ¥©¥ó¥ÈÆşÎÏ */
+	/* æ¼¢å­—ï¼²ï¼¯ï¼­ ãƒ•ã‚©ãƒ³ãƒˆå…¥åŠ› */
   case 0xe8:
     return kanji_rom[0][kanji1_addr.W][1];
   case 0xe9:
@@ -1472,7 +1472,7 @@ byte	main_io_in( byte port )
 
 
 
-	/* £Ğ£É£Ï */
+	/* ï¼°ï¼©ï¼¯ */
 
   case 0xfc:
     {
@@ -1503,7 +1503,7 @@ byte	main_io_in( byte port )
 
 
 
-	/* ¤½¤ÎÂ¾¤Î¥İ¡¼¥È */
+	/* ãã®ä»–ã®ãƒãƒ¼ãƒˆ */
 
   case 0x90:  case 0x91:  case 0x92:  case 0x93:	/* CD-ROM */
   case 0x94:  case 0x95:  case 0x96:  case 0x97:
@@ -1550,24 +1550,24 @@ byte	main_io_in( byte port )
 
 
 /*===========================================================================*/
-/* ¥·¥ê¥¢¥ë¥İ¡¼¥È							     */
+/* ã‚·ãƒªã‚¢ãƒ«ãƒãƒ¼ãƒˆ							     */
 /*===========================================================================*/
 
-static	int	sio_instruction;		/* USART ¤Î¥³¥Ş¥ó¥É¾õÂÖ */
-static	byte	sio_mode;			/* USART ¤ÎÀßÄê¥â¡¼¥É   */
-static	byte	sio_command;			/* USART ¤Î¥³¥Ş¥ó¥É	*/
-static	int	sio_data_exist;			/* ÆÉ¹şÌ¤¤Î SIO¥Ç¡¼¥¿Í­ */
-static	byte	sio_data;			/* SIO¥Ç¡¼¥¿            */
+static	int	sio_instruction;		/* USART ã®ã‚³ãƒãƒ³ãƒ‰çŠ¶æ…‹ */
+static	byte	sio_mode;			/* USART ã®è¨­å®šãƒ¢ãƒ¼ãƒ‰   */
+static	byte	sio_command;			/* USART ã®ã‚³ãƒãƒ³ãƒ‰	*/
+static	int	sio_data_exist;			/* èª­è¾¼æœªã® SIOãƒ‡ãƒ¼ã‚¿æœ‰ */
+static	byte	sio_data;			/* SIOãƒ‡ãƒ¼ã‚¿            */
 
-static	int	com_X_flow = FALSE;		/* ¿¿¤Ç¡¢X¥Õ¥í¡¼À©¸æÃæ	*/
+static	int	com_X_flow = FALSE;		/* çœŸã§ã€Xãƒ•ãƒ­ãƒ¼åˆ¶å¾¡ä¸­	*/
 
-static	int	cmt_dummy_read_cnt = 0;		/* ³ä¹şÌ¤»ÈÍÑ»ş¤Î¥À¥ß¡¼	*/
-static	int	cmt_skip;			/* Ìµ¸ú¥Ç¡¼¥¿Éô¤ÎÆÉ¤ßÈô¤Ğ¤· */
-static	int	cmt_skip_data;			/* ÆÉ¤ßÈô¤Ğ¤·Ä¾¸å¤Î¥Ç¡¼¥¿   */
+static	int	cmt_dummy_read_cnt = 0;		/* å‰²è¾¼æœªä½¿ç”¨æ™‚ã®ãƒ€ãƒŸãƒ¼	*/
+static	int	cmt_skip;			/* ç„¡åŠ¹ãƒ‡ãƒ¼ã‚¿éƒ¨ã®èª­ã¿é£›ã°ã— */
+static	int	cmt_skip_data;			/* èª­ã¿é£›ã°ã—ç›´å¾Œã®ãƒ‡ãƒ¼ã‚¿   */
 
-static	long	cmt_read_chars = 0;		/* ÆÉ¤ß¹ş¤ó¤À¼Â¥Ğ¥¤¥È¿ô	*/
-static	long	cmt_stateload_chars = 0;	/* ¥¹¥Æ¡¼¥È¥í¡¼¥É»şÆÉ¹ş¿ô*/
-static	int	cmt_stateload_skip = 0;		/* ¥¹¥Æ¡¼¥È¥í¡¼¥É»ş skip */
+static	long	cmt_read_chars = 0;		/* èª­ã¿è¾¼ã‚“ã å®Ÿãƒã‚¤ãƒˆæ•°	*/
+static	long	cmt_stateload_chars = 0;	/* ã‚¹ãƒ†ãƒ¼ãƒˆãƒ­ãƒ¼ãƒ‰æ™‚èª­è¾¼æ•°*/
+static	int	cmt_stateload_skip = 0;		/* ã‚¹ãƒ†ãƒ¼ãƒˆãƒ­ãƒ¼ãƒ‰æ™‚ skip */
 
 static	int	sio_getc( int is_cmt, int *tick );
 
@@ -1577,7 +1577,7 @@ void	sio_data_clear(void)
 }
 
 
-/*-------- ¥í¡¼¥ÉÍÑ¥Æ¡¼¥×¥¤¥á¡¼¥¸¥Õ¥¡¥¤¥ë¤ò "rb" ¤Ç³«¤¯ --------*/
+/*-------- ãƒ­ãƒ¼ãƒ‰ç”¨ãƒ†ãƒ¼ãƒ—ã‚¤ãƒ¡ãƒ¼ã‚¸ãƒ•ã‚¡ã‚¤ãƒ«ã‚’ "rb" ã§é–‹ã --------*/
 
 int	sio_open_tapeload( const char *filename )
 {
@@ -1603,7 +1603,7 @@ void	sio_close_tapeload( void )
   cmt_read_chars = 0;
 }
 
-/*-------- ¥»¡¼¥ÖÍÑ¥Æ¡¼¥×¥¤¥á¡¼¥¸¥Õ¥¡¥¤¥ë¤ò "ab" ¤Ç³«¤¯ --------*/
+/*-------- ã‚»ãƒ¼ãƒ–ç”¨ãƒ†ãƒ¼ãƒ—ã‚¤ãƒ¡ãƒ¼ã‚¸ãƒ•ã‚¡ã‚¤ãƒ«ã‚’ "ab" ã§é–‹ã --------*/
 
 int	sio_open_tapesave( const char *filename )
 {
@@ -1624,7 +1624,7 @@ void	sio_close_tapesave( void )
   if( fp_to ){ osd_fclose( fp_to ); fp_to = NULL; }
 }
 
-/*-------- ¥·¥ê¥¢¥ëÆşÎÏÍÑ¤Î¥Õ¥¡¥¤¥ë¤ò "rb" ¤Ç³«¤¯ --------*/
+/*-------- ã‚·ãƒªã‚¢ãƒ«å…¥åŠ›ç”¨ã®ãƒ•ã‚¡ã‚¤ãƒ«ã‚’ "rb" ã§é–‹ã --------*/
 
 int	sio_open_serialin( const char *filename )
 {
@@ -1659,7 +1659,7 @@ void	sio_close_serialin( void )
   /* com_X_flow = FALSE; */
 }
 
-/*-------- ¥·¥ê¥¢¥ë½ĞÎÏÍÑ¤Î¥Õ¥¡¥¤¥ë¤ò "ab" ¤Ç³«¤¯ --------*/
+/*-------- ã‚·ãƒªã‚¢ãƒ«å‡ºåŠ›ç”¨ã®ãƒ•ã‚¡ã‚¤ãƒ«ã‚’ "ab" ã§é–‹ã --------*/
 
 int	sio_open_serialout( const char *filename )
 {
@@ -1680,7 +1680,7 @@ void	sio_close_serialout( void )
   if( fp_so ){ osd_fclose( fp_so ); fp_so = NULL; }
 }
 
-/*-------- ¥·¥ê¥¢¥ë¥Ş¥¦¥¹¤ò½é´ü²½/½ªÎ»¤¹¤ë --------*/
+/*-------- ã‚·ãƒªã‚¢ãƒ«ãƒã‚¦ã‚¹ã‚’åˆæœŸåŒ–/çµ‚äº†ã™ã‚‹ --------*/
 
 void	sio_mouse_init(int initial)
 {
@@ -1690,7 +1690,7 @@ void	sio_mouse_init(int initial)
   sio_set_intr_base();
 }
 
-/*-------- ³«¤¤¤Æ¤¤¤ë¥Æ¡¼¥×¥¤¥á¡¼¥¸¤ò´¬¤­Ìá¤¹ --------*/
+/*-------- é–‹ã„ã¦ã„ã‚‹ãƒ†ãƒ¼ãƒ—ã‚¤ãƒ¡ãƒ¼ã‚¸ã‚’å·»ãæˆ»ã™ --------*/
 
 #define T88_HEADER_STR		"PC-8801 Tape Image(T88)"
 int	sio_tape_rewind( void )
@@ -1720,7 +1720,7 @@ int	sio_tape_rewind( void )
       if( osd_fseek( fp_ti, 0, SEEK_SET ) ) goto ERR;
     }
 
-    while( cmt_stateload_chars -- ){	/* ¥¹¥Æ¡¼¥È¥í¡¼¥É»ş¤Ï¡¢¥Æ¡¼¥×ÁáÁ÷¤ê */
+    while( cmt_stateload_chars -- ){	/* ã‚¹ãƒ†ãƒ¼ãƒˆãƒ­ãƒ¼ãƒ‰æ™‚ã¯ã€ãƒ†ãƒ¼ãƒ—æ—©é€ã‚Š */
       if( sio_getc( TRUE, NULL ) == EOF ){
 	break;
       }
@@ -1742,18 +1742,18 @@ int	sio_tape_rewind( void )
   return FALSE;
 }
 
-/*-------- ³«¤¤¤Æ¤¤¤ë¥Æ¡¼¥×¤Î¸½ºß°ÌÃÖ¤òÊÖ¤¹ (²¿%ÆÉ¤ó¤À¤«¤Î³ÎÇ§ÍÑ) --------*/
+/*-------- é–‹ã„ã¦ã„ã‚‹ãƒ†ãƒ¼ãƒ—ã®ç¾åœ¨ä½ç½®ã‚’è¿”ã™ (ä½•%èª­ã‚“ã ã‹ã®ç¢ºèªç”¨) --------*/
 
 int	sio_tape_pos( long *cur, long *end )
 {
   long v;
 
   if( fp_ti ){
-    if( cmt_EOF ){		/* ½ªÃ¼¤Ê¤é¡¢°ÌÃÖ=0/½ªÃ¼=0 ¤Ë¤·¡¢¿¿¤òÊÖ¤¹ */
+    if( cmt_EOF ){		/* çµ‚ç«¯ãªã‚‰ã€ä½ç½®=0/çµ‚ç«¯=0 ã«ã—ã€çœŸã‚’è¿”ã™ */
       *cur = 0;
       *end = 0;
       return TRUE;
-    }else{			/* ÅÓÃæ¤Ê¤é¡¢°ÌÃÖ¤È½ªÃ¼¤ò¥»¥Ã¥È¤·¿¿¤òÊÖ¤¹ */
+    }else{			/* é€”ä¸­ãªã‚‰ã€ä½ç½®ã¨çµ‚ç«¯ã‚’ã‚»ãƒƒãƒˆã—çœŸã‚’è¿”ã™ */
       v = osd_ftell( fp_ti );
       if( v >= 0 ){
 	*cur = v;
@@ -1762,7 +1762,7 @@ int	sio_tape_pos( long *cur, long *end )
       }
     }
   }
-  *cur = 0;			/* ÉÔÌÀ»ş¤Ï¡¢°ÌÃÖ=0/½ªÃ¼=0 ¤Ë¤·¡¢µ¶¤òÊÖ¤¹ */
+  *cur = 0;			/* ä¸æ˜æ™‚ã¯ã€ä½ç½®=0/çµ‚ç«¯=0 ã«ã—ã€å½ã‚’è¿”ã™ */
   *end = 0;
   return FALSE;
 }
@@ -1772,11 +1772,11 @@ int	sio_com_pos( long *cur, long *end )
   long v;
 
   if( fp_si ){
-    if( com_EOF ){		/* ½ªÃ¼¤Ê¤é¡¢°ÌÃÖ=0/½ªÃ¼=0 ¤Ë¤·¡¢¿¿¤òÊÖ¤¹ */
+    if( com_EOF ){		/* çµ‚ç«¯ãªã‚‰ã€ä½ç½®=0/çµ‚ç«¯=0 ã«ã—ã€çœŸã‚’è¿”ã™ */
       *cur = 0;
       *end = 0;
       return TRUE;
-    }else{			/* ÅÓÃæ¤Ê¤é¡¢°ÌÃÖ¤È½ªÃ¼¤ò¥»¥Ã¥È¤·¿¿¤òÊÖ¤¹ */
+    }else{			/* é€”ä¸­ãªã‚‰ã€ä½ç½®ã¨çµ‚ç«¯ã‚’ã‚»ãƒƒãƒˆã—çœŸã‚’è¿”ã™ */
       v = osd_ftell( fp_si );
       if( v >= 0 ){
 	*cur = v;
@@ -1785,7 +1785,7 @@ int	sio_com_pos( long *cur, long *end )
       }
     }
   }
-  *cur = 0;			/* ÉÔÌÀ»ş¤Ï¡¢°ÌÃÖ=0/½ªÃ¼=0 ¤Ë¤·¡¢µ¶¤òÊÖ¤¹ */
+  *cur = 0;			/* ä¸æ˜æ™‚ã¯ã€ä½ç½®=0/çµ‚ç«¯=0 ã«ã—ã€å½ã‚’è¿”ã™ */
   *end = 0;
   return FALSE;
 }
@@ -1795,7 +1795,7 @@ int	sio_com_pos( long *cur, long *end )
 
 
 /*
- * ³«¤¤¤Æ¤¤¤ësio¥¤¥á¡¼¥¸¤«¤é1Ê¸»úÆÉ¤ß¹ş¤à 
+ * é–‹ã„ã¦ã„ã‚‹sioã‚¤ãƒ¡ãƒ¼ã‚¸ã‹ã‚‰1æ–‡å­—èª­ã¿è¾¼ã‚€ 
  */
 static	int	sio_getc( int is_cmt, int *tick )
 {
@@ -1803,7 +1803,7 @@ static	int	sio_getc( int is_cmt, int *tick )
 
   if( tick ) *tick = 0;
 
-  if( is_cmt==FALSE ){			/* ¥·¥ê¥¢¥ëÆşÎÏ */
+  if( is_cmt==FALSE ){			/* ã‚·ãƒªã‚¢ãƒ«å…¥åŠ› */
 
     if (use_siomouse) {
       c = get_serial_mouse_data();
@@ -1821,16 +1821,16 @@ static	int	sio_getc( int is_cmt, int *tick )
     }
     return c;
 
-  }else{				/* ¥Æ¡¼¥×ÆşÎÏ */
+  }else{				/* ãƒ†ãƒ¼ãƒ—å…¥åŠ› */
 
     if( fp_ti==NULL ) return EOF;
     if( cmt_EOF )     return EOF;
 
-    if( cmt_is_t88 == FALSE ){			/* CMT·Á¼°¤Î¾ì¹ç */
+    if( cmt_is_t88 == FALSE ){			/* CMTå½¢å¼ã®å ´åˆ */
 
       c = osd_fgetc( fp_ti );
 
-    }else{					/* T88·Á¼°¤Î¾ì¹ç */
+    }else{					/* T88å½¢å¼ã®å ´åˆ */
 
       while( cmt_block_size == 0 ){
 
@@ -1839,7 +1839,7 @@ static	int	sio_getc( int is_cmt, int *tick )
 	if( (c=osd_fgetc(fp_ti))==EOF ){ break; }
 	id += c << 8;
 
-	if( id==0x0000 ){				/* ½ªÎ»¥¿¥° */
+	if( id==0x0000 ){				/* çµ‚äº†ã‚¿ã‚° */
 	  c = EOF; break;
 	}
 	else {
@@ -1848,11 +1848,11 @@ static	int	sio_getc( int is_cmt, int *tick )
 	  if( (c=osd_fgetc(fp_ti))==EOF ){ break; }
 	  size += c << 8;
 
-	  if( id == 0x0101 ){				/* ¥Ç¡¼¥¿¥¿¥° */
+	  if( id == 0x0101 ){				/* ãƒ‡ãƒ¼ã‚¿ã‚¿ã‚° */
 
 	    if( size < 12 ){ c = EOF; break; }
 
-	    for( i=0; i<12; i++ ){	/* ¾ğÊó¤ÏÁ´¤ÆÌµ»ë */
+	    for( i=0; i<12; i++ ){	/* æƒ…å ±ã¯å…¨ã¦ç„¡è¦– */
 	      if( (c=osd_fgetc(fp_ti))==EOF ){ break; }
 	    }
 	    if( c==EOF ) break;
@@ -1860,17 +1860,17 @@ static	int	sio_getc( int is_cmt, int *tick )
 
 	  }else{					
 
-	    if( id == 0x0100 ||				/* ¥Ö¥é¥ó¥¯¥¿¥° */
-		id == 0x0102 ||				/* ¥¹¥Ú¡¼¥¹¥¿¥° */
-		id == 0x0103 ){				/* ¥Ş¡¼¥¯¥¿¥°   */
+	    if( id == 0x0100 ||				/* ãƒ–ãƒ©ãƒ³ã‚¯ã‚¿ã‚° */
+		id == 0x0102 ||				/* ã‚¹ãƒšãƒ¼ã‚¹ã‚¿ã‚° */
+		id == 0x0103 ){				/* ãƒãƒ¼ã‚¯ã‚¿ã‚°   */
 
 	      if( size != 8 ){ c = EOF; break; }
 
-	      for( i=0; i<4; i++ ){	/* ³«»Ï»ş´Ö¤ÏÌµ»ë */
+	      for( i=0; i<4; i++ ){	/* é–‹å§‹æ™‚é–“ã¯ç„¡è¦– */
 		if( (c=osd_fgetc(fp_ti))==EOF ){ break; }
 	      }
 	      if( c==EOF ) break;
-					/* Ä¹¤µ»ş´Ö¤Ï¼èÆÀ */
+					/* é•·ã•æ™‚é–“ã¯å–å¾— */
 	      if( (c=osd_fgetc(fp_ti))==EOF ){ break; }
 	      time = c;
 	      if( (c=osd_fgetc(fp_ti))==EOF ){ break; }
@@ -1882,7 +1882,7 @@ static	int	sio_getc( int is_cmt, int *tick )
 
 	      if( tick ) *tick += time;
 
-	    }else{					/* Â¾¤Î¥¿¥°(Ìµ»ë) */
+	    }else{					/* ä»–ã®ã‚¿ã‚°(ç„¡è¦–) */
 
 	      for( i=0; i<size; i++ ){
 		if( (c=osd_fgetc(fp_ti))==EOF ){ break; }
@@ -1910,15 +1910,15 @@ static	int	sio_getc( int is_cmt, int *tick )
 }
 
 /* 
- * ¥Æ¡¼¥×¤ÎÆÉ¤ß¹ş¤ßÅÓÃæ¤Ë¥â¡¼¥¿OFF¤µ¤ì¤¿¤é¡¢ÆÉ¤ß¹ş¤ß¥¨¥é¡¼È¯À¸¤È¤·¤Æ
- * 1¥Ğ¥¤¥ÈÆÉ¤ßÈô¤Ğ¤¹¡£¥Ç¡¼¥¿¤ÎÅÓÃæ¤«¤É¤¦¤«¤Ï T88 ¤Ç¤Ê¤¤¤È¥Á¥§¥Ã¥¯¤Ç¤­¤Ê¤¤¡£
- * ¤³¤ó¤Ê¥Á¥§¥Ã¥¯¡¢É¬Í×¤Ê¤Î¤«¡©¡©
+ * ãƒ†ãƒ¼ãƒ—ã®èª­ã¿è¾¼ã¿é€”ä¸­ã«ãƒ¢ãƒ¼ã‚¿OFFã•ã‚ŒãŸã‚‰ã€èª­ã¿è¾¼ã¿ã‚¨ãƒ©ãƒ¼ç™ºç”Ÿã¨ã—ã¦
+ * 1ãƒã‚¤ãƒˆèª­ã¿é£›ã°ã™ã€‚ãƒ‡ãƒ¼ã‚¿ã®é€”ä¸­ã‹ã©ã†ã‹ã¯ T88 ã§ãªã„ã¨ãƒã‚§ãƒƒã‚¯ã§ããªã„ã€‚
+ * ã“ã‚“ãªãƒã‚§ãƒƒã‚¯ã€å¿…è¦ãªã®ã‹ï¼Ÿï¼Ÿ
  */
 static	void	sio_check_cmt_error( void )
 {
   int c;
   if( sio_tape_readable() ){
-    if( cmt_is_t88     &&	/* T88 ¤«¤Ä¡¢¥Ç¡¼¥¿¥¿¥°¤ÎÅÓÃæ¤Î»ş¤Î¤ß */
+    if( cmt_is_t88     &&	/* T88 ã‹ã¤ã€ãƒ‡ãƒ¼ã‚¿ã‚¿ã‚°ã®é€”ä¸­ã®æ™‚ã®ã¿ */
 	cmt_skip == 0  &&
 	cmt_block_size ){
       cmt_block_size --;
@@ -1943,14 +1943,14 @@ static	void	sio_check_cmt_error( void )
 
 
 /*
- * ³«¤¤¤Æ¤¤¤ësio¥¤¥á¡¼¥¸¤Ë1Ê¸»ú½ñ¤­¹ş¤à 
+ * é–‹ã„ã¦ã„ã‚‹sioã‚¤ãƒ¡ãƒ¼ã‚¸ã«1æ–‡å­—æ›¸ãè¾¼ã‚€ 
  */
 static	int	sio_putc( int is_cmt, int c )
 {
   OSD_FILE *fp;
 
-  if( is_cmt==FALSE ){ fp = fp_so; }	/* ¥·¥ê¥¢¥ë½ĞÎÏ */
-  else               { fp = fp_to; }	/* ¥Æ¡¼¥×½ĞÎÏ */
+  if( is_cmt==FALSE ){ fp = fp_so; }	/* ã‚·ãƒªã‚¢ãƒ«å‡ºåŠ› */
+  else               { fp = fp_to; }	/* ãƒ†ãƒ¼ãƒ—å‡ºåŠ› */
   
   if( fp ){
     osd_fputc( c, fp );
@@ -1961,7 +1961,7 @@ static	int	sio_putc( int is_cmt, int c )
 
 
 /*
- * ¹âÂ®¥Æ¡¼¥×¥í¡¼¥É ¡Ä¡Ä ¾ÜºÙÉÔÌÀ¡£¤³¤ó¤Êµ¡Ç½¤¢¤Ã¤¿¤Î¤«¡Ä 
+ * é«˜é€Ÿãƒ†ãƒ¼ãƒ—ãƒ­ãƒ¼ãƒ‰ â€¦â€¦ è©³ç´°ä¸æ˜ã€‚ã“ã‚“ãªæ©Ÿèƒ½ã‚ã£ãŸã®ã‹â€¦ 
  */
 static	void	sio_tape_highspeed_load( void )
 {
@@ -1969,49 +1969,49 @@ static	void	sio_tape_highspeed_load( void )
 
   if( sio_tape_readable()==FALSE ) return;
 
-			  /* ¥Ş¥·¥ó¸ì¥Ø¥Ã¥À¤òÃµ¤¹ */
+			  /* ãƒã‚·ãƒ³èªãƒ˜ãƒƒãƒ€ã‚’æ¢ã™ */
 
-  do{						/* 0x3a ¤¬½Ğ¤Æ¤¯¤ë¤Ş¤Ç¥ê¡¼¥É */
+  do{						/* 0x3a ãŒå‡ºã¦ãã‚‹ã¾ã§ãƒªãƒ¼ãƒ‰ */
     if( (c = sio_getc(TRUE,0)) == EOF ){ return; }
   } while( c != 0x3a );
-						/* Å¾Á÷Àè¥¢¥É¥ì¥¹ H */
+						/* è»¢é€å…ˆã‚¢ãƒ‰ãƒ¬ã‚¹ H */
   if( (c = sio_getc(TRUE,0)) == EOF ){ return; }
   sum = c;
   addr = c * 256;
-						/* Å¾Á÷Àè¥¢¥É¥ì¥¹ L */
+						/* è»¢é€å…ˆã‚¢ãƒ‰ãƒ¬ã‚¹ L */
   if( (c = sio_getc(TRUE,0)) == EOF ){ return; }
   sum += c;
   addr += c;
-						/* ¥Ø¥Ã¥ÀÉô¥µ¥à */
+						/* ãƒ˜ãƒƒãƒ€éƒ¨ã‚µãƒ  */
   if( (c = sio_getc(TRUE,0)) == EOF ){ return; }
   sum += c;
   if( (sum&0xff) != 0 ){ return; }
 
 
-		/* ¤¢¤È¤Ï¥Ç¡¼¥¿Éô¤Î·«¤êÊÖ¤· */
+		/* ã‚ã¨ã¯ãƒ‡ãƒ¼ã‚¿éƒ¨ã®ç¹°ã‚Šè¿”ã— */
 
   while( TRUE ){
 
-    do{						/* 0x3a ¤¬½Ğ¤Æ¤¯¤ë¤Ş¤Ç¥ê¡¼¥É */
+    do{						/* 0x3a ãŒå‡ºã¦ãã‚‹ã¾ã§ãƒªãƒ¼ãƒ‰ */
       if( (c = sio_getc(TRUE,0)) == EOF ){ return; }
     } while( c != 0x3a );
 
-						/* ¥Ç¡¼¥¿¿ô */
+						/* ãƒ‡ãƒ¼ã‚¿æ•° */
     if( (c = sio_getc(TRUE,0)) == EOF ){ return; }
     sum  = c;
     size = c;
-    if( c==0 ){						/* ¥Ç¡¼¥¿¿ô==0¤Ç½ªÃ¼ */
+    if( c==0 ){						/* ãƒ‡ãƒ¼ã‚¿æ•°==0ã§çµ‚ç«¯ */
       return;
     }
 
-    for( ; size; size -- ){			/* ¥Ç¡¼¥¿¿ôÊ¬¡¢Å¾Á÷ */
+    for( ; size; size -- ){			/* ãƒ‡ãƒ¼ã‚¿æ•°åˆ†ã€è»¢é€ */
 
       if( (c = sio_getc(TRUE,0)) == EOF ){ return; }
       sum += c;
       main_mem_write( addr, c );
       addr ++;
     }
-						/* ¥Ç¡¼¥¿Éô¥µ¥à */
+						/* ãƒ‡ãƒ¼ã‚¿éƒ¨ã‚µãƒ  */
     if( (c = sio_getc(TRUE,0)) == EOF ){ return; }
     sum += c;
     if( (sum&0xff) != 0 ){ return; }
@@ -2021,11 +2021,11 @@ static	void	sio_tape_highspeed_load( void )
 
 
 /*
- * RS232C³ä¤ê¹ş¤ß¼ş´ü¤Î¥»¥Ã¥È 
+ * RS232Cå‰²ã‚Šè¾¼ã¿å‘¨æœŸã®ã‚»ãƒƒãƒˆ 
  */
-				/* ¤³¤ì¤é¤ÎÊÑ¿ô¤Ï¡¢ÀßÄê¤«¤é»»½Ğ¤¹¤ë */
+				/* ã“ã‚Œã‚‰ã®å¤‰æ•°ã¯ã€è¨­å®šã‹ã‚‰ç®—å‡ºã™ã‚‹ */
 static int sio_bps;		/* BPS */
-static int sio_framesize;	/* StartBit + BitÄ¹ + StopBit ¤òÅ¬Åö¤Ë·×»» */
+static int sio_framesize;	/* StartBit + Bité•· + StopBit ã‚’é©å½“ã«è¨ˆç®— */
 
 static void sio_set_intr_base( void )
 {
@@ -2033,32 +2033,32 @@ static void sio_set_intr_base( void )
     75, 150, 300, 600, 1200, 2400, 4800, 9600, 19200,
   };
 
-  /* ¥¤¥á¡¼¥¸¥Õ¥¡¥¤¥ë¥»¥Ã¥ÈºÑ¤ß ¤«¤Ä¡¢
-     ¼õ¿® Enable ¤«¤Ä¡¢
-     RS232C (I/O 30h:bit5=ON) ¤«¡¢CMT¤«¤Ä¥â¡¼¥¿ON (I/O 30h:bit5=OFF,bit3=ON)
-     ¤Î»ş¤Ë¡¢¼ş´üÅª¤Ë³ä¤ê¹ş¤ß¤òÈ¯À¸¤µ¤»¤ë¡£¤½¤Î¼ş´ü¤ò·×»»¤¹¤ë¡£ */
+  /* ã‚¤ãƒ¡ãƒ¼ã‚¸ãƒ•ã‚¡ã‚¤ãƒ«ã‚»ãƒƒãƒˆæ¸ˆã¿ ã‹ã¤ã€
+     å—ä¿¡ Enable ã‹ã¤ã€
+     RS232C (I/O 30h:bit5=ON) ã‹ã€CMTã‹ã¤ãƒ¢ãƒ¼ã‚¿ON (I/O 30h:bit5=OFF,bit3=ON)
+     ã®æ™‚ã«ã€å‘¨æœŸçš„ã«å‰²ã‚Šè¾¼ã¿ã‚’ç™ºç”Ÿã•ã›ã‚‹ã€‚ãã®å‘¨æœŸã‚’è¨ˆç®—ã™ã‚‹ã€‚ */
 
   if( (fp_si || fp_ti || use_siomouse) &&
       (sio_command & 0x04) &&
       ( (sys_ctrl & 0x20) || (sys_ctrl & 0x08) ) ){
 
-    if( sys_ctrl & 0x20 ){		/* RS232C »ØÄê»ş  */
+    if( sys_ctrl & 0x20 ){		/* RS232C æŒ‡å®šæ™‚  */
 
-      sio_bps = table[ baudrate_sw ];		/* BPS ¤Ï ¥Ü¡¼¥ì¡¼¥ÈÀßÄê */
-      sio_framesize = 10;			/* ¥Õ¥ì¡¼¥àÄ¹¤Ï10bit¸ÇÄê */
+      sio_bps = table[ baudrate_sw ];		/* BPS ã¯ ãƒœãƒ¼ãƒ¬ãƒ¼ãƒˆè¨­å®š */
+      sio_framesize = 10;			/* ãƒ•ãƒ¬ãƒ¼ãƒ é•·ã¯10bitå›ºå®š */
 
-    }else{				/* CMT »ØÄê»ş */
+    }else{				/* CMT æŒ‡å®šæ™‚ */
 
-      if( cmt_speed == 0 ){			/* ÄÌ¾ï¤Ï¡¢*/
-	if( sys_ctrl & 0x10 ) sio_bps = 1200;	/* I/O 30h:bit4=1 ¤Ç 1200bps */
-	else                  sio_bps =  600;	/*             =0 ¤Ç  600bps */
+      if( cmt_speed == 0 ){			/* é€šå¸¸ã¯ã€*/
+	if( sys_ctrl & 0x10 ) sio_bps = 1200;	/* I/O 30h:bit4=1 ã§ 1200bps */
+	else                  sio_bps =  600;	/*             =0 ã§  600bps */
       }else{
-	sio_bps = cmt_speed;			/* °ú¿ô»ØÄê»ş¤Ï¤½¤ÎÃÍ */
+	sio_bps = cmt_speed;			/* å¼•æ•°æŒ‡å®šæ™‚ã¯ãã®å€¤ */
       }
-      sio_framesize = 11;			/* ¥Õ¥ì¡¼¥àÄ¹¤Ï11bit¸ÇÄê */
+      sio_framesize = 11;			/* ãƒ•ãƒ¬ãƒ¼ãƒ é•·ã¯11bitå›ºå®š */
     }
 
-  }else{				/* ¥·¥ê¥¢¥ëÉÔ²Ä»ş */
+  }else{				/* ã‚·ãƒªã‚¢ãƒ«ä¸å¯æ™‚ */
     sio_bps = 0;
     sio_framesize = 0;
   }
@@ -2068,14 +2068,14 @@ static void sio_set_intr_base( void )
 
 
 /*
- * T88 ¥Õ¥©¡¼¥Ş¥Ã¥È ¤Î TICK»ş´Ö¤ò ¥·¥ê¥¢¥ë³ä¤ê¹ş¤ß²ó¿ô¤Ë´¹»»¤¹¤ë
+ * T88 ãƒ•ã‚©ãƒ¼ãƒãƒƒãƒˆ ã® TICKæ™‚é–“ã‚’ ã‚·ãƒªã‚¢ãƒ«å‰²ã‚Šè¾¼ã¿å›æ•°ã«æ›ç®—ã™ã‚‹
  *
- * ¥Ö¥é¥ó¥¯¡¢¥¹¥Ú¡¼¥¹¡¢¥Ş¡¼¥¯¥¿¥°¤Ï¡¢1/4800sÃ±°Ì¤ÎÀäÂĞ»ş´Ö¤¬µ­½Ò¤·¤Æ¤¢¤ë¡£
- * ¤Ê¤Î¤Ç¡¢»ş´Ö¤¬ n ¤Î¾ì¹ç¡¢n/4800ÉÃ¥¦¥§¥¤¥È¤ò¤¤¤ì¤ë¤È¤¤¤¤´¶¤¸¤Ë¤Ê¤ë¤Ï¤º¡£
- * ¤Ä¤Ş¤ê¡¢ ( n / 4800 ) * CPU_CLOCK / rs232c_intr_base ²óÊ¬¡¢
- * RS232C³ä¤ê¹ş¤ß¤òÍ¾Ê¬¤ËÂÔ¤Æ¤Ğ¤¤¤¤¡£¤³¤Î¼°¤Ï¡¢ÃÖ¤­´¹¤¨¤ë¤È
+ * ãƒ–ãƒ©ãƒ³ã‚¯ã€ã‚¹ãƒšãƒ¼ã‚¹ã€ãƒãƒ¼ã‚¯ã‚¿ã‚°ã¯ã€1/4800så˜ä½ã®çµ¶å¯¾æ™‚é–“ãŒè¨˜è¿°ã—ã¦ã‚ã‚‹ã€‚
+ * ãªã®ã§ã€æ™‚é–“ãŒ n ã®å ´åˆã€n/4800ç§’ã‚¦ã‚§ã‚¤ãƒˆã‚’ã„ã‚Œã‚‹ã¨ã„ã„æ„Ÿã˜ã«ãªã‚‹ã¯ãšã€‚
+ * ã¤ã¾ã‚Šã€ ( n / 4800 ) * CPU_CLOCK / rs232c_intr_base å›åˆ†ã€
+ * RS232Cå‰²ã‚Šè¾¼ã¿ã‚’ä½™åˆ†ã«å¾…ã¦ã°ã„ã„ã€‚ã“ã®å¼ã¯ã€ç½®ãæ›ãˆã‚‹ã¨
  *	     ( n / 4800 ) * ( bps / framesize )
- * ¤Ë¤Ê¤ë¡£¤Ş¤¢¤¤¤º¤ì¤Ë¤»¤è¤«¤Ê¤êÅ¬Åö¤Ê¥¦¥§¥¤¥È¤Ç¤Ï¤¢¤ë¤¬¡£
+ * ã«ãªã‚‹ã€‚ã¾ã‚ã„ãšã‚Œã«ã›ã‚ˆã‹ãªã‚Šé©å½“ãªã‚¦ã‚§ã‚¤ãƒˆã§ã¯ã‚ã‚‹ãŒã€‚
 */
 static	int	tick_2_intr_skip( int tick )
 {
@@ -2095,7 +2095,7 @@ static	void	sio_init( void )
   sio_command     = 0;
   sio_mode        = 0;
   sio_data_exist  = FALSE;
-  sio_data        = 0;		/* ½é´üÃÍ¤Ï0¡£¤È¤¢¤ë¥²¡¼¥à¤ÎµßºÑ¤Î¤¿¤á¡Ä ;_; */
+  sio_data        = 0;		/* åˆæœŸå€¤ã¯0ã€‚ã¨ã‚ã‚‹ã‚²ãƒ¼ãƒ ã®æ•‘æ¸ˆã®ãŸã‚â€¦ ;_; */
 
   com_X_flow      = FALSE;
 
@@ -2106,24 +2106,24 @@ static	void	sio_init( void )
  */
 static	void	sio_out_command( byte data )
 {
-  if( sio_instruction==0 ){			/* ÆâÉô¥ê¥»¥Ã¥ÈÄ¾¸å¤Ï¡¢ */
-    sio_mode        = data;				/* ¥â¡¼¥É¼õÉÕ¤± */
+  if( sio_instruction==0 ){			/* å†…éƒ¨ãƒªã‚»ãƒƒãƒˆç›´å¾Œã¯ã€ */
+    sio_mode        = data;				/* ãƒ¢ãƒ¼ãƒ‰å—ä»˜ã‘ */
     sio_instruction = 1;
 
-  }else{					/* ¤½¤ì°Ê³°¤Ï¥³¥Ş¥ó¥É¼õÉÕ¤± */
+  }else{					/* ãã‚Œä»¥å¤–ã¯ã‚³ãƒãƒ³ãƒ‰å—ä»˜ã‘ */
 
-    if( data & 0x40 ){					/* ÆâÉô¥ê¥»¥Ã¥È */
+    if( data & 0x40 ){					/* å†…éƒ¨ãƒªã‚»ãƒƒãƒˆ */
       sio_mode        = 0;
       sio_instruction = 0;
       sio_command     = 0x40;
       sio_data        = 0;
-    }else{						/* ¤½¤ÎÂ¾       */
+    }else{						/* ãã®ä»–       */
       sio_command     = data;
     }
 
-    if( (sio_command & 0x04) == 0 ){			/* ¥ê¥»¥Ã¥Èor¼õ¿®¶Ø»ß*/
-      sio_data_exist = FALSE;				/* ¤Ê¤é¡¢¼õ¿®¥ï¡¼¥¯  */
-      RS232C_flag   = FALSE;				/* ¤ò¥¯¥ê¥¢¤¹¤ë      */
+    if( (sio_command & 0x04) == 0 ){			/* ãƒªã‚»ãƒƒãƒˆorå—ä¿¡ç¦æ­¢*/
+      sio_data_exist = FALSE;				/* ãªã‚‰ã€å—ä¿¡ãƒ¯ãƒ¼ã‚¯  */
+      RS232C_flag   = FALSE;				/* ã‚’ã‚¯ãƒªã‚¢ã™ã‚‹      */
     }
 
     sio_set_intr_base();
@@ -2137,15 +2137,15 @@ static	void	sio_out_data( byte data )
 {
   int is_cmt;
 
-  if( (sio_command & 0x01) ){		/* Á÷¿®¥¤¥Í¡¼¥Ö¥ë */
-    if( sys_ctrl & 0x20 ){			/* ¥·¥ê¥¢¥ë½ĞÎÏ¤Î¾ì¹ç */
+  if( (sio_command & 0x01) ){		/* é€ä¿¡ã‚¤ãƒãƒ¼ãƒ–ãƒ« */
+    if( sys_ctrl & 0x20 ){			/* ã‚·ãƒªã‚¢ãƒ«å‡ºåŠ›ã®å ´åˆ */
       is_cmt = FALSE;
-      if     ( data==0x11 ){				/* ^Q ½ĞÎÏ */
+      if     ( data==0x11 ){				/* ^Q å‡ºåŠ› */
 	com_X_flow = FALSE;
-      }else if( data==0x13 ){				/* ^S ½ĞÎÏ */
+      }else if( data==0x13 ){				/* ^S å‡ºåŠ› */
 	com_X_flow = TRUE;
       }
-    }else{					/* ¥Æ¡¼¥×½ĞÎÏ¤Î¾ì¹ç */
+    }else{					/* ãƒ†ãƒ¼ãƒ—å‡ºåŠ›ã®å ´åˆ */
       is_cmt = TRUE;
     }
     sio_putc( is_cmt, data );
@@ -2167,20 +2167,20 @@ static	byte	sio_in_data( void )
 static	byte	sio_in_status( void )
 {
   int c;
-  byte	status = 0x80 | 0x04;		/* Á÷¿®¥Ğ¥Ã¥Õ¥¡¥¨¥ó¥×¥Æ¥£ */
+  byte	status = 0x80 | 0x04;		/* é€ä¿¡ãƒãƒƒãƒ•ã‚¡ã‚¨ãƒ³ãƒ—ãƒ†ã‚£ */
                 /* DSR| TxE */
 
-  if( sio_command & 0x04 ){		/* ¸½ºß¡¢¼õ¿®¥¤¥Í¡¼¥Ö¥ë¤Î¾ì¹ç */
+  if( sio_command & 0x04 ){		/* ç¾åœ¨ã€å—ä¿¡ã‚¤ãƒãƒ¼ãƒ–ãƒ«ã®å ´åˆ */
 
-    if( (sys_ctrl & 0x20)==0 && 		/* ¥Æ¡¼¥×¤Ç¡¢SIO³ä¤ê¹ş¤ß¤ò  */
-	sio_tape_readable() &&			/* »È¤ï¤Ê¤¤¾ì¹ç¡¢¤³¤³¤ÇÆÉ¤à */
+    if( (sys_ctrl & 0x20)==0 && 		/* ãƒ†ãƒ¼ãƒ—ã§ã€SIOå‰²ã‚Šè¾¼ã¿ã‚’  */
+	sio_tape_readable() &&			/* ä½¿ã‚ãªã„å ´åˆã€ã“ã“ã§èª­ã‚€ */
 	cmt_intr == FALSE ){
 
-      cmt_dummy_read_cnt ++;			/* IN 21 ¤ò 2²ó¼Â¹Ô¤¹¤ëÅÙ¤Ë */
+      cmt_dummy_read_cnt ++;			/* IN 21 ã‚’ 2å›å®Ÿè¡Œã™ã‚‹åº¦ã« */
       if( cmt_dummy_read_cnt >= 2 ){
 	cmt_dummy_read_cnt = 0;
 
-	c = sio_getc( TRUE, 0 );		/* ¥Æ¡¼¥×¤«¤é1Ê¸»úÆÉ¤à */
+	c = sio_getc( TRUE, 0 );		/* ãƒ†ãƒ¼ãƒ—ã‹ã‚‰1æ–‡å­—èª­ã‚€ */
 /*printf("[%03x]",c&0xfff);fflush(stdout);*/
 	if( c != EOF ){
 	  sio_data = (byte)c;
@@ -2189,16 +2189,16 @@ static	byte	sio_in_status( void )
       }
     }
 
-    if( sio_data_exist ){			/* ¥Ç¡¼¥¿¤¬¤¢¤ì¤Ğ */
-      status |= 0x02;					/* ¼õ¿®¥ì¥Ç¥£ */
+    if( sio_data_exist ){			/* ãƒ‡ãƒ¼ã‚¿ãŒã‚ã‚Œã° */
+      status |= 0x02;					/* å—ä¿¡ãƒ¬ãƒ‡ã‚£ */
              /* RxRDY */
     }
   }
 
-  if( sio_command & 0x01 ){		/* ¸½ºß¡¢Á÷¿®¥¤¥Í¡¼¥Ö¥ë¤Î¾ì¹ç */
+  if( sio_command & 0x01 ){		/* ç¾åœ¨ã€é€ä¿¡ã‚¤ãƒãƒ¼ãƒ–ãƒ«ã®å ´åˆ */
     if(( (sys_ctrl & 0x20) /*&& sio_serial_writable()*/ ) ||
        (!(sys_ctrl & 0x20)   && sio_tape_writable()     ) ){
-      status |= 0x01;				/* Á÷¿®¥ì¥Ç¥£ */
+      status |= 0x01;				/* é€ä¿¡ãƒ¬ãƒ‡ã‚£ */
              /* TxRDY */
     }
   }
@@ -2215,22 +2215,22 @@ static	void	sio_term( void )
 
 
 /*
- * RS-232C ¼õ¿®³ä¤ê¹ş¤ß½èÍı
+ * RS-232C å—ä¿¡å‰²ã‚Šè¾¼ã¿å‡¦ç†
  */
 int	sio_intr( void )
 {
   int c = EOF;
   int tick;
 
-  if( (sio_command & 0x04) &&		/* ¸½ºß¡¢¼õ¿®¥¤¥Í¡¼¥Ö¥ë¤Ç   */
-      ! sio_data_exist ){		/* ÆÉ¹şÌ¤¤Î¥Ç¡¼¥¿¤¬¤Ê¤¤¾ì¹ç */
+  if( (sio_command & 0x04) &&		/* ç¾åœ¨ã€å—ä¿¡ã‚¤ãƒãƒ¼ãƒ–ãƒ«ã§   */
+      ! sio_data_exist ){		/* èª­è¾¼æœªã®ãƒ‡ãƒ¼ã‚¿ãŒãªã„å ´åˆ */
 
-    if( sys_ctrl & 0x20 ){			/* ¥·¥ê¥¢¥ëÆşÎÏ */
+    if( sys_ctrl & 0x20 ){			/* ã‚·ãƒªã‚¢ãƒ«å…¥åŠ› */
 
       if( com_X_flow ) return FALSE;
       c = sio_getc( FALSE, 0 );
 
-    }else{					/* ¥Æ¡¼¥×ÆşÎÏ(³ä¹ş»ÈÍÑ»ş¤Î¤ß)*/
+    }else{					/* ãƒ†ãƒ¼ãƒ—å…¥åŠ›(å‰²è¾¼ä½¿ç”¨æ™‚ã®ã¿)*/
       if( cmt_intr ){
 
 	if( cmt_skip==0 ){
@@ -2246,9 +2246,9 @@ int	sio_intr( void )
 	  }else{
 	    c = sio_getc( TRUE, 0 );
 	  }
-	}else{						/* T88¤Î¾ì¹ç¤Ï¡¢    */
-	  cmt_skip --;					/* Ìµ¸ú¥Ç¡¼¥¿ÉôÊ¬¤Î */
-	  if( cmt_skip==0 ){				/* ´Ö¡¢»ş´ÖÄÙ¤·¤¹¤ë */
+	}else{						/* T88ã®å ´åˆã¯ã€    */
+	  cmt_skip --;					/* ç„¡åŠ¹ãƒ‡ãƒ¼ã‚¿éƒ¨åˆ†ã® */
+	  if( cmt_skip==0 ){				/* é–“ã€æ™‚é–“æ½°ã—ã™ã‚‹ */
 	    c = cmt_skip_data;
 	  }
 	}
@@ -2259,7 +2259,7 @@ int	sio_intr( void )
       sio_data = (byte)c;
       sio_data_exist = TRUE;
 /*printf("<%02x> ",sio_data);fflush(stdout);*/
-      return TRUE;				/* RxRDY³ä¤ê¹ş¤ßÈ¯À¸ */
+      return TRUE;				/* RxRDYå‰²ã‚Šè¾¼ã¿ç™ºç”Ÿ */
     }
   }
   return FALSE;
@@ -2268,7 +2268,7 @@ int	sio_intr( void )
 
 
 /*
- *	¾õÂÖ¥Á¥§¥Ã¥¯´Ø¿ô
+ *	çŠ¶æ…‹ãƒã‚§ãƒƒã‚¯é–¢æ•°
  */
 int	tape_exist( void )
 {
@@ -2302,7 +2302,7 @@ int	tape_writing( void )
 
 
 /*===========================================================================*/
-/* ¥Ñ¥é¥ì¥ë¥İ¡¼¥È							     */
+/* ãƒ‘ãƒ©ãƒ¬ãƒ«ãƒãƒ¼ãƒˆ							     */
 /*===========================================================================*/
 
 int	printer_open( const char *filename )
@@ -2342,7 +2342,7 @@ void	printer_term( void )
 
 
 /*===========================================================================*/
-/* ¥«¥ì¥ó¥À¥¯¥í¥Ã¥¯							     */
+/* ã‚«ãƒ¬ãƒ³ãƒ€ã‚¯ãƒ­ãƒƒã‚¯							     */
 /*===========================================================================*/
 
 static	Uchar	shift_reg[7];
@@ -2459,8 +2459,8 @@ void	calendar_shift_clock( void )
 void	calendar_stlobe( void )
 {
   switch( common_out_data & 0x7 ){
-  case 0:	/*calendar_init();*/	break;		/* ½é´ü²½ */
-  case 1:	calendar_shift_clock();	break;		/* ¥·¥Õ¥È */
+  case 0:	/*calendar_init();*/	break;		/* åˆæœŸåŒ– */
+  case 1:	calendar_shift_clock();	break;		/* ã‚·ãƒ•ãƒˆ */
   case 2:	calendar_shift_clock();
 		calendar_shift_clock();
 		calendar_shift_clock();
@@ -2474,7 +2474,7 @@ void	calendar_stlobe( void )
 		calendar_shift_clock();
 		calendar_shift_clock();
 		set_calendar_work(0);	break;
-  case 3:	get_calendar_work();			/* »ş¹ï¼èÆÀ */
+  case 3:	get_calendar_work();			/* æ™‚åˆ»å–å¾— */
 		calendar_shift_clock();
 		calendar_shift_clock();
 		calendar_shift_clock();
@@ -2485,10 +2485,10 @@ void	calendar_stlobe( void )
   case 7:
     switch( shift_reg[6] & 0xf ){
 
-    case 0:	/*calendar_init();*/	break;		/* ½é´ü²½ */
-    case 1:	calendar_shift_clock();	break;		/* ¥·¥Õ¥È */
-    case 2:	set_calendar_work(1);	break;		/* »ş¹ïÀßÄê */
-    case 3:	get_calendar_work();	break;		/* »ş¹ï¼èÆÀ */
+    case 0:	/*calendar_init();*/	break;		/* åˆæœŸåŒ– */
+    case 1:	calendar_shift_clock();	break;		/* ã‚·ãƒ•ãƒˆ */
+    case 2:	set_calendar_work(1);	break;		/* æ™‚åˆ»è¨­å®š */
+    case 3:	get_calendar_work();	break;		/* æ™‚åˆ»å–å¾— */
     case 4:	break;
     case 5:	break;
     case 6:	break;
@@ -2508,7 +2508,7 @@ void	calendar_stlobe( void )
 
 
 /*===========================================================================*/
-/* ¥³¥ó¥È¥í¡¼¥ë¿®¹æÆş½ĞÎÏ						     */
+/* ã‚³ãƒ³ãƒˆãƒ­ãƒ¼ãƒ«ä¿¡å·å…¥å‡ºåŠ›						     */
 /*===========================================================================*/
 
 void	out_ctrl_signal( byte data )
@@ -2549,7 +2549,7 @@ byte	in_ctrl_signal( void )
 
 
 /************************************************************************/
-/* ¥á¥â¥ê¤Î½é´ü²½ (ÅÅ¸»ÅêÆş»ş¤Î¤ß)					*/
+/* ãƒ¡ãƒ¢ãƒªã®åˆæœŸåŒ– (é›»æºæŠ•å…¥æ™‚ã®ã¿)					*/
 /************************************************************************/
 #if 0
 void	power_on_ram_init( void )
@@ -2557,7 +2557,7 @@ void	power_on_ram_init( void )
   int   addr, i;
   Uchar data;
 
-		/* ¥á¥¤¥ó RAM ¤òÆÃ¼ì¤Ê¥Ñ¥¿¡¼¥ó¤ÇËä¤á¤ë */
+		/* ãƒ¡ã‚¤ãƒ³ RAM ã‚’ç‰¹æ®Šãªãƒ‘ã‚¿ãƒ¼ãƒ³ã§åŸ‹ã‚ã‚‹ */
 
   for( addr = 0; addr < 0x10000; addr += 0x100 ){
     if( (addr&0x0d00)==0x0100 || (addr&0x0f00)==0x0500 ||
@@ -2568,7 +2568,7 @@ void	power_on_ram_init( void )
     if( addr&0x8000 ) data ^= 0xff;
     if((addr&0xf000)==0xb000 ) data ^= 0xff;
 #if 0
-    if((addr&0xf000)==0xe000 ) data ^= 0xff; /* ¤È¤ê¤¢¤¨¤ºÈ¿Å¾ */
+    if((addr&0xf000)==0xe000 ) data ^= 0xff; /* ã¨ã‚Šã‚ãˆãšåè»¢ */
 					     /* changed by peach */
 #endif
 
@@ -2585,20 +2585,20 @@ void	power_on_ram_init( void )
   }
 
 
-		/* ¹âÂ® RAM(¤ÎÎ¢) ¤òÆÃ¼ì¤Ê¥Ñ¥¿¡¼¥ó¤ÇËä¤á¤ë */
+		/* é«˜é€Ÿ RAM(ã®è£) ã‚’ç‰¹æ®Šãªãƒ‘ã‚¿ãƒ¼ãƒ³ã§åŸ‹ã‚ã‚‹ */
 
   memcpy( main_high_ram, &main_ram[0xf000], 0x1000 );
   for( addr=0xf000; addr<0x10000; addr++ ) main_ram[addr] ^= 0xff;
 }
 
 
-#else	/* FH ¤Ç¤Ï¤³¤Î¤è¤¦¤Êµ¤¤¬¤¹¤ë¤±¤É¡Ä¡Ä¡Ä */
+#else	/* FH ã§ã¯ã“ã®ã‚ˆã†ãªæ°—ãŒã™ã‚‹ã‘ã©â€¦â€¦â€¦ */
 void	power_on_ram_init( void )
 {
   int   addr, i;
   Uchar data;
 
-		/* ¥á¥¤¥ó RAM ¤òÆÃ¼ì¤Ê¥Ñ¥¿¡¼¥ó¤ÇËä¤á¤ë */
+		/* ãƒ¡ã‚¤ãƒ³ RAM ã‚’ç‰¹æ®Šãªãƒ‘ã‚¿ãƒ¼ãƒ³ã§åŸ‹ã‚ã‚‹ */
 
   for( addr = 0; addr < 0x4000; addr += 0x100 ){
 
@@ -2647,10 +2647,10 @@ void	power_on_ram_init( void )
   }
   main_ram[ 0xffff ] = 0x00;
 
-  /* »²¹Í¤Ş¤Ç¤Ë¡¢°Ê²¼¤Î¥½¥Õ¥È¤ÏRAM¤Î½é´üÃÍ¤ò»È¤Ã¤Æ¤¤¤ë¤è¤¦¤À¡£
-     ¥¹¥­¡¼¥à        : 0xffff ¤¬ 0x00 ¤Ç¤¢¤ë¤³¤È
-     Å·»È¤¿¤Á¤Î¸á¸å2 : 0xfff8¡Á0xffff ¤Î Á´¥Ğ¥¤¥È¤ÎOR !=0x00 ¤Ç¤¢¤ë¤³¤È
-     Å·»È¤¿¤Á¤Î¸á¸å  : ¾ò·ïÉÔÌÀ
+  /* å‚è€ƒã¾ã§ã«ã€ä»¥ä¸‹ã®ã‚½ãƒ•ãƒˆã¯RAMã®åˆæœŸå€¤ã‚’ä½¿ã£ã¦ã„ã‚‹ã‚ˆã†ã ã€‚
+     ã‚¹ã‚­ãƒ¼ãƒ         : 0xffff ãŒ 0x00 ã§ã‚ã‚‹ã“ã¨
+     å¤©ä½¿ãŸã¡ã®åˆå¾Œ2 : 0xfff8ã€œ0xffff ã® å…¨ãƒã‚¤ãƒˆã®OR !=0x00 ã§ã‚ã‚‹ã“ã¨
+     å¤©ä½¿ãŸã¡ã®åˆå¾Œ  : æ¡ä»¶ä¸æ˜
   */
 }
 #endif
@@ -2665,52 +2665,52 @@ void	power_on_ram_init( void )
 
 
 /************************************************************************/
-/* PC88 ¥á¥¤¥ó¥·¥¹¥Æ¥à ½é´ü²½						*/
+/* PC88 ãƒ¡ã‚¤ãƒ³ã‚·ã‚¹ãƒ†ãƒ  åˆæœŸåŒ–						*/
 /************************************************************************/
 
 static	void	bootup_work_init(void)
 {
-	/* V1¥â¡¼¥É¤Î¥Ğ¡¼¥¸¥ç¥ó¤Î¾®¿ôÅÀ°Ê²¼¤ò¶¯À©ÊÑ¹¹¤¹¤ë */
+	/* V1ãƒ¢ãƒ¼ãƒ‰ã®ãƒãƒ¼ã‚¸ãƒ§ãƒ³ã®å°æ•°ç‚¹ä»¥ä¸‹ã‚’å¼·åˆ¶å¤‰æ›´ã™ã‚‹ */
 
     if (set_version) ROM_VERSION = set_version;
     else             ROM_VERSION = rom_version;
 
-	/* µ¯Æ°¥Ç¥Ğ¥¤¥¹(ROM/DISK)Ì¤Äê¤Î»ş */
+	/* èµ·å‹•ãƒ‡ãƒã‚¤ã‚¹(ROM/DISK)æœªå®šã®æ™‚ */
 
     if (boot_from_rom == BOOT_AUTO) {
-	if (disk_image_exist(0))	/* ¥Ç¥£¥¹¥¯ÁŞÆş»ş¤ÏDISK */
+	if (disk_image_exist(0))	/* ãƒ‡ã‚£ã‚¹ã‚¯æŒ¿å…¥æ™‚ã¯DISK */
 	    boot_from_rom = FALSE;
-	else				/* ¤½¤ì°Ê³°¤Ï¡¢    ROM  */
+	else				/* ãã‚Œä»¥å¤–ã¯ã€    ROM  */
 	    boot_from_rom = TRUE;
     }
 
-	/* µ¯Æ°»ş¤Î BASIC¥â¡¼¥ÉÌ¤Äê¤Î»ş	  */
+	/* èµ·å‹•æ™‚ã® BASICãƒ¢ãƒ¼ãƒ‰æœªå®šã®æ™‚	  */
 
     if (boot_basic == BASIC_AUTO) {			
-	if (ROM_VERSION >= '4')			/* SR °Ê¹ß¤Ï¡¢V2	  */
+	if (ROM_VERSION >= '4')			/* SR ä»¥é™ã¯ã€V2	  */
 	    boot_basic = BASIC_V2;
-	else					/* ¤½¤ì°ÊÁ°¤Ï¡¢V1S	  */
+	else					/* ãã‚Œä»¥å‰ã¯ã€V1S	  */
 	    boot_basic = BASIC_V1S;
     }
 
-	/* ¥µ¥¦¥ó¥É(I/II)¤Î¥İ¡¼¥È¤òÀßÄê	 */
+	/* ã‚µã‚¦ãƒ³ãƒ‰(I/II)ã®ãƒãƒ¼ãƒˆã‚’è¨­å®š	 */
 
     if (sound_board == SOUND_II) {
 
-	if      (ROM_VERSION >= '8')		/* FH/MH °Ê¹ß¤Ï¡¢44¡Á47H */
+	if      (ROM_VERSION >= '8')		/* FH/MH ä»¥é™ã¯ã€44ã€œ47H */
 	    sound_port = SD_PORT_44_45 | SD_PORT_46_47;
-	else if (ROM_VERSION >= '4')		/* SR °Ê¹ß¤Ï¡¢44¡Á45,A8¡ÁADH */
+	else if (ROM_VERSION >= '4')		/* SR ä»¥é™ã¯ã€44ã€œ45,A8ã€œADH */
 	    sound_port = SD_PORT_44_45 | SD_PORT_A8_AD;
-	else					/* ¤½¤ì°ÊÁ°¤Ï¡¢  A8¡ÁADH */
+	else					/* ãã‚Œä»¥å‰ã¯ã€  A8ã€œADH */
 	    sound_port = SD_PORT_A8_AD;
 
     } else {
 
-	if (ROM_VERSION >= '4')			/* SR°Ê¹ß¤Ï¡¢44¡Á45H	 */
+	if (ROM_VERSION >= '4')			/* SRä»¥é™ã¯ã€44ã€œ45H	 */
 	    sound_port = SD_PORT_44_45;
-	else					/* ¤½¤ì°ÊÁ°¤Ï¡¢¡©¡©¡©	 */
+	else					/* ãã‚Œä»¥å‰ã¯ã€ï¼Ÿï¼Ÿï¼Ÿ	 */
 	  /*sound_port = SD_PORT_A8_AD;*/
-	    sound_port = 0;			/*	ÂĞ±ş¤·¤Ê¤¤¤Ê¤é 0 */
+	    sound_port = 0;			/*	å¯¾å¿œã—ãªã„ãªã‚‰ 0 */
     }
 }
 
@@ -2721,7 +2721,7 @@ void	pc88main_init( int init )
 
   bootup_work_init();
 
-	/* CPU ¥ï¡¼¥¯½é´ü²½ */
+	/* CPU ãƒ¯ãƒ¼ã‚¯åˆæœŸåŒ– */
 
   if( init == INIT_POWERON  ||  init == INIT_RESET ){
 
@@ -2743,14 +2743,14 @@ void	pc88main_init( int init )
 #endif
 
 
-	/* RAM¤òÅÅ¸»ÅêÆş»ş¥Ñ¥¿¡¼¥ó¤Ç½é´ü²½ */
+	/* RAMã‚’é›»æºæŠ•å…¥æ™‚ãƒ‘ã‚¿ãƒ¼ãƒ³ã§åˆæœŸåŒ– */
 
   if( init == INIT_POWERON ){
     power_on_ram_init();
   }
 
 
-	/* ¥Õ¥©¥ó¥È½é´ü²½ */
+	/* ãƒ•ã‚©ãƒ³ãƒˆåˆæœŸåŒ– */
 
   if( init == INIT_POWERON  ||  init == INIT_RESET ){
 
@@ -2760,7 +2760,7 @@ void	pc88main_init( int init )
   }
 
 
-	/* ¥­¡¼¥Ü¡¼¥É½é´ü²½ */
+	/* ã‚­ãƒ¼ãƒœãƒ¼ãƒ‰åˆæœŸåŒ– */
 
   if( init == INIT_POWERON  ||  init == INIT_STATELOAD ){
     keyboard_reset();
@@ -2768,7 +2768,7 @@ void	pc88main_init( int init )
 
 
 
-  printer_init();			/* PRINTER ¤ÏÉü¸µ¤·¤Ê¤¤	*/
+  printer_init();			/* PRINTER ã¯å¾©å…ƒã—ãªã„	*/
 
   if( init == INIT_POWERON  ||  init == INIT_RESET ){
 
@@ -2857,16 +2857,16 @@ void	pc88main_init( int init )
   main_memory_vram_mapping();
 
 
-  /* CRTC/DMAC´ØÏ¢¤Ë¤è¤ë½é´ü²½ */
+  /* CRTC/DMACé–¢é€£ã«ã‚ˆã‚‹åˆæœŸåŒ– */
   set_text_display();
   frameskip_blink_reset();
 
-  /* ¥·¥ê¥¢¥ë¥Ş¥¦¥¹½é´ü²½ */
+  /* ã‚·ãƒªã‚¢ãƒ«ãƒã‚¦ã‚¹åˆæœŸåŒ– */
   if (use_siomouse) {
     sio_mouse_init(TRUE);
   }
 
-  /* ¥µ¥¦¥ó¥É¤Ë¤Ä¤¤¤Æ¡¦¡¦¡¦ */
+  /* ã‚µã‚¦ãƒ³ãƒ‰ã«ã¤ã„ã¦ãƒ»ãƒ»ãƒ» */
   if( init == INIT_STATELOAD ){
     sound_output_after_stateload();
   }
@@ -2875,7 +2875,7 @@ void	pc88main_init( int init )
 
 
 /************************************************************************/
-/* PC88 ¥á¥¤¥ó¥·¥¹¥Æ¥à ½ªÎ»						*/
+/* PC88 ãƒ¡ã‚¤ãƒ³ã‚·ã‚¹ãƒ†ãƒ  çµ‚äº†						*/
 /************************************************************************/
 void	pc88main_term( void )
 {
@@ -2893,13 +2893,13 @@ void	pc88main_term( void )
 
 
 /************************************************************************/
-/* ¥Ö¥ì¡¼¥¯¥İ¥¤¥ó¥È´ØÏ¢							*/
+/* ãƒ–ãƒ¬ãƒ¼ã‚¯ãƒã‚¤ãƒ³ãƒˆé–¢é€£							*/
 /************************************************************************/
 INLINE	void	check_break_point( int type, word addr, byte data, char *str )
 {
   int	i;
 
-  if (quasi88_is_monitor())  return; /* ¥â¥Ë¥¿¡¼¥â¡¼¥É»ş¤Ï¥¹¥ë¡¼ */
+  if (quasi88_is_monitor())  return; /* ãƒ¢ãƒ‹ã‚¿ãƒ¼ãƒ¢ãƒ¼ãƒ‰æ™‚ã¯ã‚¹ãƒ«ãƒ¼ */
   for( i=0; i<NR_BP; i++ ){
     if( break_point[BP_MAIN][i].type == type &&
         break_point[BP_MAIN][i].addr == addr ){
@@ -3004,7 +3004,7 @@ void	pc88main_bus_setup( void )
 
 
 /***********************************************************************
- * ¥¹¥Æ¡¼¥È¥í¡¼¥É¡¿¥¹¥Æ¡¼¥È¥»¡¼¥Ö
+ * ã‚¹ãƒ†ãƒ¼ãƒˆãƒ­ãƒ¼ãƒ‰ï¼ã‚¹ãƒ†ãƒ¼ãƒˆã‚»ãƒ¼ãƒ–
  ************************************************************************/
 
 #define	SID	"MAIN"
@@ -3145,7 +3145,7 @@ int	stateload_pc88main( void )
 
   if( stateload_table(SID2, suspend_pc88main_work2) != STATE_OK ) {
 
-    /* µì¥Ğ¡¼¥¸¥ç¥ó¤Ê¤é¡¢¤ß¤Î¤¬¤¹ */
+    /* æ—§ãƒãƒ¼ã‚¸ãƒ§ãƒ³ãªã‚‰ã€ã¿ã®ãŒã™ */
 
     printf( "stateload : Statefile is old. (ver 0.6.0, 1, 2 or 3?)\n" );
 

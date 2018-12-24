@@ -1,39 +1,39 @@
 
-�� ���Υǥ��쥯�ȥ�ʲ��ˤϡ�MAME 0.71/XMAME 0.71.1 �Υ��������ޤޤ�Ƥ��ޤ���
+※ このディレクトリ以下には、MAME 0.71/XMAME 0.71.1 のソースが含まれています。
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-  QUASI88 �Υ���ѥ�����˥�����ɽ��Ϥ�ͭ���ˤ��Ƥ����ȡ����Υǥ��쥯�ȥ�
-�ʲ��Υե����뤬�Ȥ߹��ޤ졢MAME/XMAME �Υ�����ɽ��ϵ�ǽ (������ɥɥ饤��)
-�����Ѥ��뤳�Ȥ��Ǥ���褦�ˤʤ�ޤ���
+  QUASI88 のコンパイル時にサウンド出力を有効にしておくと、このディレクトリ
+以下のファイルが組み込まれ、MAME/XMAME のサウンド出力機能 (サウンドドライバ)
+が使用することができるようになります。
 
-�ʤ������ξ�祳��ѥ��뤷���Х��ʥ�ϡ�MAME ����� XMAME �Υ饤���󥹤�Ŭ��
-����ޤ��ΤǤ����դ������������Υǥ��쥯�ȥ�ʲ��Υ������ե�����κ���������
-�Ĥ��Ƥ�Ʊ�ͤǤ���
+なお、この場合コンパイルしたバイナリは、MAME および XMAME のライセンスが適用
+されますのでご注意ください。このディレクトリ以下のソースファイルの再配布等に
+ついても同様です。
 
 
-MAME �Υ饤���󥹤ˤĤ��Ƥϡ����Υǥ��쥯�ȥ�ˤ���
+MAME のライセンスについては、このディレクトリにある
 
 	mame.txt
 
-�򻲾Ȥ��Ƥ���������(XMAME�Υ饤���󥹤⤳��˽�򤷤ޤ�)
+を参照してください。(XMAMEのライセンスもこれに準拠します)
 
 
-(*) MAME �ϡ�Nicola Salmoria �� �� The MAME Team �������ͭ���롢�ޥ��
-    ���������ɥޥ��󥨥ߥ�졼���Ǥ���
-    XMAME �ϡ�XMAME project �ˤ�� MAME �� UNIX�ܿ��ǤǤ���
+(*) MAME は、Nicola Salmoria 氏 と The MAME Team が著作権を有する、マルチ
+    アーケードマシンエミュレータです。
+    XMAME は、XMAME project による MAME の UNIX移植版です。
 
-    MAME��XMAME �ˤĤ��ƤΡ����¿���ξ���ϰʲ��Υڡ����������������
+    MAME、XMAME についての、より多くの情報は以下のページを御覧下さい。
 
 	MAME  website ==>> http://www.mamedev.org/
-	XMAME website ==>> http://x.mame.net/      (����ڤ�)
+	XMAME website ==>> http://x.mame.net/      (リンク切れ)
 
 
 -------------------------------------------------------------------------------
-xmame 0.71.1 �Υ�����ɥɥ饤�Ф��Ȥ߹��ߤˤ����ꡢ�ʲ��Υե������
-���Ѥ��ޤ����������Τ��������Ĥ��ϡ�QUASI88 �����˲��Ѥ���Ƥ��ޤ���
+xmame 0.71.1 のサウンドドライバを組み込みにあたり、以下のファイルを
+使用しました。これらのうちいくつかは、QUASI88 向けに改変されています。
 
-�ʤ���������Ȥ�ȤΥե�����Τ��ä����ǡ����� QUASI88 ����ʪ�ˤ�����
-�ե�����ξ��Ǥ���
+なお、左がもともとのファイルのあった場所で、右が QUASI88 配布物における
+ファイルの場所です。
 
 xmame-0.71.1/src/sndintrf.c				snddrv/src/sndintrf.c
 xmame-0.71.1/src/sndintrf.h				snddrv/src/sndintrf.h
@@ -96,13 +96,13 @@ xmame-0.71.1/src/unix/sysdep/mixer-drivers/solaris.c	snddrv/src/unix/sysdep/mixe
 
 
 
-MAME ��ɬ�פʥ�������������Ѥˡ��ʲ��Υե������������ޤ�����
+MAME で必要なワークの宣言・定義用に、以下のファイルを作成しました。
 
 	snddrv/quasi88/mame-quasi88.c
 	snddrv/quasi88/mame-quasi88.h
 
 
-����ѥ����ѤΥ��ߡ��ե�����Ȥ��ơ��ʲ��Υե��������������ޤ�����
+コンパイル用のダミーファイルとして、以下のファイルを作成ししました。
 
 	snddrv/src/devices.h
 	snddrv/src/osd_cpu.h
@@ -112,17 +112,17 @@ MAME ��ɬ�פʥ�������������Ѥˡ��ʲ��Υե������������ޤ�����
 
 
 -------------------------------------------------------------------------------
-X11�� QUASI88 �� MAME/XMAME �ȤΥ��󥿡��ե��������Ȥ��ơ��ʲ��Υե������
-�������ޤ�����
+X11版 QUASI88 と MAME/XMAME とのインターフェイス部として、以下のファイルを
+作成しました。
 
 	snddrv/quasi88/X11/audio.c
 	snddrv/quasi88/X11/audio.h
 
 
-SDL�� QUASI88 �� MAME �ȤΥ��󥿡��ե��������Ȥ��ơ��ʲ��Υե������
-�������ޤ�����
-(snddrv/quasi88/SDL/sdl.c �ϡ� src/unix/sysdep/dsp-drivers/sdl.c ��
- �١����˺������ޤ���)
+SDL版 QUASI88 と MAME とのインターフェイス部として、以下のファイルを
+作成しました。
+(snddrv/quasi88/SDL/sdl.c は、 src/unix/sysdep/dsp-drivers/sdl.c を
+ ベースに作成しました)
 
 	snddrv/quasi88/SDL/audio.c
 	snddrv/quasi88/SDL/audio.h
@@ -130,8 +130,8 @@ SDL�� QUASI88 �� MAME �ȤΥ��󥿡��ե��������Ȥ��ơ��ʲ��Υե������
 
 
 -------------------------------------------------------------------------------
-MAME/XMAME �Υ�����ɥɥ饤�Ф� BEEP ������Ϥ����뤿��ˡ��ʲ��Υե������
-�������ɲä��ޤ�����
+MAME/XMAME のサウンドドライバで BEEP 音を出力させるために、以下のファイルを
+新規に追加しました。
 
 	snddrv/quasi88/beepintf.c
 	snddrv/quasi88/beep.c

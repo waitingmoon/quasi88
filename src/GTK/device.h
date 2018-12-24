@@ -6,16 +6,16 @@
 
 
 /*
- *	src/GTK/ �ʲ��ǤΥ������Х��ѿ�
+ *	src/GTK/ 以下でのグローバル変数
  */
-extern	int	gtksys_get_focus;	/* ���ߡ��ե����������꤫�ɤ���	*/
+extern	int	gtksys_get_focus;	/* 現在、フォーカスありかどうか	*/
 
 
 
 /*
- *	src/GTK/ �ʲ��ǤΥ������Х��ѿ� (���ץ���������ǽ���ѿ�)
+ *	src/GTK/ 以下でのグローバル変数 (オプション設定可能な変数)
  */
-extern	int	use_gdk_image;		/* ���ǡ�GdkImage����� */
+extern	int	use_gdk_image;		/* 真で、GdkImageを使用 */
 
 
 

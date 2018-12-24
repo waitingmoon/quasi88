@@ -1,19 +1,19 @@
 /************************************************************************/
-/* ¥â¥Ë¥¿¡¼¥â¡¼¥É¤Î loadbas¡¢savebas ½èÍı				*/
+/* ãƒ¢ãƒ‹ã‚¿ãƒ¼ãƒ¢ãƒ¼ãƒ‰ã® loadbasã€savebas å‡¦ç†				*/
 /*									*/
-/*				¤³¤Îµ¡Ç½¤Ï peach»á¤Ë¤è¤ê¼ÂÁõ¤µ¤ì¤Ş¤·¤¿	*/
+/*				ã“ã®æ©Ÿèƒ½ã¯ peachæ°ã«ã‚ˆã‚Šå®Ÿè£…ã•ã‚Œã¾ã—ãŸ	*/
 /************************************************************************/
 #ifdef	USE_MONITOR
 
 
 /*
- *  ²¾ÁÛÅª¤Ë CPU ¤È RAM ¤òÍÑ°Õ¤·¤Æ¤Ö¤ó²ó¤·¤Ş¤¹¡£
+ *  ä»®æƒ³çš„ã« CPU ã¨ RAM ã‚’ç”¨æ„ã—ã¦ã¶ã‚“å›ã—ã¾ã™ã€‚
  *
- *  ¶ñÂÎÅª¤Ë
- *    ¡¦³ä¤ê¹ş¤ß½èÍı¤ÏÌµ»ë
- *    ¡¦RAM ¤Ï¥á¥¤¥ó RAM ¤Î¤ß
- *    ¡¦¥İ¡¼¥È½èÍı¤ÏÉ¬Í×¤Ê¤È¤³¤í¤À¤±½èÍı
- *  ¤Ê¤É¤Ç¹âÂ®²½¤·¤Æ¤¤¤Ş¤¹¡£
+ *  å…·ä½“çš„ã«
+ *    ãƒ»å‰²ã‚Šè¾¼ã¿å‡¦ç†ã¯ç„¡è¦–
+ *    ãƒ»RAM ã¯ãƒ¡ã‚¤ãƒ³ RAM ã®ã¿
+ *    ãƒ»ãƒãƒ¼ãƒˆå‡¦ç†ã¯å¿…è¦ãªã¨ã“ã‚ã ã‘å‡¦ç†
+ *  ãªã©ã§é«˜é€ŸåŒ–ã—ã¦ã„ã¾ã™ã€‚
  */
 
 
@@ -29,21 +29,21 @@
 #include "monitor.h"
 #include "basic.h"
 
-#define BASIC_MAX_ERR_NUM	4	/* ¥¨¥é¡¼ÅĞÏ¿²ÄÇ½¿ô		*/
-#define BASIC_MAX_ERR_STR	20	/* ¥¨¥é¡¼É½¼¨Ê¸»ú¿ô		*/
+#define BASIC_MAX_ERR_NUM	4	/* ã‚¨ãƒ©ãƒ¼ç™»éŒ²å¯èƒ½æ•°		*/
+#define BASIC_MAX_ERR_STR	20	/* ã‚¨ãƒ©ãƒ¼è¡¨ç¤ºæ–‡å­—æ•°		*/
 
-#define BASIC_MAX_LINE		256	/* °ì¹Ô¤ÎÊ¸»úºÇÂç¿ô		*/
-#define BASIC_MAX_LOOP		200000	/* ²¾ÁÛ¥×¥í¥»¥¹¤ÎºÇÂç¥ë¡¼¥×¿ô	*/
+#define BASIC_MAX_LINE		256	/* ä¸€è¡Œã®æ–‡å­—æœ€å¤§æ•°		*/
+#define BASIC_MAX_LOOP		200000	/* ä»®æƒ³ãƒ—ãƒ­ã‚»ã‚¹ã®æœ€å¤§ãƒ«ãƒ¼ãƒ—æ•°	*/
 
 
-/* ¥á¥â¥êÆÉ¤ß¹ş¤ßÍÑ¥Ş¥¯¥í */
+/* ãƒ¡ãƒ¢ãƒªèª­ã¿è¾¼ã¿ç”¨ãƒã‚¯ãƒ­ */
 #define READ_BYTE(mem, addr)						\
 	((mem)[addr] & 0xff)
 
 #define READ_WORD(mem, addr)						\
 	((READ_BYTE(mem, addr + 1) << 8) + READ_BYTE(mem, addr))
 
-/* ¥á¥â¥ê½ñ¤­¹ş¤ßÍÑ¥Ş¥¯¥í */
+/* ãƒ¡ãƒ¢ãƒªæ›¸ãè¾¼ã¿ç”¨ãƒã‚¯ãƒ­ */
 #define WRITE_BYTE(mem, addr, data)					\
 	(mem)[addr] = ((data) & 0xff)
 
@@ -54,13 +54,13 @@
 	} while (0)
 
 
-/* ¥ì¥¸¥¹¥¿½ñ¤­¹ş¤ßÍÑ¥Ş¥¯¥í */
+/* ãƒ¬ã‚¸ã‚¹ã‚¿æ›¸ãè¾¼ã¿ç”¨ãƒã‚¯ãƒ­ */
 #define SET_REG(reg, data)						\
 	((reg).W   = data,						\
 	 (reg).B.h = ((data) >> 8) & 0xff,				\
 	 (reg).B.l = (data) & 0xff)
 
-/* ¥¨¥é¡¼ÀßÄêÍÑ¥Ş¥¯¥í */
+/* ã‚¨ãƒ©ãƒ¼è¨­å®šç”¨ãƒã‚¯ãƒ­ */
 #define SET_ERR(err, epc, estr)						\
 	do {								\
 	    (err).pc = epc;						\
@@ -68,7 +68,7 @@
 	    (err).str[BASIC_MAX_ERR_STR - 1] = '\0';			\
 	} while (0)
 
-/* ²¾ÁÛ¥×¥í¥»¥¹»ş¥¨¥é¡¼¹½Â¤ÂÎ */
+/* ä»®æƒ³ãƒ—ãƒ­ã‚»ã‚¹æ™‚ã‚¨ãƒ©ãƒ¼æ§‹é€ ä½“ */
 typedef struct {
     word pc;
     char str[BASIC_MAX_ERR_STR];
@@ -76,39 +76,39 @@ typedef struct {
 
 int basic_mode = FALSE;
 
-static z80arch pseudo_z80_cpu;			/* ²¾ÁÛ CPU               */
+static z80arch pseudo_z80_cpu;			/* ä»®æƒ³ CPU               */
 
-static byte *pseudo_ram;			/* ²¾ÁÛ¥á¥â¥ê (MAIN RAM)  */
-static word pseudo_window_offset;		/* ²¾ÁÛ¥á¥â¥êÍÑ¥¦¥¤¥ó¥É¥¦ */
+static byte *pseudo_ram;			/* ä»®æƒ³ãƒ¡ãƒ¢ãƒª (MAIN RAM)  */
+static word pseudo_window_offset;		/* ä»®æƒ³ãƒ¡ãƒ¢ãƒªç”¨ã‚¦ã‚¤ãƒ³ãƒ‰ã‚¦ */
 
-static byte *read_pseudo_mem_0000_7fff;		/* ²¾ÁÛ¥á¥â¥ê¥ê¡¼¥É¥İ¥¤¥ó¥¿  */
+static byte *read_pseudo_mem_0000_7fff;		/* ä»®æƒ³ãƒ¡ãƒ¢ãƒªãƒªãƒ¼ãƒ‰ãƒã‚¤ãƒ³ã‚¿  */
 static byte *read_pseudo_mem_8000_83ff;
 
-static byte *write_pseudo_mem_8000_83ff;	/* ²¾ÁÛ¥á¥â¥ê¥é¥¤¥È¥İ¥¤¥ó¥¿  */
+static byte *write_pseudo_mem_8000_83ff;	/* ä»®æƒ³ãƒ¡ãƒ¢ãƒªãƒ©ã‚¤ãƒˆãƒã‚¤ãƒ³ã‚¿  */
 
-static word basic_top_addr_addr;		/* Ãæ´Ö¥³¡¼¥É»ÏÅÀ¥¢¥É¥ì¥¹³ÊÇ¼*/
-static word basic_end_addr_addr;		/* Ãæ´Ö¥³¡¼¥É½ªÅÀ¥¢¥É¥ì¥¹³ÊÇ¼*/
-static word basic_top_addr;			/* Ãæ´Ö¥³¡¼¥É»ÏÅÀ¥¢¥É¥ì¥¹    */
-static word basic_end_addr;			/* Ãæ´Ö¥³¡¼¥É½ªÅÀ¥¢¥É¥ì¥¹    */
-static word basic_buffer_addr;			/* Ãæ´Ö¥³¡¼¥É¥Ğ¥Ã¥Õ¥¡¥¢¥É¥ì¥¹*/
-static word basic_buffer_size;			/* Ãæ´Ö¥³¡¼¥É¥Ğ¥Ã¥Õ¥¡¥µ¥¤¥º  */
-static word basic_sp;				/* ³«»Ï»ş¤Î¥¹¥¿¥Ã¥¯¥İ¥¤¥ó¥¿  */
+static word basic_top_addr_addr;		/* ä¸­é–“ã‚³ãƒ¼ãƒ‰å§‹ç‚¹ã‚¢ãƒ‰ãƒ¬ã‚¹æ ¼ç´*/
+static word basic_end_addr_addr;		/* ä¸­é–“ã‚³ãƒ¼ãƒ‰çµ‚ç‚¹ã‚¢ãƒ‰ãƒ¬ã‚¹æ ¼ç´*/
+static word basic_top_addr;			/* ä¸­é–“ã‚³ãƒ¼ãƒ‰å§‹ç‚¹ã‚¢ãƒ‰ãƒ¬ã‚¹    */
+static word basic_end_addr;			/* ä¸­é–“ã‚³ãƒ¼ãƒ‰çµ‚ç‚¹ã‚¢ãƒ‰ãƒ¬ã‚¹    */
+static word basic_buffer_addr;			/* ä¸­é–“ã‚³ãƒ¼ãƒ‰ãƒãƒƒãƒ•ã‚¡ã‚¢ãƒ‰ãƒ¬ã‚¹*/
+static word basic_buffer_size;			/* ä¸­é–“ã‚³ãƒ¼ãƒ‰ãƒãƒƒãƒ•ã‚¡ã‚µã‚¤ã‚º  */
+static word basic_sp;				/* é–‹å§‹æ™‚ã®ã‚¹ã‚¿ãƒƒã‚¯ãƒã‚¤ãƒ³ã‚¿  */
 
-static word basic_conv_buffer_addr;		/* ÊÑ´¹ÍÑ¥Ğ¥Ã¥Õ¥¡¥¢¥É¥ì¥¹ */
+static word basic_conv_buffer_addr;		/* å¤‰æ›ç”¨ãƒãƒƒãƒ•ã‚¡ã‚¢ãƒ‰ãƒ¬ã‚¹ */
 
-static word encode_start_pc;			/* ¥¨¥ó¥³¡¼¥É³«»Ï¥¢¥É¥ì¥¹ */
-static word encode_end_pc;			/* ¥¨¥ó¥³¡¼¥É½ªÎ»¥¢¥É¥ì¥¹ */
-static basic_err encode_err[BASIC_MAX_ERR_NUM];	/* ¥¨¥ó¥³¡¼¥É¥¨¥é¡¼       */
-static int encode_err_num;			/* ¥¨¥ó¥³¡¼¥É¥¨¥é¡¼ÅĞÏ¿¿ô */
+static word encode_start_pc;			/* ã‚¨ãƒ³ã‚³ãƒ¼ãƒ‰é–‹å§‹ã‚¢ãƒ‰ãƒ¬ã‚¹ */
+static word encode_end_pc;			/* ã‚¨ãƒ³ã‚³ãƒ¼ãƒ‰çµ‚äº†ã‚¢ãƒ‰ãƒ¬ã‚¹ */
+static basic_err encode_err[BASIC_MAX_ERR_NUM];	/* ã‚¨ãƒ³ã‚³ãƒ¼ãƒ‰ã‚¨ãƒ©ãƒ¼       */
+static int encode_err_num;			/* ã‚¨ãƒ³ã‚³ãƒ¼ãƒ‰ã‚¨ãƒ©ãƒ¼ç™»éŒ²æ•° */
 
-static word decode_start_pc;			/* ¥Ç¥³¡¼¥É³«»Ï¥¢¥É¥ì¥¹   */
-static word decode_end_pc;			/* ¥Ç¥³¡¼¥É½ªÎ»¥¢¥É¥ì¥¹   */
-static basic_err decode_err[BASIC_MAX_ERR_NUM];	/* ¥Ç¥³¡¼¥É¥¨¥é¡¼         */
-static int decode_err_num;			/* ¥Ç¥³¡¼¥É¥¨¥é¡¼ÅĞÏ¿¿ô   */
+static word decode_start_pc;			/* ãƒ‡ã‚³ãƒ¼ãƒ‰é–‹å§‹ã‚¢ãƒ‰ãƒ¬ã‚¹   */
+static word decode_end_pc;			/* ãƒ‡ã‚³ãƒ¼ãƒ‰çµ‚äº†ã‚¢ãƒ‰ãƒ¬ã‚¹   */
+static basic_err decode_err[BASIC_MAX_ERR_NUM];	/* ãƒ‡ã‚³ãƒ¼ãƒ‰ã‚¨ãƒ©ãƒ¼         */
+static int decode_err_num;			/* ãƒ‡ã‚³ãƒ¼ãƒ‰ã‚¨ãƒ©ãƒ¼ç™»éŒ²æ•°   */
 
 
 /*------------------------------------------------------*/
-/* ²¾ÁÛ¥á¥â¥ê³ä¤êÅö¤Æ					*/
+/* ä»®æƒ³ãƒ¡ãƒ¢ãƒªå‰²ã‚Šå½“ã¦					*/
 /*------------------------------------------------------*/
 static void pseudo_memory_mapping(void)
 {
@@ -124,7 +124,7 @@ static void pseudo_memory_mapping(void)
 }
 
 /*------------------------------------------------------*/
-/* ²¾ÁÛ¥á¥â¥ê¡¦¥é¥¤¥È					*/
+/* ä»®æƒ³ãƒ¡ãƒ¢ãƒªãƒ»ãƒ©ã‚¤ãƒˆ					*/
 /*------------------------------------------------------*/
 static void pseudo_mem_write(word addr, byte data)
 {
@@ -134,7 +134,7 @@ static void pseudo_mem_write(word addr, byte data)
 }
 
 /*------------------------------------------------------*/
-/* ²¾ÁÛ¥á¥â¥ê¡¦¥ê¡¼¥É					*/
+/* ä»®æƒ³ãƒ¡ãƒ¢ãƒªãƒ»ãƒªãƒ¼ãƒ‰					*/
 /*------------------------------------------------------*/
 static byte pseudo_mem_read(word addr)
 {
@@ -145,7 +145,7 @@ static byte pseudo_mem_read(word addr)
 
 
 /*------------------------------------------------------*/
-/* ²¾ÁÛ¥İ¡¼¥È¡¦¥é¥¤¥È					*/
+/* ä»®æƒ³ãƒãƒ¼ãƒˆãƒ»ãƒ©ã‚¤ãƒˆ					*/
 /*------------------------------------------------------*/
 static void pseudo_io_out(byte port, byte data)
 {
@@ -156,7 +156,7 @@ static void pseudo_io_out(byte port, byte data)
 }
 
 /*------------------------------------------------------*/
-/* ²¾ÁÛ¥İ¡¼¥È¡¦¥ê¡¼¥É					*/
+/* ä»®æƒ³ãƒãƒ¼ãƒˆãƒ»ãƒªãƒ¼ãƒ‰					*/
 /*------------------------------------------------------*/
 static byte pseudo_io_in(byte port)
 {
@@ -186,7 +186,7 @@ void	pseudo_intr_update(void){ pseudo_z80_cpu.skip_intr_chk=TRUE; }
 int	pseudo_intr_ack(void){ return -1; }
 
 /*------------------------------------------------------*/
-/* ²¾ÁÛ CPU ½é´ü²½					*/
+/* ä»®æƒ³ CPU åˆæœŸåŒ–					*/
 /*------------------------------------------------------*/
 static void pseudo_z80_init(void)
 {
@@ -203,7 +203,7 @@ static void pseudo_z80_init(void)
 }
 
 /*------------------------------------------------------*/
-/* ²¾ÁÛ¥á¥â¥ê½é´ü²½					*/
+/* ä»®æƒ³ãƒ¡ãƒ¢ãƒªåˆæœŸåŒ–					*/
 /*------------------------------------------------------*/
 static int pseudo_mem_init(void)
 {
@@ -230,7 +230,7 @@ static int pseudo_mem_init(void)
 }
 
 /*------------------------------------------------------*/
-/* Ãæ´Ö¥³¡¼¥É¤Î»ÏÅÀ¡¦½ªÅÀ¥¢¥É¥ì¥¹¤Î½ñ¤­¹ş¤ß		*/
+/* ä¸­é–“ã‚³ãƒ¼ãƒ‰ã®å§‹ç‚¹ãƒ»çµ‚ç‚¹ã‚¢ãƒ‰ãƒ¬ã‚¹ã®æ›¸ãè¾¼ã¿		*/
 /*------------------------------------------------------*/
 static void write_basic_addr(void)
 {
@@ -243,14 +243,14 @@ static void write_basic_addr(void)
 }
 
 /*------------------------------------------------------*/
-/* ¥¨¥ó¥³¡¼¥É¡¦¥Ç¥³¡¼¥ÉÍÑ¥¢¥É¥ì¥¹ÀßÄê			*/
+/* ã‚¨ãƒ³ã‚³ãƒ¼ãƒ‰ãƒ»ãƒ‡ã‚³ãƒ¼ãƒ‰ç”¨ã‚¢ãƒ‰ãƒ¬ã‚¹è¨­å®š			*/
 /*------------------------------------------------------*/
 static void pseudo_set_addr(void)
 {
     if (grph_ctrl & GRPH_CTRL_N) {
 	/* N-mode */
 
-	/* ¥¢¥É¥ì¥¹ÀßÄê */
+	/* ã‚¢ãƒ‰ãƒ¬ã‚¹è¨­å®š */
 	basic_top_addr_addr    = 0xeb54;
 	basic_end_addr_addr    = 0xefa0;
 	basic_buffer_addr      = 0x8021;
@@ -259,28 +259,28 @@ static void pseudo_set_addr(void)
 	basic_sp               = 0xe8d1;
 	basic_conv_buffer_addr = 0xec96;
 
-	/* ¥¨¥ó¥³¡¼¥É³«»Ï¡¦½ªÎ»¥¢¥É¥ì¥¹ÀßÄê */
+	/* ã‚¨ãƒ³ã‚³ãƒ¼ãƒ‰é–‹å§‹ãƒ»çµ‚äº†ã‚¢ãƒ‰ãƒ¬ã‚¹è¨­å®š */
 	encode_start_pc        = 0x3cf2;
 	encode_end_pc          = 0x3d6a;
 	
-	/* ¥¨¥ó¥³¡¼¥É¥¨¥é¡¼ÅĞÏ¿ */
+	/* ã‚¨ãƒ³ã‚³ãƒ¼ãƒ‰ã‚¨ãƒ©ãƒ¼ç™»éŒ² */
 	SET_ERR(encode_err[0], 0x3c9f, "no string");
 	SET_ERR(encode_err[1], 0x423b, "no line number");
 	SET_ERR(encode_err[2], 0x459e, "only line number");
 	encode_err_num = 3;
 
-	/* ¥Ç¥³¡¼¥É³«»Ï¡¦½ªÎ»¥¢¥É¥ì¥¹ÀßÄê */
+	/* ãƒ‡ã‚³ãƒ¼ãƒ‰é–‹å§‹ãƒ»çµ‚äº†ã‚¢ãƒ‰ãƒ¬ã‚¹è¨­å®š */
 	decode_start_pc        = 0x5718;
 	decode_end_pc          = 0x574e;
 
-	/* ¥Ç¥³¡¼¥É¥¨¥é¡¼ÅĞÏ¿ */
+	/* ãƒ‡ã‚³ãƒ¼ãƒ‰ã‚¨ãƒ©ãƒ¼ç™»éŒ² */
 	SET_ERR(decode_err[0], 0x3c82, "no line number");
 	SET_ERR(decode_err[1], 0x3c81, "buffer over flow");
 	decode_err_num = 1;
     } else {
 	/* V1,V2-mode */
 
-	/* ¥¢¥É¥ì¥¹ÀßÄê */
+	/* ã‚¢ãƒ‰ãƒ¬ã‚¹è¨­å®š */
 	basic_top_addr_addr    = 0xe658;
 	basic_end_addr_addr    = 0xeb18;
 	basic_buffer_addr      = 0x0001;
@@ -288,22 +288,22 @@ static void pseudo_set_addr(void)
 	basic_sp               = 0xe5ff;
 	basic_conv_buffer_addr = 0xe9b9;
 
-	/* ¥¨¥ó¥³¡¼¥É³«»Ï¡¦½ªÎ»¥¢¥É¥ì¥¹ÀßÄê */
+	/* ã‚¨ãƒ³ã‚³ãƒ¼ãƒ‰é–‹å§‹ãƒ»çµ‚äº†ã‚¢ãƒ‰ãƒ¬ã‚¹è¨­å®š */
 	encode_start_pc        = 0x04e2;
 	encode_end_pc          = 0x05a8;
 
-	/* ¥¨¥ó¥³¡¼¥É¥¨¥é¡¼ÅĞÏ¿ */
+	/* ã‚¨ãƒ³ã‚³ãƒ¼ãƒ‰ã‚¨ãƒ©ãƒ¼ç™»éŒ² */
 	SET_ERR(encode_err[0], 0x04a7, "no string");
 	SET_ERR(encode_err[1], 0x4c70, "no line number");
 	SET_ERR(encode_err[2], 0x0393, "line number is 0");
 	SET_ERR(encode_err[3], 0x0c3c, "only line number");
 	encode_err_num = 4;
 	
-	/* ¥Ç¥³¡¼¥É³«»Ï¡¦½ªÎ»¥¢¥É¥ì¥¹ÀßÄê */
+	/* ãƒ‡ã‚³ãƒ¼ãƒ‰é–‹å§‹ãƒ»çµ‚äº†ã‚¢ãƒ‰ãƒ¬ã‚¹è¨­å®š */
 	decode_start_pc        = 0x18f1;
 	decode_end_pc          = 0x1928;
 
-	/* ¥Ç¥³¡¼¥É¥¨¥é¡¼ÅĞÏ¿ */
+	/* ãƒ‡ã‚³ãƒ¼ãƒ‰ã‚¨ãƒ©ãƒ¼ç™»éŒ² */
 	SET_ERR(decode_err[0], 0x047b, "no string");
 	SET_ERR(decode_err[1], 0x047a, "buffer over flow");
 	decode_err_num = 2;
@@ -312,7 +312,7 @@ static void pseudo_set_addr(void)
 
 
 /*------------------------------------------------------*/
-/* ¥¨¥ó¥³¡¼¥ÉÍÑ²¾ÁÛ CPU ¥ì¥¸¥¹¥¿ÀßÄê			*/
+/* ã‚¨ãƒ³ã‚³ãƒ¼ãƒ‰ç”¨ä»®æƒ³ CPU ãƒ¬ã‚¸ã‚¹ã‚¿è¨­å®š			*/
 /*------------------------------------------------------*/
 static void encode_z80_set_register(void)
 {
@@ -323,18 +323,18 @@ static void encode_z80_set_register(void)
 
 
 /*------------------------------------------------------*/
-/* ¥¨¥ó¥³¡¼¥ÉÍÑ²¾ÁÛ¥á¥â¥êÀßÄê				*/
+/* ã‚¨ãƒ³ã‚³ãƒ¼ãƒ‰ç”¨ä»®æƒ³ãƒ¡ãƒ¢ãƒªè¨­å®š				*/
 /*------------------------------------------------------*/
 static void encode_set_mem(void)
 {
-    /* ³«»Ï¥¢¥É¥ì¥¹³ÊÇ¼ */
+    /* é–‹å§‹ã‚¢ãƒ‰ãƒ¬ã‚¹æ ¼ç´ */
     WRITE_WORD(pseudo_ram, basic_top_addr_addr, basic_buffer_addr);
-    /* ½ªÎ»¥¢¥É¥ì¥¹³ÊÇ¼ */
+    /* çµ‚äº†ã‚¢ãƒ‰ãƒ¬ã‚¹æ ¼ç´ */
     WRITE_WORD(pseudo_ram, basic_end_addr_addr, basic_buffer_addr + 2);
 }
 
 /*------------------------------------------------------*/
-/* ¥Æ¥­¥¹¥È¥ê¥¹¥È¤«¤éÃæ´Ö¥³¡¼¥É¤ËÊÑ´¹			*/
+/* ãƒ†ã‚­ã‚¹ãƒˆãƒªã‚¹ãƒˆã‹ã‚‰ä¸­é–“ã‚³ãƒ¼ãƒ‰ã«å¤‰æ›			*/
 /*------------------------------------------------------*/
 int basic_encode_list(FILE *fp)
 {
@@ -357,21 +357,21 @@ int basic_encode_list(FILE *fp)
     text_line_num = 0;
     while (fgets(buf, BASIC_MAX_LINE, fp) != NULL) {
 	text_line_num++;
-	/* ²ş¹Ô¥³¡¼¥Éºï½ü */
+	/* æ”¹è¡Œã‚³ãƒ¼ãƒ‰å‰Šé™¤ */
 	if ((ptr = strchr(buf, '\r')) != NULL) *ptr = '\0';
 	if ((ptr = strchr(buf, '\n')) != NULL) *ptr = '\0';
 
-	/* ÀèÆ¬¤¬¿ô»ú¤Ç¤Ê¤¤¤Ê¤é¤È¤Ğ¤¹ */
+	/* å…ˆé ­ãŒæ•°å­—ã§ãªã„ãªã‚‰ã¨ã°ã™ */
 	ptr = buf;
 	while (*ptr == ' ') ptr++;
 	if (!isdigit(*ptr)) continue;
 	encode_z80_set_register();
 
-	/* ÊÑ´¹ÍÑ¥Ğ¥Ã¥Õ¥¡¤Ë¥ê¥¹¥È¤ò¥³¥Ô¡¼ */
+	/* å¤‰æ›ç”¨ãƒãƒƒãƒ•ã‚¡ã«ãƒªã‚¹ãƒˆã‚’ã‚³ãƒ”ãƒ¼ */
 	strncpy(&pseudo_ram[basic_conv_buffer_addr], ptr, strlen(ptr));
-	pseudo_ram[basic_conv_buffer_addr + strlen(ptr)] = 0x00; /* ½ªÃ¼ */
+	pseudo_ram[basic_conv_buffer_addr + strlen(ptr)] = 0x00; /* çµ‚ç«¯ */
 
-	/* ²¾ÁÛ¥×¥í¥»¥¹³«»Ï */
+	/* ä»®æƒ³ãƒ—ãƒ­ã‚»ã‚¹é–‹å§‹ */
 	for (loop = 0; loop < BASIC_MAX_LOOP; loop++) {
             z80_emu(&pseudo_z80_cpu, 1);
 	    if (pseudo_z80_cpu.PC.W == encode_end_pc) break;
@@ -390,7 +390,7 @@ int basic_encode_list(FILE *fp)
         }
     }
 
-    /* ¥¨¥ó¥³¡¼¥É·ë²Ì¤ò¥á¥¤¥ó RAM ¤Ë¥³¥Ô¡¼ */
+    /* ã‚¨ãƒ³ã‚³ãƒ¼ãƒ‰çµæœã‚’ãƒ¡ã‚¤ãƒ³ RAM ã«ã‚³ãƒ”ãƒ¼ */
     basic_top_addr = READ_WORD(pseudo_ram, basic_top_addr_addr);
     basic_end_addr = READ_WORD(pseudo_ram, basic_end_addr_addr);
     if (basic_end_addr < basic_top_addr) {
@@ -411,11 +411,11 @@ int basic_encode_list(FILE *fp)
 
 
 /*------------------------------------------------------*/
-/* ¥Ç¥³¡¼¥ÉÍÑ²¾ÁÛ¥á¥â¥êÀßÄê 1				*/
+/* ãƒ‡ã‚³ãƒ¼ãƒ‰ç”¨ä»®æƒ³ãƒ¡ãƒ¢ãƒªè¨­å®š 1				*/
 /*------------------------------------------------------*/
 static int decode_mem_set1(void)
 {
-    /* Ãæ´Ö¥³¡¼¥É¤ò¥³¥Ô¡¼ */
+    /* ä¸­é–“ã‚³ãƒ¼ãƒ‰ã‚’ã‚³ãƒ”ãƒ¼ */
     basic_top_addr = READ_WORD(main_ram, basic_top_addr_addr);
     basic_end_addr = READ_WORD(main_ram, basic_end_addr_addr);
     WRITE_WORD(pseudo_ram, basic_top_addr_addr, basic_top_addr);
@@ -429,24 +429,24 @@ static int decode_mem_set1(void)
 
     if (grph_ctrl & GRPH_CTRL_N) {
 	WRITE_BYTE(pseudo_ram, 0xea59, 0xff);
-	WRITE_BYTE(pseudo_ram, 0xea65, 0x28); /* ²£¤ÎºÇÂçÊ¸»ú¿ô */
-	WRITE_BYTE(pseudo_ram, 0xeb4a, 0x28); /* ²£¤ÎºÇÂçÊ¸»ú¿ô */
+	WRITE_BYTE(pseudo_ram, 0xea65, 0x28); /* æ¨ªã®æœ€å¤§æ–‡å­—æ•° */
+	WRITE_BYTE(pseudo_ram, 0xeb4a, 0x28); /* æ¨ªã®æœ€å¤§æ–‡å­—æ•° */
 	WRITE_WORD(pseudo_ram, 0xef56, 0xef58);
 	WRITE_WORD(pseudo_ram, 0xef79, 0xe9ff);
     } else {
-	WRITE_BYTE(pseudo_ram, 0xe6a0, 0xff); /* ¥¨¥é¡¼´Ø·¸¡© */
+	WRITE_BYTE(pseudo_ram, 0xe6a0, 0xff); /* ã‚¨ãƒ©ãƒ¼é–¢ä¿‚ï¼Ÿ */
 	WRITE_BYTE(pseudo_ram, 0xe6a2, 0xff);
 	WRITE_WORD(pseudo_ram, 0xe6c4, 0xf3c8);
 	WRITE_WORD(pseudo_ram, 0xeace, 0xead0);
 	WRITE_WORD(pseudo_ram, 0xeaf1, 0xe3fd);
-	WRITE_BYTE(pseudo_ram, 0xef89, 0x50); /* ²£¤ÎºÇÂçÊ¸»ú¿ô */
+	WRITE_BYTE(pseudo_ram, 0xef89, 0x50); /* æ¨ªã®æœ€å¤§æ–‡å­—æ•° */
     }
     return(TRUE);
 }
 
 
 /*------------------------------------------------------*/
-/* ¥Ç¥³¡¼¥ÉÍÑ²¾ÁÛ¥á¥â¥êÀßÄê 2				*/
+/* ãƒ‡ã‚³ãƒ¼ãƒ‰ç”¨ä»®æƒ³ãƒ¡ãƒ¢ãƒªè¨­å®š 2				*/
 /*------------------------------------------------------*/
 static void decode_mem_set2(void)
 {
@@ -456,15 +456,15 @@ static void decode_mem_set2(void)
     WRITE_WORD(pseudo_ram, basic_sp, 0xfffa); /* POP DE */
 
     if (grph_ctrl & GRPH_CTRL_N) {
-	WRITE_WORD(pseudo_ram, 0xea63, 0x0101); /* ¥«¡¼¥½¥ë°ÌÃÖ */
+	WRITE_WORD(pseudo_ram, 0xea63, 0x0101); /* ã‚«ãƒ¼ã‚½ãƒ«ä½ç½® */
     } else {
-	WRITE_WORD(pseudo_ram, 0xef86, 0x0101); /* ¥«¡¼¥½¥ë°ÌÃÖ */
+	WRITE_WORD(pseudo_ram, 0xef86, 0x0101); /* ã‚«ãƒ¼ã‚½ãƒ«ä½ç½® */
     }
 
 }
 
 /*------------------------------------------------------*/
-/* ¥Ç¥³¡¼¥ÉÍÑ²¾ÁÛ CPU ¥ì¥¸¥¹¥¿ÀßÄê			*/
+/* ãƒ‡ã‚³ãƒ¼ãƒ‰ç”¨ä»®æƒ³ CPU ãƒ¬ã‚¸ã‚¹ã‚¿è¨­å®š			*/
 /*------------------------------------------------------*/
 static void decode_z80_set_register(word top_addr)
 {
@@ -474,9 +474,9 @@ static void decode_z80_set_register(word top_addr)
 }
 
 /*------------------------------------------------------*/
-/* Ãæ´Ö¥³¡¼¥É¤«¤é¥Æ¥­¥¹¥È¥ê¥¹¥È¤ØÊÑ´¹			*/
+/* ä¸­é–“ã‚³ãƒ¼ãƒ‰ã‹ã‚‰ãƒ†ã‚­ã‚¹ãƒˆãƒªã‚¹ãƒˆã¸å¤‰æ›			*/
 /*------------------------------------------------------*/
-/* list ¥³¥Ş¥ó¥É¤òÎ®ÍÑ */
+/* list ã‚³ãƒãƒ³ãƒ‰ã‚’æµç”¨ */
 int basic_decode_list(FILE *fp)
 {
     char buf[BASIC_MAX_LINE];
@@ -509,7 +509,7 @@ int basic_decode_list(FILE *fp)
 	decode_mem_set2();
 	decode_z80_set_register(line_top_addr);
 
-	/* ²¾ÁÛ¥×¥í¥»¥¹³«»Ï */
+	/* ä»®æƒ³ãƒ—ãƒ­ã‚»ã‚¹é–‹å§‹ */
 	for (loop = 0; loop < BASIC_MAX_LOOP; loop++) {
             z80_emu(&pseudo_z80_cpu, 1);
 	    if (pseudo_z80_cpu.PC.W == decode_end_pc) break;
@@ -527,7 +527,7 @@ int basic_decode_list(FILE *fp)
             break;
         }
 
-	/* ·ë²ÌÉ½¼¨ */
+	/* çµæœè¡¨ç¤º */
 	size += fprintf(fp, "%d ", line_num);
 	for (i = 0; i < BASIC_MAX_LINE - 1; i++) {
 	    if (READ_BYTE(pseudo_ram, basic_conv_buffer_addr + i) == 0x00) break;
@@ -552,7 +552,7 @@ int basic_decode_list(FILE *fp)
 
 
 /*------------------------------------------------------*/
-/* ¥Õ¥¡¥¤¥ë¤«¤éÃæ´Ö¥³¡¼¥É¤ò¥á¥¤¥ó RAM ¤ËÆÉ¤ß¹ş¤à	*/
+/* ãƒ•ã‚¡ã‚¤ãƒ«ã‹ã‚‰ä¸­é–“ã‚³ãƒ¼ãƒ‰ã‚’ãƒ¡ã‚¤ãƒ³ RAM ã«èª­ã¿è¾¼ã‚€	*/
 /*------------------------------------------------------*/
 int basic_load_intermediate_code(FILE *fp)
 {
@@ -570,7 +570,7 @@ int basic_load_intermediate_code(FILE *fp)
 
 
 /*------------------------------------------------------*/
-/* ¥á¥¤¥ó RAM ¤«¤é¥Õ¥¡¥¤¥ë¤ËÃæ´Ö¥³¡¼¥É¤ò½ñ¤­¹ş¤à	*/
+/* ãƒ¡ã‚¤ãƒ³ RAM ã‹ã‚‰ãƒ•ã‚¡ã‚¤ãƒ«ã«ä¸­é–“ã‚³ãƒ¼ãƒ‰ã‚’æ›¸ãè¾¼ã‚€	*/
 /*------------------------------------------------------*/
 int basic_save_intermediate_code(FILE *fp)
 {
@@ -584,7 +584,7 @@ int basic_save_intermediate_code(FILE *fp)
 	printf("Error : no basic code.\n");
 	return(0);
     }
-    /* p88make, p80make ¤Ç¤½¤Î¤Ş¤Ş»È¤¨¤Ş¤¹ */
+    /* p88make, p80make ã§ãã®ã¾ã¾ä½¿ãˆã¾ã™ */
     size = basic_end_addr - basic_top_addr + 2;
     wsize = fwrite(&main_ram[basic_top_addr - 1], 1, size, fp);
     if (wsize < size) {

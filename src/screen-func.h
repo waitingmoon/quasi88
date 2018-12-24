@@ -6,7 +6,7 @@ enum {	V_COLOR,  V_MONO,   V_UNDISP, V_HIRESO,	  V_VRAM_MODE };
 enum {	V_80x25,  V_80x20,  V_40x25,  V_40x20,	  V_TEXT_MODE };
 enum {	V_DIF,	  V_ALL,			  V_METHOD    };
 
-/* void (*´Ø¿ô¥ê¥¹¥È[ V_VRAM_MODE ][ V_TEXT_MODE ][ V_METHOD ])(void); */
+/* void (*é–¢æ•°ãƒªã‚¹ãƒˆ[ V_VRAM_MODE ][ V_TEXT_MODE ][ V_METHOD ])(void); */
 
 /* ------------------------------------------------------------------------- */
 #ifdef	SUPPORT_8BPP

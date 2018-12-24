@@ -1,5 +1,5 @@
 /*
- *	Joystick ¥Ø¥Ã¥À¥Õ¥¡¥¤¥ë
+ *	Joystick ãƒ˜ãƒƒãƒ€ãƒ•ã‚¡ã‚¤ãƒ«
  */
 
 #ifndef	JOYSTICK_H_INCLUDED

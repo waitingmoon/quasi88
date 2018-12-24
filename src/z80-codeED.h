@@ -1,11 +1,11 @@
 /************************************************************************/
 /*									*/
-/* ���ڥ������̽��� ( ED XX )						*/
+/* オペコード別処理 ( ED XX )						*/
 /*									*/
 /************************************************************************/
 
 
-      /* 8�ӥå�ž��̿�� */
+      /* 8ビット転送命令 */
 
     case LD_A_I:
       z80->ACC  = z80->I;
@@ -22,7 +22,7 @@
     case LD_R_A:   z80->R = z80->ACC;    break;
 
 
-      /* 16�ӥå�ž��̿�� */
+      /* 16ビット転送命令 */
 
     case LD_x16x_HL:
       J.B.l = M_RDMEM(z80->PC.W++);
@@ -74,7 +74,7 @@
       z80->SP.B.h = M_RDMEM(J.W  );
       break;
       
-      /* 16�ӥåȻ��ѱ黻̿�� */
+      /* 16ビット算術演算命令 */
 
     case ADC_HL_BC:  M_ADCW(z80->BC.W);  break;
     case ADC_HL_DE:  M_ADCW(z80->DE.W);  break;
@@ -87,7 +87,7 @@
     case SBC_HL_SP:  M_SBCW(z80->SP.W);  break;
 
 
-      /* �����ơ��ȡ����ե�̿�� */
+      /* ローテート・シフト命令 */
 
     case RLD:
       I = M_RDMEM(z80->HL.W);
@@ -104,7 +104,7 @@
       z80->FLAG = SZP_table[z80->ACC]|(z80->FLAG&C_FLAG);
       break;
 
-      /* �ãУ�����̿�� */
+      /* ＣＰＵ制御命令 */
 
     case IM_0:
     case IM_0_4E:
@@ -117,7 +117,7 @@
     case IM_2:
     case IM_2_7E:  z80->IM = 2;  break;
 
-      /* �������졼�����̿�� */
+      /* アキュムレータ操作命令 */
 
     case NEG:
     case NEG_4C:
@@ -128,7 +128,7 @@
     case NEG_74:
     case NEG_7C:   I=z80->ACC;  z80->ACC=0;  M_SUB(I);  break;
 
-      /* ʬ��̿�� */
+      /* 分岐命令 */
 
     case RETI:      M_RET();                      break;
 
@@ -140,7 +140,7 @@
     case RETN_7D:  
     case RETN_75:   M_RET();                      break;
 
-      /* ������̿�� */
+      /* 入出力命令 */
 
     case IN_B_xC:   M_IN_C(z80->BC.B.h);   break;
     case IN_C_xC:   M_IN_C(z80->BC.B.l);   break;
@@ -226,7 +226,7 @@
       }
       break;
 
-      /* �֥��å�ž��̿�� */
+      /* ブロック転送命令 */
 
     case LDI:
       {
@@ -265,7 +265,7 @@
       }
       break;
 
-      /* �֥��å�������̿�� */
+      /* ブロックサーチ命令 */
 
     case CPI:
       {

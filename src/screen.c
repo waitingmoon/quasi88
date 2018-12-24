@@ -1,6 +1,6 @@
 /************************************************************************/
 /*									*/
-/* ²èÌÌ¤ÎÉ½¼¨								*/
+/* ç”»é¢ã®è¡¨ç¤º								*/
 /*									*/
 /************************************************************************/
 
@@ -26,65 +26,65 @@
 
 
 PC88_PALETTE_T	vram_bg_palette;	/* OUT[52/54-5B]		*/
-PC88_PALETTE_T	vram_palette[8];	/*		³Æ¼ï¥Ñ¥ì¥Ã¥È	*/
+PC88_PALETTE_T	vram_palette[8];	/*		å„ç¨®ãƒ‘ãƒ¬ãƒƒãƒˆ	*/
 
 byte	sys_ctrl;			/* OUT[30] SystemCtrl		*/
 byte	grph_ctrl;			/* OUT[31] GraphCtrl		*/
-byte	grph_pile;			/* OUT[53] ½Å¤Í¹ç¤ï¤»		*/
+byte	grph_pile;			/* OUT[53] é‡ã­åˆã‚ã›		*/
 
 
 
-char	screen_dirty_flag[ 0x4000*2 ];		/* ¥á¥¤¥óÎÎ°è º¹Ê¬¹¹¿·	*/
-int	screen_dirty_all = TRUE;		/* ¥á¥¤¥óÎÎ°è Á´°è¹¹¿·	*/
-int	screen_dirty_palette = TRUE;		/* ¿§¾ğÊó ¹¹¿·		*/
-int	screen_dirty_status = FALSE;		/* ¥¹¥Æ¡¼¥¿¥¹ÎÎ°è ¹¹¿·	*/
-int	screen_dirty_status_hide = FALSE;	/* ¥¹¥Æ¡¼¥¿¥¹ÎÎ°è ¾Ãµî	*/
-int	screen_dirty_status_show = FALSE;	/* ¥¹¥Æ¡¼¥¿¥¹ÎÎ°è ½é´ü²½*/
-int	screen_dirty_frame = TRUE;		/* Á´ÎÎ°è ¹¹¿· 		*/
+char	screen_dirty_flag[ 0x4000*2 ];		/* ãƒ¡ã‚¤ãƒ³é ˜åŸŸ å·®åˆ†æ›´æ–°	*/
+int	screen_dirty_all = TRUE;		/* ãƒ¡ã‚¤ãƒ³é ˜åŸŸ å…¨åŸŸæ›´æ–°	*/
+int	screen_dirty_palette = TRUE;		/* è‰²æƒ…å ± æ›´æ–°		*/
+int	screen_dirty_status = FALSE;		/* ã‚¹ãƒ†ãƒ¼ã‚¿ã‚¹é ˜åŸŸ æ›´æ–°	*/
+int	screen_dirty_status_hide = FALSE;	/* ã‚¹ãƒ†ãƒ¼ã‚¿ã‚¹é ˜åŸŸ æ¶ˆå»	*/
+int	screen_dirty_status_show = FALSE;	/* ã‚¹ãƒ†ãƒ¼ã‚¿ã‚¹é ˜åŸŸ åˆæœŸåŒ–*/
+int	screen_dirty_frame = TRUE;		/* å…¨é ˜åŸŸ æ›´æ–° 		*/
 
 
 
-int	frameskip_rate	= DEFAULT_FRAMESKIP;	/* ²èÌÌÉ½¼¨¤Î¹¹¿·´Ö³Ö	*/
-int	monitor_analog	= TRUE;			/* ¥¢¥Ê¥í¥°¥â¥Ë¥¿¡¼     */
-int	use_auto_skip	= TRUE;			/* ¼«Æ°¥Õ¥ì¡¼¥à¥¹¥­¥Ã¥×	*/
+int	frameskip_rate	= DEFAULT_FRAMESKIP;	/* ç”»é¢è¡¨ç¤ºã®æ›´æ–°é–“éš”	*/
+int	monitor_analog	= TRUE;			/* ã‚¢ãƒŠãƒ­ã‚°ãƒ¢ãƒ‹ã‚¿ãƒ¼     */
+int	use_auto_skip	= TRUE;			/* è‡ªå‹•ãƒ•ãƒ¬ãƒ¼ãƒ ã‚¹ã‚­ãƒƒãƒ—	*/
 
 
-static	int	do_skip_draw = FALSE;		/* º£²ó¥¹¥­¥Ã¥×¤¹¤ë¤«?	*/
-static	int	already_skip_draw = FALSE;	/* Á°²ó¥¹¥­¥Ã¥×¤·¤¿¤«?	*/
+static	int	do_skip_draw = FALSE;		/* ä»Šå›ã‚¹ã‚­ãƒƒãƒ—ã™ã‚‹ã‹?	*/
+static	int	already_skip_draw = FALSE;	/* å‰å›ã‚¹ã‚­ãƒƒãƒ—ã—ãŸã‹?	*/
 
-static	int	skip_counter = 0;	/* Ï¢Â³²¿²ó¥¹¥­¥Ã¥×¤·¤¿¤«	*/
-static	int	skip_count_max = 15;	/* ¤³¤ì°Ê¾åÏ¢Â³¥¹¥­¥Ã¥×¤·¤¿¤é
-						°ìÃ¶¡¢¶¯À©Åª¤ËÉÁ²è¤¹¤ë	*/
+static	int	skip_counter = 0;	/* é€£ç¶šä½•å›ã‚¹ã‚­ãƒƒãƒ—ã—ãŸã‹	*/
+static	int	skip_count_max = 15;	/* ã“ã‚Œä»¥ä¸Šé€£ç¶šã‚¹ã‚­ãƒƒãƒ—ã—ãŸã‚‰
+						ä¸€æ—¦ã€å¼·åˆ¶çš„ã«æç”»ã™ã‚‹	*/
 
-static	int	frame_counter = 0;	/* ¥Õ¥ì¡¼¥à¥¹¥­¥Ã¥×ÍÑ¤Î¥«¥¦¥ó¥¿	*/
-
-
-
-static	int	blink_ctrl_cycle   = 1;	/* ¥«¡¼¥½¥ëÉ½¼¨ÍÑ¤Î¥«¥¦¥ó¥¿	*/
-static	int	blink_ctrl_counter = 0;	/*              ¡·		*/
+static	int	frame_counter = 0;	/* ãƒ•ãƒ¬ãƒ¼ãƒ ã‚¹ã‚­ãƒƒãƒ—ç”¨ã®ã‚«ã‚¦ãƒ³ã‚¿	*/
 
 
 
-
-
-/*CFG*/	int	hide_mouse = FALSE;	/* ¥Ş¥¦¥¹¤ò±£¤¹¤«¤É¤¦¤«		*/
-/*CFG*/	int	grab_mouse = FALSE;	/* ¥°¥é¥Ö¤¹¤ë¤«¤É¤¦¤«		*/
-
-/*CFG*/	int	use_swcursor = FALSE;	/* ¥á¥Ë¥å¡¼ÀìÍÑ¥«¡¼¥½¥ëÉ½¼¨Í­Ìµ	*/
-	int	now_swcursor;		/* ¸½ºßÀìÍÑ¥«¡¼¥½¥ëÉ½¼¨Ãæ?	*/
+static	int	blink_ctrl_cycle   = 1;	/* ã‚«ãƒ¼ã‚½ãƒ«è¡¨ç¤ºç”¨ã®ã‚«ã‚¦ãƒ³ã‚¿	*/
+static	int	blink_ctrl_counter = 0;	/*              ã€ƒ		*/
 
 
 
 
-/*CFG*/	int	use_interlace = 0;		/* ¥¤¥ó¥¿¡¼¥ì¡¼¥¹É½¼¨	*/
 
-static	int	enable_half_interp = FALSE;	/* HALF»ş¡¢¿§Êä´Ö²ÄÇ½¤«Èİ¤« */
-/*CFG*/	int	use_half_interp = TRUE;		/* HALF»ş¡¢¿§Êä´Ö¤¹¤ë	    */
-static	int	now_half_interp = FALSE;	/* ¸½ºß¡¢¿§Êä´°Ãæ¤Ê¤é¿¿	    */
+/*CFG*/	int	hide_mouse = FALSE;	/* ãƒã‚¦ã‚¹ã‚’éš ã™ã‹ã©ã†ã‹		*/
+/*CFG*/	int	grab_mouse = FALSE;	/* ã‚°ãƒ©ãƒ–ã™ã‚‹ã‹ã©ã†ã‹		*/
+
+/*CFG*/	int	use_swcursor = FALSE;	/* ãƒ¡ãƒ‹ãƒ¥ãƒ¼å°‚ç”¨ã‚«ãƒ¼ã‚½ãƒ«è¡¨ç¤ºæœ‰ç„¡	*/
+	int	now_swcursor;		/* ç¾åœ¨å°‚ç”¨ã‚«ãƒ¼ã‚½ãƒ«è¡¨ç¤ºä¸­?	*/
 
 
 
-typedef	struct{				/* ²èÌÌ¥µ¥¤¥º¤Î¥ê¥¹¥È		*/
+
+/*CFG*/	int	use_interlace = 0;		/* ã‚¤ãƒ³ã‚¿ãƒ¼ãƒ¬ãƒ¼ã‚¹è¡¨ç¤º	*/
+
+static	int	enable_half_interp = FALSE;	/* HALFæ™‚ã€è‰²è£œé–“å¯èƒ½ã‹å¦ã‹ */
+/*CFG*/	int	use_half_interp = TRUE;		/* HALFæ™‚ã€è‰²è£œé–“ã™ã‚‹	    */
+static	int	now_half_interp = FALSE;	/* ç¾åœ¨ã€è‰²è£œå®Œä¸­ãªã‚‰çœŸ	    */
+
+
+
+typedef	struct{				/* ç”»é¢ã‚µã‚¤ã‚ºã®ãƒªã‚¹ãƒˆ		*/
     int		w,  h;
 } SCREEN_SIZE_TABLE;
 
@@ -99,71 +99,71 @@ static const SCREEN_SIZE_TABLE screen_size_tbl[ SCREEN_SIZE_END ] =
 };
 
 
-static	int	screen_size_max = SCREEN_SIZE_END - 1; /*ÊÑ¹¹²ÄÇ½¤ÊºÇÂç¥µ¥¤¥º*/
-static	int	screen_size_min = SCREEN_SIZE_HALF;    /*ÊÑ¹¹²ÄÇ½¤ÊºÇ¾®¥µ¥¤¥º*/
-/*CFG*/	int	screen_size	= SCREEN_SIZE_FULL;    /*²èÌÌ¥µ¥¤¥º»ØÄê      */
-static	int	now_screen_size;		       /*¼Âºİ¤Î¡¢²èÌÌ¥µ¥¤¥º  */
+static	int	screen_size_max = SCREEN_SIZE_END - 1; /*å¤‰æ›´å¯èƒ½ãªæœ€å¤§ã‚µã‚¤ã‚º*/
+static	int	screen_size_min = SCREEN_SIZE_HALF;    /*å¤‰æ›´å¯èƒ½ãªæœ€å°ã‚µã‚¤ã‚º*/
+/*CFG*/	int	screen_size	= SCREEN_SIZE_FULL;    /*ç”»é¢ã‚µã‚¤ã‚ºæŒ‡å®š      */
+static	int	now_screen_size;		       /*å®Ÿéš›ã®ã€ç”»é¢ã‚µã‚¤ã‚º  */
 
 
-static	int	enable_fullscreen = 0;	/* Á´²èÌÌÉ½¼¨²ÄÇ½¤«¤É¤¦¤«	*/
-/*CFG*/	int	use_fullscreen = FALSE;	/* Á´²èÌÌÉ½¼¨»ØÄê		*/
-static	int	now_fullscreen = FALSE;	/* ¸½ºß¡¢Á´²èÌÌÉ½¼¨Ãæ¤Ê¤é¿¿	*/
+static	int	enable_fullscreen = 0;	/* å…¨ç”»é¢è¡¨ç¤ºå¯èƒ½ã‹ã©ã†ã‹	*/
+/*CFG*/	int	use_fullscreen = FALSE;	/* å…¨ç”»é¢è¡¨ç¤ºæŒ‡å®š		*/
+static	int	now_fullscreen = FALSE;	/* ç¾åœ¨ã€å…¨ç”»é¢è¡¨ç¤ºä¸­ãªã‚‰çœŸ	*/
 
 
-/*CFG*/	double	mon_aspect = 0.0;	/* ¥â¥Ë¥¿¡¼¤Î¥¢¥¹¥Ú¥¯¥ÈÈæ	*/
+/*CFG*/	double	mon_aspect = 0.0;	/* ãƒ¢ãƒ‹ã‚¿ãƒ¼ã®ã‚¢ã‚¹ãƒšã‚¯ãƒˆæ¯”	*/
 
 
-int	WIDTH  = 0;			/* ÉÁ²è¥Ğ¥Ã¥Õ¥¡²£¥µ¥¤¥º		*/
-int	HEIGHT = 0;			/* ÉÁ²è¥Ğ¥Ã¥Õ¥¡½Ä¥µ¥¤¥º		*/
-int	DEPTH  = 8;			/* ¿§¥Ó¥Ã¥È¿ô	(8 or 16 or 32)	*/
-int	SCREEN_W = 0;			/* ²èÌÌ²£¥µ¥¤¥º (320/640/1280)	*/
-int	SCREEN_H = 0;			/* ²èÌÌ½Ä¥µ¥¤¥º (200/400/800)	*/
+int	WIDTH  = 0;			/* æç”»ãƒãƒƒãƒ•ã‚¡æ¨ªã‚µã‚¤ã‚º		*/
+int	HEIGHT = 0;			/* æç”»ãƒãƒƒãƒ•ã‚¡ç¸¦ã‚µã‚¤ã‚º		*/
+int	DEPTH  = 8;			/* è‰²ãƒ“ãƒƒãƒˆæ•°	(8 or 16 or 32)	*/
+int	SCREEN_W = 0;			/* ç”»é¢æ¨ªã‚µã‚¤ã‚º (320/640/1280)	*/
+int	SCREEN_H = 0;			/* ç”»é¢ç¸¦ã‚µã‚¤ã‚º (200/400/800)	*/
 
-int	SCREEN_DX = 0;			/* ¥¦¥¤¥ó¥É¥¦º¸¾å¤È¡¢		*/
-int	SCREEN_DY = 0;			/* ²èÌÌ¥¨¥ê¥¢º¸¾å¤È¤Î¥ª¥Õ¥»¥Ã¥È	*/
+int	SCREEN_DX = 0;			/* ã‚¦ã‚¤ãƒ³ãƒ‰ã‚¦å·¦ä¸Šã¨ã€		*/
+int	SCREEN_DY = 0;			/* ç”»é¢ã‚¨ãƒªã‚¢å·¦ä¸Šã¨ã®ã‚ªãƒ•ã‚»ãƒƒãƒˆ	*/
 
-char	*screen_buf;			/* ÉÁ²è¥Ğ¥Ã¥Õ¥¡ÀèÆ¬		*/
-char	*screen_start;			/* ²èÌÌÀèÆ¬			*/
+char	*screen_buf;			/* æç”»ãƒãƒƒãƒ•ã‚¡å…ˆé ­		*/
+char	*screen_start;			/* ç”»é¢å…ˆé ­			*/
 
-static	int	screen_bx;		/* ¥Ü¡¼¥À¡¼(ÏÈ)¤ÎÉı x (¥É¥Ã¥È)	*/
-static	int	screen_by;		/*	   ¡·	    y (¥É¥Ã¥È)	*/
+static	int	screen_bx;		/* ãƒœãƒ¼ãƒ€ãƒ¼(æ )ã®å¹… x (ãƒ‰ãƒƒãƒˆ)	*/
+static	int	screen_by;		/*	   ã€ƒ	    y (ãƒ‰ãƒƒãƒˆ)	*/
 
 
 
-/*CFG*/	int	status_fg = 0x000000;	/* ¥¹¥Æ¡¼¥¿¥¹Á°·Ê¿§		*/
-/*CFG*/	int	status_bg = 0xd6d6d6;	/* ¥¹¥Æ¡¼¥¿¥¹ÇØ·Ê¿§		*/
+/*CFG*/	int	status_fg = 0x000000;	/* ã‚¹ãƒ†ãƒ¼ã‚¿ã‚¹å‰æ™¯è‰²		*/
+/*CFG*/	int	status_bg = 0xd6d6d6;	/* ã‚¹ãƒ†ãƒ¼ã‚¿ã‚¹èƒŒæ™¯è‰²		*/
 
-static	int	enable_status = TRUE;	/* ¥¹¥Æ¡¼¥¿¥¹É½¼¨²ÄÇ½¤«¤É¤¦¤«	*/
-/*CFG*/	int	show_status = TRUE;	/* ¥¹¥Æ¡¼¥¿¥¹É½¼¨Í­Ìµ		*/
-static	int	now_status = FALSE;	/* ¸½ºß¡¢¥¹¥Æ¡¼¥¿¥¹É½¼¨Ãæ¤Ê¤é¿¿	*/
+static	int	enable_status = TRUE;	/* ã‚¹ãƒ†ãƒ¼ã‚¿ã‚¹è¡¨ç¤ºå¯èƒ½ã‹ã©ã†ã‹	*/
+/*CFG*/	int	show_status = TRUE;	/* ã‚¹ãƒ†ãƒ¼ã‚¿ã‚¹è¡¨ç¤ºæœ‰ç„¡		*/
+static	int	now_status = FALSE;	/* ç¾åœ¨ã€ã‚¹ãƒ†ãƒ¼ã‚¿ã‚¹è¡¨ç¤ºä¸­ãªã‚‰çœŸ	*/
 
-char	*status_buf;			/* ¥¹¥Æ¡¼¥¿¥¹Á´°è ÀèÆ¬		*/
-char	*status_start[3];		/* ¥¹¥Æ¡¼¥¿¥¹ÉÁ²è ÀèÆ¬		*/
-int	status_sx[3];			/* ¥¹¥Æ¡¼¥¿¥¹ÉÁ²è¥µ¥¤¥º		*/
+char	*status_buf;			/* ã‚¹ãƒ†ãƒ¼ã‚¿ã‚¹å…¨åŸŸ å…ˆé ­		*/
+char	*status_start[3];		/* ã‚¹ãƒ†ãƒ¼ã‚¿ã‚¹æç”» å…ˆé ­		*/
+int	status_sx[3];			/* ã‚¹ãƒ†ãƒ¼ã‚¿ã‚¹æç”»ã‚µã‚¤ã‚º		*/
 int	status_sy[3];
 
 
-Ulong	color_pixel[16];			/* ¿§¥³¡¼¥É		*/
-Ulong	color_half_pixel[16][16];		/* ¿§Êä´°»ş¤Î¿§¥³¡¼¥É	*/
-Ulong	black_pixel;				/* ¹õ¤Î¿§¥³¡¼¥É		*/
-Ulong	status_pixel[ STATUS_COLOR_END ];	/* ¥¹¥Æ¡¼¥¿¥¹¤Î¿§¥³¡¼¥É	*/
+Ulong	color_pixel[16];			/* è‰²ã‚³ãƒ¼ãƒ‰		*/
+Ulong	color_half_pixel[16][16];		/* è‰²è£œå®Œæ™‚ã®è‰²ã‚³ãƒ¼ãƒ‰	*/
+Ulong	black_pixel;				/* é»’ã®è‰²ã‚³ãƒ¼ãƒ‰		*/
+Ulong	status_pixel[ STATUS_COLOR_END ];	/* ã‚¹ãƒ†ãƒ¼ã‚¿ã‚¹ã®è‰²ã‚³ãƒ¼ãƒ‰	*/
 
 
 
-static	int	screen_write_only;	/* ²èÌÌ¥Ğ¥Ã¥Õ¥¡ÆÉ½ĞÉÔ²Ä¤Ê¤é¡¢¿¿	*/
+static	int	screen_write_only;	/* ç”»é¢ãƒãƒƒãƒ•ã‚¡èª­å‡ºä¸å¯ãªã‚‰ã€çœŸ	*/
 
-static	void	(*draw_start)(void);	/* ÉÁ²èÁ°¤Î¥³¡¼¥ë¥Ğ¥Ã¥¯´Ø¿ô	*/
-static	void	(*draw_finish)(void);	/* ÉÁ²è¸å¤Î¥³¡¼¥ë¥Ğ¥Ã¥¯´Ø¿ô	*/
-static	int	dont_frameskip;		/* ¥Õ¥ì¡¼¥à¥¹¥­¥Ã¥×¶Ø»ß¤Ê¤é¡¢¿¿	*/
+static	void	(*draw_start)(void);	/* æç”»å‰ã®ã‚³ãƒ¼ãƒ«ãƒãƒƒã‚¯é–¢æ•°	*/
+static	void	(*draw_finish)(void);	/* æç”»å¾Œã®ã‚³ãƒ¼ãƒ«ãƒãƒƒã‚¯é–¢æ•°	*/
+static	int	dont_frameskip;		/* ãƒ•ãƒ¬ãƒ¼ãƒ ã‚¹ã‚­ãƒƒãƒ—ç¦æ­¢ãªã‚‰ã€çœŸ	*/
 
 
 
-static	int	drawn_count;		/* fps·×»»ÍÑ¤ÎÉÁ²è²ó¿ô¥«¥¦¥ó¥¿	*/
+static	int	drawn_count;		/* fpsè¨ˆç®—ç”¨ã®æç”»å›æ•°ã‚«ã‚¦ãƒ³ã‚¿	*/
 
-static	int	broken_mouse;		/* ¥·¥¹¥Æ¥à¤Î¥Ş¥¦¥¹É½¼¨¤¬°Û¾ï	*/
-static	int	auto_mouse;		/* ¿¿¤Ç¡¢¥Ş¥¦¥¹¤ò¼«Æ°¤Ç±£¤¹¥â¡¼¥É   */
-static	int	auto_mouse_timer;	/* ¼«Æ°¤Ç±£¤¹¤Ş¤Ç¤Î»Ä¤ê»ş´Ö¥¿¥¤¥Ş¡¼ */
-static	int	auto_grab;		/* ¿¿¤Ç¡¢¥Ş¥¦¥¹¼«Æ°¥°¥é¥Ö¥â¡¼¥É     */
+static	int	broken_mouse;		/* ã‚·ã‚¹ãƒ†ãƒ ã®ãƒã‚¦ã‚¹è¡¨ç¤ºãŒç•°å¸¸	*/
+static	int	auto_mouse;		/* çœŸã§ã€ãƒã‚¦ã‚¹ã‚’è‡ªå‹•ã§éš ã™ãƒ¢ãƒ¼ãƒ‰   */
+static	int	auto_mouse_timer;	/* è‡ªå‹•ã§éš ã™ã¾ã§ã®æ®‹ã‚Šæ™‚é–“ã‚¿ã‚¤ãƒãƒ¼ */
+static	int	auto_grab;		/* çœŸã§ã€ãƒã‚¦ã‚¹è‡ªå‹•ã‚°ãƒ©ãƒ–ãƒ¢ãƒ¼ãƒ‰     */
 
 
 enum {
@@ -181,7 +181,7 @@ static	void	clear_all_screen(void);
 static	void	put_image_all(void);
 
 /***********************************************************************
- * ²èÌÌ½èÍı¤Î½é´ü²½¡¦½ªÎ»
+ * ç”»é¢å‡¦ç†ã®åˆæœŸåŒ–ãƒ»çµ‚äº†
  ************************************************************************/
 static	const T_GRAPH_SPEC *spec;
 
@@ -193,7 +193,7 @@ int	screen_init(void)
     int i;
     int w, h, max, min;
 
-    status_init();			/* ¥¹¥Æ¡¼¥¿¥¹É½¼¨¤Î¥ï¡¼¥¯½é´ü²½	*/
+    status_init();			/* ã‚¹ãƒ†ãƒ¼ã‚¿ã‚¹è¡¨ç¤ºã®ãƒ¯ãƒ¼ã‚¯åˆæœŸåŒ–	*/
 
     spec = graph_init();
     if (spec == NULL) {
@@ -201,7 +201,7 @@ int	screen_init(void)
     }
 
 
-    /* spec ¤Ë¤è¤Ã¤Æ¡¢¥¦¥¤¥ó¥É¥¦¤ÎºÇÂç¡¦ºÇ¾®¥µ¥¤¥º¤ò·èÄê */
+    /* spec ã«ã‚ˆã£ã¦ã€ã‚¦ã‚¤ãƒ³ãƒ‰ã‚¦ã®æœ€å¤§ãƒ»æœ€å°ã‚µã‚¤ã‚ºã‚’æ±ºå®š */
 
     min = -1;
     for (i = 0; i < SCREEN_SIZE_END; i++) {
@@ -229,7 +229,7 @@ int	screen_init(void)
     screen_size_min = min;
 
 
-    /* spec ¤Ë¤è¤Ã¤Æ¡¢Á´²èÌÌ²ÄÇ½¤«¤É¤¦¤«¤ò·èÄê */
+    /* spec ã«ã‚ˆã£ã¦ã€å…¨ç”»é¢å¯èƒ½ã‹ã©ã†ã‹ã‚’æ±ºå®š */
 
     if (spec->forbid_half) { i = SCREEN_SIZE_FULL; }
     else                   { i = SCREEN_SIZE_HALF; }
@@ -243,13 +243,13 @@ int	screen_init(void)
 
 
 
-    /* screen_size, WIDTH, HEIGHT ¤Ë¥³¥Ş¥ó¥É¥é¥¤¥ó¤Ç»ØÄê¤·¤¿¥¦¥¤¥ó¥É¥¦¥µ¥¤¥º¤¬
-       ¥»¥Ã¥ÈºÑ¤ß¤Ê¤Î¤Ç¡¢¤½¤ì¤ò¤â¤È¤Ë¥Ü¡¼¥À¡¼(ÏÈ)¤Î¥µ¥¤¥º¤ò»»½Ğ¤¹¤ë */
+    /* screen_size, WIDTH, HEIGHT ã«ã‚³ãƒãƒ³ãƒ‰ãƒ©ã‚¤ãƒ³ã§æŒ‡å®šã—ãŸã‚¦ã‚¤ãƒ³ãƒ‰ã‚¦ã‚µã‚¤ã‚ºãŒ
+       ã‚»ãƒƒãƒˆæ¸ˆã¿ãªã®ã§ã€ãã‚Œã‚’ã‚‚ã¨ã«ãƒœãƒ¼ãƒ€ãƒ¼(æ )ã®ã‚µã‚¤ã‚ºã‚’ç®—å‡ºã™ã‚‹ */
 
     w = screen_size_tbl[ screen_size ].w;
     h = screen_size_tbl[ screen_size ].h;
 
-    screen_bx = ((MAX(WIDTH,  w) - w) / 2) & ~7;	/* 8¤ÎÇÜ¿ô */
+    screen_bx = ((MAX(WIDTH,  w) - w) / 2) & ~7;	/* 8ã®å€æ•° */
     screen_by = ((MAX(HEIGHT, h) - h) / 2);
 
     if (open_window()) {
@@ -270,7 +270,7 @@ void	screen_exit(void)
 
 
 /*----------------------------------------------------------------------
- * ¥¦¥¤¥ó¥É¥¦¤ÎÀ¸À®
+ * ã‚¦ã‚¤ãƒ³ãƒ‰ã‚¦ã®ç”Ÿæˆ
  *----------------------------------------------------------------------*/
 static int added_color;
 static unsigned long added_pixel[120+16];
@@ -281,10 +281,10 @@ static unsigned long added_pixel[120+16];
 		color[ n ].blue  = ((rgb)      ) & 0xff;	\
 
 /*
-  °Ê²¼¤ÎÊÑ¿ô¤Ë´ğ¤Å¤­¡¢²èÌÌ¤òÀ¸À®¤·¡¢°Ê²¼¤ÎÊÑ¿ô¤ò¥»¥Ã¥È¤¹¤ë
-	use_fullscreen, enable_fullscreen		¢ª now_fullscreen
+  ä»¥ä¸‹ã®å¤‰æ•°ã«åŸºã¥ãã€ç”»é¢ã‚’ç”Ÿæˆã—ã€ä»¥ä¸‹ã®å¤‰æ•°ã‚’ã‚»ãƒƒãƒˆã™ã‚‹
+	use_fullscreen, enable_fullscreen		â†’ now_fullscreen
 	screen_size   , screen_size_max, screen_size_min
-	show_status					¢ª now_status
+	show_status					â†’ now_status
 	screen_bx     , screen_by
  */
 
@@ -297,37 +297,37 @@ static	int	open_window(void)
 
     added_color = 0;
 
-    if (enable_fullscreen == FALSE) {	/* Á´²èÌÌÉÔ²Ä¤Ê¤é¡¢Á´²èÌÌ»Ø¼¨¤ÏµÑ²¼ */
+    if (enable_fullscreen == FALSE) {	/* å…¨ç”»é¢ä¸å¯ãªã‚‰ã€å…¨ç”»é¢æŒ‡ç¤ºã¯å´ä¸‹ */
 	use_fullscreen = FALSE;
     }
 
 
-    /* ¥Õ¥ë¥¹¥¯¥ê¡¼¥óÉ½¼¨¤¬²ÄÇ½¤Ê¥µ¥¤¥º¤ò¡¢Âç¤­¤¤¤Û¤¦¤«¤éÃµ¤·½Ğ¤¹ */
+    /* ãƒ•ãƒ«ã‚¹ã‚¯ãƒªãƒ¼ãƒ³è¡¨ç¤ºãŒå¯èƒ½ãªã‚µã‚¤ã‚ºã‚’ã€å¤§ãã„ã»ã†ã‹ã‚‰æ¢ã—å‡ºã™ */
 
     if (use_fullscreen) {
 	for (size = screen_size; size >= screen_size_min; size--) {
 
-	    for (i = 0; i < 3; i++) {	/* 3¥Ñ¥¿¡¼¥ó¤Î¥µ¥¤¥º¤Ë¤Æ³ÎÇ§ */
+	    for (i = 0; i < 3; i++) {	/* 3ãƒ‘ã‚¿ãƒ¼ãƒ³ã®ã‚µã‚¤ã‚ºã«ã¦ç¢ºèª */
 
 		w = screen_size_tbl[ size ].w;
 		h = screen_size_tbl[ size ].h;
 
 		switch (i) {
-		case 0:		/* »ØÄê¥µ¥¤¥º (¥¹¥Æ¡¼¥¿¥¹ÉÔ²Ä¤«¤â) */
+		case 0:		/* æŒ‡å®šã‚µã‚¤ã‚º (ã‚¹ãƒ†ãƒ¼ã‚¿ã‚¹ä¸å¯ã‹ã‚‚) */
 		    if (screen_bx == 0 && screen_by == 0) { continue; }
 		    w += screen_bx * 2;
 		    h += screen_by * 2;
 		    status_displayable = FALSE;
 		    break;
 
-		case 1:		/* ºÇÅ¬¥µ¥¤¥º + ¥¹¥Æ¡¼¥¿¥¹ */
+		case 1:		/* æœ€é©ã‚µã‚¤ã‚º + ã‚¹ãƒ†ãƒ¼ã‚¿ã‚¹ */
 		    if (spec->forbid_status) { continue; }
 		    w += (0) * 2;
 		    h += STATUS_HEIGHT * 2;
 		    status_displayable = TRUE;
 		    break;
 
-		case 2:		/* ºÇÅ¬¥µ¥¤¥º (¥¹¥Æ¡¼¥¿¥¹ÉÔ²Ä) */
+		case 2:		/* æœ€é©ã‚µã‚¤ã‚º (ã‚¹ãƒ†ãƒ¼ã‚¿ã‚¹ä¸å¯) */
 		    status_displayable = FALSE;
 		    break;
 		}
@@ -341,44 +341,44 @@ static	int	open_window(void)
 	    if (found) break;
 	}
 
-	if (found == FALSE) {		/* É½¼¨²ÄÇ½¥µ¥¤¥ºÌµ¤·¤Ê¤éÁ´²èÌÌÉÔ²Ä */
+	if (found == FALSE) {		/* è¡¨ç¤ºå¯èƒ½ã‚µã‚¤ã‚ºç„¡ã—ãªã‚‰å…¨ç”»é¢ä¸å¯ */
 	    use_fullscreen = FALSE;
 	}
     }
 
 
-    /* ¥¦¥¤¥ó¥É¥¦É½¼¨¤¬É½¼¨¤Ê²ÄÇ½¥µ¥¤¥º¤ò¡¢Âç¤­¤¤¤Û¤¦¤«¤éÃµ¤·½Ğ¤¹ */
+    /* ã‚¦ã‚¤ãƒ³ãƒ‰ã‚¦è¡¨ç¤ºãŒè¡¨ç¤ºãªå¯èƒ½ã‚µã‚¤ã‚ºã‚’ã€å¤§ãã„ã»ã†ã‹ã‚‰æ¢ã—å‡ºã™ */
 
     if (use_fullscreen == FALSE) {
 	for (size = screen_size; size >= screen_size_min; size--) {
 
-	    for (i = 0; i < 4; i++) {	/* 4¥Ñ¥¿¡¼¥ó¤Î¥µ¥¤¥º¤Ë¤Æ³ÎÇ§ */
+	    for (i = 0; i < 4; i++) {	/* 4ãƒ‘ã‚¿ãƒ¼ãƒ³ã®ã‚µã‚¤ã‚ºã«ã¦ç¢ºèª */
 
 		w = screen_size_tbl[ size ].w;
 		h = screen_size_tbl[ size ].h;
 
 		switch (i) {
-		case 0:		/* »ØÄê¥µ¥¤¥º + ¥¹¥Æ¡¼¥¿¥¹ */
+		case 0:		/* æŒ‡å®šã‚µã‚¤ã‚º + ã‚¹ãƒ†ãƒ¼ã‚¿ã‚¹ */
 		    if (screen_bx == 0 && screen_by == 0) { continue; }
 		    w += screen_bx * 2;
 		    h += screen_by * 2 + STATUS_HEIGHT;
 		    status_displayable = TRUE;
 		    break;
 
-		case 1:		/* »ØÄê¥µ¥¤¥º (¥¹¥Æ¡¼¥¿¥¹ÉÔ²Ä) */
+		case 1:		/* æŒ‡å®šã‚µã‚¤ã‚º (ã‚¹ãƒ†ãƒ¼ã‚¿ã‚¹ä¸å¯) */
 		    if (screen_bx == 0 && screen_by == 0) { continue; }
 		    w += screen_bx * 2;
 		    h += screen_by * 2;
 		    status_displayable = FALSE;
 		    break;
 
-		case 2:		/* ºÇÅ¬¥µ¥¤¥º + ¥¹¥Æ¡¼¥¿¥¹ */
+		case 2:		/* æœ€é©ã‚µã‚¤ã‚º + ã‚¹ãƒ†ãƒ¼ã‚¿ã‚¹ */
 		    w += 0;
 		    h += STATUS_HEIGHT;
 		    status_displayable = TRUE;
 		    break;
 
-		case 3:		/* ºÇÅ¬¥µ¥¤¥º (¥¹¥Æ¡¼¥¿¥¹ÉÔ²Ä) */
+		case 3:		/* æœ€é©ã‚µã‚¤ã‚º (ã‚¹ãƒ†ãƒ¼ã‚¿ã‚¹ä¸å¯) */
 		    status_displayable = FALSE;
 		    break;
 		}
@@ -392,8 +392,8 @@ static	int	open_window(void)
 	    if (found) break;
 	}
 
-	/* ¥¹¥Æ¡¼¥¿¥¹É½¼¨¤¬²ÄÇ½¤Ê¥µ¥¤¥º¤¬¸«¤Ä¤«¤Ã¤¿¾ì¹ç¤Ç¤â¡¢
-	   ¥¹¥Æ¡¼¥¿¥¹É½¼¨¤·¤Ê¤¤¤Ê¤é¤Ğ¡¢¤½¤ÎÊ¬¤Î¥µ¥¤¥º¤ò¸º¤é¤·¤Æ¤ª¤¯ */
+	/* ã‚¹ãƒ†ãƒ¼ã‚¿ã‚¹è¡¨ç¤ºãŒå¯èƒ½ãªã‚µã‚¤ã‚ºãŒè¦‹ã¤ã‹ã£ãŸå ´åˆã§ã‚‚ã€
+	   ã‚¹ãƒ†ãƒ¼ã‚¿ã‚¹è¡¨ç¤ºã—ãªã„ãªã‚‰ã°ã€ãã®åˆ†ã®ã‚µã‚¤ã‚ºã‚’æ¸›ã‚‰ã—ã¦ãŠã */
 	if (status_displayable) {
 	    if (spec->forbid_status || show_status == FALSE) {
 		h -= STATUS_HEIGHT;
@@ -402,9 +402,9 @@ static	int	open_window(void)
     }
 
 
-    /* ¥µ¥¤¥º¤¬·è¤Ş¤Ã¤¿¤Î¤Ç¡¢¤¤¤è¤¤¤è²èÌÌ¤òÀ¸À®¤¹¤ë */
+    /* ã‚µã‚¤ã‚ºãŒæ±ºã¾ã£ãŸã®ã§ã€ã„ã‚ˆã„ã‚ˆç”»é¢ã‚’ç”Ÿæˆã™ã‚‹ */
 
-    if (found == FALSE) {	/* ¤³¤ì¤Ï¤¢¤ê¤¨¤Ê¤¤¥Ï¥º¤À¤¬¡¢Ç°¤Î¤¿¤á¡Ä */
+    if (found == FALSE) {	/* ã“ã‚Œã¯ã‚ã‚Šãˆãªã„ãƒã‚ºã ãŒã€å¿µã®ãŸã‚â€¦ */
 	size = screen_size_min;
 	w = screen_size_tbl[ size ].w;
 	h = screen_size_tbl[ size ].h;
@@ -416,22 +416,22 @@ static	int	open_window(void)
 
     if (info) {
 
-	/* ¥Õ¥ë¥¹¥¯¥ê¡¼¥ó¤Ç¡¢¥¹¥Æ¡¼¥¿¥¹É½¼¨¤¬²ÄÇ½¤Ê¥µ¥¤¥º¤¬³ÎÊİ¤Ç¤­¤¿¤«³ÎÇ§ */
+	/* ãƒ•ãƒ«ã‚¹ã‚¯ãƒªãƒ¼ãƒ³ã§ã€ã‚¹ãƒ†ãƒ¼ã‚¿ã‚¹è¡¨ç¤ºãŒå¯èƒ½ãªã‚µã‚¤ã‚ºãŒç¢ºä¿ã§ããŸã‹ç¢ºèª */
 	if ((info->fullscreen) &&
 	    (info->height >= screen_size_tbl[ size ].h + STATUS_HEIGHT * 2)) {
 	    status_displayable = TRUE;
 	}
 
-	/* ËÜÅö¤Ë¥¹¥Æ¡¼¥¿¥¹É½¼¨¤¬²ÄÇ½¤«¤É¤¦¤«¤ò¡¢ºÇ½ªÈ½ÃÇ */
+	/* æœ¬å½“ã«ã‚¹ãƒ†ãƒ¼ã‚¿ã‚¹è¡¨ç¤ºãŒå¯èƒ½ã‹ã©ã†ã‹ã‚’ã€æœ€çµ‚åˆ¤æ–­ */
 	if (status_displayable && (spec->forbid_status == FALSE)) {
 	    enable_status = TRUE;
-	    /* show_status ¤Ï¸½ºßÃÍ¤Î¤Ş¤Ş */
+	    /* show_status ã¯ç¾åœ¨å€¤ã®ã¾ã¾ */
 	} else {
 	    enable_status = FALSE;
 	    show_status   = FALSE;
 	}
 
-	/* ¥µ¥¤¥º¤Î½ô¸À¤ò·×»» */
+	/* ã‚µã‚¤ã‚ºã®è«¸è¨€ã‚’è¨ˆç®— */
 	WIDTH      = info->byte_per_line / info->byte_per_pixel;
 	if (info->fullscreen) {
 	    HEIGHT = info->height;
@@ -456,30 +456,30 @@ static	int	open_window(void)
 	DEPTH     = info->byte_per_pixel * 8;
 
 
-	/* »È¤¨¤ë¿§¤Î¿ô¤ò¥Á¥§¥Ã¥¯ */
-	if        (info->nr_color >= 144) {	/* ¤¤¤Ã¤Ñ¤¤»È¤¨¤ë */
+	/* ä½¿ãˆã‚‹è‰²ã®æ•°ã‚’ãƒã‚§ãƒƒã‚¯ */
+	if        (info->nr_color >= 144) {	/* ã„ã£ã±ã„ä½¿ãˆã‚‹ */
 	    enable_half_interp = TRUE;
 
-	} else if (info->nr_color >= 24) {	/* È¾Ê¬¥â¡¼¥É¤Î¿§Êä´Ö¤Ï¤À¤á */
+	} else if (info->nr_color >= 24) {	/* åŠåˆ†ãƒ¢ãƒ¼ãƒ‰ã®è‰²è£œé–“ã¯ã ã‚ */
 	    enable_half_interp = FALSE;
 
-	} else if (info->nr_color >= 16) {	/* ¥¹¥Æ¡¼¥¿¥¹É½¼¨¤â¤Ş¤Ş¤Ê¤é¤ó*/
+	} else if (info->nr_color >= 16) {	/* ã‚¹ãƒ†ãƒ¼ã‚¿ã‚¹è¡¨ç¤ºã‚‚ã¾ã¾ãªã‚‰ã‚“*/
 	    enable_half_interp = FALSE;
 
-	} else {				/* ¤¼¤ó¤¼¤ó¿§¤¬Â­¤ê¤Ê¤¤ */
+	} else {				/* ãœã‚“ãœã‚“è‰²ãŒè¶³ã‚Šãªã„ */
 	    return FALSE;
 	}
 
-	/* HALF¥µ¥¤¥º»ş¤Î¿§Êä´°Í­Ìµ¤òÀßÄê */
+	/* HALFã‚µã‚¤ã‚ºæ™‚ã®è‰²è£œå®Œæœ‰ç„¡ã‚’è¨­å®š */
 	check_half_interp();
 
 
-	/* ¥¹¥¯¥ê¡¼¥ó¥Ğ¥Ã¥Õ¥¡¤Î¡¢ÉÁ²è³«»Ï°ÌÃÖ¤òÀßÄê */
+	/* ã‚¹ã‚¯ãƒªãƒ¼ãƒ³ãƒãƒƒãƒ•ã‚¡ã®ã€æç”»é–‹å§‹ä½ç½®ã‚’è¨­å®š */
 	screen_buf = (char *)info->buffer;
 	screen_start = &screen_buf[ (WIDTH*SCREEN_DY + SCREEN_DX)
 						* info->byte_per_pixel ];
 
-	/* ¥¹¥Æ¡¼¥¿¥¹ÍÑ¤Î¥Ğ¥Ã¥Õ¥¡¤Ê¤É¤ò»»½Ğ */
+	/* ã‚¹ãƒ†ãƒ¼ã‚¿ã‚¹ç”¨ã®ãƒãƒƒãƒ•ã‚¡ãªã©ã‚’ç®—å‡º */
 	status_sx[0] = info->width / 5;
 	status_sx[1] = info->width - status_sx[0]*2;
 	status_sx[2] = info->width / 5;
@@ -490,13 +490,13 @@ static	int	open_window(void)
 
 	status_buf = &screen_buf[ WIDTH * HEIGHT * info->byte_per_pixel ];
 
-	/* ¥¹¥Æ¡¼¥¿¥¹¤ÎÉÁ²è³«»Ï°ÌÃÖ¤Ï¡¢¥Ğ¥Ã¥Õ¥¡¤Î 2¥é¥¤¥ó²¼ */
+	/* ã‚¹ãƒ†ãƒ¼ã‚¿ã‚¹ã®æç”»é–‹å§‹ä½ç½®ã¯ã€ãƒãƒƒãƒ•ã‚¡ã® 2ãƒ©ã‚¤ãƒ³ä¸‹ */
 	status_start[0]= status_buf + 2*(WIDTH * info->byte_per_pixel);
 	status_start[1]= status_start[0] + (status_sx[0]*info->byte_per_pixel);
 	status_start[2]= status_start[1] + (status_sx[1]*info->byte_per_pixel);
 
 
-	/* ¥¹¥Æ¡¼¥¿¥¹ÍÑ¤Î¿§¥Ô¥¯¥»¥ë¤òÄêµÁ */
+	/* ã‚¹ãƒ†ãƒ¼ã‚¿ã‚¹ç”¨ã®è‰²ãƒ”ã‚¯ã‚»ãƒ«ã‚’å®šç¾© */
 	if (info->nr_color >= 24) {
 	    PC88_PALETTE_T color[8];
 	    unsigned long pixel[8];
@@ -524,12 +524,12 @@ static	int	open_window(void)
 	    PC88_PALETTE_T syspal[16];
 	    unsigned long black, white;
 
-	    /* syspal[0]¡Á[14] ¤Ï¹õ¡¢ syspal[15] ¤ÏÇò */
+	    /* syspal[0]ã€œ[14] ã¯é»’ã€ syspal[15] ã¯ç™½ */
 	    memset(&syspal[0],  0x00, sizeof(PC88_PALETTE_T) * 15);
 	    memset(&syspal[15], 0xff, sizeof(PC88_PALETTE_T));
 
-	    /* ¥¹¥Æ¡¼¥¿¥¹ÍÑ¤Î¿§¤¬³ÎÊİ¤Ç¤­¤Ê¤¤¤Î¤Ç¡¢¤È¤ê¤¢¤¨¤ºÅ¬Åö¤Ë¿§¤ò³ÎÊİ */
-	    /* syspal[8] ¤Ï¥Æ¥­¥¹¥È¤Î¹õ¡¢ syspal[15] ¤Ï¥Æ¥­¥¹¥È¤ÎÇò¤òÁÛÄê   */
+	    /* ã‚¹ãƒ†ãƒ¼ã‚¿ã‚¹ç”¨ã®è‰²ãŒç¢ºä¿ã§ããªã„ã®ã§ã€ã¨ã‚Šã‚ãˆãšé©å½“ã«è‰²ã‚’ç¢ºä¿ */
+	    /* syspal[8] ã¯ãƒ†ã‚­ã‚¹ãƒˆã®é»’ã€ syspal[15] ã¯ãƒ†ã‚­ã‚¹ãƒˆã®ç™½ã‚’æƒ³å®š   */
 	    trans_palette(syspal);
 
 	    black = color_pixel[ 8];
@@ -554,16 +554,16 @@ static	int	open_window(void)
 	dont_frameskip = info->dont_frameskip;
 
 
-	/* Å¾Á÷¡¦É½¼¨´Ø¿ô¤Î¥ê¥¹¥È¤òÀßÄê */
+	/* è»¢é€ãƒ»è¡¨ç¤ºé–¢æ•°ã®ãƒªã‚¹ãƒˆã‚’è¨­å®š */
 	set_vram2screen_list();
 
 
-	/* ¥·¥¹¥Æ¥à¤Î¥Ş¥¦¥¹É½¼¨¾õÂÖ */
+	/* ã‚·ã‚¹ãƒ†ãƒ ã®ãƒã‚¦ã‚¹è¡¨ç¤ºçŠ¶æ…‹ */
 	broken_mouse = info->broken_mouse;
 
 	screen_switch();
 
-	/* ¥¹¥Æ¡¼¥¿¥¹¤ÎÀßÄê */
+	/* ã‚¹ãƒ†ãƒ¼ã‚¿ã‚¹ã®è¨­å®š */
 	status_setup(now_status);
 
 	return TRUE;
@@ -573,7 +573,7 @@ static	int	open_window(void)
 }
 
 /*
- * ¥¦¥¤¥ó¥É¥¦¤ÎºÆÀ¸À®¡£¼ºÇÔ¤·¤¿¤é exit
+ * ã‚¦ã‚¤ãƒ³ãƒ‰ã‚¦ã®å†ç”Ÿæˆã€‚å¤±æ•—ã—ãŸã‚‰ exit
  */
 static	void	open_window_or_exit(void)
 {
@@ -587,13 +587,13 @@ static	void	open_window_or_exit(void)
 
 
 /*----------------------------------------------------------------------
- * HALF¥µ¥¤¥º¿§Êä´Ö¤ÎÍ­Ìµ¥ï¡¼¥¯¤òÀßÄê
+ * HALFã‚µã‚¤ã‚ºè‰²è£œé–“ã®æœ‰ç„¡ãƒ¯ãƒ¼ã‚¯ã‚’è¨­å®š
  *----------------------------------------------------------------------*/
 static	void	check_half_interp(void)
 {
-    if (now_screen_size == SCREEN_SIZE_HALF &&	/* ¸½ºß HALF¥µ¥¤¥º¤Ç    */
-	enable_half_interp  &&			/* ¥Õ¥£¥ë¥¿¥ê¥ó¥°²ÄÇ½¤Ç	*/
-	use_half_interp) {			/* ¿§Êä´°¤·¤Æ¤¢¤ê¤Ê¤é   */
+    if (now_screen_size == SCREEN_SIZE_HALF &&	/* ç¾åœ¨ HALFã‚µã‚¤ã‚ºã§    */
+	enable_half_interp  &&			/* ãƒ•ã‚£ãƒ«ã‚¿ãƒªãƒ³ã‚°å¯èƒ½ã§	*/
+	use_half_interp) {			/* è‰²è£œå®Œã—ã¦ã‚ã‚Šãªã‚‰   */
 
 	now_half_interp = TRUE;
 
@@ -609,38 +609,38 @@ static	void	check_half_interp(void)
 
 
 /***********************************************************************
- * ¥â¡¼¥ÉÀÚ¤êÂØ¤¨»ş¤Î¡¢³Æ¼ïºÆÀßÄê
+ * ãƒ¢ãƒ¼ãƒ‰åˆ‡ã‚Šæ›¿ãˆæ™‚ã®ã€å„ç¨®å†è¨­å®š
  ************************************************************************/
 void	screen_switch(void)
 {
     char *title;
 
-    /* Á´¥¨¥ê¥¢¶¯À©ÉÁ²è¤Î½àÈ÷ */
+    /* å…¨ã‚¨ãƒªã‚¢å¼·åˆ¶æç”»ã®æº–å‚™ */
 
-    screen_set_dirty_frame();		/* Á´ÎÎ°è ½é´ü²½(==¹¹¿·) */
-    screen_set_dirty_palette();		/* ¿§¾ğÊó ½é´ü²½(==¹¹¿·) */
+    screen_set_dirty_frame();		/* å…¨é ˜åŸŸ åˆæœŸåŒ–(==æ›´æ–°) */
+    screen_set_dirty_palette();		/* è‰²æƒ…å ± åˆæœŸåŒ–(==æ›´æ–°) */
 
-    if (now_status) {			/* ¥¹¥Æ¡¼¥¿¥¹É½¼¨ */
+    if (now_status) {			/* ã‚¹ãƒ†ãƒ¼ã‚¿ã‚¹è¡¨ç¤º */
 
-	screen_set_dirty_status_show();		/* ¥¹¥Æ¡¼¥¿¥¹ÎÎ°è ½é´ü²½ */
+	screen_set_dirty_status_show();		/* ã‚¹ãƒ†ãƒ¼ã‚¿ã‚¹é ˜åŸŸ åˆæœŸåŒ– */
 
-    } else {				/* ¥¹¥Æ¡¼¥¿¥¹ÈóÉ½¼¨ */
+    } else {				/* ã‚¹ãƒ†ãƒ¼ã‚¿ã‚¹éè¡¨ç¤º */
 
-	if (now_fullscreen && enable_status) {	/* Á´²èÌÌ¤Ê¤é */
-	    screen_set_dirty_status_hide();	/* ¥¹¥Æ¡¼¥¿¥¹ÎÎ°è ¾Ãµî */
-	}					/* ¥¦¥¤¥ó¥É¥¦¤Ê¤é½èÍı¤Ê¤· */
+	if (now_fullscreen && enable_status) {	/* å…¨ç”»é¢ãªã‚‰ */
+	    screen_set_dirty_status_hide();	/* ã‚¹ãƒ†ãƒ¼ã‚¿ã‚¹é ˜åŸŸ æ¶ˆå» */
+	}					/* ã‚¦ã‚¤ãƒ³ãƒ‰ã‚¦ãªã‚‰å‡¦ç†ãªã— */
 
     }
 
-    frameskip_counter_reset();		/* ¼¡²óÉÁ²è */
+    frameskip_counter_reset();		/* æ¬¡å›æç”» */
 
 
-    /* ¥Ş¥¦¥¹¡¢¥­¡¼¥ê¥Ô¡¼¥È¤ÎÀßÄê */
+    /* ãƒã‚¦ã‚¹ã€ã‚­ãƒ¼ãƒªãƒ”ãƒ¼ãƒˆã®è¨­å®š */
 
     screen_attr_setup(SETUP_START);
 
 
-    /* ¥·¥¹¥Æ¥à¤Î¥Ş¥¦¥¹É½¼¨¤¬°Û¾ï¡¢¤Ş¤¿¤Ï¥á¥Ë¥å¡¼ÀìÍÑ¥«¡¼¥½¥ë»ÈÍÑ¤Î¾ì¹ç	*/
+    /* ã‚·ã‚¹ãƒ†ãƒ ã®ãƒã‚¦ã‚¹è¡¨ç¤ºãŒç•°å¸¸ã€ã¾ãŸã¯ãƒ¡ãƒ‹ãƒ¥ãƒ¼å°‚ç”¨ã‚«ãƒ¼ã‚½ãƒ«ä½¿ç”¨ã®å ´åˆ	*/
 
     if ((broken_mouse) ||
 	(! quasi88_is_exec() && /*now_fullscreen &&*/ use_swcursor)) {
@@ -650,7 +650,7 @@ void	screen_switch(void)
     }
 
 
-    /* ¥¦¥¤¥ó¥É¥¦¥¿¥¤¥È¥ë¤òÉ½¼¨ */
+    /* ã‚¦ã‚¤ãƒ³ãƒ‰ã‚¦ã‚¿ã‚¤ãƒˆãƒ«ã‚’è¡¨ç¤º */
 
     if      (quasi88_is_exec())    title = Q_TITLE " ver " Q_VERSION;
     else if (quasi88_is_menu())    title = Q_TITLE " ver " Q_VERSION;
@@ -662,62 +662,62 @@ void	screen_switch(void)
 
 
     /*
-      SDL¥á¥â
+      SDLãƒ¡ãƒ¢
 
-      ¥Õ¥ë¥¹¥¯¥ê¡¼¥ó¤ÎÌäÂêÅÀ (Win¤Ë¤ÆÈ¯À¸)
-      ¥À¥Ö¥ë¥Ğ¥Ã¥Õ¥¡¤Î¾ì¹ç¡¢¥Ş¥¦¥¹¤¬Àµ¾ï¤ËÉ½¼¨¤µ¤ì¤Ê¤¤¡©
-      ¥·¥ó¥°¥ë¥Ğ¥Ã¥Õ¥¡¤Ç¥Ï¡¼¥É¥¦¥§¥¢¥µ¡¼¥Õ¥§¥¹¤Î¾ì¹ç¡¢
-      ¥Ş¥¦¥¹¤òON¤Ë¤·¤¿½Ö´Ö¡¢¥Ş¥¦¥¹¤ÎÉ½¼¨¤¹¤Ù¤­°ÌÃÖ¤Ë¥´¥ß¤¬»Ä¤ë¡©
+      ãƒ•ãƒ«ã‚¹ã‚¯ãƒªãƒ¼ãƒ³ã®å•é¡Œç‚¹ (Winã«ã¦ç™ºç”Ÿ)
+      ãƒ€ãƒ–ãƒ«ãƒãƒƒãƒ•ã‚¡ã®å ´åˆã€ãƒã‚¦ã‚¹ãŒæ­£å¸¸ã«è¡¨ç¤ºã•ã‚Œãªã„ï¼Ÿ
+      ã‚·ãƒ³ã‚°ãƒ«ãƒãƒƒãƒ•ã‚¡ã§ãƒãƒ¼ãƒ‰ã‚¦ã‚§ã‚¢ã‚µãƒ¼ãƒ•ã‚§ã‚¹ã®å ´åˆã€
+      ãƒã‚¦ã‚¹ã‚’ONã«ã—ãŸç¬é–“ã€ãƒã‚¦ã‚¹ã®è¡¨ç¤ºã™ã¹ãä½ç½®ã«ã‚´ãƒŸãŒæ®‹ã‚‹ï¼Ÿ
 
-      ¢­
-      ¥á¥Ë¥å¡¼²èÌÌÁ«°Ü¤À¤±¤ÎÌäÂê¤Ê¤Î¤Ç¡¢¥½¥Õ¥È¥¦¥§¥¢¥«¡¼¥½¥ë¤Ç¤´¤Ş¤«¤½¤¦
+      â†“
+      ãƒ¡ãƒ‹ãƒ¥ãƒ¼ç”»é¢é·ç§»ã ã‘ã®å•é¡Œãªã®ã§ã€ã‚½ãƒ•ãƒˆã‚¦ã‚§ã‚¢ã‚«ãƒ¼ã‚½ãƒ«ã§ã”ã¾ã‹ãã†
     */
 }
 
 /*-----------------------------------------------------------------------------
-  ¥Ş¥¦¥¹É½¼¨¡¢¥°¥é¥Ö¡¢¥­¡¼¥ê¥Ô¡¼¥È¤òÀßÄê¤¹¤ë¡£
+  ãƒã‚¦ã‚¹è¡¨ç¤ºã€ã‚°ãƒ©ãƒ–ã€ã‚­ãƒ¼ãƒªãƒ”ãƒ¼ãƒˆã‚’è¨­å®šã™ã‚‹ã€‚
 
 			EMU		MENU/PAUSE
-	¥Ş¥¦¥¹É½¼¨	¢¨ ÀßÄê¤Ë¤è¤ë	¤¹¤ë
-	¥°¥é¥Ö		¢¨ ÀßÄê¤Ë¤è¤ë	¤·¤Ê¤¤
-	¥­¡¼¥ê¥Ô¡¼¥È	¥ª¥Õ		¥ª¥ó
+	ãƒã‚¦ã‚¹è¡¨ç¤º	â€» è¨­å®šã«ã‚ˆã‚‹	ã™ã‚‹
+	ã‚°ãƒ©ãƒ–		â€» è¨­å®šã«ã‚ˆã‚‹	ã—ãªã„
+	ã‚­ãƒ¼ãƒªãƒ”ãƒ¼ãƒˆ	ã‚ªãƒ•		ã‚ªãƒ³
 
-  ¢¨ EMU ¤Ë¤ª¤±¤ë¡¢¥Ş¥¦¥¹É½¼¨¡¦¥°¥é¥Ö¤Ï°Ê²¼¤Î¤è¤¦¤Ë¤Ê¤ë¡£
+  â€» EMU ã«ãŠã‘ã‚‹ã€ãƒã‚¦ã‚¹è¡¨ç¤ºãƒ»ã‚°ãƒ©ãƒ–ã¯ä»¥ä¸‹ã®ã‚ˆã†ã«ãªã‚‹ã€‚
 
-	A ¡Ä ¥°¥é¥Ö¤·¤Ê¤¤¡¿¥Ş¥¦¥¹É½¼¨¤¹¤ë
-	B ¡Ä ¥°¥é¥Ö¤·¤Ê¤¤¡¿¥Ş¥¦¥¹É½¼¨¤·¤Ê¤¤
-	C ¡Ä ¥°¥é¥Ö¤¹¤ë	 ¡¿¥Ş¥¦¥¹É½¼¨¤·¤Ê¤¤
+	A â€¦ ã‚°ãƒ©ãƒ–ã—ãªã„ï¼ãƒã‚¦ã‚¹è¡¨ç¤ºã™ã‚‹
+	B â€¦ ã‚°ãƒ©ãƒ–ã—ãªã„ï¼ãƒã‚¦ã‚¹è¡¨ç¤ºã—ãªã„
+	C â€¦ ã‚°ãƒ©ãƒ–ã™ã‚‹	 ï¼ãƒã‚¦ã‚¹è¡¨ç¤ºã—ãªã„
 
-	D ¡Ä ¥°¥é¥Ö¤·¤Ê¤¤¡¿¥Ş¥¦¥¹É½¼¨¤Ï¡¢¼«Æ°¤ÇÈ½ÃÇ
+	D â€¦ ã‚°ãƒ©ãƒ–ã—ãªã„ï¼ãƒã‚¦ã‚¹è¡¨ç¤ºã¯ã€è‡ªå‹•ã§åˆ¤æ–­
 
-    ¥¦¥¤¥ó¥É¥¦»ş
-	            |¥Ş¥¦¥¹É½¼¨¤¹¤ë|¥Ş¥¦¥¹É½¼¨¤·¤Ê¤¤||¥Ş¥¦¥¹¼«Æ°É½¼¨
+    ã‚¦ã‚¤ãƒ³ãƒ‰ã‚¦æ™‚
+	            |ãƒã‚¦ã‚¹è¡¨ç¤ºã™ã‚‹|ãƒã‚¦ã‚¹è¡¨ç¤ºã—ãªã„||ãƒã‚¦ã‚¹è‡ªå‹•è¡¨ç¤º
 	------------+--------------+----------------++--------------
-	¥°¥é¥Ö¤·¤Ê¤¤|       A      |        B       ||       D
+	ã‚°ãƒ©ãƒ–ã—ãªã„|       A      |        B       ||       D
 	------------+--------------+----------------++--------------
-	¥°¥é¥Ö¤¹¤ë  |       C   ¢÷ |        C       ||       C
+	ã‚°ãƒ©ãƒ–ã™ã‚‹  |       C   â€  |        C       ||       C
 
-	¢÷ ¥°¥é¥Ö¤¹¤ë¡¿¥Ş¥¦¥¹É½¼¨¤¹¤ë ¤ÎÁÈ¹ç¤»¤ÏÌµ¸ú
-	   ¥¦¥¤¥ó¥É¥¦Ã¼¤Ç¥Ş¥¦¥¹¤¬Ää»ß¤¹¤ë¤Î¤À¤¬¡¢¤¢¤Ş¤êÌò¤ËÎ©¤Á¤½¤¦¤Ë¤Ê¤¤¡£
+	â€  ã‚°ãƒ©ãƒ–ã™ã‚‹ï¼ãƒã‚¦ã‚¹è¡¨ç¤ºã™ã‚‹ ã®çµ„åˆã›ã¯ç„¡åŠ¹
+	   ã‚¦ã‚¤ãƒ³ãƒ‰ã‚¦ç«¯ã§ãƒã‚¦ã‚¹ãŒåœæ­¢ã™ã‚‹ã®ã ãŒã€ã‚ã¾ã‚Šå½¹ã«ç«‹ã¡ãã†ã«ãªã„ã€‚
 
-    ¥Õ¥ë¥¹¥¯¥ê¡¼¥ó»ş
-	            |¥Ş¥¦¥¹É½¼¨¤¹¤ë|¥Ş¥¦¥¹É½¼¨¤·¤Ê¤¤||¥Ş¥¦¥¹¼«Æ°É½¼¨
+    ãƒ•ãƒ«ã‚¹ã‚¯ãƒªãƒ¼ãƒ³æ™‚
+	            |ãƒã‚¦ã‚¹è¡¨ç¤ºã™ã‚‹|ãƒã‚¦ã‚¹è¡¨ç¤ºã—ãªã„||ãƒã‚¦ã‚¹è‡ªå‹•è¡¨ç¤º
 	------------+--------------+----------------++--------------
-	¥°¥é¥Ö¤·¤Ê¤¤|       A   ¢ø |        C    ¡ø ||       C
+	ã‚°ãƒ©ãƒ–ã—ãªã„|       A   â€¡ |        C    Â§ ||       C
 	------------+--------------+----------------++--------------
-	¥°¥é¥Ö¤¹¤ë  |       C   ¢÷ |        C       ||       C
+	ã‚°ãƒ©ãƒ–ã™ã‚‹  |       C   â€  |        C       ||       C
 
-	¢÷ ¥°¥é¥Ö¤¹¤ë¡¿¥Ş¥¦¥¹É½¼¨¤¹¤ë ¤ÎÁÈ¹ç¤»¤ÏÌµ¸ú
-	   ²èÌÌÃ¼¤Ç¥Ş¥¦¥¹¤¬Ää»ß¤¹¤ë¤Î¤À¤¬¡¢¤¢¤Ş¤êÌò¤ËÎ©¤Á¤½¤¦¤Ë¤Ê¤¤¡£
-	¢ø ¥°¥é¥Ö¤·¤Ê¤¤¡¿¥Ş¥¦¥¹É½¼¨¤¹¤ë ¤ÎÁÈ¹ç¤»¤Ï¡¢Í­¸ú
-	   ²èÌÌÃ¼¤Ç¥Ş¥¦¥¹¤¬Ää»ß¤¹¤ë¤Î¤À¤¬¡¢Win+SDL ¤Ç¥Ş¥ë¥Á¥Ç¥£¥¹¥×¥ì¥¤¤Î¾ì¹ç
-	   ¥Ş¥¦¥¹¤ÏÄä»ß¤»¤º¤ËÎÙ¤Î¥Ç¥£¥¹¥×¥ì¥¤¤Ë°ÜÆ°¤¹¤ë¤³¤È¤¬¤¢¤ë¤é¤·¤¤¡£
-	¡ø ¥°¥é¥Ö¤·¤Ê¤¤¡¿¥Ş¥¦¥¹É½¼¨¤·¤Ê¤¤ ¤ÎÁÈ¹ç¤»¤ÏÌµ¸ú
-	   ²èÌÌÃ¼¤Ç¥Ş¥¦¥¹¤¬Ää»ß¤¹¤ë¤¬¡¢¥Ş¥¦¥¹¤¬É½¼¨¤µ¤ì¤Ê¤¤¤Î¤Ç¡¢¤ï¤«¤ê¤Ë¤¯¤¤
+	â€  ã‚°ãƒ©ãƒ–ã™ã‚‹ï¼ãƒã‚¦ã‚¹è¡¨ç¤ºã™ã‚‹ ã®çµ„åˆã›ã¯ç„¡åŠ¹
+	   ç”»é¢ç«¯ã§ãƒã‚¦ã‚¹ãŒåœæ­¢ã™ã‚‹ã®ã ãŒã€ã‚ã¾ã‚Šå½¹ã«ç«‹ã¡ãã†ã«ãªã„ã€‚
+	â€¡ ã‚°ãƒ©ãƒ–ã—ãªã„ï¼ãƒã‚¦ã‚¹è¡¨ç¤ºã™ã‚‹ ã®çµ„åˆã›ã¯ã€æœ‰åŠ¹
+	   ç”»é¢ç«¯ã§ãƒã‚¦ã‚¹ãŒåœæ­¢ã™ã‚‹ã®ã ãŒã€Win+SDL ã§ãƒãƒ«ãƒãƒ‡ã‚£ã‚¹ãƒ—ãƒ¬ã‚¤ã®å ´åˆ
+	   ãƒã‚¦ã‚¹ã¯åœæ­¢ã›ãšã«éš£ã®ãƒ‡ã‚£ã‚¹ãƒ—ãƒ¬ã‚¤ã«ç§»å‹•ã™ã‚‹ã“ã¨ãŒã‚ã‚‹ã‚‰ã—ã„ã€‚
+	Â§ ã‚°ãƒ©ãƒ–ã—ãªã„ï¼ãƒã‚¦ã‚¹è¡¨ç¤ºã—ãªã„ ã®çµ„åˆã›ã¯ç„¡åŠ¹
+	   ç”»é¢ç«¯ã§ãƒã‚¦ã‚¹ãŒåœæ­¢ã™ã‚‹ãŒã€ãƒã‚¦ã‚¹ãŒè¡¨ç¤ºã•ã‚Œãªã„ã®ã§ã€ã‚ã‹ã‚Šã«ãã„
 
 -----------------------------------------------------------------------------*/
 
-/*#define DEBUG_ALL_MOUSE_PATTERN*/  /* ¥Ç¥Ğ¥Ã¥°(Á´¥Ş¥¦¥¹ÀßÄê¤ÎÁÈ¹ç¤»¤ò¸¡¾Ú) */
+/*#define DEBUG_ALL_MOUSE_PATTERN*/  /* ãƒ‡ãƒãƒƒã‚°(å…¨ãƒã‚¦ã‚¹è¨­å®šã®çµ„åˆã›ã‚’æ¤œè¨¼) */
 
 #ifdef	DEBUG_ALL_MOUSE_PATTERN
 int	screen_attr_mouse_debug(void) { return TRUE; }
@@ -728,7 +728,7 @@ int	screen_attr_mouse_debug(void) { return FALSE; }
 
 #define	AUTO_MOUSE_TIMEOUT	(2 * 60)
 
-/* ¥Ş¥¦¥¹¤¬Æ°¤¤¤¿¤é¸Æ¤Ó½Ğ¤µ¤ì¤ë */
+/* ãƒã‚¦ã‚¹ãŒå‹•ã„ãŸã‚‰å‘¼ã³å‡ºã•ã‚Œã‚‹ */
 void	screen_attr_mouse_move(void)
 {
     if (auto_mouse) {
@@ -740,7 +740,7 @@ void	screen_attr_mouse_move(void)
     }
 }
 
-/* ¥Ş¥¦¥¹¤Î¥¯¥ê¥Ã¥¯»ş¤Ë¸Æ¤Ó½Ğ¤µ¤ì¤ë */
+/* ãƒã‚¦ã‚¹ã®ã‚¯ãƒªãƒƒã‚¯æ™‚ã«å‘¼ã³å‡ºã•ã‚Œã‚‹ */
 void	screen_attr_mouse_click(void)
 {
     if (auto_grab) {
@@ -749,7 +749,7 @@ void	screen_attr_mouse_click(void)
     }
 }
 
-/* 1/60secËè¤Ë¸Æ¤Ó½Ğ¤µ¤ì¤ë */
+/* 1/60secæ¯ã«å‘¼ã³å‡ºã•ã‚Œã‚‹ */
 static	void	screen_attr_update(void)
 {
     if (auto_mouse) {
@@ -761,12 +761,12 @@ static	void	screen_attr_update(void)
     }
 }
 
-/* ¥Ş¥¦¥¹É½¼¨¡¢¥°¥é¥Ö¡¢¥­¡¼¥ê¥Ô¡¼¥È¤òÀßÄê¤¹¤ë */
+/* ãƒã‚¦ã‚¹è¡¨ç¤ºã€ã‚°ãƒ©ãƒ–ã€ã‚­ãƒ¼ãƒªãƒ”ãƒ¼ãƒˆã‚’è¨­å®šã™ã‚‹ */
 static	void	screen_attr_setup(int stat)
 {
-    int repeat;		/* ¥ª¡¼¥È¥ê¥Ô¡¼¥È¤ÎÍ­Ìµ	*/
-    int mouse;		/* ¥Ş¥¦¥¹É½¼¨¤ÎÍ­Ìµ	*/
-    int grab;		/* ¥°¥é¥Ö¤ÎÍ­Ìµ		*/
+    int repeat;		/* ã‚ªãƒ¼ãƒˆãƒªãƒ”ãƒ¼ãƒˆã®æœ‰ç„¡	*/
+    int mouse;		/* ãƒã‚¦ã‚¹è¡¨ç¤ºã®æœ‰ç„¡	*/
+    int grab;		/* ã‚°ãƒ©ãƒ–ã®æœ‰ç„¡		*/
 
     if (stat == SETUP_START) {
 	auto_mouse = FALSE;
@@ -779,7 +779,7 @@ static	void	screen_attr_setup(int stat)
 
 	repeat = FALSE;
 
-#ifdef	DEBUG_ALL_MOUSE_PATTERN	/* ¥Ç¥Ğ¥Ã¥°ÍÑ:Á´¤Æ¤Î¥Ş¥¦¥¹ÀßÄê¤ÎÁÈ¹ç¤»¤ò¸¡¾Ú */
+#ifdef	DEBUG_ALL_MOUSE_PATTERN	/* ãƒ‡ãƒãƒƒã‚°ç”¨:å…¨ã¦ã®ãƒã‚¦ã‚¹è¨­å®šã®çµ„åˆã›ã‚’æ¤œè¨¼ */
 	if      (grab_mouse == UNGRAB_MOUSE){ grab = FALSE; }
 	else if (grab_mouse == GRAB_MOUSE)  { grab = TRUE;  }
 	else {
@@ -793,28 +793,28 @@ static	void	screen_attr_setup(int stat)
 	goto DEBUG;
 #endif
 
-	if (now_fullscreen) {	/* Á´²èÌÌÉ½¼¨¤Î¾ì¹ç -------- */
+	if (now_fullscreen) {	/* å…¨ç”»é¢è¡¨ç¤ºã®å ´åˆ -------- */
 
 	    if (grab_mouse == UNGRAB_MOUSE &&
 		hide_mouse == SHOW_MOUSE) {
 
-		/* ¥°¥é¥Ö¤Ê¤· && ¥Ş¥¦¥¹¤¢¤ê ¤Î¾ì¹ç¤Î¤ß¡¢¤½¤ÎÄÌ¤ê¤Ë¤¹¤ë */
+		/* ã‚°ãƒ©ãƒ–ãªã— && ãƒã‚¦ã‚¹ã‚ã‚Š ã®å ´åˆã®ã¿ã€ãã®é€šã‚Šã«ã™ã‚‹ */
 		mouse = TRUE;
 		grab  = FALSE;
 
 	    } else {
 
-		/* ¥°¥é¥Ö¤¢¤êor¼«Æ° || ¥Ş¥¦¥¹¤Ê¤·or¼«Æ° ¤Ê¤é¤Ğ¡¢°Ê²¼¤Ç¸ÇÄê */
+		/* ã‚°ãƒ©ãƒ–ã‚ã‚Šorè‡ªå‹• || ãƒã‚¦ã‚¹ãªã—orè‡ªå‹• ãªã‚‰ã°ã€ä»¥ä¸‹ã§å›ºå®š */
 		mouse = FALSE;
 		grab  = TRUE;
 
 	    }
 
-	} else {		/* ¥¦¥¤¥ó¥É¥¦É½¼¨¤Î¾ì¹ç -------- */
+	} else {		/* ã‚¦ã‚¤ãƒ³ãƒ‰ã‚¦è¡¨ç¤ºã®å ´åˆ -------- */
 
 	    if (grab_mouse == GRAB_MOUSE) {
 
-		/* ¥°¥é¥Ö¤¢¤ê¤Ê¤é¡¢¥Ş¥¦¥¹¤Ï¾Ã¤¹ */
+		/* ã‚°ãƒ©ãƒ–ã‚ã‚Šãªã‚‰ã€ãƒã‚¦ã‚¹ã¯æ¶ˆã™ */
 		grab  = TRUE;
 		mouse = FALSE;
 
@@ -823,18 +823,18 @@ static	void	screen_attr_setup(int stat)
 		if (grab_mouse == AUTO_MOUSE &&
 		    stat == SETUP_CLICK) {
 
-		    /* ¼«Æ°¥°¥é¥Ö¤Ç¡¢¥Ü¥¿¥ó¥¯¥ê¥Ã¥¯»ş¤Ï¡¢¥Ş¥¦¥¹¾Ã¤¹ */
+		    /* è‡ªå‹•ã‚°ãƒ©ãƒ–ã§ã€ãƒœã‚¿ãƒ³ã‚¯ãƒªãƒƒã‚¯æ™‚ã¯ã€ãƒã‚¦ã‚¹æ¶ˆã™ */
 		    grab  = TRUE;
 		    mouse = FALSE;
 
-		    /* °Ê²¼¤Ï¥¯¥ê¥¢ */
+		    /* ä»¥ä¸‹ã¯ã‚¯ãƒªã‚¢ */
 		    auto_mouse = FALSE;
 		    auto_mouse_timer = 0;
 		    auto_grab  = FALSE;
 
 		} else {
 
-		    /* ¥°¥é¥Ö¤Ê¤·¤Ê¤é¡¢¥Ş¥¦¥¹¤ÎÍ­Ìµ¤ÏÀßÄê¤Ë¤è¤ë */
+		    /* ã‚°ãƒ©ãƒ–ãªã—ãªã‚‰ã€ãƒã‚¦ã‚¹ã®æœ‰ç„¡ã¯è¨­å®šã«ã‚ˆã‚‹ */
 		    if (grab_mouse == AUTO_MOUSE) {
 			auto_grab = TRUE;
 		    }
@@ -874,7 +874,7 @@ DEBUG:
 	mouse  = TRUE;
 	grab   = FALSE;
 
-	/* Á´²èÌÌ¥â¡¼¥É¤Ç¡¢¥½¥Õ¥È¥¦¥§¥¢¥«¡¼¥½¥ë¤ò»È¤¦¤Ê¤é¡¢¥Ş¥¦¥¹¤Ï¾Ã¤¹ */
+	/* å…¨ç”»é¢ãƒ¢ãƒ¼ãƒ‰ã§ã€ã‚½ãƒ•ãƒˆã‚¦ã‚§ã‚¢ã‚«ãƒ¼ã‚½ãƒ«ã‚’ä½¿ã†ãªã‚‰ã€ãƒã‚¦ã‚¹ã¯æ¶ˆã™ */
 	if (/*now_fullscreen &&*/ use_swcursor) mouse = FALSE;
     }
 
@@ -887,137 +887,137 @@ DEBUG:
 
 
 /***********************************************************************
- * HALF¥µ¥¤¥º»ş¤Î¿§Êä´°¤ÎÍ­¸ú¡¦Ìµ¸ú´ØÏ¢¤Î´Ø¿ô
+ * HALFã‚µã‚¤ã‚ºæ™‚ã®è‰²è£œå®Œã®æœ‰åŠ¹ãƒ»ç„¡åŠ¹é–¢é€£ã®é–¢æ•°
  ***********************************************************************/
 
-/* ¿§Êä´°¤Î²ÄÈİ¤òÊÖ¤¹ */
+/* è‰²è£œå®Œã®å¯å¦ã‚’è¿”ã™ */
 int	quasi88_cfg_can_interp(void) { return enable_half_interp; }
 
-/* ¿§Êä´°¤Î¸½ºß¾õÂÖ¤òÊÖ¤¹ */
+/* è‰²è£œå®Œã®ç¾åœ¨çŠ¶æ…‹ã‚’è¿”ã™ */
 int	quasi88_cfg_now_interp(void) { return use_half_interp; }
 
-/* ¿§Êä´°¤ÎÍ­Ìµ¤òÀßÄê¤¹¤ë */
+/* è‰²è£œå®Œã®æœ‰ç„¡ã‚’è¨­å®šã™ã‚‹ */
 void	quasi88_cfg_set_interp(int enable)
 {
     use_half_interp = enable;
     check_half_interp();
     set_vram2screen_list();
-    screen_set_dirty_all();		/* ¥á¥¤¥óÎÎ°è ½é´ü²½(==¹¹¿·) */
-    frameskip_counter_reset();		/* ¼¡²óÉÁ²è */
+    screen_set_dirty_all();		/* ãƒ¡ã‚¤ãƒ³é ˜åŸŸ åˆæœŸåŒ–(==æ›´æ–°) */
+    frameskip_counter_reset();		/* æ¬¡å›æç”» */
 }
 
 
 
 /***********************************************************************
- * INTERLACE¤ÎÀßÄê´ØÏ¢¤Î´Ø¿ô
+ * INTERLACEã®è¨­å®šé–¢é€£ã®é–¢æ•°
  ***********************************************************************/
 
-/* ¸½ºß¤Î¥¤¥ó¥¿¥ì¡¼¥¹¾õÂÖ¤òÊÖ¤¹ */
+/* ç¾åœ¨ã®ã‚¤ãƒ³ã‚¿ãƒ¬ãƒ¼ã‚¹çŠ¶æ…‹ã‚’è¿”ã™ */
 int	quasi88_cfg_now_interlace(void) { return use_interlace; }
 
-/* ¥¤¥ó¥¿¥ì¡¼¥¹¾õÂÖ¤òÀßÄê¤¹¤ë */
+/* ã‚¤ãƒ³ã‚¿ãƒ¬ãƒ¼ã‚¹çŠ¶æ…‹ã‚’è¨­å®šã™ã‚‹ */
 void	quasi88_cfg_set_interlace(int interlace_mode)
 {
     use_interlace = interlace_mode;
     set_vram2screen_list();
-    screen_set_dirty_frame();		/* Á´ÎÎ°è ½é´ü²½(==¹¹¿·) */
-    frameskip_counter_reset();		/* ¼¡²óÉÁ²è */
+    screen_set_dirty_frame();		/* å…¨é ˜åŸŸ åˆæœŸåŒ–(==æ›´æ–°) */
+    frameskip_counter_reset();		/* æ¬¡å›æç”» */
 }
 
 
 
 /***********************************************************************
- * ¥¹¥Æ¡¼¥¿¥¹É½¼¨ÀßÄê´ØÏ¢¤Î´Ø¿ô
+ * ã‚¹ãƒ†ãƒ¼ã‚¿ã‚¹è¡¨ç¤ºè¨­å®šé–¢é€£ã®é–¢æ•°
  ***********************************************************************/
 
-/* ¥¹¥Æ¡¼¥¿¥¹É½¼¨¤Î²ÄÈİ¤òÊÖ¤¹ */
+/* ã‚¹ãƒ†ãƒ¼ã‚¿ã‚¹è¡¨ç¤ºã®å¯å¦ã‚’è¿”ã™ */
 int	quasi88_cfg_can_showstatus(void) { return enable_status; }
 
-/* ¥¹¥Æ¡¼¥¿¥¹É½¼¨¤Î¸½ºß¾õÂÖ¤òÊÖ¤¹ */
+/* ã‚¹ãƒ†ãƒ¼ã‚¿ã‚¹è¡¨ç¤ºã®ç¾åœ¨çŠ¶æ…‹ã‚’è¿”ã™ */
 int	quasi88_cfg_now_showstatus(void) { return now_status; }
 
-/* ¥¹¥Æ¡¼¥¿¥¹¤ÎÉ½¼¨¤òÀßÄê¤¹¤ë */
+/* ã‚¹ãƒ†ãƒ¼ã‚¿ã‚¹ã®è¡¨ç¤ºã‚’è¨­å®šã™ã‚‹ */
 void	quasi88_cfg_set_showstatus(int show)
 {
-    if (now_status != show) {		/* ¥¹¥Æ¡¼¥¿¥¹É½¼¨Í­Ìµ¤¬ÊÑ¤ï¤Ã¤¿ */
+    if (now_status != show) {		/* ã‚¹ãƒ†ãƒ¼ã‚¿ã‚¹è¡¨ç¤ºæœ‰ç„¡ãŒå¤‰ã‚ã£ãŸ */
 	show_status = show;
 
-	if (now_fullscreen == FALSE) {	/* ¥¦¥¤¥ó¥É¥¦¤Î¾ì¹ç¡¦¡¦¡¦ */
+	if (now_fullscreen == FALSE) {	/* ã‚¦ã‚¤ãƒ³ãƒ‰ã‚¦ã®å ´åˆãƒ»ãƒ»ãƒ» */
 
-	    open_window_or_exit();		/* ²èÌÌ¥µ¥¤¥ºÀÚÂØ     */
+	    open_window_or_exit();		/* ç”»é¢ã‚µã‚¤ã‚ºåˆ‡æ›¿     */
 
-	} else {			/* Á´²èÌÌ¤Î¾ì¹ç¡¦¡¦¡¦ */
+	} else {			/* å…¨ç”»é¢ã®å ´åˆãƒ»ãƒ»ãƒ» */
 
 	    now_status = show_status;
 
 	    if (now_status) {
-		screen_set_dirty_status_show();	/* ¥¹¥Æ¡¼¥¿¥¹ÎÎ°è ½é´ü²½ */
-		screen_set_dirty_status();	/* ¥¹¥Æ¡¼¥¿¥¹ÎÎ°è ¹¹¿· */
+		screen_set_dirty_status_show();	/* ã‚¹ãƒ†ãƒ¼ã‚¿ã‚¹é ˜åŸŸ åˆæœŸåŒ– */
+		screen_set_dirty_status();	/* ã‚¹ãƒ†ãƒ¼ã‚¿ã‚¹é ˜åŸŸ æ›´æ–° */
 	    } else {
-		screen_set_dirty_status_hide();	/* ¥¹¥Æ¡¼¥¿¥¹ÎÎ°è ¾Ãµî */
+		screen_set_dirty_status_hide();	/* ã‚¹ãƒ†ãƒ¼ã‚¿ã‚¹é ˜åŸŸ æ¶ˆå» */
 	    }
 
 	}
 
-	status_setup(now_status);		/* ¥¹¥Æ¡¼¥¿¥¹ÊÑ¿ôÅù½é´ü²½ */
+	status_setup(now_status);		/* ã‚¹ãƒ†ãƒ¼ã‚¿ã‚¹å¤‰æ•°ç­‰åˆæœŸåŒ– */
     }
 }
 
 
 
 /***********************************************************************
- * Á´²èÌÌÀßÄê¡¦²èÌÌ¥µ¥¤¥ºÀßÄê´ØÏ¢¤Î´Ø¿ô
+ * å…¨ç”»é¢è¨­å®šãƒ»ç”»é¢ã‚µã‚¤ã‚ºè¨­å®šé–¢é€£ã®é–¢æ•°
  ***********************************************************************/
 
-/* Á´²èÌÌ¤Î²ÄÈİ¤òÊÖ¤¹ */
+/* å…¨ç”»é¢ã®å¯å¦ã‚’è¿”ã™ */
 int	quasi88_cfg_can_fullscreen(void) { return enable_fullscreen; }
 
-/* Á´²èÌÌ¤Î¸½ºß¾õÂÖ¤òÊÖ¤¹ */
+/* å…¨ç”»é¢ã®ç¾åœ¨çŠ¶æ…‹ã‚’è¿”ã™ */
 int	quasi88_cfg_now_fullscreen(void) { return now_fullscreen; }
 
-/* Á´²èÌÌ¤ÎÀÚÂØ¤òÀßÄê¤¹¤ë */
+/* å…¨ç”»é¢ã®åˆ‡æ›¿ã‚’è¨­å®šã™ã‚‹ */
 void	quasi88_cfg_set_fullscreen(int fullscreen)
 {
     use_fullscreen = fullscreen;
 
     if (now_fullscreen != use_fullscreen) {
-	open_window_or_exit();			/* ²èÌÌ¥µ¥¤¥ºÀÚÂØ     */
+	open_window_or_exit();			/* ç”»é¢ã‚µã‚¤ã‚ºåˆ‡æ›¿     */
     }
 }
 
-/* ²èÌÌ¥µ¥¤¥º¤ÎºÇÂç¤òÊÖ¤¹ */
+/* ç”»é¢ã‚µã‚¤ã‚ºã®æœ€å¤§ã‚’è¿”ã™ */
 int	quasi88_cfg_max_size(void) { return screen_size_max; }
 
-/* ²èÌÌ¥µ¥¤¥º¤ÎºÇ¾®¤òÊÖ¤¹ */
+/* ç”»é¢ã‚µã‚¤ã‚ºã®æœ€å°ã‚’è¿”ã™ */
 int	quasi88_cfg_min_size(void) { return screen_size_min; }
 
-/* ²èÌÌ¥µ¥¤¥º¤Î¸½ºß¾õÂÖ¤òÊÖ¤¹ */
+/* ç”»é¢ã‚µã‚¤ã‚ºã®ç¾åœ¨çŠ¶æ…‹ã‚’è¿”ã™ */
 int	quasi88_cfg_now_size(void) { return now_screen_size; }
 
-/* ²èÌÌ¥µ¥¤¥º¤òÀßÄê¤¹¤ë */
+/* ç”»é¢ã‚µã‚¤ã‚ºã‚’è¨­å®šã™ã‚‹ */
 void	quasi88_cfg_set_size(int new_size)
 {
     screen_size = new_size;
 
     if (now_screen_size != screen_size) {
-	open_window_or_exit();			/* ²èÌÌ¥µ¥¤¥ºÀÚÂØ     */
+	open_window_or_exit();			/* ç”»é¢ã‚µã‚¤ã‚ºåˆ‡æ›¿     */
     }
 }
 
-/* ²èÌÌ¥µ¥¤¥º¤òÂç¤­¤¯¤¹¤ë */
+/* ç”»é¢ã‚µã‚¤ã‚ºã‚’å¤§ããã™ã‚‹ */
 void	quasi88_cfg_set_size_large(void)
 {
     if (++screen_size > screen_size_max) screen_size = screen_size_min;
 
-    open_window_or_exit();			/* ²èÌÌ¥µ¥¤¥ºÀÚÂØ     */
+    open_window_or_exit();			/* ç”»é¢ã‚µã‚¤ã‚ºåˆ‡æ›¿     */
 }
 
-/* ²èÌÌ¥µ¥¤¥º¤ò¾®¤µ¤¯¤¹¤ë */
+/* ç”»é¢ã‚µã‚¤ã‚ºã‚’å°ã•ãã™ã‚‹ */
 void	quasi88_cfg_set_size_small(void)
 {
     if (--screen_size < screen_size_min) screen_size = screen_size_max;
 
-    open_window_or_exit();			/* ²èÌÌ¥µ¥¤¥ºÀÚÂØ     */
+    open_window_or_exit();			/* ç”»é¢ã‚µã‚¤ã‚ºåˆ‡æ›¿     */
 }
 
 
@@ -1033,7 +1033,7 @@ void	quasi88_cfg_set_size_small(void)
 
 
 /*----------------------------------------------------------------------
- * ¥Ñ¥ì¥Ã¥ÈÀßÄê
+ * ãƒ‘ãƒ¬ãƒƒãƒˆè¨­å®š
  *----------------------------------------------------------------------*/
 static	void	trans_palette(PC88_PALETTE_T syspal[])
 {
@@ -1045,7 +1045,7 @@ static	void	trans_palette(PC88_PALETTE_T syspal[])
 	added_color = 0;
     }
 
-		/* 88¤Î¥Ñ¥ì¥Ã¥È16¿§Ê¬¤òÀßÄê */
+		/* 88ã®ãƒ‘ãƒ¬ãƒƒãƒˆ16è‰²åˆ†ã‚’è¨­å®š */
 
     for (i = 0; i < 16; i++) {
 	color[i].red   = syspal[i].red;
@@ -1054,8 +1054,8 @@ static	void	trans_palette(PC88_PALETTE_T syspal[])
     }
     num = 16;
 
-	/* HALF¥µ¥¤¥º¥Õ¥£¥ë¥¿¥ê¥ó¥°²ÄÇ½»ş¤Ï¥Õ¥£¥ë¥¿¥Ñ¥ì¥Ã¥ÈÃÍ¤ò·×»» */
-	/* (¥Õ¥£¥ë¥¿¥ê¥ó¥°ÍÑ¤Ë¤Ï¡¢120¿§¤òÀßÄê) */
+	/* HALFã‚µã‚¤ã‚ºãƒ•ã‚£ãƒ«ã‚¿ãƒªãƒ³ã‚°å¯èƒ½æ™‚ã¯ãƒ•ã‚£ãƒ«ã‚¿ãƒ‘ãƒ¬ãƒƒãƒˆå€¤ã‚’è¨ˆç®— */
+	/* (ãƒ•ã‚£ãƒ«ã‚¿ãƒªãƒ³ã‚°ç”¨ã«ã¯ã€120è‰²ã‚’è¨­å®š) */
 
     if (now_half_interp) {
 	for (i = 0; i < 16; i++) {
@@ -1092,8 +1092,8 @@ static	void	trans_palette(PC88_PALETTE_T syspal[])
 
 
 /*----------------------------------------------------------------------
- * GVRAM/TVRAM¤ò²èÁü¥Ğ¥Ã¥Õ¥¡¤ËÅ¾Á÷¤¹¤ë´Ø¿ô¤Î¡¢¥ê¥¹¥È¤òºîÀ®
- *	¤³¤Î´Ø¿ô¤Ï¡¢ bpp ¡¦ ¥µ¥¤¥º ¡¦ ¥¨¥Õ¥§¥¯¥È ¤ÎÊÑ¹¹»ş¤Ë¸Æ¤Ó½Ğ¤¹¡£
+ * GVRAM/TVRAMã‚’ç”»åƒãƒãƒƒãƒ•ã‚¡ã«è»¢é€ã™ã‚‹é–¢æ•°ã®ã€ãƒªã‚¹ãƒˆã‚’ä½œæˆ
+ *	ã“ã®é–¢æ•°ã¯ã€ bpp ãƒ» ã‚µã‚¤ã‚º ãƒ» ã‚¨ãƒ•ã‚§ã‚¯ãƒˆ ã®å¤‰æ›´æ™‚ã«å‘¼ã³å‡ºã™ã€‚
  *----------------------------------------------------------------------*/
 static	int	(*vram2screen_list[4][4][2])(void);
 static	void	(*screen_buf_init_p)(void);
@@ -1248,37 +1248,37 @@ static	void	set_vram2screen_list(void)
 
 static	void	clear_all_screen(void)
 {
-    if (draw_start) { (draw_start)(); }		/* ¥·¥¹¥Æ¥à°ÍÂ¸¤ÎÉÁ²èÁ°½èÍı */
+    if (draw_start) { (draw_start)(); }		/* ã‚·ã‚¹ãƒ†ãƒ ä¾å­˜ã®æç”»å‰å‡¦ç† */
 
-    (screen_buf_init_p)();			/* ²èÌÌÁ´¥¯¥ê¥¢(¥Ü¡¼¥À¡¼´Ş) */
+    (screen_buf_init_p)();			/* ç”»é¢å…¨ã‚¯ãƒªã‚¢(ãƒœãƒ¼ãƒ€ãƒ¼å«) */
     if (now_status) {
-	(status_buf_clear_p)();			/* ¥¹¥Æ¡¼¥¿¥¹ÎÎ°è ¾Ãµî */
+	(status_buf_clear_p)();			/* ã‚¹ãƒ†ãƒ¼ã‚¿ã‚¹é ˜åŸŸ æ¶ˆå» */
     }
 
-    if (draw_finish) { (draw_finish)(); }	/* ¥·¥¹¥Æ¥à°ÍÂ¸¤ÎÉÁ²è¸å½èÍı */
+    if (draw_finish) { (draw_finish)(); }	/* ã‚·ã‚¹ãƒ†ãƒ ä¾å­˜ã®æç”»å¾Œå‡¦ç† */
 }
 
 
 
 /*----------------------------------------------------------------------
- * GVRAM/TVRAM ¤ò screen_buf ¤ËÅ¾Á÷¤¹¤ë
+ * GVRAM/TVRAM ã‚’ screen_buf ã«è»¢é€ã™ã‚‹
  *
- *	int method == V_DIF ¡Ä screen_dirty_flag ¤Ë´ğ¤Å¤­¡¢º¹Ê¬¤À¤±¤òÅ¾Á÷
- *		   == V_ALL ¡Ä ²èÌÌ¤¹¤Ù¤Æ¤òÅ¾Á÷
+ *	int method == V_DIF â€¦ screen_dirty_flag ã«åŸºã¥ãã€å·®åˆ†ã ã‘ã‚’è»¢é€
+ *		   == V_ALL â€¦ ç”»é¢ã™ã¹ã¦ã‚’è»¢é€
  *
- *	Ìá¤êÃÍ     == -1    ¡Ä Å¾Á÷¤Ê¤· (²èÌÌ¤ËÊÑ²½¤Ê¤·)
- *		   != -1    ¡Ä ¾å°Ì¤«¤é 8¥Ó¥Ã¥È¤º¤Ä¤Ë¡¢x0, y0, x1, y1 ¤Î
- *			       4¸Ä¤Î unsigned ÃÍ¤¬¥»¥Ã¥È¤µ¤ì¤ë¡£¤³¤³¤Ç¡¢
+ *	æˆ»ã‚Šå€¤     == -1    â€¦ è»¢é€ãªã— (ç”»é¢ã«å¤‰åŒ–ãªã—)
+ *		   != -1    â€¦ ä¸Šä½ã‹ã‚‰ 8ãƒ“ãƒƒãƒˆãšã¤ã«ã€x0, y0, x1, y1 ã®
+ *			       4å€‹ã® unsigned å€¤ãŒã‚»ãƒƒãƒˆã•ã‚Œã‚‹ã€‚ã“ã“ã§ã€
  *				    (x0 * 8, y0 * 2) - (x1 * 8, y1 * 2)
- *			       ¤ÇÉ½¤µ¤ì¤ëÈÏ°Ï¤¬¡¢Å¾Á÷¤·¤¿ÎÎ°è¤È¤Ê¤ë¡£
+ *			       ã§è¡¨ã•ã‚Œã‚‹ç¯„å›²ãŒã€è»¢é€ã—ãŸé ˜åŸŸã¨ãªã‚‹ã€‚
  *
- *	Í½¤á¡¢ set_vram2screen_list ¤Ç´Ø¿ô¥ê¥¹¥È¤òÀ¸À®¤·¤Æ¤ª¤¯¤³¤È
+ *	äºˆã‚ã€ set_vram2screen_list ã§é–¢æ•°ãƒªã‚¹ãƒˆã‚’ç”Ÿæˆã—ã¦ãŠãã“ã¨
  *----------------------------------------------------------------------*/
 static	int	vram2screen(int method)
 {
     int vram_mode, text_mode;
 
-    if (sys_ctrl & SYS_CTRL_80) {		/* ¥Æ¥­¥¹¥È¤Î¹Ô¡¦·å */
+    if (sys_ctrl & SYS_CTRL_80) {		/* ãƒ†ã‚­ã‚¹ãƒˆã®è¡Œãƒ»æ¡ */
 	if (CRTC_SZ_LINES == 25) { text_mode = V_80x25; }
 	else                     { text_mode = V_80x20; }
     } else {
@@ -1286,25 +1286,25 @@ static	int	vram2screen(int method)
 	else                     { text_mode = V_40x20; }
     }
 
-    if (grph_ctrl & GRPH_CTRL_VDISP) {		/* VRAM É½¼¨¤¹¤ë */
+    if (grph_ctrl & GRPH_CTRL_VDISP) {		/* VRAM è¡¨ç¤ºã™ã‚‹ */
 
-	if (grph_ctrl & GRPH_CTRL_COLOR) {		/* ¥«¥é¡¼ */
+	if (grph_ctrl & GRPH_CTRL_COLOR) {		/* ã‚«ãƒ©ãƒ¼ */
 	    vram_mode = V_COLOR;
 	} else {
-	    if (grph_ctrl & GRPH_CTRL_200) {		/* Çò¹õ */
+	    if (grph_ctrl & GRPH_CTRL_200) {		/* ç™½é»’ */
 		vram_mode = V_MONO;
-	    } else {					/* 400¥é¥¤¥ó */
+	    } else {					/* 400ãƒ©ã‚¤ãƒ³ */
 		vram_mode = V_HIRESO;
 	    }
 	}
 
-    } else {					/* VRAM É½¼¨¤·¤Ê¤¤ */
+    } else {					/* VRAM è¡¨ç¤ºã—ãªã„ */
 
 	vram_mode = V_UNDISP;
     }
 
 #if 0
-{ /*¸½ºß¤É¤Î¥â¡¼¥É¤ÇÉ½¼¨Ãæ? */
+{ /*ç¾åœ¨ã©ã®ãƒ¢ãƒ¼ãƒ‰ã§è¡¨ç¤ºä¸­? */
   static int vram_mode0=-1, text_mode0=-1;
   if (text_mode0 != text_mode) {
     if      (text_mode==V_80x25) printf("      80x25\n");
@@ -1329,7 +1329,7 @@ static	int	vram2screen(int method)
 
 
 /*----------------------------------------------------------------------
- * ²èÌÌÉ½¼¨	¥Ü¡¼¥À¡¼(ÏÈ)ÎÎ°è¡¢¥á¥¤¥óÎÎ°è¡¢¥¹¥Æ¡¼¥¿¥¹ÎÎ°è¤ÎÁ´¤Æ¤òÉ½¼¨
+ * ç”»é¢è¡¨ç¤º	ãƒœãƒ¼ãƒ€ãƒ¼(æ )é ˜åŸŸã€ãƒ¡ã‚¤ãƒ³é ˜åŸŸã€ã‚¹ãƒ†ãƒ¼ã‚¿ã‚¹é ˜åŸŸã®å…¨ã¦ã‚’è¡¨ç¤º
  *----------------------------------------------------------------------*/
 static	void	put_image_all(void)
 {
@@ -1346,7 +1346,7 @@ static	void	put_image_all(void)
 
 
 /*----------------------------------------------------------------------
- * ²èÌÌÉ½¼¨	¥á¥¤¥óÎÎ°è¤Î (x0,y0)-(x1,y1) ¤È »ØÄê¤µ¤ì¤¿¥¹¥Æ¡¼¥¿¥¹ÎÎ°è¤òÉ½¼¨
+ * ç”»é¢è¡¨ç¤º	ãƒ¡ã‚¤ãƒ³é ˜åŸŸã® (x0,y0)-(x1,y1) ã¨ æŒ‡å®šã•ã‚ŒãŸã‚¹ãƒ†ãƒ¼ã‚¿ã‚¹é ˜åŸŸã‚’è¡¨ç¤º
  *----------------------------------------------------------------------*/
 static	void	put_image(int x0, int y0, int x1, int y1,
 			  int st0, int st1, int st2)
@@ -1370,7 +1370,7 @@ static	void	put_image(int x0, int y0, int x1, int y1,
 	n ++;
     }
 
-    if (now_status || now_fullscreen ){	/* Á´²èÌÌ»ş¤Ï¡¢¥¹¥Æ¡¼¥¿¥¹¾Ãµî¤¬¤¢¤ë */
+    if (now_status || now_fullscreen ){	/* å…¨ç”»é¢æ™‚ã¯ã€ã‚¹ãƒ†ãƒ¼ã‚¿ã‚¹æ¶ˆå»ãŒã‚ã‚‹ */
 	if (st0) {
 	    rect[n].x = 0;
 	    rect[n].y = HEIGHT;
@@ -1405,15 +1405,15 @@ static	void	put_image(int x0, int y0, int x1, int y1,
 
 
 /***********************************************************************
- * ÉÁ²è¤Îºİ¤Ë»ÈÍÑ¤¹¤ë¡¢¼Âºİ¤Î¥Ñ¥ì¥Ã¥È¾ğÊó¤ò°ú¿ô syspal ¤Ë¥»¥Ã¥È¤¹¤ë
+ * æç”»ã®éš›ã«ä½¿ç”¨ã™ã‚‹ã€å®Ÿéš›ã®ãƒ‘ãƒ¬ãƒƒãƒˆæƒ…å ±ã‚’å¼•æ•° syspal ã«ã‚»ãƒƒãƒˆã™ã‚‹
  ************************************************************************/
 void	screen_get_emu_palette(PC88_PALETTE_T pal[16])
 {
     int i;
 
-	/* VRAM ¤Î ¥«¥é¡¼¥Ñ¥ì¥Ã¥ÈÀßÄê   pal[0]¡Á[7] */
+	/* VRAM ã® ã‚«ãƒ©ãƒ¼ãƒ‘ãƒ¬ãƒƒãƒˆè¨­å®š   pal[0]ã€œ[7] */
 
-    if (grph_ctrl & GRPH_CTRL_COLOR) {		/* VRAM ¥«¥é¡¼ */
+    if (grph_ctrl & GRPH_CTRL_COLOR) {		/* VRAM ã‚«ãƒ©ãƒ¼ */
 
 	if (monitor_analog) {
 	    for (i = 0; i < 8; i++) {
@@ -1429,7 +1429,7 @@ void	screen_get_emu_palette(PC88_PALETTE_T pal[16])
 	    }
 	}
 
-    } else {					/* VRAM Çò¹õ */
+    } else {					/* VRAM ç™½é»’ */
 
 	if (monitor_analog) {
 	    pal[0].red   = vram_bg_palette.red   * 73 / 2;
@@ -1449,19 +1449,19 @@ void	screen_get_emu_palette(PC88_PALETTE_T pal[16])
     }
 
 
-	/* TEXT ¤Î ¥«¥é¡¼¥Ñ¥ì¥Ã¥ÈÀßÄê   pal[8]¡Á[15] */
+	/* TEXT ã® ã‚«ãƒ©ãƒ¼ãƒ‘ãƒ¬ãƒƒãƒˆè¨­å®š   pal[8]ã€œ[15] */
 
-    if (grph_ctrl & GRPH_CTRL_COLOR) {		/* VRAM ¥«¥é¡¼ */
+    if (grph_ctrl & GRPH_CTRL_COLOR) {		/* VRAM ã‚«ãƒ©ãƒ¼ */
 
-	for (i = 8; i < 16; i++) {			/* TEXT Çò¹õ¤Î¾ì¹ç¤Ï */
-	    pal[i].red   = (i & 0x02) ? 0xff : 0;	/* ¹õ=[8],Çò=[15] ¤ò */
-	    pal[i].green = (i & 0x04) ? 0xff : 0;	/* »È¤¦¤Î¤ÇÌäÂê¤Ê¤·  */
+	for (i = 8; i < 16; i++) {			/* TEXT ç™½é»’ã®å ´åˆã¯ */
+	    pal[i].red   = (i & 0x02) ? 0xff : 0;	/* é»’=[8],ç™½=[15] ã‚’ */
+	    pal[i].green = (i & 0x04) ? 0xff : 0;	/* ä½¿ã†ã®ã§å•é¡Œãªã—  */
 	    pal[i].blue  = (i & 0x01) ? 0xff : 0;
 	}
 
-    } else {					/* VRAM Çò¹õ   */
+    } else {					/* VRAM ç™½é»’   */
 
-	if (misc_ctrl & MISC_CTRL_ANALOG) {		/* ¥¢¥Ê¥í¥°¥Ñ¥ì¥Ã¥È»ş*/
+	if (misc_ctrl & MISC_CTRL_ANALOG) {		/* ã‚¢ãƒŠãƒ­ã‚°ãƒ‘ãƒ¬ãƒƒãƒˆæ™‚*/
 
 	    if (monitor_analog) {
 		for (i = 8; i < 16; i++) {
@@ -1477,7 +1477,7 @@ void	screen_get_emu_palette(PC88_PALETTE_T pal[16])
 		}
 	    }
 
-	} else {					/* ¥Ç¥¸¥¿¥ë¥Ñ¥ì¥Ã¥È»ş*/
+	} else {					/* ãƒ‡ã‚¸ã‚¿ãƒ«ãƒ‘ãƒ¬ãƒƒãƒˆæ™‚*/
 	    for (i = 8; i < 16; i++) {
 		pal[i].red   = (i & 0x02) ? 0xff : 0;
 		pal[i].green = (i & 0x04) ? 0xff : 0;
@@ -1491,51 +1491,51 @@ void	screen_get_emu_palette(PC88_PALETTE_T pal[16])
 
 
 /***********************************************************************
- * ¥¤¥á¡¼¥¸Å¾Á÷ (É½¼¨)
+ * ã‚¤ãƒ¡ãƒ¼ã‚¸è»¢é€ (è¡¨ç¤º)
  *
- *	¤³¤Î´Ø¿ô¤Ï¡¢É½¼¨¥¿¥¤¥ß¥ó¥° (Ìó 1/60ÉÃËè) ¤Ë¸Æ¤Ó½Ğ¤µ¤ì¤ë¡£
+ *	ã“ã®é–¢æ•°ã¯ã€è¡¨ç¤ºã‚¿ã‚¤ãƒŸãƒ³ã‚° (ç´„ 1/60ç§’æ¯) ã«å‘¼ã³å‡ºã•ã‚Œã‚‹ã€‚
  ************************************************************************/
 void	screen_update(void)
 {
     int i;
     int skip = FALSE;
-    int all_area  = FALSE;	/* Á´¥¨¥ê¥¢Å¾Á÷¥Õ¥é¥°	*/
-    int rect = -1;		/* ²èÌÌÅ¾Á÷¥Õ¥é¥°	*/
-    int flag = 0;		/* ¥¹¥Æ¡¼¥¿¥¹Å¾Á÷¥Õ¥é¥°	*/
+    int all_area  = FALSE;	/* å…¨ã‚¨ãƒªã‚¢è»¢é€ãƒ•ãƒ©ã‚°	*/
+    int rect = -1;		/* ç”»é¢è»¢é€ãƒ•ãƒ©ã‚°	*/
+    int flag = 0;		/* ã‚¹ãƒ†ãƒ¼ã‚¿ã‚¹è»¢é€ãƒ•ãƒ©ã‚°	*/
     PC88_PALETTE_T syspal[16];
     int is_exec = (quasi88_is_exec()) ? TRUE : FALSE;
 
 
-    screen_attr_update();	/* ¥Ş¥¦¥¹¼«Æ°¤Ç±£¤¹¡Ä¸Æ¤Ó½Ğ¤·¾ì½ê¤¬¤¤¤Ş¤¤¤Á */
+    screen_attr_update();	/* ãƒã‚¦ã‚¹è‡ªå‹•ã§éš ã™â€¦å‘¼ã³å‡ºã—å ´æ‰€ãŒã„ã¾ã„ã¡ */
 
 
     if (is_exec) {
 	profiler_lapse( PROF_LAPSE_BLIT );
     }
 
-    status_update();		/* ¥¹¥Æ¡¼¥¿¥¹ÎÎ°è¤Î²èÁü¥Ç¡¼¥¿¤ò¹¹¿· */
+    status_update();		/* ã‚¹ãƒ†ãƒ¼ã‚¿ã‚¹é ˜åŸŸã®ç”»åƒãƒ‡ãƒ¼ã‚¿ã‚’æ›´æ–° */
 
 
-    /* ¥á¥¤¥óÎÎ°è¤Ï¡¢ÉÁ²è¤ò¥¹¥­¥Ã¥×¤¹¤ë¾ì¹ç¤¬¤¢¤ë¤Î¤Ç¡¢°Ê²¼¤ÇÈ½Äê */
-    /* (¥á¥Ë¥å¡¼¤Ê¤É¤Ï¡¢¾ï»ş frame_counter==0 ¤Ê¤Î¤Ç¡¢Ëè²óÉÁ²è)   */
+    /* ãƒ¡ã‚¤ãƒ³é ˜åŸŸã¯ã€æç”»ã‚’ã‚¹ã‚­ãƒƒãƒ—ã™ã‚‹å ´åˆãŒã‚ã‚‹ã®ã§ã€ä»¥ä¸‹ã§åˆ¤å®š */
+    /* (ãƒ¡ãƒ‹ãƒ¥ãƒ¼ãªã©ã¯ã€å¸¸æ™‚ frame_counter==0 ãªã®ã§ã€æ¯å›æç”»)   */
 
-    if ((frame_counter % frameskip_rate) == 0) { /* ÉÁ²è¤Î»ş¤¬Íè¤¿¡£       */
-						 /* °Ê²¼¤Î¤¤¤º¤ì¤«¤Ê¤éÉÁ²è */
-	if (no_wait ||				   /* ¥¦¥§¥¤¥È¤Ê¤·ÀßÄê»ş     */
-	    use_auto_skip == FALSE || 		   /* ¼«Æ°¥¹¥­¥Ã¥×¤Ê¤·ÀßÄê»ş */
-	    do_skip_draw  == FALSE) {		   /* º£²ó¥¹¥­¥Ã¥×ÂĞ¾İ¤Ç¤Ê¤¤ */
+    if ((frame_counter % frameskip_rate) == 0) { /* æç”»ã®æ™‚ãŒæ¥ãŸã€‚       */
+						 /* ä»¥ä¸‹ã®ã„ãšã‚Œã‹ãªã‚‰æç”» */
+	if (no_wait ||				   /* ã‚¦ã‚§ã‚¤ãƒˆãªã—è¨­å®šæ™‚     */
+	    use_auto_skip == FALSE || 		   /* è‡ªå‹•ã‚¹ã‚­ãƒƒãƒ—ãªã—è¨­å®šæ™‚ */
+	    do_skip_draw  == FALSE) {		   /* ä»Šå›ã‚¹ã‚­ãƒƒãƒ—å¯¾è±¡ã§ãªã„ */
 
 	    skip = FALSE;
 
-	} else {				 /* °Ê³°¤Ï¥¹¥­¥Ã¥× */
+	} else {				 /* ä»¥å¤–ã¯ã‚¹ã‚­ãƒƒãƒ— */
 
 	    skip = TRUE;
 
-	    /* ÉÁ²è¥¿¥¤¥ß¥ó¥°¤Ê¤Î¤Ë¥¹¥­¥Ã¥×¤·¤¿¾ì¹ç¤Ï¡¢¤½¤Î¤³¤È¤ò³Ğ¤¨¤Æ¤ª¤¯ */
+	    /* æç”»ã‚¿ã‚¤ãƒŸãƒ³ã‚°ãªã®ã«ã‚¹ã‚­ãƒƒãƒ—ã—ãŸå ´åˆã¯ã€ãã®ã“ã¨ã‚’è¦šãˆã¦ãŠã */
 	    already_skip_draw = TRUE;
 	}
 
-	/* ¥«¡¼¥½¥ëÅÀÌÇ¤Î¥ï¡¼¥¯¹¹¿· */
+	/* ã‚«ãƒ¼ã‚½ãƒ«ç‚¹æ»…ã®ãƒ¯ãƒ¼ã‚¯æ›´æ–° */
 	if (is_exec) {
 	    if (--blink_ctrl_counter == 0) {
 		blink_ctrl_counter = blink_ctrl_cycle;
@@ -1547,13 +1547,13 @@ void	screen_update(void)
     }
 
 
-    /* ¥á¥¤¥óÎÎ°è¤òÉÁ²è¤¹¤ë (¥¹¥­¥Ã¥×¤·¤Ê¤¤) ¾ì¹ç¤Î½èÍı */
+    /* ãƒ¡ã‚¤ãƒ³é ˜åŸŸã‚’æç”»ã™ã‚‹ (ã‚¹ã‚­ãƒƒãƒ—ã—ãªã„) å ´åˆã®å‡¦ç† */
 
     if (skip == FALSE) {
 
-	/* ¿§Å¾Á÷ */
+	/* è‰²è»¢é€ */
 
-	if (screen_dirty_palette) {		/* ¿§¤ò¥·¥¹¥Æ¥à¤ËÅ¾Á÷ */
+	if (screen_dirty_palette) {		/* è‰²ã‚’ã‚·ã‚¹ãƒ†ãƒ ã«è»¢é€ */
 	    if (quasi88_is_menu()) {
 		screen_get_menu_palette(syspal);
 	    } else {
@@ -1562,7 +1562,7 @@ void	screen_update(void)
 	    trans_palette(syspal);
 	}
 
-	/* É¬Í×¤Ë±ş¤¸¤Æ¡¢¥Õ¥é¥°¤ò¥»¥Ã¥È */
+	/* å¿…è¦ã«å¿œã˜ã¦ã€ãƒ•ãƒ©ã‚°ã‚’ã‚»ãƒƒãƒˆ */
 
 	if (screen_dirty_frame) {
 	    screen_set_dirty_all();
@@ -1575,17 +1575,17 @@ void	screen_update(void)
 	    screen_dirty_palette = FALSE; 
 	}
 
-	/* ¥Õ¥é¥°¤Ë±ş¤¸¤Æ¡¢ÉÁ²è */
+	/* ãƒ•ãƒ©ã‚°ã«å¿œã˜ã¦ã€æç”» */
 
-	if (draw_start) { (draw_start)(); }	/* ¥·¥¹¥Æ¥à°ÍÂ¸¤ÎÉÁ²èÁ°½èÍı */
+	if (draw_start) { (draw_start)(); }	/* ã‚·ã‚¹ãƒ†ãƒ ä¾å­˜ã®æç”»å‰å‡¦ç† */
 
 	if (screen_dirty_frame) {
-	    (screen_buf_init_p)();		/* ²èÌÌÁ´¥¯¥ê¥¢(¥Ü¡¼¥À¡¼´Ş) */
+	    (screen_buf_init_p)();		/* ç”»é¢å…¨ã‚¯ãƒªã‚¢(ãƒœãƒ¼ãƒ€ãƒ¼å«) */
 	    screen_dirty_frame = FALSE;
-	    /* ¥Ü¡¼¥À¡¼Éô¤Ï¹õ¸ÇÄê¡£¿§ÊÑ¹¹²Ä¤È¤¹¤ë¤Ê¤é¡¢Àè¤Ë¿§Å¾Á÷¤¬É¬Í×¡Ä */
+	    /* ãƒœãƒ¼ãƒ€ãƒ¼éƒ¨ã¯é»’å›ºå®šã€‚è‰²å¤‰æ›´å¯ã¨ã™ã‚‹ãªã‚‰ã€å…ˆã«è‰²è»¢é€ãŒå¿…è¦â€¦ */
 	}
 
-	/* VRAMÅ¾Á÷ */
+	/* VRAMè»¢é€ */
 
 	if (quasi88_is_menu()) {
 
@@ -1593,7 +1593,7 @@ void	screen_update(void)
 		screen_dirty_flag[0]) {
 
 		if (screen_dirty_all) {
-		    /* Î¢²èÌÌ¤ò¥¯¥ê¥¢¡£¤³¤ì¤Çº¹Ê¬¡áÁ´Éô¤Ë¤Ê¤ë */
+		    /* è£ç”»é¢ã‚’ã‚¯ãƒªã‚¢ã€‚ã“ã‚Œã§å·®åˆ†ï¼å…¨éƒ¨ã«ãªã‚‹ */
 		    memset(&menu_screen[menu_screen_current^1],
 			   0,
 			   sizeof(menu_screen[0]));
@@ -1601,7 +1601,7 @@ void	screen_update(void)
 
 		rect = (menu2screen_p)();
 
-		/* É½²èÌÌ¤ÈÎ¢²èÌÌ¤ò°ìÃ×¤µ¤»¤Æ¤ª¤«¤Ê¤¤¤È¤ª¤«¤·¤¯¤Ê¤ë¡Ä */
+		/* è¡¨ç”»é¢ã¨è£ç”»é¢ã‚’ä¸€è‡´ã•ã›ã¦ãŠã‹ãªã„ã¨ãŠã‹ã—ããªã‚‹â€¦ */
 		memcpy(&menu_screen[menu_screen_current^1],
 		       &menu_screen[menu_screen_current],
 		       sizeof(menu_screen[0]));
@@ -1613,23 +1613,23 @@ void	screen_update(void)
 
 	} else {
 
-	    /* VRAM¹¹¿·¥Õ¥é¥° screen_dirty_flag ¤ÎÎã³°½èÍı		     */
-	    /*		VRAMÈóÉ½¼¨¤Î¾ì¹ç¡¢¹¹¿·¥Õ¥é¥°¤Ï°ÕÌ£Ìµ¤¤¤Î¤Ç¥¯¥ê¥¢¤¹¤ë */
-	    /*		400¥é¥¤¥ó¤Î¾ì¹ç¡¢¹¹¿·¥Õ¥é¥°¤ò²èÌÌ²¼È¾Ê¬¤Ë¤â³ÈÄ¥¤¹¤ë  */
+	    /* VRAMæ›´æ–°ãƒ•ãƒ©ã‚° screen_dirty_flag ã®ä¾‹å¤–å‡¦ç†		     */
+	    /*		VRAMéè¡¨ç¤ºã®å ´åˆã€æ›´æ–°ãƒ•ãƒ©ã‚°ã¯æ„å‘³ç„¡ã„ã®ã§ã‚¯ãƒªã‚¢ã™ã‚‹ */
+	    /*		400ãƒ©ã‚¤ãƒ³ã®å ´åˆã€æ›´æ–°ãƒ•ãƒ©ã‚°ã‚’ç”»é¢ä¸‹åŠåˆ†ã«ã‚‚æ‹¡å¼µã™ã‚‹  */
 
 	    if (screen_dirty_all == FALSE) {
 		if (! (grph_ctrl & GRPH_CTRL_VDISP)) {
-		    /* ÈóÉ½¼¨ */
+		    /* éè¡¨ç¤º */
 		    memset(screen_dirty_flag, 0, sizeof(screen_dirty_flag) / 2);
 		}
 		if (! (grph_ctrl & (GRPH_CTRL_COLOR|GRPH_CTRL_200))) {
-		    /* 400¥é¥¤¥ó */
+		    /* 400ãƒ©ã‚¤ãƒ³ */
 		    memcpy(&screen_dirty_flag[80*200], screen_dirty_flag, 80*200);
 		}
 	    }
 
-	    crtc_make_text_attr();	/* TVRAM ¤Î Â°À­°ìÍ÷ºîÀ®	  */
-					/* VRAM/TEXT ¢ª screen_buf Å¾Á÷	  */
+	    crtc_make_text_attr();	/* TVRAM ã® å±æ€§ä¸€è¦§ä½œæˆ	  */
+					/* VRAM/TEXT â†’ screen_buf è»¢é€	  */
 	    rect = vram2screen(screen_dirty_all ? V_ALL : V_DIF);
 
 	    text_attr_flipflop ^= 1;
@@ -1637,22 +1637,22 @@ void	screen_update(void)
 	    screen_dirty_all = FALSE;
 	}
 
-	if (draw_finish) { (draw_finish)(); }	/* ¥·¥¹¥Æ¥à°ÍÂ¸¤ÎÉÁ²è¸å½èÍı */
+	if (draw_finish) { (draw_finish)(); }	/* ã‚·ã‚¹ãƒ†ãƒ ä¾å­˜ã®æç”»å¾Œå‡¦ç† */
     }
 
 
-    /* ¥¹¥Æ¡¼¥¿¥¹¥¨¥ê¥¢¤Î½èÍı (¥¹¥Æ¡¼¥¿¥¹¤Ï¡¢É½¼¨¤¹¤ë¸Â¤ê¥¹¥­¥Ã¥×¤·¤Ê¤¤) */
+    /* ã‚¹ãƒ†ãƒ¼ã‚¿ã‚¹ã‚¨ãƒªã‚¢ã®å‡¦ç† (ã‚¹ãƒ†ãƒ¼ã‚¿ã‚¹ã¯ã€è¡¨ç¤ºã™ã‚‹é™ã‚Šã‚¹ã‚­ãƒƒãƒ—ã—ãªã„) */
 
-    if (draw_start) { (draw_start)(); }		/* ¥·¥¹¥Æ¥à°ÍÂ¸¤ÎÉÁ²èÁ°½èÍı */
+    if (draw_start) { (draw_start)(); }		/* ã‚·ã‚¹ãƒ†ãƒ ä¾å­˜ã®æç”»å‰å‡¦ç† */
 
     if (screen_dirty_status_hide) {
-	(status_buf_clear_p)();			/* ¥¹¥Æ¡¼¥¿¥¹ÎÎ°è ¾Ãµî */
+	(status_buf_clear_p)();			/* ã‚¹ãƒ†ãƒ¼ã‚¿ã‚¹é ˜åŸŸ æ¶ˆå» */
 	screen_dirty_status_hide = FALSE;
 	all_area = TRUE;
     }
 
     if (screen_dirty_status_show) {
-	(status_buf_clear_p)();			/* ¥¹¥Æ¡¼¥¿¥¹ÎÎ°è ½é´ü²½ */
+	(status_buf_clear_p)();			/* ã‚¹ãƒ†ãƒ¼ã‚¿ã‚¹é ˜åŸŸ åˆæœŸåŒ– */
 	screen_dirty_status_show = FALSE;
 	all_area = TRUE;
     }
@@ -1670,7 +1670,7 @@ void	screen_update(void)
 	}
     }
 
-    if (draw_finish) { (draw_finish)(); }	/* ¥·¥¹¥Æ¥à°ÍÂ¸¤ÎÉÁ²è¸å½èÍı */
+    if (draw_finish) { (draw_finish)(); }	/* ã‚·ã‚¹ãƒ†ãƒ ä¾å­˜ã®æç”»å¾Œå‡¦ç† */
 
     if (is_exec) {
 	profiler_video_output(((frame_counter % frameskip_rate) == 0),
@@ -1709,10 +1709,10 @@ void	screen_update(void)
 
 void	screen_update_immidiate(void)
 {
-    screen_set_dirty_frame();		/* Á´ÎÎ°è ¹¹¿· */
-    frameskip_counter_reset();		/* ¼¡²óÉÁ²è */
+    screen_set_dirty_frame();		/* å…¨é ˜åŸŸ æ›´æ–° */
+    frameskip_counter_reset();		/* æ¬¡å›æç”» */
 
-    screen_update();			/* ÉÁ²è½èÍı */
+    screen_update();			/* æç”»å‡¦ç† */
 }
 
 int	quasi88_info_draw_count(void)
@@ -1733,7 +1733,7 @@ int	quasi88_info_draw_count(void)
 
 
 /***********************************************************************
- * ¥·¥¹¥Æ¥à¥¤¥Ù¥ó¥È½èÍı EXPOSE / FOCUS-IN / FOCUS-OUT
+ * ã‚·ã‚¹ãƒ†ãƒ ã‚¤ãƒ™ãƒ³ãƒˆå‡¦ç† EXPOSE / FOCUS-IN / FOCUS-OUT
  ***********************************************************************/
 
 /*======================================================================
@@ -1741,9 +1741,9 @@ int	quasi88_info_draw_count(void)
  *======================================================================*/
 void	quasi88_expose(void)
 {
-    screen_set_dirty_frame();		/* Á´ÎÎ°è ¹¹¿· */
+    screen_set_dirty_frame();		/* å…¨é ˜åŸŸ æ›´æ–° */
 
-    frameskip_counter_reset();		/* ¼¡²óÉÁ²è */
+    frameskip_counter_reset();		/* æ¬¡å›æç”» */
 }
 
 
@@ -1781,8 +1781,8 @@ void	quasi88_focus_out(void)
 
 
 /***********************************************************************
- * ¥Æ¥­¥¹¥ÈÅÀÌÇ (¥«¡¼¥½¥ë¤ª¤è¤Ó¡¢Ê¸»úÂ°À­¤ÎÅÀÌÇ) ½èÍı¤Î¥ï¡¼¥¯ÀßÄê
- *	CRTC ¤Î frameskip_rate, blink_cycle ¤¬ÊÑ¹¹¤µ¤ì¤ë¤¿¤Ó¤Ë¸Æ¤Ó½Ğ¤¹
+ * ãƒ†ã‚­ã‚¹ãƒˆç‚¹æ»… (ã‚«ãƒ¼ã‚½ãƒ«ãŠã‚ˆã³ã€æ–‡å­—å±æ€§ã®ç‚¹æ»…) å‡¦ç†ã®ãƒ¯ãƒ¼ã‚¯è¨­å®š
+ *	CRTC ã® frameskip_rate, blink_cycle ãŒå¤‰æ›´ã•ã‚Œã‚‹ãŸã³ã«å‘¼ã³å‡ºã™
  ************************************************************************/
 void	frameskip_blink_reset(void)
 {
@@ -1801,8 +1801,8 @@ void	frameskip_blink_reset(void)
 
 
 /***********************************************************************
- * ¥Õ¥ì¡¼¥à¥«¥¦¥ó¥¿½é´ü²½
- *	¼¡¥Õ¥ì¡¼¥à¤Ï¡¢É¬¤ºÉ½¼¨¤µ¤ì¤ë¡£(¥¹¥­¥Ã¥×¤µ¤ì¤Ê¤¤)
+ * ãƒ•ãƒ¬ãƒ¼ãƒ ã‚«ã‚¦ãƒ³ã‚¿åˆæœŸåŒ–
+ *	æ¬¡ãƒ•ãƒ¬ãƒ¼ãƒ ã¯ã€å¿…ãšè¡¨ç¤ºã•ã‚Œã‚‹ã€‚(ã‚¹ã‚­ãƒƒãƒ—ã•ã‚Œãªã„)
  ************************************************************************/
 void	frameskip_counter_reset(void)
 {
@@ -1814,28 +1814,28 @@ void	frameskip_counter_reset(void)
 
 
 /***********************************************************************
- * ¼«Æ°¥Õ¥ì¡¼¥à¥¹¥­¥Ã¥×½èÍı		( by floi, thanks ! )
+ * è‡ªå‹•ãƒ•ãƒ¬ãƒ¼ãƒ ã‚¹ã‚­ãƒƒãƒ—å‡¦ç†		( by floi, thanks ! )
  ************************************************************************/
 void	frameskip_check(int on_time)
 {
     if (use_auto_skip) {
 
-	if (on_time) {			/* »ş´ÖÆâ¤Ë½èÍı¤Ç¤­¤¿ */
+	if (on_time) {			/* æ™‚é–“å†…ã«å‡¦ç†ã§ããŸ */
 
 	    skip_counter = 0;
-	    do_skip_draw = FALSE;	    /* ¼¡²óÉÁ²è¤È¤¹¤ë */
+	    do_skip_draw = FALSE;	    /* æ¬¡å›æç”»ã¨ã™ã‚‹ */
 
-	    if (already_skip_draw) {	    /* Á°²óÉÁ²è»ş¡¢¥¹¥­¥Ã¥×¤·¤Æ¤¿¤é */
-		frameskip_counter_reset();	/* ¼¡¤ÎVSYNC¤Ç¶¯À©ÉÁ²è */
+	    if (already_skip_draw) {	    /* å‰å›æç”»æ™‚ã€ã‚¹ã‚­ãƒƒãƒ—ã—ã¦ãŸã‚‰ */
+		frameskip_counter_reset();	/* æ¬¡ã®VSYNCã§å¼·åˆ¶æç”» */
 	    }
 
-	} else {			/* »ş´ÖÆâ¤Ë½èÍı¤Ç¤­¤Æ¤¤¤Ê¤¤ */
+	} else {			/* æ™‚é–“å†…ã«å‡¦ç†ã§ãã¦ã„ãªã„ */
 
-	    do_skip_draw = TRUE;	    /* ¼¡²óÉÁ²è¥¹¥­¥Ã¥× */
+	    do_skip_draw = TRUE;	    /* æ¬¡å›æç”»ã‚¹ã‚­ãƒƒãƒ— */
 
-	    skip_counter++;		    /* Ã¢¤·¡¢¥¹¥­¥Ã¥×¤·¤¹¤®¤Ê¤é */
+	    skip_counter++;		    /* ä½†ã—ã€ã‚¹ã‚­ãƒƒãƒ—ã—ã™ããªã‚‰ */
 	    if (skip_counter >= skip_count_max) {
-		frameskip_counter_reset();	/* ¼¡¤ÎVSYNC¤Ç¶¯À©ÉÁ²è */
+		frameskip_counter_reset();	/* æ¬¡ã®VSYNCã§å¼·åˆ¶æç”» */
 	    }
 	}
     }
@@ -1844,7 +1844,7 @@ void	frameskip_check(int on_time)
 
 
 /***********************************************************************
- * ¥Õ¥ì¡¼¥à¥¹¥­¥Ã¥×¥ì¡¼¥È¤Î¼èÆÀ¡¦ÀßÄê
+ * ãƒ•ãƒ¬ãƒ¼ãƒ ã‚¹ã‚­ãƒƒãƒ—ãƒ¬ãƒ¼ãƒˆã®å–å¾—ãƒ»è¨­å®š
  ************************************************************************/
 int	quasi88_cfg_now_frameskip_rate(void)
 {
@@ -1864,7 +1864,7 @@ void	quasi88_cfg_set_frameskip_rate(int rate)
 
 	sprintf(str, "FRAME RATE = %2d/sec", 60/rate);
 	status_message(1, STATUS_INFO_TIME, str);
-	/* ÊÑ¹¹¤·¤¿¸å¤Ï¡¢¤·¤Ğ¤é¤¯²èÌÌ¤Ë¥Õ¥ì¡¼¥à¥ì¡¼¥È¤òÉ½¼¨¤µ¤»¤ë */
+	/* å¤‰æ›´ã—ãŸå¾Œã¯ã€ã—ã°ã‚‰ãç”»é¢ã«ãƒ•ãƒ¬ãƒ¼ãƒ ãƒ¬ãƒ¼ãƒˆã‚’è¡¨ç¤ºã•ã›ã‚‹ */
     }
 }
 
@@ -1873,7 +1873,7 @@ void	quasi88_cfg_set_frameskip_rate(int rate)
 
 
 /***********************************************************************
- * ¥¹¥Æ¡¼¥È¥í¡¼¥É¡¿¥¹¥Æ¡¼¥È¥»¡¼¥Ö
+ * ã‚¹ãƒ†ãƒ¼ãƒˆãƒ­ãƒ¼ãƒ‰ï¼ã‚¹ãƒ†ãƒ¼ãƒˆã‚»ãƒ¼ãƒ–
  ************************************************************************/
 
 #define	SID	"SCRN"
@@ -1916,9 +1916,9 @@ static	T_SUSPEND_W	suspend_screen_work[]=
     { TYPE_INT,		&frameskip_rate,	},
     { TYPE_INT,		&monitor_analog,	},
     { TYPE_INT,		&use_auto_skip,		},
-/*  { TYPE_INT,		&frame_counter,		}, ½é´üÃÍ¤Ç¤âÌäÂê¤Ê¤¤¤À¤í¤¦ */
-/*  { TYPE_INT,		&blink_ctrl_cycle,	}, ½é´üÃÍ¤Ç¤âÌäÂê¤Ê¤¤¤À¤í¤¦ */
-/*  { TYPE_INT,		&blink_ctrl_counter,	}, ½é´üÃÍ¤Ç¤âÌäÂê¤Ê¤¤¤À¤í¤¦ */
+/*  { TYPE_INT,		&frame_counter,		}, åˆæœŸå€¤ã§ã‚‚å•é¡Œãªã„ã ã‚ã† */
+/*  { TYPE_INT,		&blink_ctrl_cycle,	}, åˆæœŸå€¤ã§ã‚‚å•é¡Œãªã„ã ã‚ã† */
+/*  { TYPE_INT,		&blink_ctrl_counter,	}, åˆæœŸå€¤ã§ã‚‚å•é¡Œãªã„ã ã‚ã† */
 
     { TYPE_INT,		&use_interlace,		},
     { TYPE_INT,		&use_half_interp,	},
@@ -1962,7 +1962,7 @@ int	stateload_screen(void)
 
 
 
-/* ¥Ç¥Ğ¥Ã¥°ÍÑ¤Î´Ø¿ô */
+/* ãƒ‡ãƒãƒƒã‚°ç”¨ã®é–¢æ•° */
 void attr_misc(int line)
 {
 int i;

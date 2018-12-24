@@ -1,7 +1,7 @@
 /***********************************************************************
- * ���٥�Ƚ��� (�����ƥ��¸)
+ * イベント処理 (システム依存)
  *
- *	�ܺ٤ϡ� event.h ����
+ *	詳細は、 event.h 参照
  ************************************************************************/
 
 #include "quasi88.h"
@@ -15,10 +15,10 @@
 static	int	now_charcode = FALSE;
 
 
-/* ���ۥ����ȡ�KEY88 ���б� */
+/* 仮想キーと、KEY88 の対応 */
 static	int	keysym2key88[ 256 ];
 
-/* ���ۥ����ȡ�KEY88 ���б� (�ǥե����) */
+/* 仮想キーと、KEY88 の対応 (デフォルト) */
 static const int keysym2key88_default[256] =
 {
     0,
@@ -52,8 +52,8 @@ static const int keysym2key88_default[256] =
     0,				/* VK_KANJI          0x19 */
     0,
     KEY88_ESC,			/* VK_ESCAPE         0x1B */
-    0,				/* VK_CONVERT        0x1C */ /* �Ѵ� */
-    0,				/* VK_NONCONVERT     0x1D */ /* ̵�Ѵ� */
+    0,				/* VK_CONVERT        0x1C */ /* 変換 */
+    0,				/* VK_NONCONVERT     0x1D */ /* 無変換 */
     0,				/* VK_ACCEPT         0x1E */
     0,				/* VK_MODECHANGE     0x1F */
 
@@ -321,7 +321,7 @@ static const int keysym2key88_default[256] =
 
 
 /******************************************************************************
- * ������ɥ��ץ���������
+ * ウィンドウプロシージャ
  *****************************************************************************/
 static void key_event_debug(UINT msg, WPARAM wp, LPARAM lp);
 
@@ -332,10 +332,10 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp)
 
     switch(msg) {
 
-    case WM_ERASEBKGND:		/* WM_PAINT��ľ������롢���̥��ꥢ�׵� */
+    case WM_ERASEBKGND:		/* WM_PAINTの直前に来る、画面クリア要求 */
 	return 0;
 
-    case WM_PAINT:		/* ���褹�٤������ߥ󥰤������Ƥ��� */
+    case WM_PAINT:		/* 描画すべきタイミングで送られてくる */
 	if (graph_update_WM_PAINT() == FALSE) {
 /*
 	    fprintf(debugfp, "Expose\n");
@@ -345,7 +345,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp)
 	return 0;
 
 
-    case WM_MOUSEMOVE:		/* �ޥ������������ư */
+    case WM_MOUSEMOVE:		/* マウスカーソル移動 */
 	x = LOWORD(lp);
 	y = HIWORD(lp);
 /*
@@ -355,10 +355,10 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp)
 	return 0;
 
 
-    case WM_LBUTTONDOWN:	/* �ޥ������ܥ��󲡲� */
-    case WM_LBUTTONUP:		/* �ޥ������ܥ������ */
-    case WM_RBUTTONDOWN:	/* �ޥ������ܥ��󲡲� */
-    case WM_RBUTTONUP:		/* �ޥ������ܥ������ */
+    case WM_LBUTTONDOWN:	/* マウス左ボタン押下 */
+    case WM_LBUTTONUP:		/* マウス左ボタン解放 */
+    case WM_RBUTTONDOWN:	/* マウス右ボタン押下 */
+    case WM_RBUTTONUP:		/* マウス右ボタン解放 */
 
 	if (msg == WM_LBUTTONDOWN ||
 	    msg == WM_LBUTTONUP)    { key88 = KEY88_MOUSE_L; }
@@ -374,49 +374,49 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp)
 	return 0;
 
 
-    case WM_KEYDOWN:		/* ��������			*/
-    case WM_KEYUP:		/* ��������			*/
-    case WM_SYSKEYDOWN:		/* �����ƥ७������ (Alt, F10)	*/
-    case WM_SYSKEYUP:		/* �����ƥ७������ (Alt, F10)	*/
-    case WM_CHAR:		/* ʸ������			*/
+    case WM_KEYDOWN:		/* キー押下			*/
+    case WM_KEYUP:		/* キー解放			*/
+    case WM_SYSKEYDOWN:		/* システムキー押下 (Alt, F10)	*/
+    case WM_SYSKEYUP:		/* システムキー解放 (Alt, F10)	*/
+    case WM_CHAR:		/* 文字入力			*/
 
 #if 0
-	key_event_debug(msg, wp, lp);	/* �ǥХå��ѤΡ����������å� */
+	key_event_debug(msg, wp, lp);	/* デバッグ用の、キーチェック */
 	return 0;
 #endif
 
-	if (now_charcode) {		/* WM_CHAR �򽦤� (��˥塼��) */
+	if (now_charcode) {		/* WM_CHAR を拾う (メニュー中) */
 
 	    if (msg == WM_CHAR) {
 
 		if (isprint(wp)) {
-		    /* ɽ���Ǥ���ʸ���ϡ��������� */
+		    /* 表示できる文字は、処理する */
 		} else {
-		    /* ɽ���Ǥ��ʤ�ʸ���ϡ�̵�� */
+		    /* 表示できない文字は、無視 */
 		    return 0;
 		}
 
 	    } else {
-		if ((              wp == ' ')  ||		/* ���� */
-		    ('0'  <= wp && wp <= '9')  ||		/* ���� */
-		    ('A'  <= wp && wp <= 'Z')  ||		/* �ѻ� */
-		    (0x60 <= wp && wp <= 0x6f) ||		/* �ƥ󥭡� */
-		    (0xb0 <= wp && wp <= 0xef)) {		/* ���業�� */
+		if ((              wp == ' ')  ||		/* 空白 */
+		    ('0'  <= wp && wp <= '9')  ||		/* 数字 */
+		    ('A'  <= wp && wp <= 'Z')  ||		/* 英字 */
+		    (0x60 <= wp && wp <= 0x6f) ||		/* テンキー */
+		    (0xb0 <= wp && wp <= 0xef)) {		/* 記号キー */
 
-		    /* �����Υ����� WM_CHAR ���Ԥ� */
+		    /* これらのキーは WM_CHAR を待つ */
 		    return 0;
 		} else {
-		    /* �ü쥭�������業���Ͻ������� */
+		    /* 特殊キー、制御キーは処理する */
 		}
 	    }
 
-	} else {			/* WM_CHAR ��ΤƤ� (���ߥ���) */
+	} else {			/* WM_CHAR を捨てる (エミュ中) */
 
 	    if (msg == WM_CHAR) {
-		/* ʸ�����٥�Ȥϡ�̵�� */
+		/* 文字イベントは、無視 */
 		return 0;
 	    } else {
-		/* �������󡦥��դϽ������� */
+		/* キーオン・オフは処理する */
 	    }
 	}
 
@@ -424,9 +424,9 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp)
 	else                                       { on = TRUE;  }
     
 
-	/* bit30 �ϡ�ľ���β��� (�Ĥޤ�Ϣ³����)��ɽ�� ��*/
+	/* bit30 は、直前の押下 (つまり連続押下)を表す ↓*/
 	if (on && (g_keyrepeat == FALSE) && (lp & 0x40000000UL)) {
-	    /* ������ԡ��Ȥξ��ϡ����ˤ��̵�� */
+	    /* キーリピートの場合は、条件により無視 */
 	    return 0;
 	}
 
@@ -434,10 +434,10 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp)
 	if (msg == WM_CHAR) {
 	    key88 = wp;
 	} else {
-	    /* bit24 �ϳ�ĥ�����ե饰����Alt����Ctrl��
-			��      �ƥ󥭡��ʳ������������������� 1 */
+	    /* bit24 は拡張キーフラグ。右Alt、右Ctrl、
+			↓      テンキー以外の方向キー押下時は 1 */
 	    if (((lp & (1UL<<24)) == 0) && (now_charcode == FALSE)) {
-		/* NumLock �ʤ��ǥƥ󥭡������ʤ顢�������ɤ��ؤ��� */
+		/* NumLock なしでテンキー押下なら、キーを読み替える */
 		if      (wp == VK_INSERT) wp = VK_NUMPAD0;
 		else if (wp == VK_DELETE) wp = VK_DECIMAL;
 		else if (wp == VK_END)    wp = VK_NUMPAD1;
@@ -453,14 +453,14 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp)
 
 	    if (wp == VK_CAPITAL ||
 		wp == VK_SCROLL) {
-		/* �ǲ��̥ӥåȤϥȥ�����֤�ɽ�� �� */
+		/* 最下位ビットはトグル状態を表す ↓ */
 		int toggle = GetKeyState(wp) & 0x01;
 
 		if ((on && toggle) ||
 		    (on == FALSE && toggle == FALSE)) {
-		    /* ���������ȥȥ�����֤����פ��Ƥ��OK */
+		    /* キー押下とトグル状態が一致してればOK */
 		} else {
-		    /* ���פ��Ƥʤ���С�������̵�뤹�� */
+		    /* 一致してなければ、キーを無視する */
 		    return 0;
 		}
 	    }
@@ -473,7 +473,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp)
 */
 	quasi88_key(key88, on);
 
-	/* WM_CHAR �ξ�硢�������ե��٥�Ȥ��ʤ����ɡĤޤ������� */
+	/* WM_CHAR の場合、キーオフイベントがないけど…まあいいか */
 	return 0;
 
 
@@ -492,7 +492,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp)
 	return 0;
 
 #ifdef	USE_SOUND
-    /* ������ɷϤΥ��٥�� */
+    /* サウンド系のイベント */
     case MM_WOM_OPEN:
 	wave_event_open((HWAVEOUT)wp);
 	return 0;
@@ -524,7 +524,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp)
 		DragQueryFile(hDrop, 0, filename, sizeof(filename));
 
 		if (quasi88_drag_and_drop(filename)) {
-		    menubar_setup(TRUE); /* ��˥塼�С������ƹ��� */
+		    menubar_setup(TRUE); /* メニューバーを全て更新 */
 		}
 	    }
 
@@ -539,7 +539,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp)
 	break;
 
     case WM_CLOSE:
-	/* ������ɥ����Ĥ��褦�Ȥ�����硢��ǧ������ʤ餳���� */
+	/* ウインドウを閉じようとした場合、確認させるならここで */
 /*
 	fprintf(debugfp, "Close\n");
 */
@@ -558,13 +558,13 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp)
 }
 
 /******************************************************************************
- * ���٥�ȥϥ�ɥ��
+ * イベントハンドリング
  *
- *	1/60��˸ƤӽФ���롣
+ *	1/60毎に呼び出される。
  *****************************************************************************/
 
 /*
- * ����� ��ư����1������ƤФ��
+ * これは 起動時に1回だけ呼ばれる
  */
 void	event_init(void)
 {
@@ -574,52 +574,52 @@ void	event_init(void)
 
 
 /*
- * �� 1/60 ��˸ƤФ��
+ * 約 1/60 毎に呼ばれる
  */
 void	event_update(void)
 {
     MSG msg;
 
-#if 0 /* ���ܷ� */
-    while (GetMessage(&msg, NULL, 0, 0)) {	/* ��å���������� */
-	TranslateMessage(&msg);			/* ���������ɤʤ��ľ�� */
-	DispatchMessage(&msg);			/* �ץ�������������� */
+#if 0 /* 基本形 */
+    while (GetMessage(&msg, NULL, 0, 0)) {	/* メッセージを取得 */
+	TranslateMessage(&msg);			/* キーコードなら手直し */
+	DispatchMessage(&msg);			/* プロシージャに送る */
     }
 #elif 0
 
     while (PeekMessage(&msg, NULL, 0, 0, PM_NOREMOVE)) {
-	if (GetMessage(&msg, NULL, 0, 0)) {	/* ��å���������� */
-	    TranslateMessage(&msg);		/* ���������ɤʤ��ľ�� */
-	    DispatchMessage(&msg);		/* �ץ�������������� */
+	if (GetMessage(&msg, NULL, 0, 0)) {	/* メッセージを取得 */
+	    TranslateMessage(&msg);		/* キーコードなら手直し */
+	    DispatchMessage(&msg);		/* プロシージャに送る */
 	}
     }
 
 #elif 1
 
     while (PeekMessage(&msg, NULL, 0, 0, PM_NOREMOVE)) {
-	if (GetMessage(&msg, NULL, 0, 0)) {	/* ��å���������� */
+	if (GetMessage(&msg, NULL, 0, 0)) {	/* メッセージを取得 */
 
-	    TranslateMessage(&msg);		/* ���������ɤʤ��ľ�� */
-	    DispatchMessage(&msg);		/* �ץ�������������� */
+	    TranslateMessage(&msg);		/* キーコードなら手直し */
+	    DispatchMessage(&msg);		/* プロシージャに送る */
 
-	} else {				/* �������� */
+	} else {				/* 取得失敗 */
 	    quasi88_quit();
 	    break;
 	}
     }
 
 
-#elif 0 /* ��˥塼�������硩 */
+#elif 0 /* メニューがある場合？ */
 
     HACCEL hAccel= LoadAccelerators(hAppModule, MAKEINTRESOURCE(IDR_ACCEL1));
     while (GetMessage(&msg, NULL, 0, 0)) {
-	if (!TranslateAccelerator(hWnd, hAccel, &msg)) { /* ��˥塼���� */
+	if (!TranslateAccelerator(hWnd, hAccel, &msg)) { /* メニュー処理 */
 	    TranslateMessage(&msg);
 	    DispatchMessage(&msg);
 	}
     }
 
-#elif 0 /* ����ϡ� */
+#elif 0 /* これは？ */
     while (PeekMessage(&msg, NULL, 0, 0, PM_NOREMOVE)) {
 	if (GetMessage(&msg, NULL, 0, 0)) {
 
@@ -635,7 +635,7 @@ void	event_update(void)
 		}
 	    }
 
-	} else {	/* ���顼�� */
+	} else {	/* エラー！ */
 	    quasi88_quit();
 	    break;
 	}
@@ -644,7 +644,7 @@ void	event_update(void)
 }
 
 /*
- * ����� ��λ����1������ƤФ��
+ * これは 終了時に1回だけ呼ばれる
  */
 void	event_exit(void)
 {
@@ -654,7 +654,7 @@ void	event_exit(void)
 
 
 /***********************************************************************
- * ���ߤΥޥ�����ɸ�����ؿ�
+ * 現在のマウス座標取得関数
  *
  ************************************************************************/
 
@@ -675,13 +675,13 @@ void	event_get_mouse_pos(int *x, int *y)
 
 
 /******************************************************************************
- * ���եȥ����� NumLock ͭ����̵��
+ * ソフトウェア NumLock 有効／無効
  *
  *****************************************************************************/
 
 int	event_numlock_on (void)
 {
-    /* ���եȥ����� NumLock ͭ���ʤ顢�ᥤ�󥭡��ΰ�����ƥ󥭡��ˤ��� */
+    /* ソフトウェア NumLock 有効なら、メインキーの一部をテンキーにする */
 
     keysym2key88[ '5' ]		= KEY88_HOME;
     keysym2key88[ '6' ]		= KEY88_HELP;
@@ -708,7 +708,7 @@ int	event_numlock_on (void)
 }
 void	event_numlock_off(void)
 {
-    /* ���եȥ����� NumLock ̵���ʤ顢�ǥե���Ȥ��᤹ */
+    /* ソフトウェア NumLock 無効なら、デフォルトに戻す */
 
     memcpy(keysym2key88, keysym2key88_default, sizeof(keysym2key88_default));
 }
@@ -716,30 +716,30 @@ void	event_numlock_off(void)
 
 
 /******************************************************************************
- * ���ߥ�졼�ȡ���˥塼���ݡ�������˥����⡼�� �� ���ϻ��ν���
+ * エミュレート／メニュー／ポーズ／モニターモード の 開始時の処理
  *
  *****************************************************************************/
 
 void	event_switch(void)
 {
-    if (quasi88_is_exec()) {		/* ���ߥ�⡼�ɤʤ� */
+    if (quasi88_is_exec()) {		/* エミュモードなら */
 
-	now_charcode = FALSE;			/* WM_CHAR ���٥��̵�� */
+	now_charcode = FALSE;			/* WM_CHAR イベント無視 */
 
-	menubar_setup(TRUE);			/* ��˥塼�С�ͭ�� */
+	menubar_setup(TRUE);			/* メニューバー有効 */
 
-    } else {				/* ��˥塼�⡼�ɤʤɤʤ� */
+    } else {				/* メニューモードなどなら */
 
-	now_charcode = TRUE;			/* WM_CHAR ���٥�Ƚ��� */
+	now_charcode = TRUE;			/* WM_CHAR イベント処理 */
 
-	menubar_setup(FALSE);			/* ��˥塼�С�̵�� */
+	menubar_setup(FALSE);			/* メニューバー無効 */
     }
 }
 
 
 
 /******************************************************************************
- * ���祤���ƥ��å�
+ * ジョイスティック
  *
  *****************************************************************************/
 
@@ -755,7 +755,7 @@ int	event_get_joystick_num(void)
 
 /*---------------------------------------------------------------------------
  *
- * �ǥХå�
+ * デバッグ
  *
  *---------------------------------------------------------------------------*/
 
@@ -774,7 +774,7 @@ static const char *vk_list[256] =
     "VK_TAB",          /* 0x09 */
     0,
     0,
-    "VK_CLEAR",        /* 0x0C */ /* �ƥ󥭡� 5 */
+    "VK_CLEAR",        /* 0x0C */ /* テンキー 5 */
     "VK_RETURN",       /* 0x0D */ /* Enter */
     0,
     0,
@@ -789,11 +789,11 @@ static const char *vk_list[256] =
     "VK_JUNJA",        /* 0x17 */
 
     "VK_FINAL",        /* 0x18 */
-    "VK_KANJI",        /* 0x19 */ /* Alt + ����Ⱦ�� */
+    "VK_KANJI",        /* 0x19 */ /* Alt + 全角半角 */
     0,
     "VK_ESCAPE",       /* 0x1B */
-    "VK_CONVERT",      /* 0x1C */ /* �Ѵ� */
-    "VK_NONCONVERT",   /* 0x1D */ /* ̵�Ѵ� */
+    "VK_CONVERT",      /* 0x1C */ /* 変換 */
+    "VK_NONCONVERT",   /* 0x1D */ /* 無変換 */
     "VK_ACCEPT",       /* 0x1E */
     "VK_MODECHANGE",   /* 0x1F */
 
@@ -884,7 +884,7 @@ static const char *vk_list[256] =
     "VK_ADD",          /* 0x6B */
     "VK_SEPARATOR",    /* 0x6C */
     "VK_SUBTRACT",     /* 0x6D */
-    "VK_DECIMAL",      /* 0x6E */	/* �ƥ󥭡� . */
+    "VK_DECIMAL",      /* 0x6E */	/* テンキー . */
     "VK_DIVIDE",       /* 0x6F */
 
     "VK_F1",           /* 0x70 */
@@ -1018,7 +1018,7 @@ static const char *vk_list[256] =
     "_",
     0,
     0,
-    "VK_PROCESSKEY",   /* 0xE5 */ /* Ctrl + F10, ����Ⱦ��? */
+    "VK_PROCESSKEY",   /* 0xE5 */ /* Ctrl + F10, 全角半角? */
     0,
     0,
 
@@ -1032,12 +1032,12 @@ static const char *vk_list[256] =
     0,
 
     0,
-    0,					/* Shift + �Ҥ餬�� */
-    0,					/* Shift + �Ҥ餬�� */
-    0,					/* ����Ⱦ�� */
-    0,					/* ����Ⱦ�� */
-    0,					/* Alt + �Ҥ餬�� */
-    "VK_ATTN",         /* 0xF6 */	/* Alt + �Ҥ餬�� */
+    0,					/* Shift + ひらがな */
+    0,					/* Shift + ひらがな */
+    0,					/* 全角半角 */
+    0,					/* 全角半角 */
+    0,					/* Alt + ひらがな */
+    "VK_ATTN",         /* 0xF6 */	/* Alt + ひらがな */
     "VK_CRSEL",        /* 0xF7 */
 
     "VK_EXSEL",        /* 0xF8 */
@@ -1050,36 +1050,36 @@ static const char *vk_list[256] =
     0,
 
     /*
-	����������
+	怪しいキー
 
-	Ctrl + ESC	�������ȥ�˥塼
-	Alt  + ESC	�����������å�
-	Alt + Space	������ɥ���˥塼
-	�Ҥ餬��	DOWN/UP ȿ���ʤ�?
-	Pause		DOWN/UPϢ³ȯ��
-	PrintScreen	DOWN�ʤ��� UP����
+	Ctrl + ESC	スタートメニュー
+	Alt  + ESC	タスクスイッチ
+	Alt + Space	ウインドウメニュー
+	ひらがな	DOWN/UP 反応なし?
+	Pause		DOWN/UP連続発生
+	PrintScreen	DOWNなし？ UPあり
 
-	VK_INSERT �Ȥ� VK_UP �Ȥ�
-			��ĥ�ե饰�� 0 �ʤ� �ƥ󥭡� (NumLock����)
-			��ĥ�ե饰�� 1 �ʤ� �ᥤ�󥭡�
+	VK_INSERT とか VK_UP とか
+			拡張フラグが 0 なら テンキー (NumLockオフ)
+			拡張フラグが 1 なら メインキー
 
 
-	�� IMEͭ���ˤ���Ȥ���˲������ʤ롣��̣���� ��
+	〜 IME有効にするとさらに怪しくなる。意味不明 〜
 
-	Ctrl + F10	0xE7	IME��˥塼
+	Ctrl + F10	0xE7	IMEメニュー
 
-	����Ⱦ��	��������ȡ�KEYDOWN (0xe5) ��ȯ������IME ������
-			KEYUP��ȯ�����ʤ���
-			  IME ������δ֤ϡ��ɤΥ����򲡤��Ƥ⡢KEYDOWN (0xe5)
-			  ��ȯ�����롣(KEYUP�ϡ����Υ����Υ�����)��
-			���ٲ�������ȡ�KEYUP (0xf4 or 0xf3) ��ȯ������IME ��
-			���ա�(0xf3/0xf4 �ΰ㤤������)
-			Ʊ���ˡ�KEYDOWN (0xe5) ��ȯ��
+	全角半角	押下すると、KEYDOWN (0xe5) が発生し、IME がオン。
+			KEYUPは発生しない。
+			  IME がオンの間は、どのキーを押しても、KEYDOWN (0xe5)
+			  が発生する。(KEYUPは、そのキーのコード)。
+			再度押下すると、KEYUP (0xf4 or 0xf3) が発生し、IME が
+			オフ。(0xf3/0xf4 の違いは不明)
+			同時に、KEYDOWN (0xe5) が発生
 
-	�Ѵ�		����Ⱦ�Ѥ�Ʊ����
-			���դϡ�KEYDOWN (0x1c)
+	変換		全角半角に同じ。
+			オフは、KEYDOWN (0x1c)
 
-	�Ҥ餬��	����Ⱦ�Ѥ˻��Ƥ뤬���ʤ󤫰㤦��
+	ひらがな	全角半角に似てるが、なんか違う。
     */
 
 };
@@ -1091,29 +1091,29 @@ static void key_event_debug(UINT msg, WPARAM wp, LPARAM lp)
     const char *s;
 
     switch (msg) {
-    case WM_SYSKEYDOWN:		/* Alt / F10 ���� */
+    case WM_SYSKEYDOWN:		/* Alt / F10 オン */
 	s = "Sys*On ";
 	on = TRUE;
 	goto KEY_COMMON;
 
-    case WM_SYSKEYUP:		/*           ���� */
+    case WM_SYSKEYUP:		/*           オフ */
 	s = "Sys*Off";
 	goto KEY_COMMON;
 
-    case WM_KEYDOWN:		/* ����¾�������� */ 
+    case WM_KEYDOWN:		/* その他キーオン */ 
 	s = "KEY On ";
 	on = TRUE;
 	goto KEY_COMMON;
 
-    case WM_KEYUP:		/*           ���� */
+    case WM_KEYUP:		/*           オフ */
 	s = "KEY Off";
 	goto KEY_COMMON;
 
     KEY_COMMON:
 
-	/* lp   bit  0-15 ������ԡ��Ȳ�� (DOWN�Τߡ��ޤȤ�����λ�)
-		bit 16-23 ������󥳡���
-		bit 24    ��ĥ����
+	/* lp   bit  0-15 キーリピート回数 (DOWNのみ、まとめて通知時)
+		bit 16-23 スキャンコード
+		bit 24    拡張キー
 		bit 25-26 na
 		bit 27-28 OS
 		bit 29    Alt
@@ -1123,7 +1123,7 @@ static void key_event_debug(UINT msg, WPARAM wp, LPARAM lp)
 
 	if (on && (lp & 0x40000000UL)) {
 
-	    ;	/* �����ȥ�ԡ����� */
+	    ;	/* オートリピート中 */
 
 	} else {
 	    /*
@@ -1141,7 +1141,7 @@ static void key_event_debug(UINT msg, WPARAM wp, LPARAM lp)
 
 
     case WM_CHAR:
-	/* �������롢INS/DEL��F1 �ʤɤ���ʤ� */
+	/* カーソル、INS/DEL、F1 などは来ない */
 	/* BackSpace = 0x08 */
 	/* Tab       = 0x09 */
 	/* Enter     = 0x0d */

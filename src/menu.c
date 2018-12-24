@@ -1,6 +1,6 @@
 /************************************************************************/
 /*									*/
-/* ¥á¥Ë¥å¡¼¥â¡¼¥É							*/
+/* ãƒ¡ãƒ‹ãƒ¥ãƒ¼ãƒ¢ãƒ¼ãƒ‰							*/
 /*									*/
 /************************************************************************/
 
@@ -40,15 +40,15 @@
 
 
 
-int	menu_lang	= MENU_JAPAN;		/* ¥á¥Ë¥å¡¼¤Î¸À¸ì           */
-int	menu_readonly	= FALSE;		/* ¥Ç¥£¥¹¥¯ÁªÂò¥À¥¤¥¢¥í¥°¤Î */
-						/* ½é´ü¾õÂÖ¤Ï ReadOnly ?    */
-int	menu_swapdrv	= FALSE;		/* ¥É¥é¥¤¥Ö¤ÎÉ½¼¨½ç½ø       */
+int	menu_lang	= MENU_JAPAN;		/* ãƒ¡ãƒ‹ãƒ¥ãƒ¼ã®è¨€èª           */
+int	menu_readonly	= FALSE;		/* ãƒ‡ã‚£ã‚¹ã‚¯é¸æŠãƒ€ã‚¤ã‚¢ãƒ­ã‚°ã® */
+						/* åˆæœŸçŠ¶æ…‹ã¯ ReadOnly ?    */
+int	menu_swapdrv	= FALSE;		/* ãƒ‰ãƒ©ã‚¤ãƒ–ã®è¡¨ç¤ºé †åº       */
 
 
 
-/* ¥³¡¼¥ë¥Ğ¥Ã¥¯´Ø¿ô¤Î°ú¿ô (Q8tkWidget*, void*) ¤¬Ì¤»ÈÍÑ¤Î¾ì¹ç¡¢
- * ¥ï¡¼¥Ë¥ó¥°¤¬½Ğ¤ÆİµÆ«¤·¤¤¤Î¤Ç¡¢ gcc ¤ËÍê¤ó¤Çµö¤·¤Æ¤â¤é¤¦¡£ */
+/* ã‚³ãƒ¼ãƒ«ãƒãƒƒã‚¯é–¢æ•°ã®å¼•æ•° (Q8tkWidget*, void*) ãŒæœªä½¿ç”¨ã®å ´åˆã€
+ * ãƒ¯ãƒ¼ãƒ‹ãƒ³ã‚°ãŒå‡ºã¦é¬±é™¶ã—ã„ã®ã§ã€ gcc ã«é ¼ã‚“ã§è¨±ã—ã¦ã‚‚ã‚‰ã†ã€‚ */
 #if defined(__GNUC__)
 #define	UNUSED_WIDGET	__attribute__((__unused__)) Q8tkWidget *dummy_0
 #define	UNUSED_PARM	__attribute__((__unused__)) void *dummy_1
@@ -60,7 +60,7 @@ int	menu_swapdrv	= FALSE;		/* ¥É¥é¥¤¥Ö¤ÎÉ½¼¨½ç½ø       */
 
 
 /*--------------------------------------------------------------*/
-/* ¥á¥Ë¥å¡¼¤Ç¤ÎÉ½¼¨¥á¥Ã¥»¡¼¥¸¤ÏÁ´¤Æ¡¢¤³¤Î¥Õ¥¡¥¤¥ë¤ÎÃæ¤Ë		*/
+/* ãƒ¡ãƒ‹ãƒ¥ãƒ¼ã§ã®è¡¨ç¤ºãƒ¡ãƒƒã‚»ãƒ¼ã‚¸ã¯å…¨ã¦ã€ã“ã®ãƒ•ã‚¡ã‚¤ãƒ«ã®ä¸­ã«		*/
 /*--------------------------------------------------------------*/
 #include "message.h"
 
@@ -68,16 +68,16 @@ int	menu_swapdrv	= FALSE;		/* ¥É¥é¥¤¥Ö¤ÎÉ½¼¨½ç½ø       */
 
 
 /****************************************************************/
-/* ¥ï¡¼¥¯							*/
+/* ãƒ¯ãƒ¼ã‚¯							*/
 /****************************************************************/
 
-static	int	menu_last_page = 0;	/* Á°²ó»ş¤Î¥á¥Ë¥å¡¼¥¿¥°¤òµ­²± */
+static	int	menu_last_page = 0;	/* å‰å›æ™‚ã®ãƒ¡ãƒ‹ãƒ¥ãƒ¼ã‚¿ã‚°ã‚’è¨˜æ†¶ */
 
-static	int	menu_boot_clock_async;	/* ¥ê¥»¥Ã¥È»ş¤Ë¥¯¥í¥Ã¥¯»ØÄêÆ±´ü¤¹¤ë? */
+static	int	menu_boot_clock_async;	/* ãƒªã‚»ãƒƒãƒˆæ™‚ã«ã‚¯ãƒ­ãƒƒã‚¯æŒ‡å®šåŒæœŸã™ã‚‹? */
 
-static	T_RESET_CFG	reset_req;	/* ¥ê¥»¥Ã¥È»ş¤ËÍ×µá¤¹¤ëÀßÄê¤ò¡¢ÊİÂ¸ */
+static	T_RESET_CFG	reset_req;	/* ãƒªã‚»ãƒƒãƒˆæ™‚ã«è¦æ±‚ã™ã‚‹è¨­å®šã‚’ã€ä¿å­˜ */
 
-/* ¥á¥Ë¥å¡¼½ªÎ»»ş¤Ë¡¢¥µ¥¦¥ó¥É¤Î´Ä¶­¤¬ÊÑ¤ï¤Ã¤Æ¤Ê¤¤¤«³ÎÇ§¤Î¤¿¤á¡¢½é´üÃÍÊİÂ¸ */
+/* ãƒ¡ãƒ‹ãƒ¥ãƒ¼çµ‚äº†æ™‚ã«ã€ã‚µã‚¦ãƒ³ãƒ‰ã®ç’°å¢ƒãŒå¤‰ã‚ã£ã¦ãªã„ã‹ç¢ºèªã®ãŸã‚ã€åˆæœŸå€¤ä¿å­˜ */
 #define	NR_SD_CFG_LOCAL	(5)
 typedef union {
     int		i;
@@ -91,7 +91,7 @@ static struct {
     int		sample_freq;
     int		use_samples;
 
-    /* °Ê²¼¡¢¥·¥¹¥Æ¥à°ÍÂ¸¤ÎÀßÄê */
+    /* ä»¥ä¸‹ã€ã‚·ã‚¹ãƒ†ãƒ ä¾å­˜ã®è¨­å®š */
     int		local_cnt;
     struct {
 	T_SNDDRV_CONFIG		*info;
@@ -103,24 +103,24 @@ static	void	sd_cfg_save(void);
 static	int	sd_cfg_has_changed(void);
 
 
-static	int	cpu_timing_save;	/* ¥á¥Ë¥å¡¼³«»Ï»ş¤Î -cpu ÃÍ µ­²± */
+static	int	cpu_timing_save;	/* ãƒ¡ãƒ‹ãƒ¥ãƒ¼é–‹å§‹æ™‚ã® -cpu å€¤ è¨˜æ†¶ */
 
-					/* µ¯Æ°¥Ç¥Ğ¥¤¥¹¤ÎÀ©¸æ¤ËÉ¬Í× */
+					/* èµ·å‹•ãƒ‡ãƒã‚¤ã‚¹ã®åˆ¶å¾¡ã«å¿…è¦ */
 static	Q8tkWidget	*widget_reset_boot;
 static	Q8tkWidget	*widget_dipsw_b_boot_disk;
 static	Q8tkWidget	*widget_dipsw_b_boot_rom;
 
-static	Q8tkWidget	*menu_accel;	/* ¥á¥¤¥ó¥á¥Ë¥å¡¼¤Î¥­¡¼ÄêµÁ */
+static	Q8tkWidget	*menu_accel;	/* ãƒ¡ã‚¤ãƒ³ãƒ¡ãƒ‹ãƒ¥ãƒ¼ã®ã‚­ãƒ¼å®šç¾© */
 
-/* ¥á¥Ë¥å¡¼²¼Éô¤Î¥ê¥»¥Ã¥È¤È¡¢¥ê¥»¥Ã¥È¥¿¥°¤Î¥ê¥»¥Ã¥È¤òÏ¢Æ°¤µ¤»¤¿¤¤¤Î¤Ç¡¢
-   ÊÒÊı¤¬ÁªÂò¤µ¤ì¤¿¤é¡¢È¿ÂĞ¤Î¤âÁªÂò¤µ¤ì¤ë¤è¤¦¤Ë¡¢¥¦¥£¥¸¥Ã¥È¤òµ­²±         */
+/* ãƒ¡ãƒ‹ãƒ¥ãƒ¼ä¸‹éƒ¨ã®ãƒªã‚»ãƒƒãƒˆã¨ã€ãƒªã‚»ãƒƒãƒˆã‚¿ã‚°ã®ãƒªã‚»ãƒƒãƒˆã‚’é€£å‹•ã•ã›ãŸã„ã®ã§ã€
+   ç‰‡æ–¹ãŒé¸æŠã•ã‚ŒãŸã‚‰ã€åå¯¾ã®ã‚‚é¸æŠã•ã‚Œã‚‹ã‚ˆã†ã«ã€ã‚¦ã‚£ã‚¸ãƒƒãƒˆã‚’è¨˜æ†¶         */
 static	Q8tkWidget	*widget_reset_basic[2][4];
 static	Q8tkWidget	*widget_reset_clock[2][2];
 
 
 
 /*===========================================================================
- * ¥Õ¥¡¥¤¥ëÁàºî¥¨¥é¡¼¥á¥Ã¥»¡¼¥¸¤Î¥À¥¤¥¢¥í¥°½èÍı
+ * ãƒ•ã‚¡ã‚¤ãƒ«æ“ä½œã‚¨ãƒ©ãƒ¼ãƒ¡ãƒƒã‚»ãƒ¼ã‚¸ã®ãƒ€ã‚¤ã‚¢ãƒ­ã‚°å‡¦ç†
  *===========================================================================*/
 static	void	cb_file_error_dialog_ok(UNUSED_WIDGET, UNUSED_PARM)
 {
@@ -147,7 +147,7 @@ static	void	start_file_error_dialog(int drv, int result)
 }
 
 /*===========================================================================
- * ¥Ç¥£¥¹¥¯ÁŞÆş & ÇÓ½Ğ
+ * ãƒ‡ã‚£ã‚¹ã‚¯æŒ¿å…¥ & æ’å‡º
  *===========================================================================*/
 static void sub_misc_suspend_update(void);
 static void sub_misc_snapshot_update(void);
@@ -155,12 +155,12 @@ static void sub_misc_waveout_update(void);
 
 /*===========================================================================
  *
- *	¥á¥¤¥ó¥Ú¡¼¥¸	¥ê¥»¥Ã¥È
+ *	ãƒ¡ã‚¤ãƒ³ãƒšãƒ¼ã‚¸	ãƒªã‚»ãƒƒãƒˆ
  *
  *===========================================================================*/
 
 /*----------------------------------------------------------------------*/
-						 /* BASIC¥â¡¼¥ÉÀÚ¤êÂØ¤¨ */
+						 /* BASICãƒ¢ãƒ¼ãƒ‰åˆ‡ã‚Šæ›¿ãˆ */
 static	int	get_reset_basic(void)
 {
     return reset_req.boot_basic;
@@ -186,7 +186,7 @@ static	Q8tkWidget	*menu_reset_basic(void)
 				  data_reset_basic, COUNTOF(data_reset_basic),
 				  get_reset_basic(), cb_reset_basic);
 
-	/* ¥ê¥¹¥È¤ò¼ê·«¤Ã¤Æ¡¢Á´¥¦¥£¥¸¥Ã¥È¤ò¼èÆÀ */
+	/* ãƒªã‚¹ãƒˆã‚’æ‰‹ç¹°ã£ã¦ã€å…¨ã‚¦ã‚£ã‚¸ãƒƒãƒˆã‚’å–å¾— */
 	widget_reset_basic[0][BASIC_V2 ] = list->data;	list = list->next;
 	widget_reset_basic[0][BASIC_V1H] = list->data;	list = list->next;
 	widget_reset_basic[0][BASIC_V1S] = list->data;	list = list->next;
@@ -197,7 +197,7 @@ static	Q8tkWidget	*menu_reset_basic(void)
 }
 
 /*----------------------------------------------------------------------*/
-						       /* CLOCKÀÚ¤êÂØ¤¨ */
+						       /* CLOCKåˆ‡ã‚Šæ›¿ãˆ */
 static	int	get_reset_clock(void)
 {
     return reset_req.boot_clock_4mhz;
@@ -232,15 +232,15 @@ static	Q8tkWidget	*menu_reset_clock(void)
 				  data_reset_clock, COUNTOF(data_reset_clock),
 				  get_reset_clock(), cb_reset_clock);
 
-	/* ¥ê¥¹¥È¤ò¼ê·«¤Ã¤Æ¡¢Á´¥¦¥£¥¸¥Ã¥È¤ò¼èÆÀ */
+	/* ãƒªã‚¹ãƒˆã‚’æ‰‹ç¹°ã£ã¦ã€å…¨ã‚¦ã‚£ã‚¸ãƒƒãƒˆã‚’å–å¾— */
 	widget_reset_clock[0][CLOCK_4MHZ] = list->data;	list = list->next;
 	widget_reset_clock[0][CLOCK_8MHZ] = list->data;
 
-	PACK_LABEL(box, "");			/* ¶õ¹Ô */
+	PACK_LABEL(box, "");			/* ç©ºè¡Œ */
 
 	box2 = PACK_HBOX(box);
 	{
-	    PACK_LABEL(box2, "  ");		/* ¥¤¥ó¥Ç¥ó¥È */
+	    PACK_LABEL(box2, "  ");		/* ã‚¤ãƒ³ãƒ‡ãƒ³ãƒˆ */
 	    PACK_CHECK_BUTTON(box2,
 			      GET_LABEL(data_reset_clock_async, 0),
 			      get_reset_clock_async(),
@@ -252,7 +252,7 @@ static	Q8tkWidget	*menu_reset_clock(void)
 }
 
 /*----------------------------------------------------------------------*/
-					      /* ¥µ¥¦¥ó¥É¥Ü¡¼¥ÉÀÚ¤êÂØ¤¨ */
+					      /* ã‚µã‚¦ãƒ³ãƒ‰ãƒœãƒ¼ãƒ‰åˆ‡ã‚Šæ›¿ãˆ */
 static	int	get_reset_sound(void)
 {
     return reset_req.sound_board;
@@ -272,15 +272,15 @@ static	Q8tkWidget	*menu_reset_sound(void)
 	PACK_RADIO_BUTTONS(box,
 			   data_reset_sound, COUNTOF(data_reset_sound),
 			   get_reset_sound(), cb_reset_sound);
-	PACK_LABEL(box, "");			/* ¶õ¹Ô */
-	PACK_LABEL(box, "");			/* ¶õ¹Ô */
+	PACK_LABEL(box, "");			/* ç©ºè¡Œ */
+	PACK_LABEL(box, "");			/* ç©ºè¡Œ */
     }
 
     return box;
 }
 
 /*----------------------------------------------------------------------*/
-								/* µ¯Æ° */
+								/* èµ·å‹• */
 static	void	set_reset_dipsw_boot(void)
 {
     const t_menulabel *l = data_reset_boot;
@@ -306,7 +306,7 @@ static	Q8tkWidget	*menu_reset_boot(void)
 }
 
 /*----------------------------------------------------------------------*/
-								/* ¾ÜºÙ */
+								/* è©³ç´° */
 static	Q8tkWidget	*reset_detail_widget;
 static	int		reset_detail_hide;
 static	Q8tkWidget	*reset_detail_button;
@@ -345,7 +345,7 @@ static	Q8tkWidget	*menu_reset_detail(void)
 }
 
 /*----------------------------------------------------------------------*/
-						/* ¥Ç¥£¥Ã¥×¥¹¥¤¥Ã¥ÁÀßÄê */
+						/* ãƒ‡ã‚£ãƒƒãƒ—ã‚¹ã‚¤ãƒƒãƒè¨­å®š */
 static	void	dipsw_create(void);
 static	void	dipsw_start(void);
 static	void	dipsw_finish(void);
@@ -369,7 +369,7 @@ static	Q8tkWidget	*menu_reset_dipsw(void)
 }
 
 /*----------------------------------------------------------------------*/
-						  /* ¥Ğ¡¼¥¸¥ç¥óÀÚ¤êÂØ¤¨ */
+						  /* ãƒãƒ¼ã‚¸ãƒ§ãƒ³åˆ‡ã‚Šæ›¿ãˆ */
 static	int	get_reset_version(void)
 {
     return reset_req.set_version;
@@ -404,14 +404,14 @@ static	Q8tkWidget	*menu_reset_version(void)
 			   get_reset_version(), wk, 8,
 			   cb_reset_version, NULL,
 			   NULL, NULL);
-	PACK_LABEL(box, "");			/* ¶õ¹Ô */
+	PACK_LABEL(box, "");			/* ç©ºè¡Œ */
     }
 
     return box;
 }
 
 /*----------------------------------------------------------------------*/
-						  /* ³ÈÄ¥¥á¥â¥êÀÚ¤êÂØ¤¨ */
+						  /* æ‹¡å¼µãƒ¡ãƒ¢ãƒªåˆ‡ã‚Šæ›¿ãˆ */
 static	int	get_reset_extram(void)
 {
     return reset_req.use_extram;
@@ -445,14 +445,14 @@ static	Q8tkWidget	*menu_reset_extram(void)
 			   get_reset_extram(), wk, 0,
 			   cb_reset_extram, NULL,
 			   NULL, NULL);
-	PACK_LABEL(box, "");			/* ¶õ¹Ô */
+	PACK_LABEL(box, "");			/* ç©ºè¡Œ */
     }
 
     return box;
 }
 
 /*----------------------------------------------------------------------*/
-						     /* ¼­½ñROMÀÚ¤êÂØ¤¨ */
+						     /* è¾æ›¸ROMåˆ‡ã‚Šæ›¿ãˆ */
 static	int	get_reset_jisho(void)
 {
     return reset_req.use_jisho_rom;
@@ -478,7 +478,7 @@ static	Q8tkWidget	*menu_reset_jisho(void)
 }
 
 /*----------------------------------------------------------------------*/
-						   /* ¸½ºß¤ÎBASIC¥â¡¼¥É */
+						   /* ç¾åœ¨ã®BASICãƒ¢ãƒ¼ãƒ‰ */
 static	Q8tkWidget	*menu_reset_current(void)
 {
     static const char *type[] = {
@@ -543,19 +543,19 @@ static	Q8tkWidget	*menu_reset_current(void)
 }
 
 /*----------------------------------------------------------------------*/
-							    /* ¥ê¥»¥Ã¥È */
+							    /* ãƒªã‚»ãƒƒãƒˆ */
 static	void	cb_reset_now(UNUSED_WIDGET, UNUSED_PARM)
 {
-    /* CLOCKÀßÄê¤È¡¢CPU¥¯¥í¥Ã¥¯¤òÆ±´ü¤µ¤»¤ë */
+    /* CLOCKè¨­å®šã¨ã€CPUã‚¯ãƒ­ãƒƒã‚¯ã‚’åŒæœŸã•ã›ã‚‹ */
     if (menu_boot_clock_async == FALSE) {
 	cpu_clock_mhz = reset_req.boot_clock_4mhz ? CONST_4MHZ_CLOCK
 						  : CONST_8MHZ_CLOCK;
     }
 
-    /* reset_req ¤ÎÀßÄê¤Ë´ğ¤Å¤­¡¢¥ê¥»¥Ã¥È ¢ª ¼Â¹Ô */
+    /* reset_req ã®è¨­å®šã«åŸºã¥ãã€ãƒªã‚»ãƒƒãƒˆ â†’ å®Ÿè¡Œ */
     quasi88_reset(&reset_req);
 
-    quasi88_exec();		/* ¢« q8tk_main_quit() ¸Æ½ĞºÑ¤ß */
+    quasi88_exec();		/* â† q8tk_main_quit() å‘¼å‡ºæ¸ˆã¿ */
 
 #if 0
     printf("boot_dipsw      %04x\n",boot_dipsw   );
@@ -575,7 +575,7 @@ static	Q8tkWidget	*menu_reset(void)
     Q8tkWidget *w, *f;
     const t_menulabel *l = data_reset;
 
-    dipsw_create();		/* ¥Ç¥£¥Ã¥×¥¹¥¤¥Ã¥Á¥¦¥¤¥ó¥É¥¦À¸À® */
+    dipsw_create();		/* ãƒ‡ã‚£ãƒƒãƒ—ã‚¹ã‚¤ãƒƒãƒã‚¦ã‚¤ãƒ³ãƒ‰ã‚¦ç”Ÿæˆ */
 
     vbox = PACK_VBOX(NULL);
     {
@@ -651,7 +651,7 @@ static	Q8tkWidget	*menu_reset(void)
 
 /* = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = 
  *
- *	¥µ¥Ö¥¦¥¤¥ó¥É¥¦	DIPSW
+ *	ã‚µãƒ–ã‚¦ã‚¤ãƒ³ãƒ‰ã‚¦	DIPSW
  *
  * = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = */
 
@@ -667,7 +667,7 @@ enum {
 };
 
 /*----------------------------------------------------------------------*/
-					    /* ¥Ç¥£¥Ã¥×¥¹¥¤¥Ã¥ÁÀÚ¤êÂØ¤¨ */
+					    /* ãƒ‡ã‚£ãƒƒãƒ—ã‚¹ã‚¤ãƒƒãƒåˆ‡ã‚Šæ›¿ãˆ */
 static	int	get_dipsw_b(int p)
 {
     int shift = data_dipsw_b[p].val;
@@ -733,8 +733,8 @@ static	Q8tkWidget	*menu_dipsw_b(void)
 				      (get_dipsw_b2() == p->val) ?TRUE :FALSE,
 				      cb_dipsw_b2, (void *)(p->val));
 
-		if (i == 0) widget_dipsw_b_boot_disk = b;  /*¤³¤ì¤é¤Î¥Ü¥¿¥ó¤Ï*/
-		else        widget_dipsw_b_boot_rom  = b;  /*³Ğ¤¨¤Æ¤ª¤¯      */
+		if (i == 0) widget_dipsw_b_boot_disk = b;  /*ã“ã‚Œã‚‰ã®ãƒœã‚¿ãƒ³ã¯*/
+		else        widget_dipsw_b_boot_rom  = b;  /*è¦šãˆã¦ãŠã      */
 	    }
 	}
     }
@@ -743,7 +743,7 @@ static	Q8tkWidget	*menu_dipsw_b(void)
 }
 
 /*----------------------------------------------------------------------*/
-				   /* ¥Ç¥£¥Ã¥×¥¹¥¤¥Ã¥ÁÀÚ¤êÂØ¤¨(RS-232C) */
+				   /* ãƒ‡ã‚£ãƒƒãƒ—ã‚¹ã‚¤ãƒƒãƒåˆ‡ã‚Šæ›¿ãˆ(RS-232C) */
 static	int	get_dipsw_r(int p)
 {
     int shift = data_dipsw_r[p].val;
@@ -841,26 +841,26 @@ static	void	dipsw_start(void)
     Q8tkWidget *w, *f, *x, *b;
     const t_menulabel *l = data_reset;
 
-    {						/* ¥á¥¤¥ó¤È¤Ê¤ë¥¦¥¤¥ó¥É¥¦ */
+    {						/* ãƒ¡ã‚¤ãƒ³ã¨ãªã‚‹ã‚¦ã‚¤ãƒ³ãƒ‰ã‚¦ */
 	w = q8tk_window_new(Q8TK_WINDOW_DIALOG);
 	dipsw_accel = q8tk_accel_group_new();
 	q8tk_accel_group_attach(dipsw_accel, w);
     }
-    {						/* ¤Ë¡¢¥Õ¥ì¡¼¥à¤ò¾è¤»¤Æ */
+    {						/* ã«ã€ãƒ•ãƒ¬ãƒ¼ãƒ ã‚’ä¹—ã›ã¦ */
 	f = q8tk_frame_new(GET_LABEL(l, DATA_RESET_DIPSW_SET));
 	q8tk_frame_set_shadow_type(f, Q8TK_SHADOW_OUT);
 	q8tk_container_add(w, f);
 	q8tk_widget_show(f);
     }
-    {						/* ¤½¤ì¤Ë¥Ü¥Ã¥¯¥¹¤ò¾è¤»¤ë */
+    {						/* ãã‚Œã«ãƒœãƒƒã‚¯ã‚¹ã‚’ä¹—ã›ã‚‹ */
 	x = q8tk_vbox_new();
 	q8tk_container_add(f, x);
 	q8tk_widget_show(x);
-							/* ¥Ü¥Ã¥¯¥¹¤Ë¤Ï     */
-	{						/* DIPSW¥á¥Ë¥å¡¼ ¤È */
+							/* ãƒœãƒƒã‚¯ã‚¹ã«ã¯     */
+	{						/* DIPSWãƒ¡ãƒ‹ãƒ¥ãƒ¼ ã¨ */
 	    q8tk_box_pack_start(x, dipsw_window);
 	}
-	{						/* ½ªÎ»¥Ü¥¿¥ó¤òÇÛÃÖ */
+	{						/* çµ‚äº†ãƒœã‚¿ãƒ³ã‚’é…ç½® */
 	    b = PACK_BUTTON(x,
 			    GET_LABEL(l, DATA_RESET_DIPSW_QUIT),
 			    cb_reset_dipsw_end, NULL);
@@ -875,13 +875,13 @@ static	void	dipsw_start(void)
     q8tk_widget_set_focus(b);
 
 
-    dipsw[ DIPSW_WIN   ] = w;	/* ¥À¥¤¥¢¥í¥°¤òÊÄ¤¸¤¿¤È¤­¤ËÈ÷¤¨¤Æ */
-    dipsw[ DIPSW_FRAME ] = f;	/* ¥¦¥£¥¸¥Ã¥È¤ò³Ğ¤¨¤Æ¤ª¤­¤Ş¤¹     */
+    dipsw[ DIPSW_WIN   ] = w;	/* ãƒ€ã‚¤ã‚¢ãƒ­ã‚°ã‚’é–‰ã˜ãŸã¨ãã«å‚™ãˆã¦ */
+    dipsw[ DIPSW_FRAME ] = f;	/* ã‚¦ã‚£ã‚¸ãƒƒãƒˆã‚’è¦šãˆã¦ãŠãã¾ã™     */
     dipsw[ DIPSW_VBOX  ] = x;
     dipsw[ DIPSW_QUIT  ] = b;
 }
 
-/* ¥Ç¥£¥Ã¥×¥¹¥¤¥Ã¥ÁÀßÄê¥¦¥¤¥ó¥É¥¦¤Î¾Ãµî */
+/* ãƒ‡ã‚£ãƒƒãƒ—ã‚¹ã‚¤ãƒƒãƒè¨­å®šã‚¦ã‚¤ãƒ³ãƒ‰ã‚¦ã®æ¶ˆå» */
 
 static	void	dipsw_finish(void)
 {
@@ -900,12 +900,12 @@ static	void	dipsw_finish(void)
 
 /*===========================================================================
  *
- *	¥á¥¤¥ó¥Ú¡¼¥¸	CPUÀßÄê
+ *	ãƒ¡ã‚¤ãƒ³ãƒšãƒ¼ã‚¸	CPUè¨­å®š
  *
  *===========================================================================*/
 
 /*----------------------------------------------------------------------*/
-						     /* CPU½èÍıÀÚ¤êÂØ¤¨ */
+						     /* CPUå‡¦ç†åˆ‡ã‚Šæ›¿ãˆ */
 static	int	get_cpu_cpu(void)
 {
     return cpu_timing;
@@ -931,7 +931,7 @@ static	Q8tkWidget	*menu_cpu_cpu(void)
 }
 
 /*----------------------------------------------------------------------*/
-								/* ÀâÌÀ */
+								/* èª¬æ˜ */
 static	Q8tkWidget	*help_widget[5];
 static	Q8tkWidget	*help_string[40];
 static	int		help_string_cnt;	
@@ -955,17 +955,17 @@ static	void	cb_cpu_help(UNUSED_WIDGET, UNUSED_PARM)
 {
     Q8tkWidget *w, *swin, *x, *b, *z;
 
-    {						/* ¥á¥¤¥ó¤È¤Ê¤ë¥¦¥¤¥ó¥É¥¦ */
+    {						/* ãƒ¡ã‚¤ãƒ³ã¨ãªã‚‹ã‚¦ã‚¤ãƒ³ãƒ‰ã‚¦ */
 	w = q8tk_window_new(Q8TK_WINDOW_DIALOG);
 	help_accel = q8tk_accel_group_new();
 	q8tk_accel_group_attach(help_accel, w);
     }
-    {						/* ¤½¤ì¤Ë¥Ü¥Ã¥¯¥¹¤ò¾è¤»¤ë */
+    {						/* ãã‚Œã«ãƒœãƒƒã‚¯ã‚¹ã‚’ä¹—ã›ã‚‹ */
 	x = q8tk_vbox_new();
 	q8tk_container_add(w, x);
 	q8tk_widget_show(x);
-							/* ¥Ü¥Ã¥¯¥¹¤Ë¤Ï     */
-	{						/* SCRL¥¦¥¤¥ó¥É¥¦¤È */
+							/* ãƒœãƒƒã‚¯ã‚¹ã«ã¯     */
+	{						/* SCRLã‚¦ã‚¤ãƒ³ãƒ‰ã‚¦ã¨ */
 	    swin  = q8tk_scrolled_window_new(NULL, NULL);
 	    q8tk_widget_show(swin);
 	    q8tk_scrolled_window_set_policy(swin, Q8TK_POLICY_NEVER,
@@ -973,7 +973,7 @@ static	void	cb_cpu_help(UNUSED_WIDGET, UNUSED_PARM)
 	    q8tk_misc_set_size(swin, 71, 20);
 	    q8tk_box_pack_start(x, swin);
 	}
-	{						/* ½ªÎ»¥Ü¥¿¥ó¤òÇÛÃÖ */
+	{						/* çµ‚äº†ãƒœã‚¿ãƒ³ã‚’é…ç½® */
 	    b = PACK_BUTTON(x,
 			    " O K ",
 			    cb_cpu_help_end, NULL);
@@ -984,14 +984,14 @@ static	void	cb_cpu_help(UNUSED_WIDGET, UNUSED_PARM)
 	}
     }
 
-    {							/* SCRL¥¦¥¤¥ó¥É¥¦¤Ë */
+    {							/* SCRLã‚¦ã‚¤ãƒ³ãƒ‰ã‚¦ã« */
 	int i;
 	const char **s = (menu_lang == MENU_JAPAN) ? help_jp : help_en;
-	z = q8tk_vbox_new();				/* VBOX¤òºî¤Ã¤Æ     */
+	z = q8tk_vbox_new();				/* VBOXã‚’ä½œã£ã¦     */
 	q8tk_container_add(swin, z);
 	q8tk_widget_show(z);
 
-	for (i=0; i<COUNTOF(help_string); i++) {	/* ÀâÌÀ¥é¥Ù¥ë¤òÇÛÃÖ */
+	for (i=0; i<COUNTOF(help_string); i++) {	/* èª¬æ˜ãƒ©ãƒ™ãƒ«ã‚’é…ç½® */
 	    if (s[i] == NULL) break;
 	    help_string[i] = q8tk_label_new(s[i]);
 	    q8tk_widget_show(help_string[i]);
@@ -1006,14 +1006,14 @@ static	void	cb_cpu_help(UNUSED_WIDGET, UNUSED_PARM)
     q8tk_widget_set_focus(b);
 
 
-    help_widget[ HELP_WIN   ] = w;	/* ¥À¥¤¥¢¥í¥°¤òÊÄ¤¸¤¿¤È¤­¤ËÈ÷¤¨¤Æ */
-    help_widget[ HELP_VBOX  ] = x;	/* ¥¦¥£¥¸¥Ã¥È¤ò³Ğ¤¨¤Æ¤ª¤­¤Ş¤¹     */
+    help_widget[ HELP_WIN   ] = w;	/* ãƒ€ã‚¤ã‚¢ãƒ­ã‚°ã‚’é–‰ã˜ãŸã¨ãã«å‚™ãˆã¦ */
+    help_widget[ HELP_VBOX  ] = x;	/* ã‚¦ã‚£ã‚¸ãƒƒãƒˆã‚’è¦šãˆã¦ãŠãã¾ã™     */
     help_widget[ HELP_SWIN  ] = swin;
     help_widget[ HELP_BOARD ] = z;
     help_widget[ HELP_EXIT  ] = b;
 }
 
-/* ÀâÌÀ¥¦¥¤¥ó¥É¥¦¤Î¾Ãµî */
+/* èª¬æ˜ã‚¦ã‚¤ãƒ³ãƒ‰ã‚¦ã®æ¶ˆå» */
 
 static	void	help_finish(void)
 {
@@ -1047,7 +1047,7 @@ static	Q8tkWidget	*menu_cpu_help(void)
 }
 
 /*----------------------------------------------------------------------*/
-						 /* CPU¥¯¥í¥Ã¥¯ÀÚ¤êÂØ¤¨ */
+						 /* CPUã‚¯ãƒ­ãƒƒã‚¯åˆ‡ã‚Šæ›¿ãˆ */
 static	double	get_cpu_clock(void)
 {
     return cpu_clock_mhz;
@@ -1061,44 +1061,44 @@ static	void	cb_cpu_clock(Q8tkWidget *widget, void *mode)
     double val = 0;
     int fit = FALSE;
 
-    /* COMBO BOX ¤«¤é ENTRY ¤Ë°ìÃ×¤¹¤ë¤â¤Î¤òÃµ¤¹ */
+    /* COMBO BOX ã‹ã‚‰ ENTRY ã«ä¸€è‡´ã™ã‚‹ã‚‚ã®ã‚’æ¢ã™ */
     for (i=0; i<COUNTOF(data_cpu_clock_combo); i++, p++) {
 	if (strcmp(p->str[menu_lang], combo_str) == 0) {
 	    val = (double)p->val / 1000000.0;
-	    fit = TRUE;					/* °ìÃ×¤·¤¿ÃÍ¤òÅ¬ÍÑ */
+	    fit = TRUE;					/* ä¸€è‡´ã—ãŸå€¤ã‚’é©ç”¨ */
 	    break;
 	}
     }
 
-    if (fit == FALSE) {			/* COMBO BOX ¤Ë³ºÅö¤¬¤Ê¤¤¾ì¹ç */
+    if (fit == FALSE) {			/* COMBO BOX ã«è©²å½“ãŒãªã„å ´åˆ */
 	strncpy(buf, combo_str, 15);
 	buf[15] = '\0';
 
 	val = strtod(buf, &conv_end);
 
-	if (((int)mode == 0) &&				/* ¶õÇò + ENTER ¤ä   */
-	    (strlen(buf) == 0 || val == 0.0)) {		/*   0  + ENTER »ş¤Ï */
-							/* ¥Ç¥Õ¥©¥ë¥ÈÃÍ¤òÅ¬ÍÑ*/
+	if (((int)mode == 0) &&				/* ç©ºç™½ + ENTER ã‚„   */
+	    (strlen(buf) == 0 || val == 0.0)) {		/*   0  + ENTER æ™‚ã¯ */
+							/* ãƒ‡ãƒ•ã‚©ãƒ«ãƒˆå€¤ã‚’é©ç”¨*/
 	    val = boot_clock_4mhz ? CONST_4MHZ_CLOCK
 				  : CONST_8MHZ_CLOCK;
 	    fit = TRUE;
 
-	} else if (*conv_end != '\0') {			/* ¿ô»úÊÑ´¹¼ºÇÔ¤Ê¤é */
-	    fit = FALSE;				/* ¤½¤ÎÃÍ¤Ï»È¤¨¤Ê¤¤ */
+	} else if (*conv_end != '\0') {			/* æ•°å­—å¤‰æ›å¤±æ•—ãªã‚‰ */
+	    fit = FALSE;				/* ãã®å€¤ã¯ä½¿ãˆãªã„ */
 
-	} else {					/* ¿ô»úÊÑ´¹À®¸ù¤Ê¤é */
-	    fit = TRUE;					/* ¤½¤ÎÃÍ¤òÅ¬ÍÑ¤¹¤ë */
+	} else {					/* æ•°å­—å¤‰æ›æˆåŠŸãªã‚‰ */
+	    fit = TRUE;					/* ãã®å€¤ã‚’é©ç”¨ã™ã‚‹ */
 	}
     }
 
-    if (fit) {				/* Å¬ÍÑ¤·¤¿ÃÍ¤¬Í­¸úÈÏ°Ï¤Ê¤é¡¢¥»¥Ã¥È */
+    if (fit) {				/* é©ç”¨ã—ãŸå€¤ãŒæœ‰åŠ¹ç¯„å›²ãªã‚‰ã€ã‚»ãƒƒãƒˆ */
 	if (0.1 <= val && val < 1000.0) {
 	    cpu_clock_mhz = val;
 	    interval_work_init_all();
 	}
     }
 
-    if ((int)mode == 0) {		/* COMBO ¤Ê¤¤¤· ENTER»ş¤Ï¡¢ÃÍ¤òºÆÉ½¼¨*/
+    if ((int)mode == 0) {		/* COMBO ãªã„ã— ENTERæ™‚ã¯ã€å€¤ã‚’å†è¡¨ç¤º*/
 	sprintf(buf, "%8.4f", get_cpu_clock());
 	q8tk_combo_set_text(widget, buf);
     }
@@ -1134,7 +1134,7 @@ static	Q8tkWidget	*menu_cpu_clock(void)
 }
 
 /*----------------------------------------------------------------------*/
-							/* ¥¦¥¨¥¤¥ÈÊÑ¹¹ */
+							/* ã‚¦ã‚¨ã‚¤ãƒˆå¤‰æ›´ */
 static	int	get_cpu_nowait(void)
 {
     return no_wait;
@@ -1158,42 +1158,42 @@ static	void	cb_cpu_wait(Q8tkWidget *widget, void *mode)
     int val = 0;
     int fit = FALSE;
 
-    /* COMBO BOX ¤«¤é ENTRY ¤Ë°ìÃ×¤¹¤ë¤â¤Î¤òÃµ¤¹ */
+    /* COMBO BOX ã‹ã‚‰ ENTRY ã«ä¸€è‡´ã™ã‚‹ã‚‚ã®ã‚’æ¢ã™ */
     for (i=0; i<COUNTOF(data_cpu_wait_combo); i++, p++) {
 	if (strcmp(p->str[menu_lang], combo_str) == 0) {
 	    val = p->val;
-	    fit = TRUE;					/* °ìÃ×¤·¤¿ÃÍ¤òÅ¬ÍÑ */
+	    fit = TRUE;					/* ä¸€è‡´ã—ãŸå€¤ã‚’é©ç”¨ */
 	    break;
 	}
     }
 
-    if (fit == FALSE) {			/* COMBO BOX ¤Ë³ºÅö¤¬¤Ê¤¤¾ì¹ç */
+    if (fit == FALSE) {			/* COMBO BOX ã«è©²å½“ãŒãªã„å ´åˆ */
 	strncpy(buf, combo_str, 15);
 	buf[15] = '\0';
 
 	val = strtoul(buf, &conv_end, 10);
 
-	if (((int)mode == 0) &&				/* ¶õÇò + ENTER ¤ä   */
-	    (strlen(buf) == 0 || val == 0)) {		/*   0  + ENTER »ş¤Ï */
-							/* ¥Ç¥Õ¥©¥ë¥ÈÃÍ¤òÅ¬ÍÑ*/
+	if (((int)mode == 0) &&				/* ç©ºç™½ + ENTER ã‚„   */
+	    (strlen(buf) == 0 || val == 0)) {		/*   0  + ENTER æ™‚ã¯ */
+							/* ãƒ‡ãƒ•ã‚©ãƒ«ãƒˆå€¤ã‚’é©ç”¨*/
 	    val = 100;
 	    fit = TRUE;
 
-	} else if (*conv_end != '\0') {			/* ¿ô»úÊÑ´¹¼ºÇÔ¤Ê¤é */
-	    fit = FALSE;				/* ¤½¤ÎÃÍ¤Ï»È¤¨¤Ê¤¤ */
+	} else if (*conv_end != '\0') {			/* æ•°å­—å¤‰æ›å¤±æ•—ãªã‚‰ */
+	    fit = FALSE;				/* ãã®å€¤ã¯ä½¿ãˆãªã„ */
 
-	} else {					/* ¿ô»úÊÑ´¹À®¸ù¤Ê¤é */
-	    fit = TRUE;					/* ¤½¤ÎÃÍ¤òÅ¬ÍÑ¤¹¤ë */
+	} else {					/* æ•°å­—å¤‰æ›æˆåŠŸãªã‚‰ */
+	    fit = TRUE;					/* ãã®å€¤ã‚’é©ç”¨ã™ã‚‹ */
 	}
     }
 
-    if (fit) {				/* Å¬ÍÑ¤·¤¿ÃÍ¤¬Í­¸úÈÏ°Ï¤Ê¤é¡¢¥»¥Ã¥È */
+    if (fit) {				/* é©ç”¨ã—ãŸå€¤ãŒæœ‰åŠ¹ç¯„å›²ãªã‚‰ã€ã‚»ãƒƒãƒˆ */
 	if (5 <= val && val <= 5000) {
 	    wait_rate = val;
 	}
     }
 
-    if ((int)mode == 0) {		/* COMBO ¤Ê¤¤¤· ENTER»ş¤Ï¡¢ÃÍ¤òºÆÉ½¼¨*/
+    if ((int)mode == 0) {		/* COMBO ãªã„ã— ENTERæ™‚ã¯ã€å€¤ã‚’å†è¡¨ç¤º*/
 	sprintf(buf, "%4d", get_cpu_wait());
 	q8tk_combo_set_text(widget, buf);
     }
@@ -1236,7 +1236,7 @@ static	Q8tkWidget	*menu_cpu_wait(void)
 }
 
 /*----------------------------------------------------------------------*/
-							    /* ¥Ö¡¼¥¹¥È */
+							    /* ãƒ–ãƒ¼ã‚¹ãƒˆ */
 static	int	get_cpu_boost(void)
 {
     return boost;
@@ -1250,36 +1250,36 @@ static	void	cb_cpu_boost(Q8tkWidget *widget, void *mode)
     int val = 0;
     int fit = FALSE;
 
-    /* COMBO BOX ¤«¤é ENTRY ¤Ë°ìÃ×¤¹¤ë¤â¤Î¤òÃµ¤¹ */
+    /* COMBO BOX ã‹ã‚‰ ENTRY ã«ä¸€è‡´ã™ã‚‹ã‚‚ã®ã‚’æ¢ã™ */
     for (i=0; i<COUNTOF(data_cpu_boost_combo); i++, p++) {
 	if (strcmp(p->str[menu_lang], combo_str) == 0) {
 	    val = p->val;
-	    fit = TRUE;					/* °ìÃ×¤·¤¿ÃÍ¤òÅ¬ÍÑ */
+	    fit = TRUE;					/* ä¸€è‡´ã—ãŸå€¤ã‚’é©ç”¨ */
 	    break;
 	}
     }
 
-    if (fit == FALSE) {			/* COMBO BOX ¤Ë³ºÅö¤¬¤Ê¤¤¾ì¹ç */
+    if (fit == FALSE) {			/* COMBO BOX ã«è©²å½“ãŒãªã„å ´åˆ */
 	strncpy(buf, combo_str, 15);
 	buf[15] = '\0';
 
 	val = strtoul(buf, &conv_end, 10);
 
-	if (((int)mode == 0) &&				/* ¶õÇò + ENTER ¤ä   */
-	    (strlen(buf) == 0 || val == 0)) {		/*   0  + ENTER »ş¤Ï */
-							/* ¥Ç¥Õ¥©¥ë¥ÈÃÍ¤òÅ¬ÍÑ*/
+	if (((int)mode == 0) &&				/* ç©ºç™½ + ENTER ã‚„   */
+	    (strlen(buf) == 0 || val == 0)) {		/*   0  + ENTER æ™‚ã¯ */
+							/* ãƒ‡ãƒ•ã‚©ãƒ«ãƒˆå€¤ã‚’é©ç”¨*/
 	    val = 1;
 	    fit = TRUE;
 
-	} else if (*conv_end != '\0') {			/* ¿ô»úÊÑ´¹¼ºÇÔ¤Ê¤é */
-	    fit = FALSE;				/* ¤½¤ÎÃÍ¤Ï»È¤¨¤Ê¤¤ */
+	} else if (*conv_end != '\0') {			/* æ•°å­—å¤‰æ›å¤±æ•—ãªã‚‰ */
+	    fit = FALSE;				/* ãã®å€¤ã¯ä½¿ãˆãªã„ */
 
-	} else {					/* ¿ô»úÊÑ´¹À®¸ù¤Ê¤é */
-	    fit = TRUE;					/* ¤½¤ÎÃÍ¤òÅ¬ÍÑ¤¹¤ë */
+	} else {					/* æ•°å­—å¤‰æ›æˆåŠŸãªã‚‰ */
+	    fit = TRUE;					/* ãã®å€¤ã‚’é©ç”¨ã™ã‚‹ */
 	}
     }
 
-    if (fit) {				/* Å¬ÍÑ¤·¤¿ÃÍ¤¬Í­¸úÈÏ°Ï¤Ê¤é¡¢¥»¥Ã¥È */
+    if (fit) {				/* é©ç”¨ã—ãŸå€¤ãŒæœ‰åŠ¹ç¯„å›²ãªã‚‰ã€ã‚»ãƒƒãƒˆ */
 	if (1 <= val && val <= 100) {
 	    if (boost != val) {
 		boost_change(val);
@@ -1287,7 +1287,7 @@ static	void	cb_cpu_boost(Q8tkWidget *widget, void *mode)
 	}
     }
 
-    if ((int)mode == 0) {		/* COMBO ¤Ê¤¤¤· ENTER»ş¤Ï¡¢ÃÍ¤òºÆÉ½¼¨*/
+    if ((int)mode == 0) {		/* COMBO ãªã„ã— ENTERæ™‚ã¯ã€å€¤ã‚’å†è¡¨ç¤º*/
 	sprintf(buf, "%4d", get_cpu_boost());
 	q8tk_combo_set_text(widget, buf);
     }
@@ -1319,7 +1319,7 @@ static	Q8tkWidget	*menu_cpu_boost(void)
 }
 
 /*----------------------------------------------------------------------*/
-						      /* ³Æ¼ïÀßÄê¤ÎÊÑ¹¹ */
+						      /* å„ç¨®è¨­å®šã®å¤‰æ›´ */
 static	int	get_cpu_misc(int type)
 {
     switch (type) {
@@ -1437,12 +1437,12 @@ static	Q8tkWidget	*menu_cpu(void)
 
 /*===========================================================================
  *
- *	¥á¥¤¥ó¥Ú¡¼¥¸	²èÌÌ
+ *	ãƒ¡ã‚¤ãƒ³ãƒšãƒ¼ã‚¸	ç”»é¢
  *
  *===========================================================================*/
 
 /*----------------------------------------------------------------------*/
-						  /* ¥Õ¥ì¡¼¥à¥ì¡¼¥ÈÊÑ¹¹ */
+						  /* ãƒ•ãƒ¬ãƒ¼ãƒ ãƒ¬ãƒ¼ãƒˆå¤‰æ›´ */
 static	int	get_graph_frate(void)
 {
     return quasi88_cfg_now_frameskip_rate();
@@ -1501,7 +1501,7 @@ static	Q8tkWidget	*menu_graph_frate(void)
 	    }
 	}
 
-	PACK_LABEL(vbox, "");			/* ¶õ¹Ô */
+	PACK_LABEL(vbox, "");			/* ç©ºè¡Œ */
 							/* thanks floi ! */
 	PACK_CHECK_BUTTON(vbox,
 			  GET_LABEL(data_graph_autoskip, 0),
@@ -1513,7 +1513,7 @@ static	Q8tkWidget	*menu_graph_frate(void)
 }
 
 /*----------------------------------------------------------------------*/
-						  /* ²èÌÌ¥µ¥¤¥ºÀÚ¤êÂØ¤¨ */
+						  /* ç”»é¢ã‚µã‚¤ã‚ºåˆ‡ã‚Šæ›¿ãˆ */
 static	int	get_graph_resize(void)
 {
     return quasi88_cfg_now_size();
@@ -1535,7 +1535,7 @@ static	void	cb_graph_fullscreen(Q8tkWidget *widget, UNUSED_PARM)
     if (quasi88_cfg_can_fullscreen()) {
 	quasi88_cfg_set_fullscreen(on);
 	
-	/* Q8TK ¥«¡¼¥½¥ëÍ­ÌµÀßÄê (Á´²èÌÌÀÚÂØ»ş¤Ë¸Æ¤ÖÉ¬Í×¤¢¤ê) */
+	/* Q8TK ã‚«ãƒ¼ã‚½ãƒ«æœ‰ç„¡è¨­å®š (å…¨ç”»é¢åˆ‡æ›¿æ™‚ã«å‘¼ã¶å¿…è¦ã‚ã‚Š) */
 	q8tk_set_cursor(now_swcursor);
     }
 }
@@ -1556,7 +1556,7 @@ static	Q8tkWidget	*menu_graph_resize(void)
 
 	if (quasi88_cfg_can_fullscreen()) {
 
-	    PACK_LABEL(vbox, "");		/* ¶õ¹Ô */
+	    PACK_LABEL(vbox, "");		/* ç©ºè¡Œ */
 
 	    PACK_CHECK_BUTTON(vbox,
 			      GET_LABEL(data_graph_fullscreen, 0),
@@ -1569,7 +1569,7 @@ static	Q8tkWidget	*menu_graph_resize(void)
 }
 
 /*----------------------------------------------------------------------*/
-						      /* ³Æ¼ïÀßÄê¤ÎÊÑ¹¹ */
+						      /* å„ç¨®è¨­å®šã®å¤‰æ›´ */
 static	int	get_graph_misc(int type)
 {
     switch (type) {
@@ -1641,7 +1641,7 @@ static	Q8tkWidget	*menu_graph_misc(void)
 }
 
 /*----------------------------------------------------------------------*/
-						 /* PCGÍ­Ìµ ¡õ ¥Õ¥©¥ó¥È */
+						 /* PCGæœ‰ç„¡ ï¼† ãƒ•ã‚©ãƒ³ãƒˆ */
 static	Q8tkWidget	*graph_font_widget;
 static	int	get_graph_pcg(void)
 {
@@ -1675,7 +1675,7 @@ static	Q8tkWidget	*menu_graph_pcg(void)
     t_menudata data_graph_font[3];
 
 
-    /* ¥Õ¥©¥ó¥ÈÁªÂò¥¦¥£¥¸¥Ã¥ÈÀ¸À® (PCGÍ­Ìµ¤Ë¤è¤ê¡¢insensitive ¤Ë¤Ê¤ë) */
+    /* ãƒ•ã‚©ãƒ³ãƒˆé¸æŠã‚¦ã‚£ã‚¸ãƒƒãƒˆç”Ÿæˆ (PCGæœ‰ç„¡ã«ã‚ˆã‚Šã€insensitive ã«ãªã‚‹) */
     {
 	data_graph_font[0] = data_graph_font1[ (font_loaded & 1) ? 1 : 0 ];
 	data_graph_font[1] = data_graph_font2[ (font_loaded & 2) ? 1 : 0 ];
@@ -1691,7 +1691,7 @@ static	Q8tkWidget	*menu_graph_pcg(void)
 				       GET_LABEL(l, DATA_GRAPH_FONT), b);
     }
 
-    /* PCGÍ­Ìµ¥¦¥£¥¸¥Ã¥È¤È¡¢¥Õ¥©¥ó¥ÈÁªÂò¥¦¥£¥¸¥Ã¥È¤òÊÂ¤Ù¤ë */
+    /* PCGæœ‰ç„¡ã‚¦ã‚£ã‚¸ãƒƒãƒˆã¨ã€ãƒ•ã‚©ãƒ³ãƒˆé¸æŠã‚¦ã‚£ã‚¸ãƒƒãƒˆã‚’ä¸¦ã¹ã‚‹ */
     vbox = PACK_VBOX(NULL);
     {
 	{
@@ -1751,12 +1751,12 @@ static	Q8tkWidget	*menu_graph(void)
 
 /*===========================================================================
  *
- *	¥á¥¤¥ó¥Ú¡¼¥¸	²»ÎÌ
+ *	ãƒ¡ã‚¤ãƒ³ãƒšãƒ¼ã‚¸	éŸ³é‡
  *
  *===========================================================================*/
 
 /*----------------------------------------------------------------------*/
-						      /* ¥Ü¥ê¥å¡¼¥àÊÑ¹¹ */
+						      /* ãƒœãƒªãƒ¥ãƒ¼ãƒ å¤‰æ›´ */
 #ifdef	USE_SOUND
 static	int	get_volume(int type)
 {
@@ -1836,7 +1836,7 @@ static	Q8tkWidget	*menu_volume_sample(void)
 }
 #endif
 /*----------------------------------------------------------------------*/
-					    /* ¥µ¥¦¥ó¥É¤Ê¤·»ş¥á¥Ã¥»¡¼¥¸ */
+					    /* ã‚µã‚¦ãƒ³ãƒ‰ãªã—æ™‚ãƒ¡ãƒƒã‚»ãƒ¼ã‚¸ */
 
 static	Q8tkWidget	*menu_volume_no_available(void)
 {
@@ -1861,7 +1861,7 @@ static	Q8tkWidget	*menu_volume_no_available(void)
 }
 
 /*----------------------------------------------------------------------*/
-					    /* ¥µ¥¦¥ó¥É¥É¥é¥¤¥Ğ¼ïÊÌÉ½¼¨ */
+					    /* ã‚µã‚¦ãƒ³ãƒ‰ãƒ‰ãƒ©ã‚¤ãƒç¨®åˆ¥è¡¨ç¤º */
 #ifdef	USE_SOUND
 static	Q8tkWidget	*menu_volume_type(void)
 {
@@ -1890,7 +1890,7 @@ static	Q8tkWidget	*menu_volume_type(void)
 #endif
 
 /*----------------------------------------------------------------------*/
-							/* ¥µ¥¦¥ó¥É¾ÜºÙ */
+							/* ã‚µã‚¦ãƒ³ãƒ‰è©³ç´° */
 #ifdef	USE_SOUND
 static	void	audio_create(void);
 static	void	audio_start(void);
@@ -1907,11 +1907,11 @@ static	Q8tkWidget	*menu_volume_audio(void)
 
     hbox = PACK_HBOX(NULL);
     {
-	PACK_LABEL(hbox, " ");			/* ¶õ¹Ô */
+	PACK_LABEL(hbox, " ");			/* ç©ºè¡Œ */
 	PACK_BUTTON(hbox,
 		    GET_LABEL(data_volume, DATA_VOLUME_AUDIO),
 		    cb_volume_audio, NULL);
-	PACK_LABEL(hbox, " ");			/* ¶õ¹Ô */
+	PACK_LABEL(hbox, " ");			/* ç©ºè¡Œ */
     }
     return hbox;
 }
@@ -1935,7 +1935,7 @@ static	Q8tkWidget	*menu_volume(void)
 
 
 #ifdef	USE_SOUND
-    audio_create();			/* ¥µ¥¦¥ó¥É¾ÜºÙ¥¦¥¤¥ó¥É¥¦À¸À® */
+    audio_create();			/* ã‚µã‚¦ãƒ³ãƒ‰è©³ç´°ã‚¦ã‚¤ãƒ³ãƒ‰ã‚¦ç”Ÿæˆ */
 
     vbox = PACK_VBOX(NULL);
     {
@@ -1999,7 +1999,7 @@ static	Q8tkWidget	*menu_volume(void)
 
 /* = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = 
  *
- *	¥µ¥Ö¥¦¥¤¥ó¥É¥¦	AUDIO
+ *	ã‚µãƒ–ã‚¦ã‚¤ãƒ³ãƒ‰ã‚¦	AUDIO
  *
  * = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = */
 #ifdef	USE_SOUND
@@ -2018,7 +2018,7 @@ enum {
 };
 
 /*----------------------------------------------------------------------*/
-						      /* FM²»¸»¥¸¥§¥Í¥ì¡¼¥¿ */
+						      /* FMéŸ³æºã‚¸ã‚§ãƒãƒ¬ãƒ¼ã‚¿ */
 #ifdef	USE_FMGEN
 static	int	get_volume_audio_fmgen(void)
 {
@@ -2049,7 +2049,7 @@ static	Q8tkWidget	*volume_audio_fmgen(void)
 #endif
 
 /*----------------------------------------------------------------------*/
-						      /* ¥µ¥ó¥×¥ë¼şÇÈ¿ô */
+						      /* ã‚µãƒ³ãƒ—ãƒ«å‘¨æ³¢æ•° */
 static	int	get_volume_audio_freq(void)
 {
     return sd_cfg_now.sample_freq;
@@ -2063,42 +2063,42 @@ static	void	cb_volume_audio_freq(Q8tkWidget *widget, void *mode)
     int val = 0;
     int fit = FALSE;
 
-    /* COMBO BOX ¤«¤é ENTRY ¤Ë°ìÃ×¤¹¤ë¤â¤Î¤òÃµ¤¹ */
+    /* COMBO BOX ã‹ã‚‰ ENTRY ã«ä¸€è‡´ã™ã‚‹ã‚‚ã®ã‚’æ¢ã™ */
     for (i=0; i<COUNTOF(data_volume_audio_freq_combo); i++, p++) {
 	if (strcmp(p->str[menu_lang], combo_str) == 0) {
 	    val = p->val;
-	    fit = TRUE;					/* °ìÃ×¤·¤¿ÃÍ¤òÅ¬ÍÑ */
+	    fit = TRUE;					/* ä¸€è‡´ã—ãŸå€¤ã‚’é©ç”¨ */
 	    break;
 	}
     }
 
-    if (fit == FALSE) {			/* COMBO BOX ¤Ë³ºÅö¤¬¤Ê¤¤¾ì¹ç */
+    if (fit == FALSE) {			/* COMBO BOX ã«è©²å½“ãŒãªã„å ´åˆ */
 	strncpy(buf, combo_str, 15);
 	buf[15] = '\0';
 
 	val = strtoul(buf, &conv_end, 10);
 
-	if (((int)mode == 0) &&				/* ¶õÇò + ENTER ¤ä   */
-	    (strlen(buf) == 0 || val == 0)) {		/*   0  + ENTER »ş¤Ï */
-							/* ¥Ç¥Õ¥©¥ë¥ÈÃÍ¤òÅ¬ÍÑ*/
+	if (((int)mode == 0) &&				/* ç©ºç™½ + ENTER ã‚„   */
+	    (strlen(buf) == 0 || val == 0)) {		/*   0  + ENTER æ™‚ã¯ */
+							/* ãƒ‡ãƒ•ã‚©ãƒ«ãƒˆå€¤ã‚’é©ç”¨*/
 	    val = 44100;
 	    fit = TRUE;
 
-	} else if (*conv_end != '\0') {			/* ¿ô»úÊÑ´¹¼ºÇÔ¤Ê¤é */
-	    fit = FALSE;				/* ¤½¤ÎÃÍ¤Ï»È¤¨¤Ê¤¤ */
+	} else if (*conv_end != '\0') {			/* æ•°å­—å¤‰æ›å¤±æ•—ãªã‚‰ */
+	    fit = FALSE;				/* ãã®å€¤ã¯ä½¿ãˆãªã„ */
 
-	} else {					/* ¿ô»úÊÑ´¹À®¸ù¤Ê¤é */
-	    fit = TRUE;					/* ¤½¤ÎÃÍ¤òÅ¬ÍÑ¤¹¤ë */
+	} else {					/* æ•°å­—å¤‰æ›æˆåŠŸãªã‚‰ */
+	    fit = TRUE;					/* ãã®å€¤ã‚’é©ç”¨ã™ã‚‹ */
 	}
     }
 
-    if (fit) {				/* Å¬ÍÑ¤·¤¿ÃÍ¤¬Í­¸úÈÏ°Ï¤Ê¤é¡¢¥»¥Ã¥È */
+    if (fit) {				/* é©ç”¨ã—ãŸå€¤ãŒæœ‰åŠ¹ç¯„å›²ãªã‚‰ã€ã‚»ãƒƒãƒˆ */
 	if (8000 <= val && val <= 48000) {
 	    sd_cfg_now.sample_freq = xmame_cfg_set_sample_freq(val);
 	}
     }
 
-    if ((int)mode == 0) {		/* COMBO ¤Ê¤¤¤· ENTER»ş¤Ï¡¢ÃÍ¤òºÆÉ½¼¨*/
+    if ((int)mode == 0) {		/* COMBO ãªã„ã— ENTERæ™‚ã¯ã€å€¤ã‚’å†è¡¨ç¤º*/
 	sprintf(buf, "%5d", get_volume_audio_freq());
 	q8tk_combo_set_text(widget, buf);
     }
@@ -2128,7 +2128,7 @@ static	Q8tkWidget	*volume_audio_freq(void)
 }
 
 /*----------------------------------------------------------------------*/
-						      /* ¥µ¥ó¥×¥ë²» */
+						      /* ã‚µãƒ³ãƒ—ãƒ«éŸ³ */
 static	int	get_volume_audio_sample(void)
 {
     return sd_cfg_now.use_samples;
@@ -2187,20 +2187,20 @@ static	void	cb_audio_config(Q8tkWidget *widget, void *modes)
 	break;
     }
 
-    if (((int)mode == 0) &&				/* ¶õÇò + ENTER ¤ä   */
-	(strlen(buf) == 0 || zero)) {			/*   0  + ENTER »ş¤Ï */
-							/* Ä¾Á°¤ÎÍ­¸úÃÍ¤òÅ¬ÍÑ*/
+    if (((int)mode == 0) &&				/* ç©ºç™½ + ENTER ã‚„   */
+	(strlen(buf) == 0 || zero)) {			/*   0  + ENTER æ™‚ã¯ */
+							/* ç›´å‰ã®æœ‰åŠ¹å€¤ã‚’é©ç”¨*/
 	val = def_val;
 	fit = TRUE;
 
-    } else if (*conv_end != '\0') {			/* ¿ô»úÊÑ´¹¼ºÇÔ¤Ê¤é */
-	fit = FALSE;					/* ¤½¤ÎÃÍ¤Ï»È¤¨¤Ê¤¤ */
+    } else if (*conv_end != '\0') {			/* æ•°å­—å¤‰æ›å¤±æ•—ãªã‚‰ */
+	fit = FALSE;					/* ãã®å€¤ã¯ä½¿ãˆãªã„ */
 
-    } else {						/* ¿ô»úÊÑ´¹À®¸ù¤Ê¤é */
-	fit = TRUE;					/* ¤½¤ÎÃÍ¤òÅ¬ÍÑ¤¹¤ë */
+    } else {						/* æ•°å­—å¤‰æ›æˆåŠŸãªã‚‰ */
+	fit = TRUE;					/* ãã®å€¤ã‚’é©ç”¨ã™ã‚‹ */
     }
 
-    if (fit) {				/* Å¬ÍÑ¤·¤¿ÃÍ¤¬Í­¸úÈÏ°Ï¤Ê¤é¡¢¥»¥Ã¥È */
+    if (fit) {				/* é©ç”¨ã—ãŸå€¤ãŒæœ‰åŠ¹ç¯„å›²ãªã‚‰ã€ã‚»ãƒƒãƒˆ */
 	switch (p->type) {
 	case SNDDRV_INT:
 	    if ((int)(p->low) <=val.i && val.i <= (int)(p->high)) {
@@ -2218,7 +2218,7 @@ static	void	cb_audio_config(Q8tkWidget *widget, void *modes)
 	}
     }
 
-    if ((int)mode == 0) {		/* COMBO ¤Ê¤¤¤· ENTER»ş¤Ï¡¢ÃÍ¤òºÆÉ½¼¨*/
+    if ((int)mode == 0) {		/* COMBO ãªã„ã— ENTERæ™‚ã¯ã€å€¤ã‚’å†è¡¨ç¤º*/
 	switch (p->type) {
 	case SNDDRV_INT:
 	    sprintf(buf, "%7d", sd_cfg_now.local[index].val.i);
@@ -2320,31 +2320,31 @@ static	void	audio_start(void)
     Q8tkWidget *w, *f, *v, *h, *b, *l;
     const t_menulabel *p = data_volume;
 
-    {						/* ¥á¥¤¥ó¤È¤Ê¤ë¥¦¥¤¥ó¥É¥¦ */
+    {						/* ãƒ¡ã‚¤ãƒ³ã¨ãªã‚‹ã‚¦ã‚¤ãƒ³ãƒ‰ã‚¦ */
 	w = q8tk_window_new(Q8TK_WINDOW_DIALOG);
 	audio_accel = q8tk_accel_group_new();
 	q8tk_accel_group_attach(audio_accel, w);
     }
-    {						/* ¤Ë¡¢¥Õ¥ì¡¼¥à¤ò¾è¤»¤Æ */
+    {						/* ã«ã€ãƒ•ãƒ¬ãƒ¼ãƒ ã‚’ä¹—ã›ã¦ */
 	f = q8tk_frame_new(GET_LABEL(p, DATA_VOLUME_AUDIO_SET));
 	q8tk_frame_set_shadow_type(f, Q8TK_SHADOW_OUT);
 	q8tk_container_add(w, f);
 	q8tk_widget_show(f);
     }
-    {						/* ¤½¤ì¤Ë¥Ü¥Ã¥¯¥¹¤ò¾è¤»¤ë */
+    {						/* ãã‚Œã«ãƒœãƒƒã‚¯ã‚¹ã‚’ä¹—ã›ã‚‹ */
 	v = q8tk_vbox_new();
 	q8tk_container_add(f, v);
 	q8tk_widget_show(v);
-							/* ¥Ü¥Ã¥¯¥¹¤Ë¤Ï     */
-	{						/* AUDIO¥á¥Ë¥å¡¼ ¤È */
+							/* ãƒœãƒƒã‚¯ã‚¹ã«ã¯     */
+	{						/* AUDIOãƒ¡ãƒ‹ãƒ¥ãƒ¼ ã¨ */
 	    q8tk_box_pack_start(v, audio_window);
 	}
-	{						/* ¤µ¤é¤Ë¥Ü¥Ã¥¯¥¹   */
+	{						/* ã•ã‚‰ã«ãƒœãƒƒã‚¯ã‚¹   */
 	    h = q8tk_hbox_new();
 	    q8tk_box_pack_start(v, h);
 	    q8tk_widget_show(h);
-							/* ¥Ü¥Ã¥¯¥¹¤Ë¤Ï     */
-	    {						/* ½ªÎ»¥Ü¥¿¥ó¤òÇÛÃÖ */
+							/* ãƒœãƒƒã‚¯ã‚¹ã«ã¯     */
+	    {						/* çµ‚äº†ãƒœã‚¿ãƒ³ã‚’é…ç½® */
 		b = PACK_BUTTON(h,
 				GET_LABEL(p, DATA_VOLUME_AUDIO_QUIT),
 				cb_volume_audio_end, NULL);
@@ -2352,7 +2352,7 @@ static	void	audio_start(void)
 		q8tk_accel_group_add(audio_accel, Q8TK_KEY_ESC, b, "clicked");
 
 
-							/* ¥é¥Ù¥ë¤âÇÛÃÖ */
+							/* ãƒ©ãƒ™ãƒ«ã‚‚é…ç½® */
 		l = PACK_LABEL(h, GET_LABEL(p, DATA_VOLUME_AUDIO_INFO));
 		q8tk_misc_set_placement(l, 0, Q8TK_PLACEMENT_Y_CENTER);
 	    }
@@ -2365,15 +2365,15 @@ static	void	audio_start(void)
     q8tk_widget_set_focus(b);
 
 
-    audio[ AUDIO_WIN    ] = w;	/* ¥À¥¤¥¢¥í¥°¤òÊÄ¤¸¤¿¤È¤­¤ËÈ÷¤¨¤Æ */
-    audio[ AUDIO_FRAME  ] = f;	/* ¥¦¥£¥¸¥Ã¥È¤ò³Ğ¤¨¤Æ¤ª¤­¤Ş¤¹     */
+    audio[ AUDIO_WIN    ] = w;	/* ãƒ€ã‚¤ã‚¢ãƒ­ã‚°ã‚’é–‰ã˜ãŸã¨ãã«å‚™ãˆã¦ */
+    audio[ AUDIO_FRAME  ] = f;	/* ã‚¦ã‚£ã‚¸ãƒƒãƒˆã‚’è¦šãˆã¦ãŠãã¾ã™     */
     audio[ AUDIO_VBOX   ] = v;
     audio[ AUDIO_HBOX   ] = h;
     audio[ AUDIO_BUTTON ] = b;
     audio[ AUDIO_LABEL  ] = l;
 }
 
-/* ¥µ¥¦¥ó¥É¾ÜºÙ¥¦¥¤¥ó¥É¥¦¤Î¾Ãµî */
+/* ã‚µã‚¦ãƒ³ãƒ‰è©³ç´°ã‚¦ã‚¤ãƒ³ãƒ‰ã‚¦ã®æ¶ˆå» */
 
 static	void	audio_finish(void)
 {
@@ -2394,36 +2394,36 @@ static	void	audio_finish(void)
 
 /*===========================================================================
  *
- *	¥á¥¤¥ó¥Ú¡¼¥¸	¥Ç¥£¥¹¥¯
+ *	ãƒ¡ã‚¤ãƒ³ãƒšãƒ¼ã‚¸	ãƒ‡ã‚£ã‚¹ã‚¯
  *
  *===========================================================================*/
 
 /*----------------------------------------------------------------------*/
 
 typedef struct{
-    Q8tkWidget	*list;			/* ¥¤¥á¡¼¥¸°ìÍ÷¤Î¥ê¥¹¥È	*/
-/*  Q8tkWidget	*button[2];		 * ¥Ü¥¿¥ó¤È		*/
-    Q8tkWidget	*label[2];		/* ¤½¤Î¥é¥Ù¥ë (2¸Ä)	*/
-    int		func[2];		/* ¥Ü¥¿¥ó¤Îµ¡Ç½ IMG_xxx	*/
-    Q8tkWidget	*stat_label;		/* ¾ğÊó - Busy/Ready	*/
-    Q8tkWidget	*attr_label;		/* ¾ğÊó - RO/RWÂ°À­	*/
-    Q8tkWidget	*num_label;		/* ¾ğÊó - ¥¤¥á¡¼¥¸¿ô	*/
+    Q8tkWidget	*list;			/* ã‚¤ãƒ¡ãƒ¼ã‚¸ä¸€è¦§ã®ãƒªã‚¹ãƒˆ	*/
+/*  Q8tkWidget	*button[2];		 * ãƒœã‚¿ãƒ³ã¨		*/
+    Q8tkWidget	*label[2];		/* ãã®ãƒ©ãƒ™ãƒ« (2å€‹)	*/
+    int		func[2];		/* ãƒœã‚¿ãƒ³ã®æ©Ÿèƒ½ IMG_xxx	*/
+    Q8tkWidget	*stat_label;		/* æƒ…å ± - Busy/Ready	*/
+    Q8tkWidget	*attr_label;		/* æƒ…å ± - RO/RWå±æ€§	*/
+    Q8tkWidget	*num_label;		/* æƒ…å ± - ã‚¤ãƒ¡ãƒ¼ã‚¸æ•°	*/
 } T_DISK_INFO;
 
-static	T_DISK_INFO	disk_info[2];	/* 2¥É¥é¥¤¥ÖÊ¬¤Î¥ï¡¼¥¯	*/
+static	T_DISK_INFO	disk_info[2];	/* 2ãƒ‰ãƒ©ã‚¤ãƒ–åˆ†ã®ãƒ¯ãƒ¼ã‚¯	*/
 
 static	char		disk_filename[ QUASI88_MAX_FILENAME ];
 
-static	int		disk_drv;	/* Áàºî¤¹¤ë¥É¥é¥¤¥Ö¤ÎÈÖ¹æ */
-static	int		disk_img;	/* Áàºî¤¹¤ë¥¤¥á¡¼¥¸¤ÎÈÖ¹æ */
+static	int		disk_drv;	/* æ“ä½œã™ã‚‹ãƒ‰ãƒ©ã‚¤ãƒ–ã®ç•ªå· */
+static	int		disk_img;	/* æ“ä½œã™ã‚‹ã‚¤ãƒ¡ãƒ¼ã‚¸ã®ç•ªå· */
 
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -*/
 
 static	void	set_disk_widget(void);
 
 
-/* BOOT from DISK ¤Ç¡¢DISK ¤ò CLOSE ¤·¤¿»ş¤ä¡¢
-   BOOT from ROM  ¤Ç¡¢DISK ¤ò OPEN ¤·¤¿»ş¤Ï¡¢ DIP-SW ÀßÄê¤ò¶¯À©ÊÑ¹¹ */
+/* BOOT from DISK ã§ã€DISK ã‚’ CLOSE ã—ãŸæ™‚ã‚„ã€
+   BOOT from ROM  ã§ã€DISK ã‚’ OPEN ã—ãŸæ™‚ã¯ã€ DIP-SW è¨­å®šã‚’å¼·åˆ¶å¤‰æ›´ */
 static	void	disk_update_dipsw_b_boot(void)
 {
     if (disk_image_exist(0) || disk_image_exist(1)) {
@@ -2433,21 +2433,21 @@ static	void	disk_update_dipsw_b_boot(void)
     }
     set_reset_dipsw_boot();
 
-    /* ¥ê¥»¥Ã¥È¤·¤Ê¤¤¤Ç¥á¥Ë¥å¡¼¥â¡¼¥É¤òÈ´¤±¤ë¤ÈÀßÄê¤¬ÊİÂ¸¤µ¤ì¤Ê¤¤¤Î¤Ç¡¦¡¦¡¦ */
+    /* ãƒªã‚»ãƒƒãƒˆã—ãªã„ã§ãƒ¡ãƒ‹ãƒ¥ãƒ¼ãƒ¢ãƒ¼ãƒ‰ã‚’æŠœã‘ã‚‹ã¨è¨­å®šãŒä¿å­˜ã•ã‚Œãªã„ã®ã§ãƒ»ãƒ»ãƒ» */
     boot_from_rom = reset_req.boot_from_rom;		/* thanks floi ! */
 }
 
 
 /*----------------------------------------------------------------------*/
-/* Â°À­ÊÑ¹¹¤Î³Æ¼ï½èÍı							*/
+/* å±æ€§å¤‰æ›´ã®å„ç¨®å‡¦ç†							*/
 
 enum {
-    ATTR_RENAME,	/* drive[drv] ¤Î¥¤¥á¡¼¥¸ img ¤ò¥ê¥Í¡¼¥à		*/
-    ATTR_PROTECT,	/* drive[drv] ¤Î¥¤¥á¡¼¥¸ img ¤ò¥×¥í¥Æ¥¯¥È	*/
-    ATTR_FORMAT,	/* drive[drv] ¤Î¥¤¥á¡¼¥¸ img ¤ò¥¢¥ó¥Õ¥©¡¼¥Ş¥Ã¥È	*/
-    ATTR_UNFORMAT,	/* drive[drv] ¤Î¥¤¥á¡¼¥¸ img ¤ò¥Õ¥©¡¼¥Ş¥Ã¥È	*/
-    ATTR_APPEND,	/* drive[drv] ¤ËºÇ¸å¤Ë¥¤¥á¡¼¥¸¤òÄÉ²Ã		*/
-    ATTR_CREATE		/* ¿·µ¬¤Ë¥Ç¥£¥¹¥¯¥¤¥á¡¼¥¸¥Õ¥¡¥¤¥ë¤òºîÀ®		*/
+    ATTR_RENAME,	/* drive[drv] ã®ã‚¤ãƒ¡ãƒ¼ã‚¸ img ã‚’ãƒªãƒãƒ¼ãƒ 		*/
+    ATTR_PROTECT,	/* drive[drv] ã®ã‚¤ãƒ¡ãƒ¼ã‚¸ img ã‚’ãƒ—ãƒ­ãƒ†ã‚¯ãƒˆ	*/
+    ATTR_FORMAT,	/* drive[drv] ã®ã‚¤ãƒ¡ãƒ¼ã‚¸ img ã‚’ã‚¢ãƒ³ãƒ•ã‚©ãƒ¼ãƒãƒƒãƒˆ	*/
+    ATTR_UNFORMAT,	/* drive[drv] ã®ã‚¤ãƒ¡ãƒ¼ã‚¸ img ã‚’ãƒ•ã‚©ãƒ¼ãƒãƒƒãƒˆ	*/
+    ATTR_APPEND,	/* drive[drv] ã«æœ€å¾Œã«ã‚¤ãƒ¡ãƒ¼ã‚¸ã‚’è¿½åŠ 		*/
+    ATTR_CREATE		/* æ–°è¦ã«ãƒ‡ã‚£ã‚¹ã‚¯ã‚¤ãƒ¡ãƒ¼ã‚¸ãƒ•ã‚¡ã‚¤ãƒ«ã‚’ä½œæˆ		*/
 };
 
 static	void	sub_disk_attr_file_ctrl(int drv, int img, int cmd, char *c)
@@ -2457,45 +2457,45 @@ static	void	sub_disk_attr_file_ctrl(int drv, int img, int cmd, char *c)
     OSD_FILE *fp;
 
 
-    if (cmd != ATTR_CREATE) {		/* ¥É¥é¥¤¥Ö¤Î¥Õ¥¡¥¤¥ë¤òÊÑ¹¹¤¹¤ë¾ì¹ç */
+    if (cmd != ATTR_CREATE) {		/* ãƒ‰ãƒ©ã‚¤ãƒ–ã®ãƒ•ã‚¡ã‚¤ãƒ«ã‚’å¤‰æ›´ã™ã‚‹å ´åˆ */
 
-	fp = drive[ drv ].fp;			/* ¤½¤Î¥Õ¥¡¥¤¥ë¥İ¥¤¥ó¥¿¤ò¼èÆÀ*/
+	fp = drive[ drv ].fp;			/* ãã®ãƒ•ã‚¡ã‚¤ãƒ«ãƒã‚¤ãƒ³ã‚¿ã‚’å–å¾—*/
 	if (drive[ drv ].read_only) {
 	    ro = TRUE;
 	}
 
-    } else {				/* ÊÌ¤Î¥Õ¥¡¥¤¥ë¤ò¹¹¿·¤¹¤ë¾ì¹ç */
+    } else {				/* åˆ¥ã®ãƒ•ã‚¡ã‚¤ãƒ«ã‚’æ›´æ–°ã™ã‚‹å ´åˆ */
 
-	fp = osd_fopen(FTYPE_DISK, c, "r+b");		/* "r+b" ¤Ç¥ª¡¼¥×¥ó */
+	fp = osd_fopen(FTYPE_DISK, c, "r+b");		/* "r+b" ã§ã‚ªãƒ¼ãƒ—ãƒ³ */
 	if (fp == NULL) {
-	    fp = osd_fopen(FTYPE_DISK, c, "rb");	/* "rb" ¤Ç¥ª¡¼¥×¥ó */
+	    fp = osd_fopen(FTYPE_DISK, c, "rb");	/* "rb" ã§ã‚ªãƒ¼ãƒ—ãƒ³ */
 	    if (fp) ro = TRUE;
 	}
 
-	if (fp) {					/* ¥ª¡¼¥×¥ó¤Ç¤­¤¿¤é */
-	    if      (fp == drive[ 0 ].fp) drv = 0;	/* ¤¹¤Ç¤Ë¥É¥é¥¤¥Ö¤Ë */
-	    else if (fp == drive[ 1 ].fp) drv = 1;	/* ³«¤¤¤Æ¤Ê¤¤¤«¤ò   */
-	    else                          drv = -1;	/* ¥Á¥§¥Ã¥¯¤¹¤ë     */
+	if (fp) {					/* ã‚ªãƒ¼ãƒ—ãƒ³ã§ããŸã‚‰ */
+	    if      (fp == drive[ 0 ].fp) drv = 0;	/* ã™ã§ã«ãƒ‰ãƒ©ã‚¤ãƒ–ã« */
+	    else if (fp == drive[ 1 ].fp) drv = 1;	/* é–‹ã„ã¦ãªã„ã‹ã‚’   */
+	    else                          drv = -1;	/* ãƒã‚§ãƒƒã‚¯ã™ã‚‹     */
 	}
-	else {						/* ¥ª¡¼¥×¥ó¤Ç¤­¤Ê¤¤ */
-	    fp = osd_fopen(FTYPE_DISK, c, "ab");	/* »ş¤Ï¡¢¿·µ¬¤ËºîÀ® */
+	else {						/* ã‚ªãƒ¼ãƒ—ãƒ³ã§ããªã„ */
+	    fp = osd_fopen(FTYPE_DISK, c, "ab");	/* æ™‚ã¯ã€æ–°è¦ã«ä½œæˆ */
 	    drv = -1;
 	}
 
     }
 
 
-    if (fp == NULL) {			/* ¥ª¡¼¥×¥ó¼ºÇÔ */
+    if (fp == NULL) {			/* ã‚ªãƒ¼ãƒ—ãƒ³å¤±æ•— */
 	start_file_error_dialog(drv, ERR_CANT_OPEN);
 	return;
     }
-    else if (ro) {			/* ¥ê¡¼¥É¥ª¥ó¥ê¡¼¤Ê¤Î¤Ç½èÍıÉÔ²Ä */
+    else if (ro) {			/* ãƒªãƒ¼ãƒ‰ã‚ªãƒ³ãƒªãƒ¼ãªã®ã§å‡¦ç†ä¸å¯ */
 	if (drv < 0) osd_fclose(fp);
 	if (cmd != ATTR_CREATE) start_file_error_dialog(drv, ERR_READ_ONLY);
 	else                    start_file_error_dialog( -1, ERR_READ_ONLY);
 	return;
     }
-    else if (drv>=0 &&			/* ²õ¤ì¤¿¥¤¥á¡¼¥¸¤¬´Ş¤Ş¤ì¤ë¤Î¤ÇÉÔ²Ä */
+    else if (drv>=0 &&			/* å£Šã‚ŒãŸã‚¤ãƒ¡ãƒ¼ã‚¸ãŒå«ã¾ã‚Œã‚‹ã®ã§ä¸å¯ */
 	     drive[ drv ].detect_broken_image) {
 	start_file_error_dialog(drv, ERR_MAYBE_BROKEN);
 	return;
@@ -2504,12 +2504,12 @@ static	void	sub_disk_attr_file_ctrl(int drv, int img, int cmd, char *c)
 
 #if 0
     if (cmd == ATTR_CREATE || cmd == ATTR_APPEND) {
-	/* ¤³¤Î½èÍı¤Ë»ş´Ö¤¬¤«¤«¤ë¤è¤¦¤Ê¾ì¹ç¡¢¥á¥Ã¥»¡¼¥¸¤ò¤À¤¹¡©¡© */
-	/* ¤³¤Î½èÍı¤¬¤½¤ó¤Ê¤Ë»ş´Ö¤¬¤«¤«¤ë¤³¤È¤Ï¤Ê¤¤¡©¡© */
+	/* ã“ã®å‡¦ç†ã«æ™‚é–“ãŒã‹ã‹ã‚‹ã‚ˆã†ãªå ´åˆã€ãƒ¡ãƒƒã‚»ãƒ¼ã‚¸ã‚’ã ã™ï¼Ÿï¼Ÿ */
+	/* ã“ã®å‡¦ç†ãŒãã‚“ãªã«æ™‚é–“ãŒã‹ã‹ã‚‹ã“ã¨ã¯ãªã„ï¼Ÿï¼Ÿ */
     }
 #endif
 
-		/* ³«¤¤¤¿¥Õ¥¡¥¤¥ë¤ËÂĞ¤·¤Æ¡¢½èÍı */
+		/* é–‹ã„ãŸãƒ•ã‚¡ã‚¤ãƒ«ã«å¯¾ã—ã¦ã€å‡¦ç† */
 
     switch (cmd) {
     case ATTR_RENAME:	result = d88_write_name(fp, drv, img, c);	break;
@@ -2520,7 +2520,7 @@ static	void	sub_disk_attr_file_ctrl(int drv, int img, int cmd, char *c)
     case ATTR_CREATE:	result = d88_append_blank(fp, drv);		break;
     }
 
-		/* ¤½¤Î·ë²Ì */
+		/* ãã®çµæœ */
 
     switch (result) {
     case D88_SUCCESS:	result = ERR_NO;			break;
@@ -2532,13 +2532,13 @@ static	void	sub_disk_attr_file_ctrl(int drv, int img, int cmd, char *c)
     default:		result = ERR_UNEXPECTED;		break;
     }
 
-		/* ½ªÎ»½èÍı¡£¤Ê¤ª¡¢¥¨¥é¡¼»ş¤Ï¥á¥Ã¥»¡¼¥¸¤ò½Ğ¤¹ */
+		/* çµ‚äº†å‡¦ç†ã€‚ãªãŠã€ã‚¨ãƒ©ãƒ¼æ™‚ã¯ãƒ¡ãƒƒã‚»ãƒ¼ã‚¸ã‚’å‡ºã™ */
 
-    if (drv < 0) {		/* ¿·µ¬¥ª¡¼¥×¥ó¤·¤¿¥Õ¥¡¥¤¥ë¤ò¹¹¿·¤·¤¿¾ì¹ç */
-	osd_fclose(fp);			/* ¥Õ¥¡¥¤¥ë¤òÊÄ¤¸¤Æ½ª¤ï¤ê	  */
+    if (drv < 0) {		/* æ–°è¦ã‚ªãƒ¼ãƒ—ãƒ³ã—ãŸãƒ•ã‚¡ã‚¤ãƒ«ã‚’æ›´æ–°ã—ãŸå ´åˆ */
+	osd_fclose(fp);			/* ãƒ•ã‚¡ã‚¤ãƒ«ã‚’é–‰ã˜ã¦çµ‚ã‚ã‚Š	  */
 
-    } else {			/* ¥É¥é¥¤¥Ö¤Î¥Õ¥¡¥¤¥ë¤ò¹¹¿·¤·¤¿¾ì¹ç	  */
-	if (result == ERR_NO) {		/* ¥á¥Ë¥å¡¼²èÌÌ¤ò¹¹¿·¤»¤Í¤Ğ	  */
+    } else {			/* ãƒ‰ãƒ©ã‚¤ãƒ–ã®ãƒ•ã‚¡ã‚¤ãƒ«ã‚’æ›´æ–°ã—ãŸå ´åˆ	  */
+	if (result == ERR_NO) {		/* ãƒ¡ãƒ‹ãƒ¥ãƒ¼ç”»é¢ã‚’æ›´æ–°ã›ã­ã°	  */
 	    set_disk_widget();
 	    if (cmd != ATTR_CREATE) disk_update_dipsw_b_boot();
 	}
@@ -2552,13 +2552,13 @@ static	void	sub_disk_attr_file_ctrl(int drv, int img, int cmd, char *c)
 }
 
 /*----------------------------------------------------------------------*/
-/* ¡Ö¥ê¥Í¡¼¥à¡×¥À¥¤¥¢¥í¥°						*/
+/* ã€Œãƒªãƒãƒ¼ãƒ ã€ãƒ€ã‚¤ã‚¢ãƒ­ã‚°						*/
 
 static	void	cb_disk_attr_rename_activate(UNUSED_WIDGET, void *p)
 {
     char wk[16 + 1];
 
-    if ((int)p) {		/* dialog_destroy() ¤ÎÁ°¤Ë¥¨¥ó¥È¥ê¤ò¥²¥Ã¥È */
+    if ((int)p) {		/* dialog_destroy() ã®å‰ã«ã‚¨ãƒ³ãƒˆãƒªã‚’ã‚²ãƒƒãƒˆ */
 	strncpy(wk, dialog_get_entry(), 16);
 	wk[16] = '\0';
     }
@@ -2605,7 +2605,7 @@ static	void	sub_disk_attr_rename(const char *image_name)
 }
 
 /*----------------------------------------------------------------------*/
-/* ¡Ö¥×¥í¥Æ¥¯¥È¡×¥À¥¤¥¢¥í¥°						*/
+/* ã€Œãƒ—ãƒ­ãƒ†ã‚¯ãƒˆã€ãƒ€ã‚¤ã‚¢ãƒ­ã‚°						*/
 
 static	void	cb_disk_attr_protect_clicked(UNUSED_WIDGET, void *p)
 {
@@ -2652,7 +2652,7 @@ static	void	sub_disk_attr_protect(const char *image_name)
 }
 
 /*----------------------------------------------------------------------*/
-/* ¡Ö¥Õ¥©¡¼¥Ş¥Ã¥È¡×¥À¥¤¥¢¥í¥°						*/
+/* ã€Œãƒ•ã‚©ãƒ¼ãƒãƒƒãƒˆã€ãƒ€ã‚¤ã‚¢ãƒ­ã‚°						*/
 
 static	void	cb_disk_attr_format_clicked(UNUSED_WIDGET, void *p)
 {
@@ -2699,7 +2699,7 @@ static	void	sub_disk_attr_format(const char *image_name)
 }
 
 /*----------------------------------------------------------------------*/
-/* ¡Ö¥Ö¥é¥ó¥¯¥Ç¥£¥¹¥¯¡×¥À¥¤¥¢¥í¥°					*/
+/* ã€Œãƒ–ãƒ©ãƒ³ã‚¯ãƒ‡ã‚£ã‚¹ã‚¯ã€ãƒ€ã‚¤ã‚¢ãƒ­ã‚°					*/
 
 static	void	cb_disk_attr_blank_clicked(UNUSED_WIDGET, void *p)
 {
@@ -2733,7 +2733,7 @@ static	void	sub_disk_attr_blank(void)
 }
 
 /*----------------------------------------------------------------------*/
-/* ¡ÖÂ°À­ÊÑ¹¹¡× ¥Ü¥¿¥ó²¡²¼»ş¤Î½èÍı  -  ¾ÜºÙÁªÂò¤Î¥À¥¤¥¢¥í¥°¤ò³«¤¯	*/
+/* ã€Œå±æ€§å¤‰æ›´ã€ ãƒœã‚¿ãƒ³æŠ¼ä¸‹æ™‚ã®å‡¦ç†  -  è©³ç´°é¸æŠã®ãƒ€ã‚¤ã‚¢ãƒ­ã‚°ã‚’é–‹ã	*/
 
 static char disk_attr_image_name[20];
 static	void	cb_disk_attr_clicked(UNUSED_WIDGET, void *p)
@@ -2756,7 +2756,7 @@ static void sub_disk_attr(void)
     int save_code;
     const t_menulabel *l = data_disk_attr;
 
-    sprintf(disk_attr_image_name,		/* ¥¤¥á¡¼¥¸Ì¾¤ò¥»¥Ã¥È */
+    sprintf(disk_attr_image_name,		/* ã‚¤ãƒ¡ãƒ¼ã‚¸åã‚’ã‚»ãƒƒãƒˆ */
 	    "\"%-16s\"", drive[disk_drv].image[disk_img].name);
 
     dialog_create();
@@ -2795,7 +2795,7 @@ static void sub_disk_attr(void)
 
 
 /*----------------------------------------------------------------------*/
-/* ¡Ö¥¤¥á¡¼¥¸¥Õ¥¡¥¤¥ë¤ò³«¤¯¡× ¥Ü¥¿¥ó²¡²¼»ş¤Î½èÍı			*/
+/* ã€Œã‚¤ãƒ¡ãƒ¼ã‚¸ãƒ•ã‚¡ã‚¤ãƒ«ã‚’é–‹ãã€ ãƒœã‚¿ãƒ³æŠ¼ä¸‹æ™‚ã®å‡¦ç†			*/
 
 static	int	disk_open_ro;
 static	int	disk_open_cmd;
@@ -2811,11 +2811,11 @@ static void sub_disk_open(int cmd)
     disk_open_cmd = cmd;
     num = (cmd == IMG_OPEN) ? DATA_DISK_OPEN_OPEN : DATA_DISK_OPEN_BOTH;
 
-    /* ¥Ç¥£¥¹¥¯¤¬¤¢¤ì¤Ğ¤½¤Î¥Õ¥¡¥¤¥ë¤ò¡¢¤Ê¤±¤ì¤Ğ¥Ç¥£¥¹¥¯ÍÑ¥Ç¥£¥ì¥¯¥È¥ê¤ò¼èÆÀ */
+    /* ãƒ‡ã‚£ã‚¹ã‚¯ãŒã‚ã‚Œã°ãã®ãƒ•ã‚¡ã‚¤ãƒ«ã‚’ã€ãªã‘ã‚Œã°ãƒ‡ã‚£ã‚¹ã‚¯ç”¨ãƒ‡ã‚£ãƒ¬ã‚¯ãƒˆãƒªã‚’å–å¾— */
     initial = filename_get_disk_or_dir(disk_drv);
 
     START_FILE_SELECTION(GET_LABEL(l, num),
-			 (menu_readonly) ? 1 : 0,     /* ReadOnly ¤ÎÁªÂò¤¬²Ä */
+			 (menu_readonly) ? 1 : 0,     /* ReadOnly ã®é¸æŠãŒå¯ */
 			 initial,
 
 			 sub_disk_open_ok,
@@ -2833,19 +2833,19 @@ static void sub_disk_open_ok(void)
 	    start_file_error_dialog(disk_drv, ERR_CANT_OPEN);
 	}
 	else {
-	    if (disk_same_file()) {	/* È¿ÂĞÂ¦¤ÈÆ±¤¸¥Õ¥¡¥¤¥ë¤À¤Ã¤¿¾ì¹ç */
+	    if (disk_same_file()) {	/* åå¯¾å´ã¨åŒã˜ãƒ•ã‚¡ã‚¤ãƒ«ã ã£ãŸå ´åˆ */
 		int dst = disk_drv;
 		int src = disk_drv ^ 1;
 		int img;
 
-		if (drive[ src ].empty) {	    /* È¿ÂĞÂ¦¥É¥é¥¤¥Ö ¶õ¤Ê¤é */
-		    img = 0;			    /*        ºÇ½é¤Î¥¤¥á¡¼¥¸ */
+		if (drive[ src ].empty) {	    /* åå¯¾å´ãƒ‰ãƒ©ã‚¤ãƒ– ç©ºãªã‚‰ */
+		    img = 0;			    /*        æœ€åˆã®ã‚¤ãƒ¡ãƒ¼ã‚¸ */
 		} else {
-		    if (disk_image_num(src) == 1) { /* ¥¤¥á¡¼¥¸¤¬1¸Ä¤Î¾ì¹ç¤Ï */
-			img = -1;		    /*        ¥É¥é¥¤¥Ö ¶õ¤Ë  */
+		    if (disk_image_num(src) == 1) { /* ã‚¤ãƒ¡ãƒ¼ã‚¸ãŒ1å€‹ã®å ´åˆã¯ */
+			img = -1;		    /*        ãƒ‰ãƒ©ã‚¤ãƒ– ç©ºã«  */
 
-		    } else {			    /* ¥¤¥á¡¼¥¸¤¬Ê£¿ô¤¢¤ì¤Ğ  */
-						    /*        ¼¡(Á°)¥¤¥á¡¼¥¸ */
+		    } else {			    /* ã‚¤ãƒ¡ãƒ¼ã‚¸ãŒè¤‡æ•°ã‚ã‚Œã°  */
+						    /*        æ¬¡(å‰)ã‚¤ãƒ¡ãƒ¼ã‚¸ */
 			img = disk_image_selected(src)
 						+ ((dst == DRIVE_1) ? -1 : +1);
 			if ((img < 0) || 
@@ -2878,7 +2878,7 @@ static void sub_disk_open_ok(void)
 }
 
 /*----------------------------------------------------------------------*/
-/* ¡Ö¥¤¥á¡¼¥¸¥Õ¥¡¥¤¥ë¤òÊÄ¤¸¤ë¡× ¥Ü¥¿¥ó²¡²¼»ş¤Î½èÍı			*/
+/* ã€Œã‚¤ãƒ¡ãƒ¼ã‚¸ãƒ•ã‚¡ã‚¤ãƒ«ã‚’é–‰ã˜ã‚‹ã€ ãƒœã‚¿ãƒ³æŠ¼ä¸‹æ™‚ã®å‡¦ç†			*/
 
 static void sub_disk_close(void)
 {
@@ -2894,7 +2894,7 @@ static void sub_disk_close(void)
 }
 
 /*----------------------------------------------------------------------*/
-/* ¡ÖÈ¿ÂĞ¥É¥é¥¤¥Ö¤ÈÆ±¤¸¥Õ¥¡¥¤¥ë¤ò³«¤¯¡× ¥Ü¥¿¥ó²¡²¼»ş¤Î½èÍı		*/
+/* ã€Œåå¯¾ãƒ‰ãƒ©ã‚¤ãƒ–ã¨åŒã˜ãƒ•ã‚¡ã‚¤ãƒ«ã‚’é–‹ãã€ ãƒœã‚¿ãƒ³æŠ¼ä¸‹æ™‚ã®å‡¦ç†		*/
 
 static void sub_disk_copy(void)
 {
@@ -2904,14 +2904,14 @@ static void sub_disk_copy(void)
 
     if (! disk_image_exist(src)) return;
 
-    if (drive[ src ].empty) {			/* È¿ÂĞÂ¦¥É¥é¥¤¥Ö ¶õ¤Ê¤é */
-	img = 0;				/*        ºÇ½é¤Î¥¤¥á¡¼¥¸ */
+    if (drive[ src ].empty) {			/* åå¯¾å´ãƒ‰ãƒ©ã‚¤ãƒ– ç©ºãªã‚‰ */
+	img = 0;				/*        æœ€åˆã®ã‚¤ãƒ¡ãƒ¼ã‚¸ */
     } else {
-	if (disk_image_num(src) == 1) {		/* ¥¤¥á¡¼¥¸¤¬1¸Ä¤Î¾ì¹ç¤Ï */
-	    img = -1;				/*        ¥É¥é¥¤¥Ö ¶õ¤Ë  */
+	if (disk_image_num(src) == 1) {		/* ã‚¤ãƒ¡ãƒ¼ã‚¸ãŒ1å€‹ã®å ´åˆã¯ */
+	    img = -1;				/*        ãƒ‰ãƒ©ã‚¤ãƒ– ç©ºã«  */
 
-	} else {				/* ¥¤¥á¡¼¥¸¤¬Ê£¿ô¤¢¤ì¤Ğ  */
-						/*        ¼¡(Á°)¥¤¥á¡¼¥¸ */
+	} else {				/* ã‚¤ãƒ¡ãƒ¼ã‚¸ãŒè¤‡æ•°ã‚ã‚Œã°  */
+						/*        æ¬¡(å‰)ã‚¤ãƒ¡ãƒ¼ã‚¸ */
 	    img = disk_image_selected(src) + ((dst == DRIVE_1) ? -1 : +1);
 	    if ((img < 0) || 
 		(disk_image_num(dst) -1 < img)) img = -1;
@@ -2936,23 +2936,23 @@ static void sub_disk_copy(void)
 
 
 /*----------------------------------------------------------------------*/
-/* ¥¤¥á¡¼¥¸¤Î¥ê¥¹¥È¥¢¥¤¥Æ¥àÁªÂò»ş¤Î¡¢¥³¡¼¥ë¥Ğ¥Ã¥¯´Ø¿ô			*/
+/* ã‚¤ãƒ¡ãƒ¼ã‚¸ã®ãƒªã‚¹ãƒˆã‚¢ã‚¤ãƒ†ãƒ é¸æŠæ™‚ã®ã€ã‚³ãƒ¼ãƒ«ãƒãƒƒã‚¯é–¢æ•°			*/
 
 static	void	cb_disk_image(UNUSED_WIDGET, void *p)
 {
     int drv = ((int)p) & 0xff;
     int img = ((int)p) >> 8;
 
-    if (img < 0) {			/* img == -1 ¤Ç <<¤Ê¤·>> */
+    if (img < 0) {			/* img == -1 ã§ <<ãªã—>> */
 	drive_set_empty(drv);
-    } else {				/* img >= 0 ¤Ê¤é ¥¤¥á¡¼¥¸ÈÖ¹æ */
+    } else {				/* img >= 0 ãªã‚‰ ã‚¤ãƒ¡ãƒ¼ã‚¸ç•ªå· */
 	drive_unset_empty(drv);
 	disk_change_image(drv, img);
     }
 }
 
 /*----------------------------------------------------------------------*/
-/* ¥É¥é¥¤¥ÖËè¤ËÂ¸ºß¤¹¤ë¥Ü¥¿¥ó¤Î¡¢¥³¡¼¥ë¥Ğ¥Ã¥¯´Ø¿ô			*/
+/* ãƒ‰ãƒ©ã‚¤ãƒ–æ¯ã«å­˜åœ¨ã™ã‚‹ãƒœã‚¿ãƒ³ã®ã€ã‚³ãƒ¼ãƒ«ãƒãƒƒã‚¯é–¢æ•°			*/
 
 static	void	cb_disk_button(UNUSED_WIDGET, void *p)
 {
@@ -2974,7 +2974,7 @@ static	void	cb_disk_button(UNUSED_WIDGET, void *p)
 	sub_disk_copy();
 	break;
     case IMG_ATTR:
-	if (! drive_check_empty(drv)) {	     /* ¥¤¥á¡¼¥¸<<¤Ê¤·>>ÁªÂò»ş¤ÏÌµ¸ú */
+	if (! drive_check_empty(drv)) {	     /* ã‚¤ãƒ¡ãƒ¼ã‚¸<<ãªã—>>é¸æŠæ™‚ã¯ç„¡åŠ¹ */
 	    sub_disk_attr();
 	}
 	break;
@@ -2982,8 +2982,8 @@ static	void	cb_disk_button(UNUSED_WIDGET, void *p)
 }
 
 /*----------------------------------------------------------------------*/
-/* ¥Õ¥¡¥¤¥ë¤ò³«¤¯Ëè¤Ë¡¢disk_info[] ¤Ë¾ğÊó¤ò¥»¥Ã¥È			*/
-/*		(¥¤¥á¡¼¥¸¤Î¥ê¥¹¥ÈÀ¸À®¡¢¥Ü¥¿¥ó¡¦¾ğÊó¤Î¥é¥Ù¥ë¤ò¥»¥Ã¥È)	*/
+/* ãƒ•ã‚¡ã‚¤ãƒ«ã‚’é–‹ãæ¯ã«ã€disk_info[] ã«æƒ…å ±ã‚’ã‚»ãƒƒãƒˆ			*/
+/*		(ã‚¤ãƒ¡ãƒ¼ã‚¸ã®ãƒªã‚¹ãƒˆç”Ÿæˆã€ãƒœã‚¿ãƒ³ãƒ»æƒ…å ±ã®ãƒ©ãƒ™ãƒ«ã‚’ã‚»ãƒƒãƒˆ)	*/
 
 static	void	set_disk_widget(void)
 {
@@ -3008,22 +3008,22 @@ static	void	set_disk_widget(void)
 			     : data_disk_button_drv2;
 	}
 
-		/* ¥¤¥á¡¼¥¸Ì¾¤Î LIST ITEM À¸À® */
+		/* ã‚¤ãƒ¡ãƒ¼ã‚¸åã® LIST ITEM ç”Ÿæˆ */
 
 	q8tk_listbox_clear_items(w->list, 0, -1);
 
 	item = q8tk_list_item_new_with_label(GET_LABEL(l,
 						       DATA_DISK_IMAGE_EMPTY));
 	q8tk_widget_show(item);
-	q8tk_container_add(w->list, item);		/* <<¤Ê¤·>> ITEM */
+	q8tk_container_add(w->list, item);		/* <<ãªã—>> ITEM */
 	q8tk_signal_connect(item, "select",
 			    cb_disk_image, (void *)((-1 << 8) + drv));
 
-	if (disk_image_exist(drv)) {		/* ---- ¥Ç¥£¥¹¥¯ÁŞÆşºÑ ---- */
+	if (disk_image_exist(drv)) {		/* ---- ãƒ‡ã‚£ã‚¹ã‚¯æŒ¿å…¥æ¸ˆ ---- */
 	    save_code = q8tk_set_kanjicode(Q8TK_KANJI_SJIS);
 	    {
 		for (i=0; i<disk_image_num(drv); i++) {
-		    sprintf(wk, "%3d  %-16s  %s ", /*¥¤¥á¡¼¥¸No ¥¤¥á¡¼¥¸Ì¾ RW*/
+		    sprintf(wk, "%3d  %-16s  %s ", /*ã‚¤ãƒ¡ãƒ¼ã‚¸No ã‚¤ãƒ¡ãƒ¼ã‚¸å RW*/
 			    i+1,
 			    drive[drv].image[i].name,
 			    (drive[drv].image[i].protect) ? "RO" : "RW");
@@ -3037,16 +3037,16 @@ static	void	set_disk_widget(void)
 	    }
 	    q8tk_set_kanjicode(save_code);
 
-				/* <<¤Ê¤·>> or ÁªÂòimage ¤Î ITEM ¤ò¥»¥ì¥¯¥È */
+				/* <<ãªã—>> or é¸æŠimage ã® ITEM ã‚’ã‚»ãƒ¬ã‚¯ãƒˆ */
 	    if (drive_check_empty(drv)) i = 0;
 	    else                        i = disk_image_selected(drv) + 1;
 	    q8tk_listbox_select_item(w->list, i);
 
-	} else {				/* ---- ¥É¥é¥¤¥Ö¶õ¤Ã¤İ ---- */
-	    q8tk_listbox_select_item(w->list, 0);	    /* <<¤Ê¤·>> ITEM */
+	} else {				/* ---- ãƒ‰ãƒ©ã‚¤ãƒ–ç©ºã£ã½ ---- */
+	    q8tk_listbox_select_item(w->list, 0);	    /* <<ãªã—>> ITEM */
 	}
 
-		/* ¥Ü¥¿¥ó¤Îµ¡Ç½ ¡ÖÊÄ¤¸¤ë¡×¡ÖÂ°À­ÊÑ¹¹¡× / ¡Ö³«¤¯¡×¡Ö³«¤¯¡× */
+		/* ãƒœã‚¿ãƒ³ã®æ©Ÿèƒ½ ã€Œé–‰ã˜ã‚‹ã€ã€Œå±æ€§å¤‰æ›´ã€ / ã€Œé–‹ãã€ã€Œé–‹ãã€ */
 
 	if (disk_image_exist(drv)) {
 	    w->func[0] = IMG_CLOSE;
@@ -3058,15 +3058,15 @@ static	void	set_disk_widget(void)
 	q8tk_label_set(w->label[0], GET_LABEL(btn, w->func[0]));
 	q8tk_label_set(w->label[1], GET_LABEL(btn, w->func[1]));
 
-		/* ¾ğÊó - Busy/Ready */
+		/* æƒ…å ± - Busy/Ready */
 
 	if (get_drive_ready(drv)) s = GET_LABEL(inf,DATA_DISK_INFO_STAT_READY);
 	else                      s = GET_LABEL(inf,DATA_DISK_INFO_STAT_BUSY);
 	q8tk_label_set(w->stat_label, s);
-	q8tk_label_set_reverse(w->stat_label,	/* BUSY¤Ê¤éÈ¿Å¾É½¼¨ */
+	q8tk_label_set_reverse(w->stat_label,	/* BUSYãªã‚‰åè»¢è¡¨ç¤º */
 			       (get_drive_ready(drv)) ? FALSE : TRUE);
 
-		/* ¾ğÊó - RO/RWÂ°À­ */
+		/* æƒ…å ± - RO/RWå±æ€§ */
 
 	if (disk_image_exist(drv)) {
 	    if (drive[drv].read_only) s =GET_LABEL(inf,DATA_DISK_INFO_ATTR_RO);
@@ -3075,16 +3075,16 @@ static	void	set_disk_widget(void)
 	    s = "";
 	}
 	q8tk_label_set(w->attr_label, s);
-	q8tk_label_set_color(w->attr_label,	/* ReadOnly¤Ê¤éÀÖ¿§É½¼¨ */
+	q8tk_label_set_color(w->attr_label,	/* ReadOnlyãªã‚‰èµ¤è‰²è¡¨ç¤º */
 			     (drive[drv].read_only) ? Q8GR_PALETTE_RED : -1);
 
-		/* ¾ğÊó - ¥¤¥á¡¼¥¸¿ô */
+		/* æƒ…å ± - ã‚¤ãƒ¡ãƒ¼ã‚¸æ•° */
 
 	if (disk_image_exist(drv)) {
-	    if (drive[drv].detect_broken_image) {	/* ÇËÂ»¤¢¤ê */
+	    if (drive[drv].detect_broken_image) {	/* ç ´æã‚ã‚Š */
 		s = GET_LABEL(inf, DATA_DISK_INFO_NR_BROKEN);
 	    } else
-	    if (drive[drv].over_image ||		/* ¥¤¥á¡¼¥¸Â¿²á¤® */
+	    if (drive[drv].over_image ||		/* ã‚¤ãƒ¡ãƒ¼ã‚¸å¤šéã */
 		disk_image_num(drv) > 99) {
 		s = GET_LABEL(inf, DATA_DISK_INFO_NR_OVER);
 	    } else {
@@ -3092,7 +3092,7 @@ static	void	set_disk_widget(void)
 	    }
 	    sprintf(wk, "%2d%s",
 		    (disk_image_num(drv)>99) ? 99 : disk_image_num(drv), s);
-	    sprintf(wk2, "%9.9s", wk);			/* 9Ê¸»ú±¦µÍ¤á¤ËÊÑ´¹ */
+	    sprintf(wk2, "%9.9s", wk);			/* 9æ–‡å­—å³è©°ã‚ã«å¤‰æ› */
 	} else {
 	    wk2[0] = '\0';
 	}
@@ -3102,7 +3102,7 @@ static	void	set_disk_widget(void)
 
 
 /*----------------------------------------------------------------------*/
-/* ¡Ö¥Ö¥é¥ó¥¯ºîÀ®¡× ¥Ü¥¿¥ó²¡²¼»ş¤Î½èÍı					*/
+/* ã€Œãƒ–ãƒ©ãƒ³ã‚¯ä½œæˆã€ ãƒœã‚¿ãƒ³æŠ¼ä¸‹æ™‚ã®å‡¦ç†					*/
 
 static	void	sub_disk_blank_ok(void);
 static	void	cb_disk_blank_warn_clicked(Q8tkWidget *, void *);
@@ -3113,11 +3113,11 @@ static	void	cb_disk_blank(UNUSED_WIDGET, UNUSED_PARM)
     const char *initial;
     const t_menulabel *l = data_disk_blank;
 
-    /* ¥Ç¥£¥¹¥¯¤¬¤¢¤ì¤Ğ¤½¤Î¥Õ¥¡¥¤¥ë¤ò¡¢¤Ê¤±¤ì¤Ğ¥Ç¥£¥¹¥¯ÍÑ¥Ç¥£¥ì¥¯¥È¥ê¤ò¼èÆÀ */
+    /* ãƒ‡ã‚£ã‚¹ã‚¯ãŒã‚ã‚Œã°ãã®ãƒ•ã‚¡ã‚¤ãƒ«ã‚’ã€ãªã‘ã‚Œã°ãƒ‡ã‚£ã‚¹ã‚¯ç”¨ãƒ‡ã‚£ãƒ¬ã‚¯ãƒˆãƒªã‚’å–å¾— */
     initial = filename_get_disk_or_dir(DRIVE_1);
 
     START_FILE_SELECTION(GET_LABEL(l, DATA_DISK_BLANK_FSEL),
-			 -1,	/* ReadOnly ¤ÎÁªÂò¤ÏÉÔ²Ä */
+			 -1,	/* ReadOnly ã®é¸æŠã¯ä¸å¯ */
 			 initial,
 
 			 sub_disk_blank_ok,
@@ -3133,17 +3133,17 @@ static	void	sub_disk_blank_ok(void)
     switch (osd_file_stat(disk_filename)) {
 
     case FILE_STAT_NOEXIST:
-	/* ¥Õ¥¡¥¤¥ë¤ò¿·µ¬¤ËºîÀ®¤·¡¢¥Ö¥é¥ó¥¯¤òºîÀ® */
+	/* ãƒ•ã‚¡ã‚¤ãƒ«ã‚’æ–°è¦ã«ä½œæˆã—ã€ãƒ–ãƒ©ãƒ³ã‚¯ã‚’ä½œæˆ */
 	sub_disk_attr_file_ctrl(0, 0, ATTR_CREATE, disk_filename);
 	break;
 
     case FILE_STAT_DIR:
-	/* ¥Ç¥£¥ì¥¯¥È¥ê¤Ê¤Î¤Ç¡¢¥Ö¥é¥ó¥¯¤ÏÄÉ²Ã¤Ç¤­¤Ê¤¤ */
+	/* ãƒ‡ã‚£ãƒ¬ã‚¯ãƒˆãƒªãªã®ã§ã€ãƒ–ãƒ©ãƒ³ã‚¯ã¯è¿½åŠ ã§ããªã„ */
 	start_file_error_dialog(-1, ERR_CANT_OPEN);
 	break;
 
     default:
-	/* ¤¹¤Ç¤Ë¥Õ¥¡¥¤¥ë¤¬Â¸ºß¤·¤Ş¤¹¡£¥Ö¥é¥ó¥¯¤òÄÉ²Ã¤·¤Ş¤¹¤«¡© */
+	/* ã™ã§ã«ãƒ•ã‚¡ã‚¤ãƒ«ãŒå­˜åœ¨ã—ã¾ã™ã€‚ãƒ–ãƒ©ãƒ³ã‚¯ã‚’è¿½åŠ ã—ã¾ã™ã‹ï¼Ÿ */
 	dialog_create();
 	{
 	    dialog_set_title(GET_LABEL(l, DATA_DISK_BLANK_WARN_0));
@@ -3170,13 +3170,13 @@ static	void	cb_disk_blank_warn_clicked(UNUSED_WIDGET, void *p)
     dialog_destroy();
 
     if ((int)p) {
-	/* ¥Õ¥¡¥¤¥ë¤Ë¡¢¥Ö¥é¥ó¥¯¤òÄÉµ­ */
+	/* ãƒ•ã‚¡ã‚¤ãƒ«ã«ã€ãƒ–ãƒ©ãƒ³ã‚¯ã‚’è¿½è¨˜ */
 	sub_disk_attr_file_ctrl(0, 0, ATTR_CREATE, disk_filename);
     }
 }
 
 /*----------------------------------------------------------------------*/
-/* ¡Ö¥Õ¥¡¥¤¥ëÌ¾³ÎÇ§¡× ¥Ü¥¿¥ó²¡²¼»ş¤Î½èÍı				*/
+/* ã€Œãƒ•ã‚¡ã‚¤ãƒ«åç¢ºèªã€ ãƒœã‚¿ãƒ³æŠ¼ä¸‹æ™‚ã®å‡¦ç†				*/
 
 static	void	cb_disk_fname_dialog_ok(UNUSED_WIDGET, UNUSED_PARM)
 {
@@ -3186,7 +3186,7 @@ static	void	cb_disk_fname_dialog_ok(UNUSED_WIDGET, UNUSED_PARM)
 static	void	cb_disk_fname(UNUSED_WIDGET, UNUSED_PARM)
 {
     const t_menulabel *l = data_disk_fname;
-    char filename[66 +5 +1];		/* 5 == strlen("[1:] "), 1 ¤Ï '\0' */
+    char filename[66 +5 +1];		/* 5 == strlen("[1:] "), 1 ã¯ '\0' */
     int save_code;
     int i, width, len;
     const char *ptr[2];
@@ -3246,7 +3246,7 @@ static	void	cb_disk_fname(UNUSED_WIDGET, UNUSED_PARM)
 
 
 /*----------------------------------------------------------------------*/
-					/* ¥É¥é¥¤¥ÖÉ½¼¨°ÌÃÖ º¸±¦Æş¤ì´¹¤¨ */
+					/* ãƒ‰ãƒ©ã‚¤ãƒ–è¡¨ç¤ºä½ç½® å·¦å³å…¥ã‚Œæ›ãˆ */
 
 static	void	cb_disk_dispswap_clicked(UNUSED_WIDGET, UNUSED_PARM)
 {
@@ -3280,7 +3280,7 @@ static	void	cb_disk_dispswap(Q8tkWidget *widget, UNUSED_PARM)
 }
 
 /*----------------------------------------------------------------------*/
-					/* ¥¹¥Æ¡¼¥¿¥¹¤Ë¥¤¥á¡¼¥¸Ì¾É½¼¨ */
+					/* ã‚¹ãƒ†ãƒ¼ã‚¿ã‚¹ã«ã‚¤ãƒ¡ãƒ¼ã‚¸åè¡¨ç¤º */
 
 static	void	cb_disk_dispstatus_clicked(UNUSED_WIDGET, UNUSED_PARM)
 {
@@ -3299,7 +3299,7 @@ static	void	cb_disk_dispstatus(Q8tkWidget *widget, UNUSED_PARM)
     status_imagename = parm;
 
     if (status_imagename) {
-	/* ¥ª¥ó¤Ë¤·¤¿»ş¤Î¤ß¡¢ÀâÌÀ¤òÉ½¼¨ */
+	/* ã‚ªãƒ³ã«ã—ãŸæ™‚ã®ã¿ã€èª¬æ˜ã‚’è¡¨ç¤º */
 	dialog_create();
 	{
 	    dialog_set_title(GET_LABEL(l, DATA_DISK_DISPSTATUS_INFO));
@@ -3359,7 +3359,7 @@ static	Q8tkWidget	*menu_disk(void)
 
 		    for (j=0; j<2; j++) {
 #if 0
-						/* ¶õ¥é¥Ù¥ë¤Î¥¦¥£¥¸¥Ã¥È³ÎÊİ */
+						/* ç©ºãƒ©ãƒ™ãƒ«ã®ã‚¦ã‚£ã‚¸ãƒƒãƒˆç¢ºä¿ */
 			w->label[j] = q8tk_label_new("");
 			q8tk_widget_show(w->label[j]);
 			w->button[j] = q8tk_button_new();
@@ -3371,7 +3371,7 @@ static	Q8tkWidget	*menu_disk(void)
 
 			q8tk_box_pack_start(vbox, w->button[j]);
 #else
-						/* ¶õ¥é¥Ù¥ë¤Î¥¦¥£¥¸¥Ã¥È³ÎÊİ */
+						/* ç©ºãƒ©ãƒ™ãƒ«ã®ã‚¦ã‚£ã‚¸ãƒƒãƒˆç¢ºä¿ */
 			w->label[j] = q8tk_label_new("");
 			q8tk_widget_show(w->label[j]);
 			btn = q8tk_button_new();
@@ -3402,21 +3402,21 @@ static	Q8tkWidget	*menu_disk(void)
 			hx = PACK_HBOX(vx);
 			{
 			    PACK_LABEL(hx, GET_LABEL(l, DATA_DISK_INFO_STAT));
-						/* ¶õ¥é¥Ù¥ë¤Î¥¦¥£¥¸¥Ã¥È³ÎÊİ */
+						/* ç©ºãƒ©ãƒ™ãƒ«ã®ã‚¦ã‚£ã‚¸ãƒƒãƒˆç¢ºä¿ */
 			    w->stat_label = PACK_LABEL(hx, "");
 			}
 
 			hx = PACK_HBOX(vx);
 			{
 			    PACK_LABEL(hx, GET_LABEL(l, DATA_DISK_INFO_ATTR));
-						/* ¶õ¥é¥Ù¥ë¤Î¥¦¥£¥¸¥Ã¥È³ÎÊİ */
+						/* ç©ºãƒ©ãƒ™ãƒ«ã®ã‚¦ã‚£ã‚¸ãƒƒãƒˆç¢ºä¿ */
 			    w->attr_label = PACK_LABEL(hx, "");
 			}
 
 			hx = PACK_HBOX(vx);
 			{
 			    PACK_LABEL(hx, GET_LABEL(l, DATA_DISK_INFO_NR));
-						/* ¶õ¥é¥Ù¥ë¤Î¥¦¥£¥¸¥Ã¥È³ÎÊİ */
+						/* ç©ºãƒ©ãƒ™ãƒ«ã®ã‚¦ã‚£ã‚¸ãƒƒãƒˆç¢ºä¿ */
 			    w->num_label = PACK_LABEL(hx, "");
 			    q8tk_misc_set_placement(w->num_label,
 						    Q8TK_PLACEMENT_X_RIGHT, 0);
@@ -3447,7 +3447,7 @@ static	Q8tkWidget	*menu_disk(void)
 				  cb_disk_dispstatus, NULL);
 
 #if 0
-		for (i=0; i<1; i++)	    /* °ÌÃÖÄ´À°¤Î¤¿¤á¥À¥ß¡¼¤ò²¿¸Ä¤« */
+		for (i=0; i<1; i++)	    /* ä½ç½®èª¿æ•´ã®ãŸã‚ãƒ€ãƒŸãƒ¼ã‚’ä½•å€‹ã‹ */
 		    PACK_LABEL(vbox, "");
 #endif
 
@@ -3468,14 +3468,14 @@ static	Q8tkWidget	*menu_disk(void)
 
 /*===========================================================================
  *
- *	¥á¥¤¥ó¥Ú¡¼¥¸	¥­¡¼ÀßÄê
+ *	ãƒ¡ã‚¤ãƒ³ãƒšãƒ¼ã‚¸	ã‚­ãƒ¼è¨­å®š
  *
  *===========================================================================*/
 
 /*----------------------------------------------------------------------*/
 static Q8tkWidget *fkey_widget[20+1][2];
 
-				    /* ¥Õ¥¡¥ó¥¯¥·¥ç¥ó¥­¡¼³ä¤êÅö¤Æ¤ÎÊÑ¹¹ */
+				    /* ãƒ•ã‚¡ãƒ³ã‚¯ã‚·ãƒ§ãƒ³ã‚­ãƒ¼å‰²ã‚Šå½“ã¦ã®å¤‰æ›´ */
 static	int	get_key_fkey(int fn_key)
 {
     return (function_f[ fn_key ] < 0x20) ? function_f[ fn_key ] : FN_FUNC;
@@ -3552,7 +3552,7 @@ static	Q8tkWidget	*menu_key_fkey(void)
 }
 
 /*----------------------------------------------------------------------*/
-						      /* ¥­¡¼ÀßÄê¤ÎÊÑ¹¹ */
+						      /* ã‚­ãƒ¼è¨­å®šã®å¤‰æ›´ */
 static	int	get_key_cfg(int type)
 {
     switch (type) {
@@ -3587,7 +3587,7 @@ static	Q8tkWidget	*menu_key_cfg(void)
 }
 
 /*----------------------------------------------------------------------*/
-					      /* ¥½¥Õ¥È¥¦¥§¥¢¥­¡¼¥Ü¡¼¥É */
+					      /* ã‚½ãƒ•ãƒˆã‚¦ã‚§ã‚¢ã‚­ãƒ¼ãƒœãƒ¼ãƒ‰ */
 static	void	keymap_start(void);
 static	void	keymap_finish(void);
 
@@ -3612,7 +3612,7 @@ static	Q8tkWidget	*menu_key_softkeyboard(void)
 
 /*----------------------------------------------------------------------*/
 static	void	menu_key_cursor_setting(void);
-					    /* ¥«¡¼¥½¥ë¥­¡¼¥«¥¹¥¿¥Ş¥¤¥º */
+					    /* ã‚«ãƒ¼ã‚½ãƒ«ã‚­ãƒ¼ã‚«ã‚¹ã‚¿ãƒã‚¤ã‚º */
 				     /* original idea by floi, thanks ! */
 static	int		key_cursor_widget_init_done;
 static	Q8tkWidget	*key_cursor_widget_sel;
@@ -3657,7 +3657,7 @@ static	Q8tkWidget	*menu_key_cursor(void)
 
     hbox = PACK_HBOX(NULL);
     {
-	{			/* ¥­¡¼³ä¤êÅö¤Æ¥â¡¼¥É¤ÎÁªÂò */
+	{			/* ã‚­ãƒ¼å‰²ã‚Šå½“ã¦ãƒ¢ãƒ¼ãƒ‰ã®é¸æŠ */
 	    vbox = PACK_VBOX(hbox);
 	    PACK_RADIO_BUTTONS(vbox,
 			       data_key_cursor_mode,
@@ -3665,14 +3665,14 @@ static	Q8tkWidget	*menu_key_cursor(void)
 			       get_key_cursor_key_mode(),
 			       cb_key_cursor_key_mode);
 
-	    for (i=0; i<2; i++) PACK_LABEL(vbox, "");	/* °ÌÃÖÄ´À°¤Î¥À¥ß¡¼ */
+	    for (i=0; i<2; i++) PACK_LABEL(vbox, "");	/* ä½ç½®èª¿æ•´ã®ãƒ€ãƒŸãƒ¼ */
 	    
 	    key_cursor_widget_sel = vbox;
 	}
 
-	PACK_VSEP(hbox);	/* ¶èÀÚ¤êËÀ */
+	PACK_VSEP(hbox);	/* åŒºåˆ‡ã‚Šæ£’ */
 
-	{			/* ¥­¡¼³ä¤êÅö¤Æ ¤Ê¤·¤Î±¦²èÌÌ */
+	{			/* ã‚­ãƒ¼å‰²ã‚Šå½“ã¦ ãªã—ã®å³ç”»é¢ */
 	    vbox = PACK_VBOX(hbox);
 
 	    PACK_LABEL(vbox, GET_LABEL(data_key, DATA_KEY_CURSOR_SPACING));
@@ -3680,7 +3680,7 @@ static	Q8tkWidget	*menu_key_cursor(void)
 	    key_cursor_widget_sel_none = vbox;
 	}
 
-	{			/* ¥­¡¼³ä¤êÅö¤Æ Ç¤°Õ¤Î±¦²èÌÌ */
+	{			/* ã‚­ãƒ¼å‰²ã‚Šå½“ã¦ ä»»æ„ã®å³ç”»é¢ */
 	    key_cursor_widget_sel_key =
 		PACK_KEY_ASSIGN(hbox,
 				data_key_cursor, COUNTOF(data_key_cursor),
@@ -3735,7 +3735,7 @@ static	Q8tkWidget	*menu_key(void)
 		q8tk_misc_set_placement(w, Q8TK_PLACEMENT_X_CENTER,
 					Q8TK_PLACEMENT_Y_CENTER);
 
-		PACK_LABEL(vbox2, "");	/* °ÌÃÖÄ´À°¤Î¥À¥ß¡¼ */
+		PACK_LABEL(vbox2, "");	/* ä½ç½®èª¿æ•´ã®ãƒ€ãƒŸãƒ¼ */
 	    }
 	    PACK_FRAME(hbox, GET_LABEL(l, DATA_KEY_SKEY), vbox2);
 	}
@@ -3750,7 +3750,7 @@ static	Q8tkWidget	*menu_key(void)
 
 /* = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = 
  *
- *	¥µ¥Ö¥¦¥¤¥ó¥É¥¦	¥½¥Õ¥È¥¦¥§¥¢¥­¡¼¥Ü¡¼¥É
+ *	ã‚µãƒ–ã‚¦ã‚¤ãƒ³ãƒ‰ã‚¦	ã‚½ãƒ•ãƒˆã‚¦ã‚§ã‚¢ã‚­ãƒ¼ãƒœãƒ¼ãƒ‰
  *
  * = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = */
 
@@ -3758,7 +3758,7 @@ static	Q8tkWidget	*keymap[129];
 static	int		keymap_num;
 static	Q8tkWidget	*keymap_accel;
 
-enum {			/* keymap[] ¤Ï°Ê²¼¤Î¥¦¥£¥¸¥Ã¥È¤ÎÊİÂ¸¤Ë»È¤¦ */
+enum {			/* keymap[] ã¯ä»¥ä¸‹ã®ã‚¦ã‚£ã‚¸ãƒƒãƒˆã®ä¿å­˜ã«ä½¿ã† */
     KEYMAP_WIN,
 
     KEYMAP_VBOX,
@@ -3794,18 +3794,18 @@ static	void	cb_key_softkey(Q8tkWidget *button, void *code)
 
 static	void	cb_key_softkey_release(UNUSED_WIDGET, UNUSED_PARM)
 {
-    softkey_release_all();	/* Á´¤Æ¤Î¥­¡¼¤òÎ¥¤·¤¿¾õÂÖ¤Ë¤¹¤ë         */
-    keymap_finish();		/* ¥½¥Õ¥È¥¦¥§¥¢¥­¡¼¤ÎÁ´¥¦¥£¥¸¥Ã¥È¤ò¾ÃÌÇ */
+    softkey_release_all();	/* å…¨ã¦ã®ã‚­ãƒ¼ã‚’é›¢ã—ãŸçŠ¶æ…‹ã«ã™ã‚‹         */
+    keymap_finish();		/* ã‚½ãƒ•ãƒˆã‚¦ã‚§ã‚¢ã‚­ãƒ¼ã®å…¨ã‚¦ã‚£ã‚¸ãƒƒãƒˆã‚’æ¶ˆæ»… */
 }
 
 static	void	cb_key_softkey_end(UNUSED_WIDGET, UNUSED_PARM)
 {
-    softkey_bug();		/* Ê£¿ô¥­¡¼Æ±»ş²¡¤·»ş¤Î¥Ï¡¼¥É¥Ğ¥°¤òºÆ¸½ */
-    keymap_finish();		/* ¥½¥Õ¥È¥¦¥§¥¢¥­¡¼¤ÎÁ´¥¦¥£¥¸¥Ã¥È¤ò¾ÃÌÇ */
+    softkey_bug();		/* è¤‡æ•°ã‚­ãƒ¼åŒæ™‚æŠ¼ã—æ™‚ã®ãƒãƒ¼ãƒ‰ãƒã‚°ã‚’å†ç¾ */
+    keymap_finish();		/* ã‚½ãƒ•ãƒˆã‚¦ã‚§ã‚¢ã‚­ãƒ¼ã®å…¨ã‚¦ã‚£ã‚¸ãƒƒãƒˆã‚’æ¶ˆæ»… */
 }
 
 
-/* ¥½¥Õ¥È¥¦¥Õ¥§¥¢¥­¡¼¥Ü¡¼¥É ¥¦¥¤¥ó¥É¥¦À¸À®¡¦É½¼¨ */
+/* ã‚½ãƒ•ãƒˆã‚¦ãƒ•ã‚§ã‚¢ã‚­ãƒ¼ãƒœãƒ¼ãƒ‰ ã‚¦ã‚¤ãƒ³ãƒ‰ã‚¦ç”Ÿæˆãƒ»è¡¨ç¤º */
 
 static	void	keymap_start(void)
 {
@@ -3815,20 +3815,20 @@ static	void	keymap_start(void)
 
     for (i=0; i<COUNTOF(keymap); i++) keymap[i] = NULL;
 
-    {						/* ¥á¥¤¥ó¤È¤Ê¤ë¥¦¥¤¥ó¥É¥¦ */
+    {						/* ãƒ¡ã‚¤ãƒ³ã¨ãªã‚‹ã‚¦ã‚¤ãƒ³ãƒ‰ã‚¦ */
 	w = q8tk_window_new(Q8TK_WINDOW_DIALOG);
 	keymap_accel = q8tk_accel_group_new();
 	q8tk_accel_group_attach(keymap_accel, w);
     }
 
-    {						/* ¤Ë¡¢¥Ü¥Ã¥¯¥¹¤ò¾è¤»¤ë */
+    {						/* ã«ã€ãƒœãƒƒã‚¯ã‚¹ã‚’ä¹—ã›ã‚‹ */
 	v = q8tk_vbox_new();
 	q8tk_container_add(w, v);
 	q8tk_widget_show(v);
     }
 
-    {							/* ¥Ü¥Ã¥¯¥¹¤Ë¤Ï     */
-	{						/* ¥¹¥¯¥í¡¼¥ëÉÕ WIN */
+    {							/* ãƒœãƒƒã‚¯ã‚¹ã«ã¯     */
+	{						/* ã‚¹ã‚¯ãƒ­ãƒ¼ãƒ«ä»˜ WIN */
 	    s = q8tk_scrolled_window_new(NULL, NULL);
 	    q8tk_box_pack_start(v, s);
 	    q8tk_misc_set_size(s, 80, 21);
@@ -3836,20 +3836,20 @@ static	void	keymap_start(void)
 					       Q8TK_POLICY_NEVER);
 	    q8tk_widget_show(s);
 	}
-	{						/* ¸«±É¤¨¤Î¤¿¤á¤Î¶õ¹Ô*/
+	{						/* è¦‹æ „ãˆã®ãŸã‚ã®ç©ºè¡Œ*/
 	    l = q8tk_label_new("");
 	    q8tk_box_pack_start(v, l);
 	    q8tk_widget_show(l);
 	}
-	{						/* ¥Ü¥¿¥óÇÛÃÖÍÑ HBOX */
+	{						/* ãƒœã‚¿ãƒ³é…ç½®ç”¨ HBOX */
 	    h = q8tk_hbox_new();
 	    q8tk_box_pack_start(v, h);
 	    q8tk_misc_set_placement(h, Q8TK_PLACEMENT_X_CENTER, 0);
 	    q8tk_widget_show(h);
 
-	    {							/* HBOX¤Ë¤Ï */
+	    {							/* HBOXã«ã¯ */
 		const t_menulabel *l = data_skey_set;
-		{						/* ¥Ü¥¿¥ó 1 */
+		{						/* ãƒœã‚¿ãƒ³ 1 */
 		    b1 = q8tk_button_new_with_label(
 					GET_LABEL(l,DATA_SKEY_BUTTON_OFF));
 		    q8tk_signal_connect(b1, "clicked",
@@ -3857,7 +3857,7 @@ static	void	keymap_start(void)
 		    q8tk_box_pack_start(h, b1);
 		    q8tk_widget_show(b1);
 		}
-		{						/* ¥Ü¥¿¥ó 2 */
+		{						/* ãƒœã‚¿ãƒ³ 2 */
 		    b2 = q8tk_button_new_with_label(
 					GET_LABEL(l,DATA_SKEY_BUTTON_QUIT));
 		    q8tk_signal_connect(b2, "clicked",
@@ -3871,9 +3871,9 @@ static	void	keymap_start(void)
 	}
     }
 
-    /* ¥¹¥¯¥í¡¼¥ëÉÕ WIN ¤Ë¡¢¥­¡¼¥È¥Ã¥×¤ÎÊ¸»ú¤Î¤«¤«¤ì¤¿¡¢¥Ü¥¿¥ó¤òÊÂ¤Ù¤ë */
+    /* ã‚¹ã‚¯ãƒ­ãƒ¼ãƒ«ä»˜ WIN ã«ã€ã‚­ãƒ¼ãƒˆãƒƒãƒ—ã®æ–‡å­—ã®ã‹ã‹ã‚ŒãŸã€ãƒœã‚¿ãƒ³ã‚’ä¸¦ã¹ã‚‹ */
 
-    vx = q8tk_vbox_new();		/* ¥­¡¼6ÎóÊ¬¤ò³ÊÇ¼¤¹¤ë VBOX ¤òÇÛÃÖ */
+    vx = q8tk_vbox_new();		/* ã‚­ãƒ¼6åˆ—åˆ†ã‚’æ ¼ç´ã™ã‚‹ VBOX ã‚’é…ç½® */
     q8tk_container_add(s, vx);
     q8tk_widget_show(vx);
 
@@ -3889,21 +3889,21 @@ static	void	keymap_start(void)
     keymap_num = KEYMAP_KEY;
 
 
-    for (j=0; j<6; j++) {		/* ¥­¡¼6ÎóÊ¬·«¤êÊÖ¤· */
+    for (j=0; j<6; j++) {		/* ã‚­ãƒ¼6åˆ—åˆ†ç¹°ã‚Šè¿”ã— */
 
 	const t_keymap *p = keymap_line[ model ][ j ];
 
-	hx = q8tk_hbox_new();		/* ¥­¡¼Ê£¿ô¸Ä¤ò³ÊÇ¼¤¹¤ë¤¿¤á¤ÎHBOX¤Ë */
+	hx = q8tk_hbox_new();		/* ã‚­ãƒ¼è¤‡æ•°å€‹ã‚’æ ¼ç´ã™ã‚‹ãŸã‚ã®HBOXã« */
 	q8tk_box_pack_start(vx, hx);
 	q8tk_widget_show(hx);
 	keymap[ KEYMAP_LINE_1 + j ] = hx;
 
-	for (i=0; p[ i ].str; i++) {	/* ¥­¡¼¤ò1¸Ä¤Å¤ÄÇÛÃÖ¤·¤Æ¤ª¤¯*/
+	for (i=0; p[ i ].str; i++) {	/* ã‚­ãƒ¼ã‚’1å€‹ã¥ã¤é…ç½®ã—ã¦ãŠã*/
 
-	    if (keymap_num >= COUNTOF(keymap))	/* ¥È¥é¥Ã¥× */
+	    if (keymap_num >= COUNTOF(keymap))	/* ãƒˆãƒ©ãƒƒãƒ— */
 		{ fprintf(stderr, "%s %d\n", __FILE__, __LINE__); break; }
       
-	    if (p[i].code)			/* ¥­¡¼¥È¥Ã¥×Ê¸»ú (¥Ü¥¿¥ó) */
+	    if (p[i].code)			/* ã‚­ãƒ¼ãƒˆãƒƒãƒ—æ–‡å­— (ãƒœã‚¿ãƒ³) */
 	    {
 		n = q8tk_toggle_button_new_with_label(p[i].str);
 		if (get_key_softkey(p[i].code)) {
@@ -3912,7 +3912,7 @@ static	void	keymap_start(void)
 		q8tk_signal_connect(n, "toggled",
 				    cb_key_softkey, (void *)p[i].code);
 	    }
-	    else				/* ¥Ñ¥Ç¥£¥ó¥°ÍÑ¶õÇò (¥é¥Ù¥ë) */
+	    else				/* ãƒ‘ãƒ‡ã‚£ãƒ³ã‚°ç”¨ç©ºç™½ (ãƒ©ãƒ™ãƒ«) */
 	    {
 		n = q8tk_label_new(p[i].str);
 	    }
@@ -3931,7 +3931,7 @@ static	void	keymap_start(void)
 }
 
 
-/* ¥­¡¼¥Ş¥Ã¥×¥À¥¤¥¢¥í¥°¤Î½ªÎ»¡¦¾ÃÌÇ */
+/* ã‚­ãƒ¼ãƒãƒƒãƒ—ãƒ€ã‚¤ã‚¢ãƒ­ã‚°ã®çµ‚äº†ãƒ»æ¶ˆæ»… */
 
 static	void	keymap_finish(void)
 {
@@ -3956,7 +3956,7 @@ static	void	keymap_finish(void)
 
 /*===========================================================================
  *
- *	¥á¥¤¥ó¥Ú¡¼¥¸	¥Ş¥¦¥¹
+ *	ãƒ¡ã‚¤ãƒ³ãƒšãƒ¼ã‚¸	ãƒã‚¦ã‚¹
  *
  *===========================================================================*/
 
@@ -3964,7 +3964,7 @@ static	void	menu_mouse_mouse_setting(void);
 static	void	menu_mouse_joy_setting(void);
 static	void	menu_mouse_joy2_setting(void);
 /*----------------------------------------------------------------------*/
-						/* ¥Ş¥¦¥¹¥â¡¼¥ÉÀÚ¤êÂØ¤¨ */
+						/* ãƒã‚¦ã‚¹ãƒ¢ãƒ¼ãƒ‰åˆ‡ã‚Šæ›¿ãˆ */
 static	int	get_mouse_mode(void)
 {
     return mouse_mode;
@@ -3994,7 +3994,7 @@ static	Q8tkWidget	*menu_mouse_mode(void)
 
     hbox  = PACK_HBOX(NULL);
     {
-	PACK_LABEL(hbox, " ");		/* ¥¤¥ó¥Ç¥ó¥È */
+	PACK_LABEL(hbox, " ");		/* ã‚¤ãƒ³ãƒ‡ãƒ³ãƒˆ */
 
 	PACK_COMBO(hbox,
 		   data_mouse_mode, COUNTOF(data_mouse_mode),
@@ -4007,7 +4007,7 @@ static	Q8tkWidget	*menu_mouse_mode(void)
 }
 
 /*----------------------------------------------------------------------*/
-						      /* ¥·¥ê¥¢¥ë¥Ş¥¦¥¹ */
+						      /* ã‚·ãƒªã‚¢ãƒ«ãƒã‚¦ã‚¹ */
 static	int	get_mouse_serial(void)
 {
     return use_siomouse;
@@ -4040,7 +4040,7 @@ static	Q8tkWidget	*menu_mouse_serial(void)
 }
 
 /*----------------------------------------------------------------------*/
-						  /* ¥Ş¥¦¥¹ÆşÎÏÀßÄêÊÑ¹¹ */
+						  /* ãƒã‚¦ã‚¹å…¥åŠ›è¨­å®šå¤‰æ›´ */
 static	int		mouse_mouse_widget_init_done;
 static	Q8tkWidget	*mouse_mouse_widget_sel;
 static	Q8tkWidget	*mouse_mouse_widget_sel_none;
@@ -4116,7 +4116,7 @@ static	Q8tkWidget	*menu_mouse_mouse(void)
 
     hbox = PACK_HBOX(NULL);
     {
-	{			/* ¥­¡¼³ä¤êÅö¤Æ¥â¡¼¥É¤ÎÁªÂò */
+	{			/* ã‚­ãƒ¼å‰²ã‚Šå½“ã¦ãƒ¢ãƒ¼ãƒ‰ã®é¸æŠ */
 	    vbox = PACK_VBOX(hbox);
 	    PACK_RADIO_BUTTONS(vbox,
 			       data_mouse_mouse_key_mode,
@@ -4124,26 +4124,26 @@ static	Q8tkWidget	*menu_mouse_mouse(void)
 			       get_mouse_mouse_key_mode(),
 			       cb_mouse_mouse_key_mode);
 
-	    for (i=0; i<5; i++) PACK_LABEL(vbox, "");	/* °ÌÃÖÄ´À°¤Î¥À¥ß¡¼ */
+	    for (i=0; i<5; i++) PACK_LABEL(vbox, "");	/* ä½ç½®èª¿æ•´ã®ãƒ€ãƒŸãƒ¼ */
 
 	    mouse_mouse_widget_sel = vbox;
 	}
 
-	{			/* ¥­¡¼³ä¤êÅö¤ÆÉÔ²Ä (ÀÜÂ³Ãæ) */
+	{			/* ã‚­ãƒ¼å‰²ã‚Šå½“ã¦ä¸å¯ (æ¥ç¶šä¸­) */
 	    vbox = PACK_VBOX(hbox);
 
-	    PACK_LABEL(vbox, "");			/* °ÌÃÖÄ´À°¤Î¥À¥ß¡¼ */
+	    PACK_LABEL(vbox, "");			/* ä½ç½®èª¿æ•´ã®ãƒ€ãƒŸãƒ¼ */
 
 	    PACK_LABEL(vbox, GET_LABEL(data_mouse, DATA_MOUSE_CONNECTING));
 
-	    for (i=0; i<6; i++) PACK_LABEL(vbox, "");	/* °ÌÃÖÄ´À°¤Î¥À¥ß¡¼ */
+	    for (i=0; i<6; i++) PACK_LABEL(vbox, "");	/* ä½ç½®èª¿æ•´ã®ãƒ€ãƒŸãƒ¼ */
 
 	    mouse_mouse_widget_con = vbox;
 	}
 
-	PACK_VSEP(hbox);	/* ¶èÀÚ¤êËÀ */
+	PACK_VSEP(hbox);	/* åŒºåˆ‡ã‚Šæ£’ */
 
-	{			/* ¥­¡¼³ä¤êÅö¤Æ ¤Ê¤·¤Î±¦²èÌÌ */
+	{			/* ã‚­ãƒ¼å‰²ã‚Šå½“ã¦ ãªã—ã®å³ç”»é¢ */
 	    vbox = PACK_VBOX(hbox);
 
 	    PACK_LABEL(vbox, "");
@@ -4151,7 +4151,7 @@ static	Q8tkWidget	*menu_mouse_mouse(void)
 	    mouse_mouse_widget_sel_none = vbox;
 	}
 
-	{			/* ¥­¡¼³ä¤êÅö¤Æ ¥Æ¥ó¥­¡¼¤Î±¦²èÌÌ */
+	{			/* ã‚­ãƒ¼å‰²ã‚Šå½“ã¦ ãƒ†ãƒ³ã‚­ãƒ¼ã®å³ç”»é¢ */
 	    vbox = PACK_VBOX(hbox);
 
 	    PACK_LABEL(vbox, "");
@@ -4165,7 +4165,7 @@ static	Q8tkWidget	*menu_mouse_mouse(void)
 	    mouse_mouse_widget_sel_tenkey = vbox;
 	}
 
-	{			/* ¥­¡¼³ä¤êÅö¤Æ Ç¤°Õ¤Î±¦²èÌÌ */
+	{			/* ã‚­ãƒ¼å‰²ã‚Šå½“ã¦ ä»»æ„ã®å³ç”»é¢ */
 
 	    mouse_mouse_widget_sel_key = 
 		PACK_KEY_ASSIGN(hbox,
@@ -4173,7 +4173,7 @@ static	Q8tkWidget	*menu_mouse_mouse(void)
 				get_mouse_mouse_key, cb_mouse_mouse_key);
 	}
 
-	{			/* ¥­¡¼³ä¤êÅö¤ÆÉÔ²Ä ±¦²èÌÌ */
+	{			/* ã‚­ãƒ¼å‰²ã‚Šå½“ã¦ä¸å¯ å³ç”»é¢ */
 	    vbox = PACK_VBOX(hbox);
 
 	    PACK_LABEL(vbox, "");
@@ -4184,9 +4184,9 @@ static	Q8tkWidget	*menu_mouse_mouse(void)
 				  get_mouse_swap(),
 				  cb_mouse_swap, (void*)0);
 
-	    for (i=0; i<4; i++) PACK_LABEL(vbox, "");	/* °ÌÃÖÄ´À°¤Î¥À¥ß¡¼ */
+	    for (i=0; i<4; i++) PACK_LABEL(vbox, "");	/* ä½ç½®èª¿æ•´ã®ãƒ€ãƒŸãƒ¼ */
 
-	    {				/* ¥Ş¥¦¥¹´¶ÅÙ */
+	    {				/* ãƒã‚¦ã‚¹æ„Ÿåº¦ */
 		const t_volume *p = data_mouse_sensitivity;
 		Q8tkWidget *hbox2, *scale;
 
@@ -4218,7 +4218,7 @@ static	void	menu_mouse_mouse_setting(void)
 {
     if (mouse_mouse_widget_init_done == FALSE) return;
 
-    if (mouse_mode == MOUSE_NONE ||		/* ¥Ş¥¦¥¹¤Ï¥İ¡¼¥È¤ËÌ¤ÀÜÂ³ */
+    if (mouse_mode == MOUSE_NONE ||		/* ãƒã‚¦ã‚¹ã¯ãƒãƒ¼ãƒˆã«æœªæ¥ç¶š */
 	mouse_mode == MOUSE_JOYSTICK) {
 
 	q8tk_widget_show(mouse_mouse_widget_sel);
@@ -4235,7 +4235,7 @@ static	void	menu_mouse_mouse_setting(void)
 	q8tk_widget_hide(mouse_mouse_widget_con);
 	q8tk_widget_hide(mouse_mouse_widget_con_con);
 
-    } else {					/* ¥Ş¥¦¥¹¤Ï¥İ¡¼¥È¤ËÀÜÂ³Ãæ */
+    } else {					/* ãƒã‚¦ã‚¹ã¯ãƒãƒ¼ãƒˆã«æ¥ç¶šä¸­ */
 	q8tk_widget_hide(mouse_mouse_widget_sel);
 	q8tk_widget_hide(mouse_mouse_widget_sel_none);
 	q8tk_widget_hide(mouse_mouse_widget_sel_tenkey);
@@ -4253,7 +4253,7 @@ static	void	menu_mouse_mouse_setting(void)
 }
 
 /*----------------------------------------------------------------------*/
-					/* ¥¸¥ç¥¤¥¹¥Æ¥£¥Ã¥¯ÆşÎÏÀßÄêÊÑ¹¹ */
+					/* ã‚¸ãƒ§ã‚¤ã‚¹ãƒ†ã‚£ãƒƒã‚¯å…¥åŠ›è¨­å®šå¤‰æ›´ */
 static	int		mouse_joy_widget_init_done;
 static	Q8tkWidget	*mouse_joy_widget_sel;
 static	Q8tkWidget	*mouse_joy_widget_sel_none;
@@ -4311,7 +4311,7 @@ static	Q8tkWidget	*menu_mouse_joy(void)
 
     hbox = PACK_HBOX(NULL);
     {
-	{			/* ¥­¡¼³ä¤êÅö¤Æ¥â¡¼¥É¤ÎÁªÂò */
+	{			/* ã‚­ãƒ¼å‰²ã‚Šå½“ã¦ãƒ¢ãƒ¼ãƒ‰ã®é¸æŠ */
 	    vbox = PACK_VBOX(hbox);
 	    PACK_RADIO_BUTTONS(vbox,
 			       data_mouse_joy_key_mode,
@@ -4319,26 +4319,26 @@ static	Q8tkWidget	*menu_mouse_joy(void)
 			       get_mouse_joy_key_mode(),
 			       cb_mouse_joy_key_mode);
 
-	    for (i=0; i<5; i++) PACK_LABEL(vbox, "");	/* °ÌÃÖÄ´À°¤Î¥À¥ß¡¼ */
+	    for (i=0; i<5; i++) PACK_LABEL(vbox, "");	/* ä½ç½®èª¿æ•´ã®ãƒ€ãƒŸãƒ¼ */
 	    
 	    mouse_joy_widget_sel = vbox;
 	}
 
-	{			/* ¥­¡¼³ä¤êÅö¤ÆÉÔ²Ä (ÀÜÂ³Ãæ) */
+	{			/* ã‚­ãƒ¼å‰²ã‚Šå½“ã¦ä¸å¯ (æ¥ç¶šä¸­) */
 	    vbox = PACK_VBOX(hbox);
 
-	    PACK_LABEL(vbox, "");			/* °ÌÃÖÄ´À°¤Î¥À¥ß¡¼ */
+	    PACK_LABEL(vbox, "");			/* ä½ç½®èª¿æ•´ã®ãƒ€ãƒŸãƒ¼ */
 
 	    PACK_LABEL(vbox, GET_LABEL(data_mouse, DATA_MOUSE_CONNECTING));
 
-	    for (i=0; i<6; i++) PACK_LABEL(vbox, "");	/* °ÌÃÖÄ´À°¤Î¥À¥ß¡¼ */
+	    for (i=0; i<6; i++) PACK_LABEL(vbox, "");	/* ä½ç½®èª¿æ•´ã®ãƒ€ãƒŸãƒ¼ */
 
 	    mouse_joy_widget_con = vbox;
 	}
 
-	PACK_VSEP(hbox);	/* ¶èÀÚ¤êËÀ */
+	PACK_VSEP(hbox);	/* åŒºåˆ‡ã‚Šæ£’ */
 
-	{			/* ¥­¡¼³ä¤êÅö¤Æ ¤Ê¤·¤Î±¦²èÌÌ */
+	{			/* ã‚­ãƒ¼å‰²ã‚Šå½“ã¦ ãªã—ã®å³ç”»é¢ */
 	    vbox = PACK_VBOX(hbox);
 
 	    PACK_LABEL(vbox, "");
@@ -4346,7 +4346,7 @@ static	Q8tkWidget	*menu_mouse_joy(void)
 	    mouse_joy_widget_sel_none = vbox;
 	}
 
-	{			/* ¥­¡¼³ä¤êÅö¤Æ ¥Æ¥ó¥­¡¼¤Î±¦²èÌÌ */
+	{			/* ã‚­ãƒ¼å‰²ã‚Šå½“ã¦ ãƒ†ãƒ³ã‚­ãƒ¼ã®å³ç”»é¢ */
 	    vbox = PACK_VBOX(hbox);
 
 	    PACK_LABEL(vbox, "");
@@ -4359,7 +4359,7 @@ static	Q8tkWidget	*menu_mouse_joy(void)
 	    mouse_joy_widget_sel_tenkey = vbox;
 	}
 
-	{			/* ¥­¡¼³ä¤êÅö¤Æ Ç¤°Õ¤Î±¦²èÌÌ */
+	{			/* ã‚­ãƒ¼å‰²ã‚Šå½“ã¦ ä»»æ„ã®å³ç”»é¢ */
 
 	    mouse_joy_widget_sel_key = 
 		PACK_KEY_ASSIGN(hbox,
@@ -4378,7 +4378,7 @@ static	void	menu_mouse_joy_setting(void)
 {
     if (mouse_joy_widget_init_done == FALSE) return;
 
-    if (mouse_mode == MOUSE_NONE ||	/* ¥¸¥ç¥¤¥¹¥Æ¥£¥Ã¥¯¤Ï¥İ¡¼¥È¤ËÌ¤ÀÜÂ³ */
+    if (mouse_mode == MOUSE_NONE ||	/* ã‚¸ãƒ§ã‚¤ã‚¹ãƒ†ã‚£ãƒƒã‚¯ã¯ãƒãƒ¼ãƒˆã«æœªæ¥ç¶š */
 	mouse_mode == MOUSE_MOUSE ||
 	mouse_mode == MOUSE_JOYMOUSE) {
 
@@ -4395,7 +4395,7 @@ static	void	menu_mouse_joy_setting(void)
 
 	q8tk_widget_hide(mouse_joy_widget_con);
 
-    } else {				/* ¥¸¥ç¥¤¥¹¥Æ¥£¥Ã¥¯¤Ï¥İ¡¼¥È¤ËÀÜÂ³Ãæ */
+    } else {				/* ã‚¸ãƒ§ã‚¤ã‚¹ãƒ†ã‚£ãƒƒã‚¯ã¯ãƒãƒ¼ãƒˆã«æ¥ç¶šä¸­ */
 	q8tk_widget_hide(mouse_joy_widget_sel);
 	q8tk_widget_hide(mouse_joy_widget_sel_none);
 	q8tk_widget_show(mouse_joy_widget_sel_tenkey);
@@ -4406,7 +4406,7 @@ static	void	menu_mouse_joy_setting(void)
 }
 
 /*----------------------------------------------------------------------*/
-				      /* ¥¸¥ç¥¤¥¹¥Æ¥£¥Ã¥¯£²ÆşÎÏÀßÄêÊÑ¹¹ */
+				      /* ã‚¸ãƒ§ã‚¤ã‚¹ãƒ†ã‚£ãƒƒã‚¯ï¼’å…¥åŠ›è¨­å®šå¤‰æ›´ */
 static	int		mouse_joy2_widget_init_done;
 static	Q8tkWidget	*mouse_joy2_widget_sel;
 static	Q8tkWidget	*mouse_joy2_widget_sel_none;
@@ -4463,7 +4463,7 @@ static	Q8tkWidget	*menu_mouse_joy2(void)
 
     hbox = PACK_HBOX(NULL);
     {
-	{			/* ¥­¡¼³ä¤êÅö¤Æ¥â¡¼¥É¤ÎÁªÂò */
+	{			/* ã‚­ãƒ¼å‰²ã‚Šå½“ã¦ãƒ¢ãƒ¼ãƒ‰ã®é¸æŠ */
 	    vbox = PACK_VBOX(hbox);
 	    PACK_RADIO_BUTTONS(vbox,
 			       data_mouse_joy2_key_mode,
@@ -4471,14 +4471,14 @@ static	Q8tkWidget	*menu_mouse_joy2(void)
 			       get_mouse_joy2_key_mode(),
 			       cb_mouse_joy2_key_mode);
 
-	    for (i=0; i<5; i++) PACK_LABEL(vbox, "");	/* °ÌÃÖÄ´À°¤Î¥À¥ß¡¼ */
+	    for (i=0; i<5; i++) PACK_LABEL(vbox, "");	/* ä½ç½®èª¿æ•´ã®ãƒ€ãƒŸãƒ¼ */
 	    
 	    mouse_joy2_widget_sel = vbox;
 	}
 
-	PACK_VSEP(hbox);	/* ¶èÀÚ¤êËÀ */
+	PACK_VSEP(hbox);	/* åŒºåˆ‡ã‚Šæ£’ */
 
-	{			/* ¥­¡¼³ä¤êÅö¤Æ ¤Ê¤·¤Î±¦²èÌÌ */
+	{			/* ã‚­ãƒ¼å‰²ã‚Šå½“ã¦ ãªã—ã®å³ç”»é¢ */
 	    vbox = PACK_VBOX(hbox);
 
 	    PACK_LABEL(vbox, "");
@@ -4486,7 +4486,7 @@ static	Q8tkWidget	*menu_mouse_joy2(void)
 	    mouse_joy2_widget_sel_none = vbox;
 	}
 
-	{			/* ¥­¡¼³ä¤êÅö¤Æ ¥Æ¥ó¥­¡¼¤Î±¦²èÌÌ */
+	{			/* ã‚­ãƒ¼å‰²ã‚Šå½“ã¦ ãƒ†ãƒ³ã‚­ãƒ¼ã®å³ç”»é¢ */
 	    vbox = PACK_VBOX(hbox);
 
 	    PACK_LABEL(vbox, "");
@@ -4499,7 +4499,7 @@ static	Q8tkWidget	*menu_mouse_joy2(void)
 	    mouse_joy2_widget_sel_tenkey = vbox;
 	}
 
-	{			/* ¥­¡¼³ä¤êÅö¤Æ Ç¤°Õ¤Î±¦²èÌÌ */
+	{			/* ã‚­ãƒ¼å‰²ã‚Šå½“ã¦ ä»»æ„ã®å³ç”»é¢ */
 	    mouse_joy2_widget_sel_key = 
 		PACK_KEY_ASSIGN(hbox,
 				data_mouse_joy2, COUNTOF(data_mouse_joy2),
@@ -4532,7 +4532,7 @@ static	void	menu_mouse_joy2_setting(void)
 }
 
 /*----------------------------------------------------------------------*/
-				      /* ¥Ş¥¦¥¹¡¦¥¸¥ç¥¤ÀßÄêÊÑ¹¹¤Ë¤Ä¤¤¤Æ */
+				      /* ãƒã‚¦ã‚¹ãƒ»ã‚¸ãƒ§ã‚¤è¨­å®šå¤‰æ›´ã«ã¤ã„ã¦ */
 static	Q8tkWidget	*menu_mouse_about(void)
 {
     Q8tkWidget *vbox;
@@ -4543,7 +4543,7 @@ static	Q8tkWidget	*menu_mouse_about(void)
     {
 	sprintf(wk, GET_LABEL(data_mouse, DATA_MOUSE_DEVICE_NUM), joy_num);
 
-	/* ¥Î¡¼¥È¥Ö¥Ã¥¯¤Î¥µ¥¤¥º¤òÅı°ì¤¹¤ë¤¿¤á¤Ë¡¢¤³¤³¤ÇÌÜ°ìÇÕ¤Î¥µ¥¤¥º¤ò³ÎÊİ */
+	/* ãƒãƒ¼ãƒˆãƒ–ãƒƒã‚¯ã®ã‚µã‚¤ã‚ºã‚’çµ±ä¸€ã™ã‚‹ãŸã‚ã«ã€ã“ã“ã§ç›®ä¸€æ¯ã®ã‚µã‚¤ã‚ºã‚’ç¢ºä¿ */
 	PACK_LABEL(vbox, "                                                                          ");
 	PACK_LABEL(vbox, wk);
     }
@@ -4551,7 +4551,7 @@ static	Q8tkWidget	*menu_mouse_about(void)
 }
 
 /*----------------------------------------------------------------------*/
-static	int	menu_mouse_last_page = 0;	/* Á°²ó»ş¤Î¥¿¥°¤òµ­²± */
+static	int	menu_mouse_last_page = 0;	/* å‰å›æ™‚ã®ã‚¿ã‚°ã‚’è¨˜æ†¶ */
 static	void	cb_mouse_notebook_changed(Q8tkWidget *widget, UNUSED_PARM)
 {
     menu_mouse_last_page = q8tk_notebook_current_page(widget);
@@ -4590,9 +4590,9 @@ static	Q8tkWidget	*menu_mouse_device(void)
 }
 
 /*----------------------------------------------------------------------*/
-						      /* ³Æ¼ïÀßÄê¤ÎÊÑ¹¹ */
+						      /* å„ç¨®è¨­å®šã®å¤‰æ›´ */
 
-/* ¥Ç¥Ğ¥Ã¥°ÍÑ¡§Á´¥Ş¥¦¥¹ÀßÄê¤ÎÁÈ¹ç¤»¤ò¸¡¾Ú */
+/* ãƒ‡ãƒãƒƒã‚°ç”¨ï¼šå…¨ãƒã‚¦ã‚¹è¨­å®šã®çµ„åˆã›ã‚’æ¤œè¨¼ */
 static int  get_mouse_debug_hide(void) { return hide_mouse; }
 static int  get_mouse_debug_grab(void) { return grab_mouse; }
 static void cb_mouse_debug_hide(UNUSED_WIDGET, void *p) { hide_mouse = (int)p;}
@@ -4610,8 +4610,8 @@ static	Q8tkWidget	*menu_mouse_debug(void)
 			data_mouse_debug_hide, COUNTOF(data_mouse_debug_hide),
 			get_mouse_debug_hide(), cb_mouse_debug_hide);
 	}
-	PACK_VSEP(hbox);	/* ¶èÀÚ¤êËÀ */
-	PACK_VSEP(hbox);	/* ¶èÀÚ¤êËÀ */
+	PACK_VSEP(hbox);	/* åŒºåˆ‡ã‚Šæ£’ */
+	PACK_VSEP(hbox);	/* åŒºåˆ‡ã‚Šæ£’ */
 	hbox2 = PACK_HBOX(hbox);
 	{
 	    PACK_RADIO_BUTTONS(hbox2,
@@ -4643,7 +4643,7 @@ static	void	cb_mouse_misc(Q8tkWidget *widget, UNUSED_PARM)
 		hide_mouse = SHOW_MOUSE;
 	    } else if (p->val == -1) {
 		grab_mouse = GRAB_MOUSE;
-		/* hide_mouse = HIDE_MOUSE; */ /* ÀßÄê¤ÏÊİ»ı¤¹¤ë */
+		/* hide_mouse = HIDE_MOUSE; */ /* è¨­å®šã¯ä¿æŒã™ã‚‹ */
 	    } else {
 		grab_mouse = UNGRAB_MOUSE;
 		hide_mouse = p->val;
@@ -4661,7 +4661,7 @@ static	Q8tkWidget	*menu_mouse_misc(void)
 
     vbox = PACK_VBOX(NULL);
     {
-	if (screen_attr_mouse_debug() == FALSE) {	/* ÄÌ¾ï»ş */
+	if (screen_attr_mouse_debug() == FALSE) {	/* é€šå¸¸æ™‚ */
 	    hbox  = PACK_HBOX(vbox);
 	    {
 		PACK_LABEL(hbox, GET_LABEL(data_mouse_misc_msg, 0));
@@ -4672,7 +4672,7 @@ static	Q8tkWidget	*menu_mouse_misc(void)
 			   cb_mouse_misc, NULL,
 			   NULL, NULL);
 	    }
-	} else {					/* ¥Ç¥Ğ¥Ã¥°ÍÑ */
+	} else {					/* ãƒ‡ãƒãƒƒã‚°ç”¨ */
 	    q8tk_box_pack_start(vbox, menu_mouse_debug());
 	}
     }
@@ -4698,7 +4698,7 @@ static	Q8tkWidget	*menu_mouse(void)
 		       GET_LABEL(l, DATA_MOUSE_SERIAL), menu_mouse_serial());
 	}
 
-	PACK_LABEL(vbox, "");			/* ¶õ¹Ô */
+	PACK_LABEL(vbox, "");			/* ç©ºè¡Œ */
 	PACK_LABEL(vbox, GET_LABEL(l, DATA_MOUSE_SYSTEM));
 
 	vbox2 = PACK_VBOX(vbox);
@@ -4720,12 +4720,12 @@ static	Q8tkWidget	*menu_mouse(void)
 
 /*===========================================================================
  *
- *	¥á¥¤¥ó¥Ú¡¼¥¸	¥Æ¡¼¥×
+ *	ãƒ¡ã‚¤ãƒ³ãƒšãƒ¼ã‚¸	ãƒ†ãƒ¼ãƒ—
  *
  *===========================================================================*/
 
 /*----------------------------------------------------------------------*/
-				      /* ¥í¡¼¥É¥¤¥á¡¼¥¸¡¦¥»¡¼¥Ö¥¤¥á¡¼¥¸ */
+				      /* ãƒ­ãƒ¼ãƒ‰ã‚¤ãƒ¡ãƒ¼ã‚¸ãƒ»ã‚»ãƒ¼ãƒ–ã‚¤ãƒ¡ãƒ¼ã‚¸ */
 int			tape_mode;
 static	char		tape_filename[ QUASI88_MAX_FILENAME ];
 
@@ -4765,7 +4765,7 @@ static	void	set_tape_rate(int c)
 
 
 /*----------------------------------------------------------------------*/
-/* ¡ÖEJECT¡×¥Ü¥¿¥ó²¡²¼»ş¤Î½èÍı						*/
+/* ã€ŒEJECTã€ãƒœã‚¿ãƒ³æŠ¼ä¸‹æ™‚ã®å‡¦ç†						*/
 
 static	void	cb_tape_eject_do(UNUSED_WIDGET, void *c)
 {
@@ -4786,15 +4786,15 @@ static	void	cb_tape_eject_do(UNUSED_WIDGET, void *c)
 }
 
 /*----------------------------------------------------------------------*/
-/* ¡ÖREW¡×¥Ü¥¿¥ó²¡²¼»ş¤Î½èÍı						*/
+/* ã€ŒREWã€ãƒœã‚¿ãƒ³æŠ¼ä¸‹æ™‚ã®å‡¦ç†						*/
 
 static	void	cb_tape_rew_do(UNUSED_WIDGET, void *c)
 {
     if ((int)c == CLOAD) {
-					/* ¥¤¥á¡¼¥¸¤ò´¬¤­Ìá¤¹ */
-	if (quasi88_load_tape_rewind()) {			/* À®¸ù */
+					/* ã‚¤ãƒ¡ãƒ¼ã‚¸ã‚’å·»ãæˆ»ã™ */
+	if (quasi88_load_tape_rewind()) {			/* æˆåŠŸ */
 	    ;
-	} else {						/* ¼ºÇÔ */
+	} else {						/* å¤±æ•— */
 	    set_tape_name((int)c);
 	}
 	set_tape_rate((int)c);
@@ -4802,7 +4802,7 @@ static	void	cb_tape_rew_do(UNUSED_WIDGET, void *c)
 }
 
 /*----------------------------------------------------------------------*/
-/* ¡ÖOPEN¡×¥Ü¥¿¥ó²¡²¼»ş¤Î½èÍı						*/
+/* ã€ŒOPENã€ãƒœã‚¿ãƒ³æŠ¼ä¸‹æ™‚ã®å‡¦ç†						*/
 
 static	void	sub_tape_open(void);
 static	void	sub_tape_open_do(void);
@@ -4813,13 +4813,13 @@ static	void	cb_tape_open(UNUSED_WIDGET, void *c)
     const char *initial;
     const t_menulabel *l = ((int)c == CLOAD) ? data_tape_load : data_tape_save;
 
-				/* º£¤«¤éÀ¸À®¤¹¤ë¥Õ¥¡¥¤¥ë¥»¥ì¥¯¥·¥ç¥ó¤Ï */
-    tape_mode = (int)c;		/* LOADÍÑ ¤« SAVEÍÑ¤« ¤ò³Ğ¤¨¤Æ¤ª¤¯      */
+				/* ä»Šã‹ã‚‰ç”Ÿæˆã™ã‚‹ãƒ•ã‚¡ã‚¤ãƒ«ã‚»ãƒ¬ã‚¯ã‚·ãƒ§ãƒ³ã¯ */
+    tape_mode = (int)c;		/* LOADç”¨ ã‹ SAVEç”¨ã‹ ã‚’è¦šãˆã¦ãŠã      */
 
     initial = filename_get_tape_or_dir(tape_mode);
 
     START_FILE_SELECTION(GET_LABEL(l, DATA_TAPE_FSEL),
-			 -1,	/* ReadOnly ¤ÎÁªÂò¤ÏÉÔ²Ä */
+			 -1,	/* ReadOnly ã®é¸æŠã¯ä¸å¯ */
 			 initial,
 
 			 sub_tape_open,
@@ -4835,21 +4835,21 @@ static	void	sub_tape_open(void)
     switch (osd_file_stat(tape_filename)) {
 
     case FILE_STAT_NOEXIST:
-	if (tape_mode == CLOAD) {		/* ¥Õ¥¡¥¤¥ëÌµ¤¤¤Î¤Ç¥¨¥é¡¼   */
+	if (tape_mode == CLOAD) {		/* ãƒ•ã‚¡ã‚¤ãƒ«ç„¡ã„ã®ã§ã‚¨ãƒ©ãƒ¼   */
 	    start_file_error_dialog(-1, ERR_CANT_OPEN);
-	} else {				/* ¥Õ¥¡¥¤¥ëÌµ¤¤¤Î¤Ç¿·µ¬ºîÀ® */
+	} else {				/* ãƒ•ã‚¡ã‚¤ãƒ«ç„¡ã„ã®ã§æ–°è¦ä½œæˆ */
 	    sub_tape_open_do();
 	}
 	break;
 
     case FILE_STAT_DIR:
-	/* ¥Ç¥£¥ì¥¯¥È¥ê¤Ê¤Î¤Ç¡¢³«¤¤¤Á¤ã¤À¤á */
+	/* ãƒ‡ã‚£ãƒ¬ã‚¯ãƒˆãƒªãªã®ã§ã€é–‹ã„ã¡ã‚ƒã ã‚ */
 	start_file_error_dialog(-1, ERR_CANT_OPEN);
 	break;
 
     default:
 	if (tape_mode == CSAVE) {
-	    /* ¤¹¤Ç¤Ë¥Õ¥¡¥¤¥ë¤¬Â¸ºß¤·¤Ş¤¹¡£¥¤¥á¡¼¥¸¤òÄÉµ­¤·¤Ş¤¹¤«¡© */
+	    /* ã™ã§ã«ãƒ•ã‚¡ã‚¤ãƒ«ãŒå­˜åœ¨ã—ã¾ã™ã€‚ã‚¤ãƒ¡ãƒ¼ã‚¸ã‚’è¿½è¨˜ã—ã¾ã™ã‹ï¼Ÿ */
 	    dialog_create();
 	    {
 		dialog_set_title(GET_LABEL(l, DATA_TAPE_WARN_0));
@@ -4878,7 +4878,7 @@ static	void	sub_tape_open_do(void)
 {
     int result, c = tape_mode;
 
-    if (c == CLOAD) {			/* ¥Æ¡¼¥×¤ò³«¤¯ */
+    if (c == CLOAD) {			/* ãƒ†ãƒ¼ãƒ—ã‚’é–‹ã */
 	result = quasi88_load_tape_insert(tape_filename);
     } else {
 	result = quasi88_save_tape_insert(tape_filename);
@@ -4998,7 +4998,7 @@ static	Q8tkWidget	*menu_tape_image(void)
 }
 
 /*----------------------------------------------------------------------*/
-					    /* ¥Æ¡¼¥×½èÍı¥â¡¼¥ÉÀÚ¤êÂØ¤¨ */
+					    /* ãƒ†ãƒ¼ãƒ—å‡¦ç†ãƒ¢ãƒ¼ãƒ‰åˆ‡ã‚Šæ›¿ãˆ */
 static	int	get_tape_intr(void)
 {
     return cmt_intr;
@@ -5044,12 +5044,12 @@ static	Q8tkWidget	*menu_tape(void)
 
 /*===========================================================================
  *
- *	¥á¥¤¥ó¥Ú¡¼¥¸	¤½¤ÎÂ¾
+ *	ãƒ¡ã‚¤ãƒ³ãƒšãƒ¼ã‚¸	ãã®ä»–
  *
  *===========================================================================*/
 
 /*----------------------------------------------------------------------*/
-							  /* ¥µ¥¹¥Ú¥ó¥É */
+							  /* ã‚µã‚¹ãƒšãƒ³ãƒ‰ */
 
 static	Q8tkWidget	*misc_suspend_entry;
 static	Q8tkWidget	*misc_suspend_combo;
@@ -5057,22 +5057,22 @@ static	Q8tkWidget	*misc_suspend_combo;
 static	char		state_filename[ QUASI88_MAX_FILENAME ];
 
 
-/*	¥µ¥¹¥Ú¥ó¥É»ş¤Î¥á¥Ã¥»¡¼¥¸¥À¥¤¥¢¥í¥°¤ò¾Ã¤¹			  */
+/*	ã‚µã‚¹ãƒšãƒ³ãƒ‰æ™‚ã®ãƒ¡ãƒƒã‚»ãƒ¼ã‚¸ãƒ€ã‚¤ã‚¢ãƒ­ã‚°ã‚’æ¶ˆã™			  */
 static	void	cb_misc_suspend_dialog_ok(UNUSED_WIDGET, void *result)
 {
     dialog_destroy();
 
     if ((int)result == DATA_MISC_RESUME_OK ||
 	(int)result == DATA_MISC_RESUME_ERR) {
-	quasi88_exec();		/* ¢« q8tk_main_quit() ¸Æ½ĞºÑ¤ß */
+	quasi88_exec();		/* â† q8tk_main_quit() å‘¼å‡ºæ¸ˆã¿ */
     }
 }
 
-/*	¥µ¥¹¥Ú¥ó¥É¼Â¹Ô¸å¤Î¥á¥Ã¥»¡¼¥¸¥À¥¤¥¢¥í¥°				  */
+/*	ã‚µã‚¹ãƒšãƒ³ãƒ‰å®Ÿè¡Œå¾Œã®ãƒ¡ãƒƒã‚»ãƒ¼ã‚¸ãƒ€ã‚¤ã‚¢ãƒ­ã‚°				  */
 static	void	sub_misc_suspend_dialog(int result)
 {
     const t_menulabel *l = data_misc_suspend_err;
-    char filename[60 +11 +1];	/* 11 == strlen("[DRIVE 1:] "), 1 ¤Ï '\0' */
+    char filename[60 +11 +1];	/* 11 == strlen("[DRIVE 1:] "), 1 ã¯ '\0' */
     int save_code;
     int i, width, len;
     const char *ptr[4];
@@ -5082,9 +5082,9 @@ static	void	sub_misc_suspend_dialog(int result)
 
     dialog_create();
     {
-	dialog_set_title(GET_LABEL(l, result));	/* ·ë²ÌÉ½¼¨ */
+	dialog_set_title(GET_LABEL(l, result));	/* çµæœè¡¨ç¤º */
 
-	if (result == DATA_MISC_SUSPEND_OK ||	/* À®¸ù»ş¤Ï¥¤¥á¡¼¥¸Ì¾É½¼¨ */
+	if (result == DATA_MISC_SUSPEND_OK ||	/* æˆåŠŸæ™‚ã¯ã‚¤ãƒ¡ãƒ¼ã‚¸åè¡¨ç¤º */
 	    result == DATA_MISC_RESUME_OK) {
 
 	    dialog_set_title(GET_LABEL(l, DATA_MISC_SUSPEND_LINE));
@@ -5121,7 +5121,7 @@ static	void	sub_misc_suspend_dialog(int result)
     dialog_start();
 }
 
-/*	¥ì¥¸¥å¡¼¥à¼Â¹ÔÁ°¤Î¥á¥Ã¥»¡¼¥¸¥À¥¤¥¢¥í¥°				  */
+/*	ãƒ¬ã‚¸ãƒ¥ãƒ¼ãƒ å®Ÿè¡Œå‰ã®ãƒ¡ãƒƒã‚»ãƒ¼ã‚¸ãƒ€ã‚¤ã‚¢ãƒ­ã‚°				  */
 static	void	sub_misc_suspend_not_access(void)
 {
     const t_menulabel *l = data_misc_suspend_err;
@@ -5141,7 +5141,7 @@ static	void	sub_misc_suspend_not_access(void)
     dialog_start();
 }
 
-/*	¥µ¥¹¥Ú¥ó¥É¼Â¹ÔÁ°¤Î¥á¥Ã¥»¡¼¥¸¥À¥¤¥¢¥í¥°				  */
+/*	ã‚µã‚¹ãƒšãƒ³ãƒ‰å®Ÿè¡Œå‰ã®ãƒ¡ãƒƒã‚»ãƒ¼ã‚¸ãƒ€ã‚¤ã‚¢ãƒ­ã‚°				  */
 static	void	cb_misc_suspend_overwrite(UNUSED_WIDGET, UNUSED_PARM);
 static	void	sub_misc_suspend_really(void)
 {
@@ -5169,55 +5169,55 @@ static	void	cb_misc_suspend_overwrite(UNUSED_WIDGET, UNUSED_PARM)
     dialog_destroy();
     {
 	if (quasi88_statesave(-1)) {
-	    sub_misc_suspend_dialog(DATA_MISC_SUSPEND_OK);	/* À®¸ù */
+	    sub_misc_suspend_dialog(DATA_MISC_SUSPEND_OK);	/* æˆåŠŸ */
 	} else {
-	    sub_misc_suspend_dialog(DATA_MISC_SUSPEND_ERR);	/* ¼ºÇÔ */
+	    sub_misc_suspend_dialog(DATA_MISC_SUSPEND_ERR);	/* å¤±æ•— */
 	}
     }
 }
 
 /*----------------------------------------------------------------------*/
-/*	¥µ¥¹¥Ú¥ó¥É½èÍı (¡Ö¥»¡¼¥Ö¡×¥¯¥ê¥Ã¥¯»ş)				*/
+/*	ã‚µã‚¹ãƒšãƒ³ãƒ‰å‡¦ç† (ã€Œã‚»ãƒ¼ãƒ–ã€ã‚¯ãƒªãƒƒã‚¯æ™‚)				*/
 static	void	cb_misc_suspend_save(UNUSED_WIDGET, UNUSED_PARM)
 {
-#if 0	/* ¤¤¤Á¤¤¤Á¾å½ñ¤­³ÎÇ§¤·¤Æ¤¯¤ë¤Î¤Ï¤¦¤¶¤¤¡© */
-    if (statesave_check_file_exist()) {			/* ¥Õ¥¡¥¤¥ë¤¢¤ë */
+#if 0	/* ã„ã¡ã„ã¡ä¸Šæ›¸ãç¢ºèªã—ã¦ãã‚‹ã®ã¯ã†ã–ã„ï¼Ÿ */
+    if (statesave_check_file_exist()) {			/* ãƒ•ã‚¡ã‚¤ãƒ«ã‚ã‚‹ */
 	sub_misc_suspend_really();
     } else
 #endif
     {
 	if (quasi88_statesave(-1)) {
-	    sub_misc_suspend_dialog(DATA_MISC_SUSPEND_OK);	/* À®¸ù */
+	    sub_misc_suspend_dialog(DATA_MISC_SUSPEND_OK);	/* æˆåŠŸ */
 	} else {
-	    sub_misc_suspend_dialog(DATA_MISC_SUSPEND_ERR);	/* ¼ºÇÔ */
+	    sub_misc_suspend_dialog(DATA_MISC_SUSPEND_ERR);	/* å¤±æ•— */
 	}
     }
 }
 
 /*----------------------------------------------------------------------*/
-/*	¥µ¥¹¥Ú¥ó¥É½èÍı (¡Ö¥í¡¼¥É¡×¥¯¥ê¥Ã¥¯»ş)				*/
+/*	ã‚µã‚¹ãƒšãƒ³ãƒ‰å‡¦ç† (ã€Œãƒ­ãƒ¼ãƒ‰ã€ã‚¯ãƒªãƒƒã‚¯æ™‚)				*/
 static	void	cb_misc_suspend_load(UNUSED_WIDGET, UNUSED_PARM)
 {
-    if (stateload_check_file_exist() == FALSE) {	/* ¥Õ¥¡¥¤¥ë¤Ê¤· */
+    if (stateload_check_file_exist() == FALSE) {	/* ãƒ•ã‚¡ã‚¤ãƒ«ãªã— */
 	sub_misc_suspend_not_access();
     } else {
 	if (quasi88_stateload(-1)) {
-	    sub_misc_suspend_dialog(DATA_MISC_RESUME_OK);	/* À®¸ù */
+	    sub_misc_suspend_dialog(DATA_MISC_RESUME_OK);	/* æˆåŠŸ */
 	} else {
-	    sub_misc_suspend_dialog(DATA_MISC_RESUME_ERR);	/* ¼ºÇÔ */
+	    sub_misc_suspend_dialog(DATA_MISC_RESUME_ERR);	/* å¤±æ•— */
 	}
     }
 }
 
 /*----------------------------------------------------------------------*/
-/*	¥Õ¥¡¥¤¥ëÌ¾Á°ÊÑ¹¹¡£¥¨¥ó¥È¥ê¡¼ changed (ÆşÎÏ)»ş¤Ë¸Æ¤Ğ¤ì¤ë¡£       */
-/*		(¥Õ¥¡¥¤¥ë¥»¥ì¥¯¥·¥ç¥ó¤Ç¤ÎÊÑ¹¹»ş¤Ï¤³¤ì¤Ï¸Æ¤Ğ¤ì¤Ê¤¤)      */
+/*	ãƒ•ã‚¡ã‚¤ãƒ«åå‰å¤‰æ›´ã€‚ã‚¨ãƒ³ãƒˆãƒªãƒ¼ changed (å…¥åŠ›)æ™‚ã«å‘¼ã°ã‚Œã‚‹ã€‚       */
+/*		(ãƒ•ã‚¡ã‚¤ãƒ«ã‚»ãƒ¬ã‚¯ã‚·ãƒ§ãƒ³ã§ã®å¤‰æ›´æ™‚ã¯ã“ã‚Œã¯å‘¼ã°ã‚Œãªã„)      */
 
 static void sub_misc_suspend_combo_update(void)
 {
     int i;
     char buf[4];
-				/* ¥¹¥Æ¡¼¥È¥Õ¥¡¥¤¥ë¤ÎÏ¢ÈÖ¤Ë±ş¤¸¤Æ¥³¥ó¥ÜÊÑ¹¹ */
+				/* ã‚¹ãƒ†ãƒ¼ãƒˆãƒ•ã‚¡ã‚¤ãƒ«ã®é€£ç•ªã«å¿œã˜ã¦ã‚³ãƒ³ãƒœå¤‰æ›´ */
     i = filename_get_state_serial();
     if ('0' <= i && i <= '9') { buf[0] = i;   }
     else                      { buf[0] = ' '; }
@@ -5235,7 +5235,7 @@ static void cb_misc_suspend_entry_change(Q8tkWidget *widget, UNUSED_PARM)
 }
 
 /*----------------------------------------------------------------------*/
-/*	¥Õ¥¡¥¤¥ëÁªÂò½èÍı¡£¥Õ¥¡¥¤¥ë¥»¥ì¥¯¥·¥ç¥ó¤ò»ÈÍÑ			*/
+/*	ãƒ•ã‚¡ã‚¤ãƒ«é¸æŠå‡¦ç†ã€‚ãƒ•ã‚¡ã‚¤ãƒ«ã‚»ãƒ¬ã‚¯ã‚·ãƒ§ãƒ³ã‚’ä½¿ç”¨			*/
 
 static void sub_misc_suspend_update(void);
 static void sub_misc_suspend_change(void);
@@ -5246,7 +5246,7 @@ static	void	cb_misc_suspend_fsel(UNUSED_WIDGET, UNUSED_PARM)
 
 
     START_FILE_SELECTION(GET_LABEL(l, DATA_MISC_SUSPEND_FSEL),
-			 -1,	/* ReadOnly ¤ÎÁªÂò¤ÏÉÔ²Ä */
+			 -1,	/* ReadOnly ã®é¸æŠã¯ä¸å¯ */
 			 q8tk_entry_get_text(misc_suspend_entry),
 
 			 sub_misc_suspend_change,
@@ -5363,7 +5363,7 @@ static	Q8tkWidget	*menu_misc_suspend(void)
 
 
 /*----------------------------------------------------------------------*/
-					 /* ¥¹¥¯¥ê¡¼¥ó ¥¹¥Ê¥Ã¥×¥·¥ç¥Ã¥È */
+					 /* ã‚¹ã‚¯ãƒªãƒ¼ãƒ³ ã‚¹ãƒŠãƒƒãƒ—ã‚·ãƒ§ãƒƒãƒˆ */
 
 static	Q8tkWidget	*misc_snapshot_entry;
 
@@ -5371,20 +5371,20 @@ static	char		snap_filename[ QUASI88_MAX_FILENAME ];
 
 
 /*----------------------------------------------------------------------*/
-/*	¥¹¥Ê¥Ã¥×¥·¥ç¥Ã¥È ¥»¡¼¥Ö (¡Ö¼Â¹Ô¡×¥¯¥ê¥Ã¥¯»ş)			*/
+/*	ã‚¹ãƒŠãƒƒãƒ—ã‚·ãƒ§ãƒƒãƒˆ ã‚»ãƒ¼ãƒ– (ã€Œå®Ÿè¡Œã€ã‚¯ãƒªãƒƒã‚¯æ™‚)			*/
 static	void	cb_misc_snapshot_do(void)
 {
-    /* Ç°¤Î¤¿¤á¡¢¥¹¥Ê¥Ã¥×¥·¥ç¥Ã¥È¤Î¥Õ¥¡¥¤¥ëÌ¾¤òºÆÀßÄê */
+    /* å¿µã®ãŸã‚ã€ã‚¹ãƒŠãƒƒãƒ—ã‚·ãƒ§ãƒƒãƒˆã®ãƒ•ã‚¡ã‚¤ãƒ«åã‚’å†è¨­å®š */
     filename_set_snap_base(q8tk_entry_get_text(misc_snapshot_entry));
 
     quasi88_screen_snapshot();
 
-    /* ¥¹¥Ê¥Ã¥×¥·¥ç¥Ã¥È¤Î¥Õ¥¡¥¤¥ëÌ¾¤Ï¡¢¼Â¹Ô»ş¤ËÊÑ¤ï¤ë¤³¤È¤¬¤¢¤ë¤Î¤ÇºÆÀßÄê */
+    /* ã‚¹ãƒŠãƒƒãƒ—ã‚·ãƒ§ãƒƒãƒˆã®ãƒ•ã‚¡ã‚¤ãƒ«åã¯ã€å®Ÿè¡Œæ™‚ã«å¤‰ã‚ã‚‹ã“ã¨ãŒã‚ã‚‹ã®ã§å†è¨­å®š */
     q8tk_entry_set_text(misc_snapshot_entry, filename_get_snap_base());
 }
 
 /*----------------------------------------------------------------------*/
-/*	²èÁü¥Õ¥©¡¼¥Ş¥Ã¥ÈÀÚ¤êÂØ¤¨					*/
+/*	ç”»åƒãƒ•ã‚©ãƒ¼ãƒãƒƒãƒˆåˆ‡ã‚Šæ›¿ãˆ					*/
 static	int	get_misc_snapshot_format(void)
 {
     return snapshot_format;
@@ -5397,8 +5397,8 @@ static	void	cb_misc_snapshot_format(UNUSED_WIDGET, void *p)
 
 
 /*----------------------------------------------------------------------*/
-/*	¥Õ¥¡¥¤¥ëÌ¾Á°ÊÑ¹¹¡£¥¨¥ó¥È¥ê¡¼ changed (ÆşÎÏ)»ş¤Ë¸Æ¤Ğ¤ì¤ë¡£	*/
-/*		(¥Õ¥¡¥¤¥ë¥»¥ì¥¯¥·¥ç¥ó¤Ç¤ÎÊÑ¹¹»ş¤Ï¤³¤ì¤Ï¸Æ¤Ğ¤ì¤Ê¤¤)	*/
+/*	ãƒ•ã‚¡ã‚¤ãƒ«åå‰å¤‰æ›´ã€‚ã‚¨ãƒ³ãƒˆãƒªãƒ¼ changed (å…¥åŠ›)æ™‚ã«å‘¼ã°ã‚Œã‚‹ã€‚	*/
+/*		(ãƒ•ã‚¡ã‚¤ãƒ«ã‚»ãƒ¬ã‚¯ã‚·ãƒ§ãƒ³ã§ã®å¤‰æ›´æ™‚ã¯ã“ã‚Œã¯å‘¼ã°ã‚Œãªã„)	*/
 
 static void cb_misc_snapshot_entry_change(Q8tkWidget *widget, UNUSED_PARM)
 {
@@ -5406,7 +5406,7 @@ static void cb_misc_snapshot_entry_change(Q8tkWidget *widget, UNUSED_PARM)
 }
 
 /*----------------------------------------------------------------------*/
-/*	¥Õ¥¡¥¤¥ëÁªÂò½èÍı¡£¥Õ¥¡¥¤¥ë¥»¥ì¥¯¥·¥ç¥ó¤ò»ÈÍÑ			*/
+/*	ãƒ•ã‚¡ã‚¤ãƒ«é¸æŠå‡¦ç†ã€‚ãƒ•ã‚¡ã‚¤ãƒ«ã‚»ãƒ¬ã‚¯ã‚·ãƒ§ãƒ³ã‚’ä½¿ç”¨			*/
 
 static void sub_misc_snapshot_update(void);
 static void sub_misc_snapshot_change(void);
@@ -5417,7 +5417,7 @@ static	void	cb_misc_snapshot_fsel(UNUSED_WIDGET, UNUSED_PARM)
 
 
     START_FILE_SELECTION(GET_LABEL(l, DATA_MISC_SNAPSHOT_FSEL),
-			 -1,	/* ReadOnly ¤ÎÁªÂò¤ÏÉÔ²Ä */
+			 -1,	/* ReadOnly ã®é¸æŠã¯ä¸å¯ */
 			 q8tk_entry_get_text(misc_snapshot_entry),
 
 			 sub_misc_snapshot_change,
@@ -5440,7 +5440,7 @@ static void sub_misc_snapshot_update(void)
 
 /*----------------------------------------------------------------------*/
 #ifdef	USE_SSS_CMD
-/*	¥³¥Ş¥ó¥É¼Â¹Ô¾õÂÖÊÑ¹¹ */
+/*	ã‚³ãƒãƒ³ãƒ‰å®Ÿè¡ŒçŠ¶æ…‹å¤‰æ›´ */
 static	int	get_misc_snapshot_c_do(void)
 {
     return snapshot_cmd_do;
@@ -5451,7 +5451,7 @@ static	void	cb_misc_snapshot_c_do(Q8tkWidget *widget, UNUSED_PARM)
     snapshot_cmd_do = key;
 }
 
-/*	¥³¥Ş¥ó¥ÉÊÑ¹¹¡£¥¨¥ó¥È¥ê¡¼ changed (ÆşÎÏ)»ş¤Ë¸Æ¤Ğ¤ì¤ë¡£  */
+/*	ã‚³ãƒãƒ³ãƒ‰å¤‰æ›´ã€‚ã‚¨ãƒ³ãƒˆãƒªãƒ¼ changed (å…¥åŠ›)æ™‚ã«å‘¼ã°ã‚Œã‚‹ã€‚  */
 static void cb_misc_snapshot_c_entry_change(Q8tkWidget *widget, UNUSED_PARM)
 {
     strncpy(snapshot_cmd, q8tk_entry_get_text(widget),
@@ -5555,7 +5555,7 @@ static	Q8tkWidget	*menu_misc_snapshot(void)
 }
 
 /*----------------------------------------------------------------------*/
-						  /* ¥µ¥¦¥ó¥É½ĞÎÏ¥»¡¼¥Ö */
+						  /* ã‚µã‚¦ãƒ³ãƒ‰å‡ºåŠ›ã‚»ãƒ¼ãƒ– */
 
 static	Q8tkWidget	*misc_waveout_entry;
 static	Q8tkWidget	*misc_waveout_start;
@@ -5581,15 +5581,15 @@ static void sub_misc_waveout_sensitive(void)
     q8tk_widget_set_focus(NULL);
 }
 /*----------------------------------------------------------------------*/
-/*	¥µ¥¦¥ó¥É½ĞÎÏ ÊİÂ¸³«»Ï (¡Ö³«»Ï¡×¥¯¥ê¥Ã¥¯»ş)			*/
+/*	ã‚µã‚¦ãƒ³ãƒ‰å‡ºåŠ› ä¿å­˜é–‹å§‹ (ã€Œé–‹å§‹ã€ã‚¯ãƒªãƒƒã‚¯æ™‚)			*/
 static	void	cb_misc_waveout_start(void)
 {
-    /* Ç°¤Î¤¿¤á¡¢¥µ¥¦¥ó¥É½ĞÎÏ¤Î¥Õ¥¡¥¤¥ëÌ¾¤òºÆÀßÄê */
+    /* å¿µã®ãŸã‚ã€ã‚µã‚¦ãƒ³ãƒ‰å‡ºåŠ›ã®ãƒ•ã‚¡ã‚¤ãƒ«åã‚’å†è¨­å®š */
     filename_set_wav_base(q8tk_entry_get_text(misc_waveout_entry));
 
     quasi88_waveout(TRUE);
 
-    /* ¥¹¥Ê¥Ã¥×¥·¥ç¥Ã¥È¤Î¥Õ¥¡¥¤¥ëÌ¾¤Ï¡¢¼Â¹Ô»ş¤ËÊÑ¤ï¤ë¤³¤È¤¬¤¢¤ë¤Î¤ÇºÆÀßÄê */
+    /* ã‚¹ãƒŠãƒƒãƒ—ã‚·ãƒ§ãƒƒãƒˆã®ãƒ•ã‚¡ã‚¤ãƒ«åã¯ã€å®Ÿè¡Œæ™‚ã«å¤‰ã‚ã‚‹ã“ã¨ãŒã‚ã‚‹ã®ã§å†è¨­å®š */
     q8tk_entry_set_text(misc_waveout_entry, filename_get_wav_base());
 
 
@@ -5597,7 +5597,7 @@ static	void	cb_misc_waveout_start(void)
 }
 
 /*----------------------------------------------------------------------*/
-/*	¥µ¥¦¥ó¥É½ĞÎÏ ÊİÂ¸½ªÎ» (¡ÖÄä»ß¡×¥¯¥ê¥Ã¥¯»ş)			*/
+/*	ã‚µã‚¦ãƒ³ãƒ‰å‡ºåŠ› ä¿å­˜çµ‚äº† (ã€Œåœæ­¢ã€ã‚¯ãƒªãƒƒã‚¯æ™‚)			*/
 static	void	cb_misc_waveout_stop(void)
 {
     quasi88_waveout(FALSE);
@@ -5606,8 +5606,8 @@ static	void	cb_misc_waveout_stop(void)
 }
 
 /*----------------------------------------------------------------------*/
-/*	¥Õ¥¡¥¤¥ëÌ¾Á°ÊÑ¹¹¡£¥¨¥ó¥È¥ê¡¼ changed (ÆşÎÏ)»ş¤Ë¸Æ¤Ğ¤ì¤ë¡£	*/
-/*		(¥Õ¥¡¥¤¥ë¥»¥ì¥¯¥·¥ç¥ó¤Ç¤ÎÊÑ¹¹»ş¤Ï¤³¤ì¤Ï¸Æ¤Ğ¤ì¤Ê¤¤)	*/
+/*	ãƒ•ã‚¡ã‚¤ãƒ«åå‰å¤‰æ›´ã€‚ã‚¨ãƒ³ãƒˆãƒªãƒ¼ changed (å…¥åŠ›)æ™‚ã«å‘¼ã°ã‚Œã‚‹ã€‚	*/
+/*		(ãƒ•ã‚¡ã‚¤ãƒ«ã‚»ãƒ¬ã‚¯ã‚·ãƒ§ãƒ³ã§ã®å¤‰æ›´æ™‚ã¯ã“ã‚Œã¯å‘¼ã°ã‚Œãªã„)	*/
 
 static void cb_misc_waveout_entry_change(Q8tkWidget *widget, UNUSED_PARM)
 {
@@ -5615,7 +5615,7 @@ static void cb_misc_waveout_entry_change(Q8tkWidget *widget, UNUSED_PARM)
 }
 
 /*----------------------------------------------------------------------*/
-/*	¥Õ¥¡¥¤¥ëÁªÂò½èÍı¡£¥Õ¥¡¥¤¥ë¥»¥ì¥¯¥·¥ç¥ó¤ò»ÈÍÑ			*/
+/*	ãƒ•ã‚¡ã‚¤ãƒ«é¸æŠå‡¦ç†ã€‚ãƒ•ã‚¡ã‚¤ãƒ«ã‚»ãƒ¬ã‚¯ã‚·ãƒ§ãƒ³ã‚’ä½¿ç”¨			*/
 
 static void sub_misc_waveout_update(void);
 static void sub_misc_waveout_change(void);
@@ -5626,7 +5626,7 @@ static	void	cb_misc_waveout_fsel(UNUSED_WIDGET, UNUSED_PARM)
 
 
     START_FILE_SELECTION(GET_LABEL(l, DATA_MISC_WAVEOUT_FSEL),
-			 -1,	/* ReadOnly ¤ÎÁªÂò¤ÏÉÔ²Ä */
+			 -1,	/* ReadOnly ã®é¸æŠã¯ä¸å¯ */
 			 q8tk_entry_get_text(misc_waveout_entry),
 
 			 sub_misc_waveout_change,
@@ -5709,7 +5709,7 @@ static	Q8tkWidget	*menu_misc_waveout(void)
 }
 
 /*----------------------------------------------------------------------*/
-						    /* ¥Õ¥¡¥¤¥ëÌ¾¹ç¤ï¤» */
+						    /* ãƒ•ã‚¡ã‚¤ãƒ«ååˆã‚ã› */
 static	int	get_misc_sync(void)
 {
     return filename_synchronize;
@@ -5767,7 +5767,7 @@ static	Q8tkWidget	*menu_misc(void)
 
 /*===========================================================================
  *
- *	¥á¥¤¥ó¥Ú¡¼¥¸	¥Ğ¡¼¥¸¥ç¥ó¾ğÊó
+ *	ãƒ¡ã‚¤ãƒ³ãƒšãƒ¼ã‚¸	ãƒãƒ¼ã‚¸ãƒ§ãƒ³æƒ…å ±
  *
  *===========================================================================*/
 
@@ -5778,9 +5778,9 @@ static	Q8tkWidget	*menu_about(void)
 
     vx = PACK_VBOX(NULL);
     {
-	hx = PACK_HBOX(vx);				/* ¾åÈ¾Ê¬¤Ë¥í¥´É½¼¨ */
+	hx = PACK_HBOX(vx);				/* ä¸ŠåŠåˆ†ã«ãƒ­ã‚´è¡¨ç¤º */
 	{
-	    PACK_LABEL(hx, " ");	/* ¥¤¥ó¥Ç¥ó¥È */
+	    PACK_LABEL(hx, " ");	/* ã‚¤ãƒ³ãƒ‡ãƒ³ãƒˆ */
 
 	    if (strcmp(Q_TITLE, "QUASI88") == 0) {
 		w = q8tk_logo_new();
@@ -5802,14 +5802,14 @@ static	Q8tkWidget	*menu_about(void)
 		PACK_LABEL(vbox, "  ver. " Q_VERSION  "  <" Q_COMMENT ">");
 	    }
 	}
-							/* ²¼È¾Ê¬¤Ï¾ğÊóÉ½¼¨ */
+							/* ä¸‹åŠåˆ†ã¯æƒ…å ±è¡¨ç¤º */
 	swin = q8tk_scrolled_window_new(NULL, NULL);
 	{
 	    hbox = PACK_HBOX(NULL);
 	    {
 		vbox = PACK_VBOX(hbox);
 		{
-		    {		/* ¥µ¥¦¥ó¥É¤Ë´Ø¤¹¤ë¾ğÊóÉ½¼¨ */
+		    {		/* ã‚µã‚¦ãƒ³ãƒ‰ã«é–¢ã™ã‚‹æƒ…å ±è¡¨ç¤º */
 			const char *(*s) = (menu_lang == 0) ? data_about_en
 							    : data_about_jp;
 
@@ -5824,7 +5824,7 @@ static	Q8tkWidget	*menu_about(void)
 			}
 		    }
 
-		    {		/* ¥·¥¹¥Æ¥à°ÍÂ¸Éô¤Ë´Ø¤¹¤ë¾ğÊóÉ½¼¨ */
+		    {		/* ã‚·ã‚¹ãƒ†ãƒ ä¾å­˜éƒ¨ã«é–¢ã™ã‚‹æƒ…å ±è¡¨ç¤º */
 			int new_code, save_code = 0;
 			const char *msg;
 			char buf[256];
@@ -5881,12 +5881,12 @@ static	Q8tkWidget	*menu_about(void)
 
 /*===========================================================================
  *
- *	¥á¥¤¥ó¥¦¥¤¥ó¥É¥¦
+ *	ãƒ¡ã‚¤ãƒ³ã‚¦ã‚¤ãƒ³ãƒ‰ã‚¦
  *
  *===========================================================================*/
 
 /*----------------------------------------------------------------------*/
-				     /* NOTEBOOK ¤ËÄ¥¤êÉÕ¤±¤ë¡¢³Æ¥Ú¡¼¥¸ */
+				     /* NOTEBOOK ã«å¼µã‚Šä»˜ã‘ã‚‹ã€å„ãƒšãƒ¼ã‚¸ */
 static	struct{
     int		data_num;
     Q8tkWidget	*(*menu_func)(void);
@@ -5907,8 +5907,8 @@ static	struct{
 };
 
 /*----------------------------------------------------------------------*/
-/* NOTEBOOK ¤Î³Æ¥Ú¡¼¥¸¤ò¡¢¥Õ¥¡¥ó¥¯¥·¥ç¥ó¥­¡¼¤ÇÁªÂò½ĞÍè¤ë¤è¤¦¤Ë¡¢
-   ¥¢¥¯¥»¥é¥ì¡¼¥¿¥­¡¼¤òÀßÄê¤¹¤ë¡£¤½¤Î¤¿¤á¡¢¥À¥ß¡¼¥¦¥£¥¸¥Ã¥ÈÍøÍÑ */
+/* NOTEBOOK ã®å„ãƒšãƒ¼ã‚¸ã‚’ã€ãƒ•ã‚¡ãƒ³ã‚¯ã‚·ãƒ§ãƒ³ã‚­ãƒ¼ã§é¸æŠå‡ºæ¥ã‚‹ã‚ˆã†ã«ã€
+   ã‚¢ã‚¯ã‚»ãƒ©ãƒ¬ãƒ¼ã‚¿ã‚­ãƒ¼ã‚’è¨­å®šã™ã‚‹ã€‚ãã®ãŸã‚ã€ãƒ€ãƒŸãƒ¼ã‚¦ã‚£ã‚¸ãƒƒãƒˆåˆ©ç”¨ */
 
 #define	cb_note_fake(fn,n)						\
 static	void	cb_note_fake_##fn(UNUSED_WIDGET, Q8tkWidget *notebook)	\
@@ -5926,7 +5926,7 @@ cb_note_fake(f8,7)
 cb_note_fake(f9,8)
 cb_note_fake(f10,9)
 
-     /* °Ê²¼¤Î¥¢¥¯¥»¥é¥ì¡¼¥¿¥­¡¼½èÍı¤Ï¡¢ floi»á Äó¶¡¡£ Thanks ! */
+     /* ä»¥ä¸‹ã®ã‚¢ã‚¯ã‚»ãƒ©ãƒ¬ãƒ¼ã‚¿ã‚­ãƒ¼å‡¦ç†ã¯ã€ floiæ° æä¾›ã€‚ Thanks ! */
 static	void	cb_note_fake_prev(UNUSED_WIDGET, Q8tkWidget *notebook)
 {
     int n = q8tk_notebook_current_page(notebook) - 1;
@@ -5962,7 +5962,7 @@ static	struct {
 };
 
 /*----------------------------------------------------------------------*/
-				/* ´Ê°×¥ê¥»¥Ã¥È¥Ü¥¿¥ó ¡Ü ¥â¥Ë¥¿¡¼¥Ü¥¿¥ó */
+				/* ç°¡æ˜“ãƒªã‚»ãƒƒãƒˆãƒœã‚¿ãƒ³ ï¼‹ ãƒ¢ãƒ‹ã‚¿ãƒ¼ãƒœã‚¿ãƒ³ */
 static	Q8tkWidget	*monitor_widget;
 static	Q8tkWidget	*quickres_widget;
 
@@ -6010,7 +6010,7 @@ static	Q8tkWidget	*menu_top_button_misc(void)
 }
 
 /*----------------------------------------------------------------------*/
-						/* ´Ê°×¥ê¥»¥Ã¥È¥Ü¥¿¥ó   */
+						/* ç°¡æ˜“ãƒªã‚»ãƒƒãƒˆãƒœã‚¿ãƒ³   */
 static	int	get_quickres_basic(void)
 {
     return reset_req.boot_basic;
@@ -6047,7 +6047,7 @@ static	Q8tkWidget *menu_top_misc_quickres(void)
 			data_quickres_basic, COUNTOF(data_quickres_basic),
 			get_quickres_basic(), cb_quickres_basic);
 
-	/* ¥ê¥¹¥È¤ò¼ê·«¤Ã¤Æ¡¢Á´¥¦¥£¥¸¥Ã¥È¤ò¼èÆÀ */
+	/* ãƒªã‚¹ãƒˆã‚’æ‰‹ç¹°ã£ã¦ã€å…¨ã‚¦ã‚£ã‚¸ãƒƒãƒˆã‚’å–å¾— */
 	widget_reset_basic[1][BASIC_V2 ] = list->data;	list = list->next;
 	widget_reset_basic[1][BASIC_V1H] = list->data;	list = list->next;
 	widget_reset_basic[1][BASIC_V1S] = list->data;	list = list->next;
@@ -6058,7 +6058,7 @@ static	Q8tkWidget *menu_top_misc_quickres(void)
 			data_quickres_clock, COUNTOF(data_quickres_clock),
 			get_quickres_clock(), cb_quickres_clock);
 
-	/* ¥ê¥¹¥È¤ò¼ê·«¤Ã¤Æ¡¢Á´¥¦¥£¥¸¥Ã¥È¤ò¼èÆÀ */
+	/* ãƒªã‚¹ãƒˆã‚’æ‰‹ç¹°ã£ã¦ã€å…¨ã‚¦ã‚£ã‚¸ãƒƒãƒˆã‚’å–å¾— */
 	widget_reset_clock[1][CLOCK_4MHZ] = list->data;	list = list->next;
 	widget_reset_clock[1][CLOCK_8MHZ] = list->data;
 
@@ -6075,10 +6075,10 @@ static	Q8tkWidget *menu_top_misc_quickres(void)
 }
 
 /*----------------------------------------------------------------------*/
-						/* ¥â¥Ë¥¿¡¼¥Ü¥¿¥ó	*/
+						/* ãƒ¢ãƒ‹ã‚¿ãƒ¼ãƒœã‚¿ãƒ³	*/
 static	void	cb_top_monitor(UNUSED_WIDGET, UNUSED_PARM)
 {
-    quasi88_monitor();		/* ¢« q8tk_main_quit() ¸Æ½ĞºÑ¤ß */
+    quasi88_monitor();		/* â† q8tk_main_quit() å‘¼å‡ºæ¸ˆã¿ */
 }
 
 static	Q8tkWidget *menu_top_misc_monitor(void)
@@ -6105,7 +6105,7 @@ static	Q8tkWidget *menu_top_misc_monitor(void)
     return box;
 }
 /*----------------------------------------------------------------------*/
-							/* ¥¹¥Æ¡¼¥¿¥¹	*/
+							/* ã‚¹ãƒ†ãƒ¼ã‚¿ã‚¹	*/
 static	int	get_top_status(void) { return quasi88_cfg_now_showstatus(); }
 static	void	cb_top_status(Q8tkWidget *widget, UNUSED_PARM)
 {
@@ -6136,7 +6136,7 @@ static	void	menu_top_status(Q8tkWidget *base_hbox)
     }
 }
 /*----------------------------------------------------------------------*/
-					/* ¥á¥¤¥ó¥¦¥¤¥ó¥É¥¦²¼Éô¤Î¥Ü¥¿¥ó */
+					/* ãƒ¡ã‚¤ãƒ³ã‚¦ã‚¤ãƒ³ãƒ‰ã‚¦ä¸‹éƒ¨ã®ãƒœã‚¿ãƒ³ */
 static	void	sub_top_savecfg(void);
 static	void	sub_top_quit(void);
 
@@ -6147,7 +6147,7 @@ static	void	cb_top_button(UNUSED_WIDGET, void *p)
 	sub_top_savecfg();
 	break;
     case DATA_TOP_EXIT:
-	quasi88_exec();		/* ¢« q8tk_main_quit() ¸Æ½ĞºÑ¤ß */
+	quasi88_exec();		/* â† q8tk_main_quit() å‘¼å‡ºæ¸ˆã¿ */
 	break;
     case DATA_TOP_QUIT:
 	sub_top_quit();
@@ -6188,7 +6188,7 @@ static	Q8tkWidget	*menu_top_button(void)
 
 
 /*----------------------------------------------------------------------*/
-				/* ÀßÄêÊİÂ¸¥Ü¥¿¥ó²¡²¼»ş¤Î¡¢³ÎÇ§¥À¥¤¥¢¥í¥° */
+				/* è¨­å®šä¿å­˜ãƒœã‚¿ãƒ³æŠ¼ä¸‹æ™‚ã®ã€ç¢ºèªãƒ€ã‚¤ã‚¢ãƒ­ã‚° */
 
 static	char	*top_savecfg_filename;
 
@@ -6249,14 +6249,14 @@ static	void	sub_top_savecfg(void)
 
 
 /*----------------------------------------------------------------------*/
-				  /* QUIT¥Ü¥¿¥ó²¡²¼»ş¤Î¡¢³ÎÇ§¥À¥¤¥¢¥í¥° */
+				  /* QUITãƒœã‚¿ãƒ³æŠ¼ä¸‹æ™‚ã®ã€ç¢ºèªãƒ€ã‚¤ã‚¢ãƒ­ã‚° */
 
 static	void	cb_top_quit_clicked(UNUSED_WIDGET, void *p)
 {
     dialog_destroy();
 
     if ((int)p) {
-	quasi88_quit();		/* ¢« q8tk_main_quit() ¸Æ½ĞºÑ¤ß */
+	quasi88_quit();		/* â† q8tk_main_quit() å‘¼å‡ºæ¸ˆã¿ */
     }
 }
 static	void	sub_top_quit(void)
@@ -6284,7 +6284,7 @@ static	void	sub_top_quit(void)
 
 
 /*----------------------------------------------------------------------*/
-				  /* ¥á¥Ë¥å¡¼¤Î¥Î¡¼¥È¥Ú¡¼¥¸¤¬ÊÑ¤ï¤Ã¤¿¤é */
+				  /* ãƒ¡ãƒ‹ãƒ¥ãƒ¼ã®ãƒãƒ¼ãƒˆãƒšãƒ¼ã‚¸ãŒå¤‰ã‚ã£ãŸã‚‰ */
 
 static	void	cb_top_notebook_changed(Q8tkWidget *widget, UNUSED_PARM)
 {
@@ -6308,7 +6308,7 @@ static Q8tkWidget *menu_top(void)
     vbox = PACK_VBOX(NULL);
     {
 	{
-	    /* ³Æ¥á¥Ë¥å¡¼¤ò¥Î¡¼¥È¥Ú¡¼¥¸¤Ë¾è¤»¤Æ¤¤¤¯ */
+	    /* å„ãƒ¡ãƒ‹ãƒ¥ãƒ¼ã‚’ãƒãƒ¼ãƒˆãƒšãƒ¼ã‚¸ã«ä¹—ã›ã¦ã„ã */
 
 	    notebook = q8tk_notebook_new();
 	    {
@@ -6340,12 +6340,12 @@ static Q8tkWidget *menu_top(void)
 	    q8tk_widget_show(notebook);
 	    q8tk_box_pack_start(vbox, notebook);
 
-	    /* ¼Â¸³¡§¥È¥Ã¥×¤Î¥Î¡¼¥È¥Ö¥Ã¥¯¤Ï¡¢¥Õ¥©¡¼¥«¥¹¤òÅ¬µ¹¥¯¥ê¥¢
-	             (¥¿¥°ÉôÊ¬¤Î¥¢¥ó¥À¡¼¥é¥¤¥óÉ½¼¨¤¬¤Ê¤¯¤Ê¤ë¡£¤¿¤À¤½¤ì¤À¤±) */
+	    /* å®Ÿé¨“ï¼šãƒˆãƒƒãƒ—ã®ãƒãƒ¼ãƒˆãƒ–ãƒƒã‚¯ã¯ã€ãƒ•ã‚©ãƒ¼ã‚«ã‚¹ã‚’é©å®œã‚¯ãƒªã‚¢
+	             (ã‚¿ã‚°éƒ¨åˆ†ã®ã‚¢ãƒ³ãƒ€ãƒ¼ãƒ©ã‚¤ãƒ³è¡¨ç¤ºãŒãªããªã‚‹ã€‚ãŸã ãã‚Œã ã‘) */
 	    q8tk_notebook_hook_focus_lost(notebook, TRUE);
 	}
 	{
-	    /* ¤ª¤Ä¤®¤Ï¡¢¥Ü¥¿¥ó */
+	    /* ãŠã¤ãã¯ã€ãƒœã‚¿ãƒ³ */
 
 	    w = menu_top_button();
 	    q8tk_box_pack_start(vbox, w);
@@ -6354,7 +6354,7 @@ static Q8tkWidget *menu_top(void)
     q8tk_container_add(win, vbox);
 
 
-	/* ¥Î¡¼¥È¥Ö¥Ã¥¯¤òÊÖ¤·¤Ş¤¹ */
+	/* ãƒãƒ¼ãƒˆãƒ–ãƒƒã‚¯ã‚’è¿”ã—ã¾ã™ */
     return notebook;
 }
 
@@ -6363,23 +6363,23 @@ static Q8tkWidget *menu_top(void)
 
 
 /****************************************************************/
-/* ¥á¥Ë¥å¡¼¥â¡¼¥É ¥á¥¤¥ó½èÍı					*/
+/* ãƒ¡ãƒ‹ãƒ¥ãƒ¼ãƒ¢ãƒ¼ãƒ‰ ãƒ¡ã‚¤ãƒ³å‡¦ç†					*/
 /****************************************************************/
 
 void	menu_init(void)
 {
     int i;
 
-    for (i=0; i<0x10; i++) {			/* ¥­¡¼¥¹¥­¥ã¥ó¥ï¡¼¥¯½é´ü²½ */
-	if      (i == 0x08) key_scan[i] |= 0xdf;	/* ¥«¥Ê¤Ï»Ä¤¹ */
-	else if (i == 0x0a) key_scan[i] |= 0x7f;	/* CAPS¤â»Ä¤¹ */
+    for (i=0; i<0x10; i++) {			/* ã‚­ãƒ¼ã‚¹ã‚­ãƒ£ãƒ³ãƒ¯ãƒ¼ã‚¯åˆæœŸåŒ– */
+	if      (i == 0x08) key_scan[i] |= 0xdf;	/* ã‚«ãƒŠã¯æ®‹ã™ */
+	else if (i == 0x0a) key_scan[i] |= 0x7f;	/* CAPSã‚‚æ®‹ã™ */
 	else                key_scan[i]  = 0xff;
     }
 
-    /* ¸½ºß¤Î¡¢¥ê¥»¥Ã¥È¾ğÊó¤ò¼èÆÀ */
+    /* ç¾åœ¨ã®ã€ãƒªã‚»ãƒƒãƒˆæƒ…å ±ã‚’å–å¾— */
     quasi88_get_reset_cfg(&reset_req);
 
-    /* ¸½ºß¤Î¡¢¥µ¥¦¥ó¥É¤ÎÀßÄê¤òÊİÂ¸ */
+    /* ç¾åœ¨ã®ã€ã‚µã‚¦ãƒ³ãƒ‰ã®è¨­å®šã‚’ä¿å­˜ */
     sd_cfg_save();
 
     cpu_timing_save = cpu_timing;
@@ -6393,14 +6393,14 @@ void	menu_init(void)
 
 
 
-    /* ¤³¤³¤«¤é¡¢Q8TK ´ØÏ¢¤Î½é´ü²½ */
+    /* ã“ã“ã‹ã‚‰ã€Q8TK é–¢é€£ã®åˆæœŸåŒ– */
     {
 	Q8tkWidget *notebook;
 
-	/* Q8TK ½é´ü²½ */
+	/* Q8TK åˆæœŸåŒ– */
 	q8tk_init();
 
-	/* Q8TK Ê¸»ú¥³¡¼¥É¥»¥Ã¥È */
+	/* Q8TK æ–‡å­—ã‚³ãƒ¼ãƒ‰ã‚»ãƒƒãƒˆ */
 	if     (strcmp(menu_kanji_code, menu_kanji_code_euc) == 0)
 	{
 	    q8tk_set_kanjicode(Q8TK_KANJI_EUC);
@@ -6418,10 +6418,10 @@ void	menu_init(void)
 	    q8tk_set_kanjicode(Q8TK_KANJI_ANK);
 	}
 
-	/* Q8TK ¥«¡¼¥½¥ëÍ­ÌµÀßÄê (½é´ü²½»ş¤Ë¸Æ¤ÖÉ¬Í×¤¢¤ê) */
+	/* Q8TK ã‚«ãƒ¼ã‚½ãƒ«æœ‰ç„¡è¨­å®š (åˆæœŸåŒ–æ™‚ã«å‘¼ã¶å¿…è¦ã‚ã‚Š) */
 	q8tk_set_cursor(now_swcursor);
 
-	/* Q8TK ¥á¥Ë¥å¡¼À¸À® */
+	/* Q8TK ãƒ¡ãƒ‹ãƒ¥ãƒ¼ç”Ÿæˆ */
 	notebook = menu_top();
 	q8tk_notebook_set_page(notebook, menu_last_page);
     }
@@ -6431,23 +6431,23 @@ void	menu_init(void)
 
 void	menu_main(void)
 {
-    /* Q8TK ¥á¥¤¥ó½èÍı */
+    /* Q8TK ãƒ¡ã‚¤ãƒ³å‡¦ç† */
     q8tk_main_loop();
 
 
-    /* ¥á¥Ë¥å¡¼¤òÈ´¤±¤¿¤é¡¢¥á¥Ë¥å¡¼¤ÇÊÑ¹¹¤·¤¿ÆâÍÆ¤Ë±ş¤¸¤Æ¡¢ºÆ½é´ü²½ */
+    /* ãƒ¡ãƒ‹ãƒ¥ãƒ¼ã‚’æŠœã‘ãŸã‚‰ã€ãƒ¡ãƒ‹ãƒ¥ãƒ¼ã§å¤‰æ›´ã—ãŸå†…å®¹ã«å¿œã˜ã¦ã€å†åˆæœŸåŒ– */
     if (quasi88_event_flags & EVENT_MODE_CHANGED) {
 
 	if (quasi88_event_flags & EVENT_QUIT) {
 
-	    /* QUASI88½ªÎ»»ş¤Ï¡¢¤Ê¤Ë¤â¤·¤Ê¤¤      */
-	    /* (ºÆ½é´ü²½¤·¤Æ¤â¤¹¤°¤Ë½ªÎ»¤Ê¤Î¤Ç¡Ä) */
+	    /* QUASI88çµ‚äº†æ™‚ã¯ã€ãªã«ã‚‚ã—ãªã„      */
+	    /* (å†åˆæœŸåŒ–ã—ã¦ã‚‚ã™ãã«çµ‚äº†ãªã®ã§â€¦) */
 
 	} else {
 
 #ifdef	USE_SOUND
-	    if (sd_cfg_has_changed()) {	/* ¥µ¥¦¥ó¥É´ØÏ¢¤ÎÀßÄê¤ËÊÑ¹¹¤¬¤¢¤ì¤Ğ */
-		menu_sound_restart(TRUE);     /* ¥µ¥¦¥ó¥É¥É¥é¥¤¥Ğ¤ÎºÆ½é´ü²½ */
+	    if (sd_cfg_has_changed()) {	/* ã‚µã‚¦ãƒ³ãƒ‰é–¢é€£ã®è¨­å®šã«å¤‰æ›´ãŒã‚ã‚Œã° */
+		menu_sound_restart(TRUE);     /* ã‚µã‚¦ãƒ³ãƒ‰ãƒ‰ãƒ©ã‚¤ãƒã®å†åˆæœŸåŒ– */
 	    }
 #endif
 
@@ -6468,7 +6468,7 @@ void	menu_main(void)
 
 /*---------------------------------------------------------------------------*/
 /*
- * ¸½ºß¤Î¥µ¥¦¥ó¥É¤ÎÀßÄêÃÍ¤òµ­²±¤¹¤ë (¥á¥Ë¥å¡¼³«»Ï»ş¤Ë¸Æ¤Ó½Ğ¤¹)
+ * ç¾åœ¨ã®ã‚µã‚¦ãƒ³ãƒ‰ã®è¨­å®šå€¤ã‚’è¨˜æ†¶ã™ã‚‹ (ãƒ¡ãƒ‹ãƒ¥ãƒ¼é–‹å§‹æ™‚ã«å‘¼ã³å‡ºã™)
  */
 static	void	sd_cfg_save(void)
 {
@@ -6522,7 +6522,7 @@ static	void	sd_cfg_save(void)
 }
 
 /*
- * ¥µ¥¦¥ó¥É¤ÎÀßÄêÃÍ¤¬¡¢µ­²±¤·¤¿ÃÍ¤È°ã¤¦¤È¡¢¿¿¤òÊÖ¤¹ (¥á¥Ë¥å¡¼½ªÎ»»ş¤Ë¥Á¥§¥Ã¥¯)
+ * ã‚µã‚¦ãƒ³ãƒ‰ã®è¨­å®šå€¤ãŒã€è¨˜æ†¶ã—ãŸå€¤ã¨é•ã†ã¨ã€çœŸã‚’è¿”ã™ (ãƒ¡ãƒ‹ãƒ¥ãƒ¼çµ‚äº†æ™‚ã«ãƒã‚§ãƒƒã‚¯)
  */
 static	int	sd_cfg_has_changed(void)
 {
@@ -6530,7 +6530,7 @@ static	int	sd_cfg_has_changed(void)
     int i;
     T_SNDDRV_CONFIG *p;
 
-    /* ¥µ¥¦¥ó¥É¥Ü¡¼¥É¤ÎÊÑ¹¹¤À¤±¡¢¥Á¥§¥Ã¥¯¤¹¤ë¥ï¡¼¥¯¤¬°ã¤¦¡¦¡¦¡¦ */
+    /* ã‚µã‚¦ãƒ³ãƒ‰ãƒœãƒ¼ãƒ‰ã®å¤‰æ›´ã ã‘ã€ãƒã‚§ãƒƒã‚¯ã™ã‚‹ãƒ¯ãƒ¼ã‚¯ãŒé•ã†ãƒ»ãƒ»ãƒ» */
     if (sd_cfg_init.sound_board != sound_board) {
 	return TRUE;
     }
@@ -6575,26 +6575,26 @@ static	int	sd_cfg_has_changed(void)
 
 void	menu_sound_restart(int output)
 {
-    xmame_sound_resume();		/* ÃæÃÇ¤·¤¿¥µ¥¦¥ó¥É¤òÉüµ¢¸å¤Ë */
-    xmame_sound_stop();			/* ¥µ¥¦¥ó¥É¤òÄä»ß¤µ¤»¤ë¡£     */
-    xmame_sound_start();		/* ¤½¤·¤Æ¡¢¥µ¥¦¥ó¥ÉºÆ½é´ü²½   */
+    xmame_sound_resume();		/* ä¸­æ–­ã—ãŸã‚µã‚¦ãƒ³ãƒ‰ã‚’å¾©å¸°å¾Œã« */
+    xmame_sound_stop();			/* ã‚µã‚¦ãƒ³ãƒ‰ã‚’åœæ­¢ã•ã›ã‚‹ã€‚     */
+    xmame_sound_start();		/* ãã—ã¦ã€ã‚µã‚¦ãƒ³ãƒ‰å†åˆæœŸåŒ–   */
 
 
-    /* ¥µ¥¦¥ó¥É¥É¥é¥¤¥Ğ¤òºÆ½é´ü²½¤¹¤ë¤È¡¢WAV½ĞÎÏ¤¬·ÑÂ³¤Ç¤­¤Ê¤¤¾ì¹ç¤¬¤¢¤ë */
+    /* ã‚µã‚¦ãƒ³ãƒ‰ãƒ‰ãƒ©ã‚¤ãƒã‚’å†åˆæœŸåŒ–ã™ã‚‹ã¨ã€WAVå‡ºåŠ›ãŒç¶™ç¶šã§ããªã„å ´åˆãŒã‚ã‚‹ */
     if (xmame_wavout_damaged()) {
 	quasi88_waveout(FALSE);
 	XPRINTF("*** Waveout Stop ***\n");
     }
 
 
-    /* ¶¯À©¥ê¥¹¥¿¡¼¥È»ş¤Ï¡¢¥İ¡¼¥È¤ÎºÆ½é´ü²½¤Ï¡¢¸Æ¤Ó½Ğ¤·¸µ¤Ë¤Æ¼Â»Ü¤¹¤ë¡£
-       ¤½¤¦¤Ç¤Ê¤¤¾ì¹ç¤Ï¡¢¤³¤³¤ÇºÆ½é´ü²½ */
+    /* å¼·åˆ¶ãƒªã‚¹ã‚¿ãƒ¼ãƒˆæ™‚ã¯ã€ãƒãƒ¼ãƒˆã®å†åˆæœŸåŒ–ã¯ã€å‘¼ã³å‡ºã—å…ƒã«ã¦å®Ÿæ–½ã™ã‚‹ã€‚
+       ãã†ã§ãªã„å ´åˆã¯ã€ã“ã“ã§å†åˆæœŸåŒ– */
     if (output) {
 	sound_output_after_stateload();
     }
 
 
-    /* ¥á¥Ë¥å¡¼¥â¡¼¥É¤Ç¤³¤Î´Ø¿ô¤¬¸Æ¤Ğ¤ì¤¿¾ì¹ç¤ËÈ÷¤¨¤Æ¡¢¥ï¡¼¥¯¥ê¥»¥Ã¥È */
+    /* ãƒ¡ãƒ‹ãƒ¥ãƒ¼ãƒ¢ãƒ¼ãƒ‰ã§ã“ã®é–¢æ•°ãŒå‘¼ã°ã‚ŒãŸå ´åˆã«å‚™ãˆã¦ã€ãƒ¯ãƒ¼ã‚¯ãƒªã‚»ãƒƒãƒˆ */
     sd_cfg_save();
 
 

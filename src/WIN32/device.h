@@ -7,7 +7,7 @@
 
 
 /*
- *	src/WIN32/ �ʲ��ǤΥ������Х��ѿ�
+ *	src/WIN32/ 以下でのグローバル変数
  */
 extern	HINSTANCE	g_hInstance;
 extern	HWND		g_hWnd;
@@ -21,7 +21,7 @@ extern	FILE		*debugfp;
 
 
 /*
- *	src/WIN32/ �ʲ��ǤΥ������Х��ѿ� (���ץ���������ǽ���ѿ�)
+ *	src/WIN32/ 以下でのグローバル変数 (オプション設定可能な変数)
  */
 
 

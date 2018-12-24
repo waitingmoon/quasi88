@@ -1,6 +1,6 @@
 /************************************************************************/
 /*									*/
-/* �����޻��������Ѵ�����						*/
+/* ローマ字→カナ変換処理						*/
 /*									*/
 /************************************************************************/
 
@@ -38,13 +38,13 @@
 #define Pd	13
 #define Pe	14
 
-/* ���塼���ߤ����͡��ݡ��Ⱦ��󤬥ѥå����Ƥ��� */
+/* キューに蓄える値。ポート情報がパックしてある */
 #define	RJ( port, bit, shift )	((Uchar)( (port<<4) | (shift<<3) | bit ))
 
 /*----------------------------------------------------------------------
  *
  *----------------------------------------------------------------------*/
-/*	�����޻� �� ���� �Ѵ��ơ��֥�	*/
+/*	ローマ字 → カナ 変換テーブル	*/
 typedef struct {
   const char *s;
   Uchar      list[4];
@@ -52,7 +52,7 @@ typedef struct {
 
 #include "romaji-table.h"
 
-/* �� romaji-table.h ��ˤơ��ʲ��Υơ��֥뤬������Ƥ��� */
+/* ↑ romaji-table.h 内にて、以下のテーブルが定義してある */
 /*
 static const romaji_list list_NN;
 static const romaji_list list_tu;
@@ -65,24 +65,24 @@ static const romaji_list list_egg[];
 
 
 /*----------------------------------------------------------------------
- * ��� (�����ڥ�ɾ���ˤϻĤ�ɬ�פʤ�)
+ * ワーク (サスペンド情報には残す必要なし)
  *----------------------------------------------------------------------*/
 
-/*	�����޻��Ѵ����ΥХåե�	*/
+/*	ローマ字変換前のバッファ	*/
 
-static	char	input_buf[4];			/* ���ϺѤߤ�ʸ���ΥХåե�  */
-static	int	input_size;			/* ���ϺѤߤ�ʸ���ο�	     */
+static	char	input_buf[4];			/* 入力済みの文字のバッファ  */
+static	int	input_size;			/* 入力済みの文字の数	     */
 
 
-/*	�����޻��Ѵ���ΥХåե�(���塼) */
+/*	ローマ字変換後のバッファ(キュー) */
 
 #define	ROMAJI_QUE_SIZE	(64)
-static	int	romaji_set;			/* �����޻����Ϥ��줿���ʤ� */
-static	int	romaji_ptr;			/* ���塼���ߤ���졢�缡   */
-static	Uchar	romaji_que[ ROMAJI_QUE_SIZE ];	/* I/O �ݡ��Ȥ������Ƥ��� */
+static	int	romaji_set;			/* ローマ字入力されたカナは */
+static	int	romaji_ptr;			/* キューに蓄えられ、順次   */
+static	Uchar	romaji_que[ ROMAJI_QUE_SIZE ];	/* I/O ポートに送られていく */
 
-static	int	press_timer;			/* �������󡦥��դΥ����ޡ� */
-#define	KEY_ON_OFF_INTERVAL	(4)		/* �������󡦥��դλ���	    */
+static	int	press_timer;			/* キーオン・オフのタイマー */
+#define	KEY_ON_OFF_INTERVAL	(4)		/* キーオン・オフの時間	    */
 
 
 
@@ -90,7 +90,7 @@ static	int	press_timer;			/* �������󡦥��դΥ����ޡ� */
 
 /*----------------------------------------------------------------------
  *
- *	�����޻������Ѵ��ơ��֥�κ��� (1������ƤӽФ��Ƥ���)
+ *	ローマ字カナ変換テーブルの作成 (1回だけ呼び出しておく)
  *
  *----------------------------------------------------------------------*/
 
@@ -139,19 +139,19 @@ void	romaji_init( void )
 
 /*----------------------------------------------------------------------
  *
- *	�����޻��Ѵ��Υ������� (�����޻��Ѵ��⡼�ɳ��ϻ��˸ƤӽФ�)
+ *	ローマ字変換のワーク初期化 (ローマ字変換モード開始時に呼び出す)
  *
  *----------------------------------------------------------------------*/
 void	romaji_clear( void )
 {
-  /* �Ѵ���Υ��ʤ򥪥��������ä��顢���ս��Ϥ��� */
+  /* 変換後のカナをオン出力中だったら、オフ出力する */
 
   if( 0< press_timer && press_timer <= KEY_ON_OFF_INTERVAL ){
     press_timer = KEY_ON_OFF_INTERVAL;
     romaji_output();
   }
 
-  /* ��������ƥ��ꥢ */
+  /* ワークを全てクリア */
 
   romaji_set  = 0;
   romaji_ptr  = 0;
@@ -163,7 +163,7 @@ void	romaji_clear( void )
 
 /*----------------------------------------------------------------------
  *
- *	���Ϥ�����޻����Ѵ��������塼���ߤ�������ؿ�
+ *	入力をローマ字に変換し、キューに蓄える処理関数
  *
  *----------------------------------------------------------------------*/
 
@@ -181,7 +181,7 @@ int	romaji_input( int key )
 {
   int i, j;
 
-  if( key == ' ' ||		/* �����Υ������ü��Ѵ��˻Ȥ� */
+  if( key == ' ' ||		/* これらのキーは特殊変換に使う */
       key == '@' ||
       key == '[' ||
       key == '/' ||
@@ -193,13 +193,13 @@ int	romaji_input( int key )
       key == '\'' ){
     ;
   }
-  else if( islower(key) ){	/* ��ʸ������ʸ�����Ѵ����ƻȤ� */
+  else if( islower(key) ){	/* 小文字は大文字に変換して使う */
     key = toupper( key );
   }
-  else if( isupper(key) ){	/* ��ʸ���Ϥ��Τޤ޻Ȥ� */
+  else if( isupper(key) ){	/* 大文字はそのまま使う */
     ;
   }
-  else {			/* ����ʳ��ϻȤ�ʤ� */
+  else {			/* それ以外は使わない */
 
     if( key == KEY88_ESC && input_size != 0 ){
       romaji_clear();
@@ -240,45 +240,45 @@ int	romaji_input( int key )
 	if( *s1 != *s2 ){ j=0; break; }
       }
 
-      if( j==0 ){			/* �԰��� */
-	if( nearly ) break;			/* ����ޤǰ��פ��Ƥ��Τ� */
-	/* list->s �Υ����ȺѤߤ����� */	/* ���פ��ʤ��ʤä������� */
+      if( j==0 ){			/* 不一致 */
+	if( nearly ) break;			/* 途中まで一致してたのに */
+	/* list->s のソート済みが前提 */	/* 一致しなくなったら中断 */
       }else{
-	if( *s2 == '\0' ){		/* �����˰��� */
+	if( *s2 == '\0' ){		/* 完全に一致 */
 	  same   = TRUE;	break;
-	}else{				/* ����ޤǰ��� */
+	}else{				/* 途中まで一致 */
 	  nearly = TRUE;
 	}
       }
     }
 
-    if( same ){					/*** �������פξ�� */
-      set_romaji_que( list_p->list );			/* ���塼�˥��å� */
-      input_size = 0;					/* ���Ϥ�ΤƤ�   */
+    if( same ){					/*** 完全一致の場合 */
+      set_romaji_que( list_p->list );			/* キューにセット */
+      input_size = 0;					/* 入力を捨てる   */
       break;
 
-    }else if( nearly ){				/*** ����ޤǰ��פξ�� */
-      break;						/* ���ϤϤ��Τޤ� */
+    }else if( nearly ){				/*** 途中まで一致の場合 */
+      break;						/* 入力はそのまま */
 
-    }else{					/*** �԰��פξ�� */
+    }else{					/*** 不一致の場合 */
 
       if( input_buf[0] == 'N' ){
-	set_romaji_que( list_NN.list );			/* ��򥭥塼�˥��å�*/
+	set_romaji_que( list_NN.list );			/* んをキューにセット*/
 
       }else if( input_size >= 2 &&
 		input_buf[0]==input_buf[1] ){
-	set_romaji_que( list_tu.list );			/* �ä򥭥塼�˥��å�*/
+	set_romaji_que( list_tu.list );			/* っをキューにセット*/
       }
 
-      input_size --;					/* ���Ϥ򤺤餹 */
+      input_size --;					/* 入力をずらす */
       memmove( &input_buf[0], &input_buf[1],input_size );
 
-      /* ���פ���ޤǥ����å����ʤ��� */
+      /* 一致するまでチェックしなおす */
     }
   }
 
 
-  if( input_size >= (int)sizeof(input_buf) )	/* �Хåե������С��ɻ� */
+  if( input_size >= (int)sizeof(input_buf) )	/* バッファオーバー防止 */
     input_size = 0;
 
   return 0;
@@ -288,11 +288,11 @@ int	romaji_input( int key )
 
 /*----------------------------------------------------------------------
  *
- *	�Ѵ���Υ��ʤ�ݡ��Ȥ˽��Ϥ��Ƥ����ؿ� (1/60s��˸ƤӽФ�)
+ *	変換後のカナをポートに出力していく関数 (1/60s毎に呼び出す)
  *
  *----------------------------------------------------------------------*/
 /*
- *	���塼����ݡ��Ȥ˽��Ϥ��Ƥ����ؿ�
+ *	キューからポートに出力していく関数
  */
 void	romaji_output( void )
 {

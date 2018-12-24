@@ -1,6 +1,6 @@
 /************************************************************************/
 /*									*/
-/* �����꡼�� ���ʥåץ���å�						*/
+/* スクリーン スナップショット						*/
 /*									*/
 /************************************************************************/
 
@@ -22,20 +22,20 @@
 
 
 
-char	file_snap[QUASI88_MAX_FILENAME];/* ���ʥåץ���åȥ١�����	*/
-int	snapshot_format  = 0;		/* ���ʥåץ���åȥե����ޥå�	*/
+char	file_snap[QUASI88_MAX_FILENAME];/* スナップショットベース部	*/
+int	snapshot_format  = 0;		/* スナップショットフォーマット	*/
 
-char	snapshot_cmd[ SNAPSHOT_CMD_SIZE ];/* ���ʥåץ���åȸ女�ޥ��	*/
-char	snapshot_cmd_do  = FALSE;	/* ���ޥ�ɼ¹Ԥ�̵ͭ		*/
+char	snapshot_cmd[ SNAPSHOT_CMD_SIZE ];/* スナップショット後コマンド	*/
+char	snapshot_cmd_do  = FALSE;	/* コマンド実行の有無		*/
 
 #ifdef	USE_SSS_CMD
-char	snapshot_cmd_enable = TRUE;	/* ���ޥ�ɼ¹Ԥβ���		*/
+char	snapshot_cmd_enable = TRUE;	/* コマンド実行の可否		*/
 #else
-char	snapshot_cmd_enable = FALSE;	/* ���ޥ�ɼ¹Ԥβ���		*/
+char	snapshot_cmd_enable = FALSE;	/* コマンド実行の可否		*/
 #endif
 
 
-/* ���ʥåץ���åȤ�����������Хåե��ȡ����Υ���ǥå��� */
+/* スナップショットを作成する一時バッファと、色のインデックス */
 
 char			screen_snapshot[ 640*400 ];
 static PC88_PALETTE_T	pal[16 +1];
@@ -45,7 +45,7 @@ static PC88_PALETTE_T	pal[16 +1];
 
 
 /***********************************************************************
- * ���ʥåץ���åȥե�����̾�ʤɤ�����
+ * スナップショットファイル名などを初期化
  ************************************************************************/
 void	screen_snapshot_init(void)
 {
@@ -57,12 +57,12 @@ void	screen_snapshot_init(void)
 
 
     memset(snapshot_cmd, 0, SNAPSHOT_CMD_SIZE);
-    s = getenv("QUASI88_SSS_CMD");			/* �¹ԥ��ޥ�� */
+    s = getenv("QUASI88_SSS_CMD");			/* 実行コマンド */
     if (s  &&  (strlen(s) < SNAPSHOT_CMD_SIZE)) {
 	strcpy(snapshot_cmd, s);
     }
 
-    snapshot_cmd_do = FALSE;	/* ����ͤϡ����ޥ�ɼ¹ԡؤ��ʤ��٤ˤ��� */
+    snapshot_cmd_do = FALSE;	/* 初期値は、コマンド実行『しない』にする */
 
 
 
@@ -79,7 +79,7 @@ void	screen_snapshot_exit(void)
 
 
 /*----------------------------------------------------------------------*/
-/* ���̥��᡼������������						*/
+/* 画面イメージを生成する						*/
 /*----------------------------------------------------------------------*/
 
 typedef	int		( *SNAPSHOT_FUNC )( void );
@@ -90,7 +90,7 @@ static	void	make_snapshot( void )
   SNAPSHOT_FUNC		(*list)[4][2];
 
 
-  /* skipline �ξ��ϡ�ͽ�� snapshot_clear() ��ƤӽФ��Ƥ��� */
+  /* skipline の場合は、予め snapshot_clear() を呼び出しておく */
 
   if     ( use_interlace == 0 ){ list = snapshot_list_normal; }
   else if( use_interlace >  0 ){ list = snapshot_list_itlace; }
@@ -99,7 +99,7 @@ static	void	make_snapshot( void )
 
 
 
-	/* VRAM/TEXT �����Ƥ� screen_snapshot[] ��ž�� */
+	/* VRAM/TEXT の内容を screen_snapshot[] に転送 */
 
   if( sys_ctrl & SYS_CTRL_80 ){
     if( CRTC_SZ_LINES == 25 ){ text_mode = V_80x25; }
@@ -110,27 +110,27 @@ static	void	make_snapshot( void )
   }
 
   if( grph_ctrl & GRPH_CTRL_VDISP ){
-    if( grph_ctrl & GRPH_CTRL_COLOR ){		/* ���顼 */
+    if( grph_ctrl & GRPH_CTRL_COLOR ){		/* カラー */
         vram_mode = V_COLOR;
     }else{
-      if( grph_ctrl & GRPH_CTRL_200 ){		/* ��� */
+      if( grph_ctrl & GRPH_CTRL_200 ){		/* 白黒 */
 	vram_mode = V_MONO;
-      }else{					/* 400�饤�� */
+      }else{					/* 400ライン */
 	vram_mode = V_HIRESO;
       }
     }
-  }else{					/* ��ɽ�� */
+  }else{					/* 非表示 */
         vram_mode = V_UNDISP;
   }
 
   (list[ vram_mode ][ text_mode ][ V_ALL ])();
 
 
-	/* �ѥ�åȤ����Ƥ� pal[] ��ž�� */
+	/* パレットの内容を pal[] に転送 */
 
   screen_get_emu_palette( pal );
 
-  pal[16].red   = 0;		/* pal[16] �Ϲ�����ǻ��Ѥ��� */
+  pal[16].red   = 0;		/* pal[16] は黒固定で使用する */
   pal[16].green = 0;
   pal[16].blue  = 0;
 }
@@ -140,9 +140,9 @@ static	void	make_snapshot( void )
 
 
 
-#if 0		/* XPM �ϥ��ݡ����оݳ� */
+#if 0		/* XPM はサポート対象外 */
 /*----------------------------------------------------------------------*/
-/* ����ץ��㤷�����Ƥ�xpm �����ǥե�����˽���			*/
+/* キャプチャした内容を、xpm 形式でファイルに出力			*/
 /*----------------------------------------------------------------------*/
 static int	save_snapshot_xpm( OSD_FILE *fp )
 {
@@ -194,7 +194,7 @@ static int	save_snapshot_xpm( OSD_FILE *fp )
 
 
 /*----------------------------------------------------------------------*/
-/* ����ץ��㤷�����Ƥ�ppm ����(raw)�ǥե�����˽���			*/
+/* キャプチャした内容を、ppm 形式(raw)でファイルに出力			*/
 /*----------------------------------------------------------------------*/
 static int	save_snapshot_ppm( OSD_FILE *fp )
 {
@@ -227,9 +227,9 @@ static int	save_snapshot_ppm( OSD_FILE *fp )
 
 
 
-#if 0		/* PPM(ascii)  �ϥ��ݡ����оݳ� */
+#if 0		/* PPM(ascii)  はサポート対象外 */
 /*----------------------------------------------------------------------*/
-/* ����ץ��㤷�����Ƥ�ppm ����(ascii)�ǥե�����˽���		*/
+/* キャプチャした内容を、ppm 形式(ascii)でファイルに出力		*/
 /*----------------------------------------------------------------------*/
 static int	save_snapshot_ppm_ascii( OSD_FILE *fp )
 {
@@ -269,29 +269,29 @@ static int	save_snapshot_ppm_ascii( OSD_FILE *fp )
 
 
 /*----------------------------------------------------------------------*/
-/* ����ץ��㤷�����Ƥ�bmp ����(win)�ǥե�����˽���			*/
+/* キャプチャした内容を、bmp 形式(win)でファイルに出力			*/
 /*----------------------------------------------------------------------*/
 static int	save_snapshot_bmp( OSD_FILE *fp )
 {
   static const unsigned char header[] =
   {
     'B', 'M',			/* BM */
-    0x36, 0xb8, 0x0b, 0x00,	/* �ե����륵���� 0xbb836 */
+    0x36, 0xb8, 0x0b, 0x00,	/* ファイルサイズ 0xbb836 */
     0x00, 0x00,
     0x00, 0x00,
-    0x36, 0x00, 0x00, 0x00,	/* �����ǡ������ե��å� 0x36 */
+    0x36, 0x00, 0x00, 0x00,	/* 画像データオフセット 0x36 */
 
-    0x28, 0x00, 0x00, 0x00,	/* ���󥵥��� 0x28 */
-    0x80, 0x02, 0x00, 0x00,	/* ��	0x280 */
-    0x90, 0x01, 0x00, 0x00,	/* �⤵	0x190 */
+    0x28, 0x00, 0x00, 0x00,	/* 情報サイズ 0x28 */
+    0x80, 0x02, 0x00, 0x00,	/* 幅	0x280 */
+    0x90, 0x01, 0x00, 0x00,	/* 高さ	0x190 */
     0x01, 0x00,
-    0x18, 0x00,			/* ������ */
+    0x18, 0x00,			/* 色深度 */
     0x00, 0x00, 0x00, 0x00,
-    0x00, 0x00, 0x00, 0x00,	/* ����������?	0xbb800 */
-    0x00, 0x00, 0x00, 0x00,	/* ������������?	*/
-    0x00, 0x00, 0x00, 0x00,	/* ������������?	*/
-    0x00, 0x00, 0x00, 0x00,	/* ���ѥѥ�åȿ�	*/
-    0x00, 0x00, 0x00, 0x00,	/* ����?		*/
+    0x00, 0x00, 0x00, 0x00,	/* 画像サイズ?	0xbb800 */
+    0x00, 0x00, 0x00, 0x00,	/* 横方向解像度?	*/
+    0x00, 0x00, 0x00, 0x00,	/* 縦方向解像度?	*/
+    0x00, 0x00, 0x00, 0x00,	/* 使用パレット数	*/
+    0x00, 0x00, 0x00, 0x00,	/* 重要?		*/
   };
 
   unsigned char buf[4];
@@ -320,7 +320,7 @@ static int	save_snapshot_bmp( OSD_FILE *fp )
 
 
 /*----------------------------------------------------------------------*/
-/* ����ץ��㤷�����Ƥ�raw�����ǥե�����˽���			*/
+/* キャプチャした内容を、raw形式でファイルに出力			*/
 /*----------------------------------------------------------------------*/
 static int	save_snapshot_raw( OSD_FILE *fp )
 {
@@ -346,46 +346,46 @@ static int	save_snapshot_raw( OSD_FILE *fp )
 
 
 /***********************************************************************
- * ���̤Υ��ʥåץ���åȤ򥻡��֤���
- *	��������VRAM���Ȥ˥��ʥåץ���åȤ�������롣
- *	����ɽ������Ƥ�����̤򥻡��֤���櫓�ǤϤʤ���
+ * 画面のスナップショットをセーブする
+ *	現時点のVRAMをもとにスナップショットを作成する。
+ *	現在表示されている画面をセーブするわけではない。
  *
- *	�Ķ��ѿ� ${QUASI88_SSS_CMD} ���������Ƥ����硢�����ָ��
- *	�������Ƥ򥳥ޥ�ɤȤ��Ƽ¹Ԥ��롣���κݡ�%a ���ե�����̾�ˡ�
- *	%b ���ե�����̾���饵�ե��å�������������Τˡ��֤�����롣
+ *	環境変数 ${QUASI88_SSS_CMD} が定義されている場合、セーブ後に
+ *	この内容をコマンドとして実行する。この際、%a がファイル名に、
+ *	%b がファイル名からサフィックスを削除したものに、置き換わる。
  *
- *	��) setenv QUASI88_SSS_CMD 'ppmtopng %a > %b.png'
+ *	例) setenv QUASI88_SSS_CMD 'ppmtopng %a > %b.png'
  *
  ************************************************************************/
 
 /*
-  screen_snapshot_save() �ǡ������֤����ե�����̾�ϡ�
-  ��ưŪ�����ꤵ���Τǡ������ֻ��˻��ꤹ��ɬ�פϤʤ���
-  (�ǥ��������᡼����̾���ʤɤ˴�Ť������ꤵ���)
+  screen_snapshot_save() で、セーブされるファイル名は、
+  自動的に設定されるので、セーブ時に指定する必要はない。
+  (ディスクイメージの名前などに基づき、設定される)
 
-	�ե�����̾�ϡ� /my/snap/dir/save0001.bmp �Τ褦�ˡ�Ϣ�� + ��ĥ�� ��
-	�ղä���롣Ϣ�֤ϡ� 0000 �� 9999 �ǡ���¸�Υե�����Ƚ�ʣ���ʤ�
-	�褦��Ŭ�����ꤵ��롣
+	ファイル名は、 /my/snap/dir/save0001.bmp のように、連番 + 拡張子 が
+	付加される。連番は、 0000 〜 9999 で、既存のファイルと重複しない
+	ように適宜決定される。
 
   ----------------------------------------------------------------------
-  �ե�����̾���ѹ����������ϡ��ʲ��δؿ���Ȥ���
+  ファイル名を変更したい場合は、以下の関数を使う。
 
-  �ե�����̾�μ��� �� filename_get_snap_base()
-	�����Ǥ���ե�����̾�ϡ�/my/snap/dir/save �Τ褦�ˡ�Ϣ�֤ȳ�ĥ�Ҥ�
-	�������Ƥ��롣
+  ファイル名の取得 … filename_get_snap_base()
+	取得できるファイル名は、/my/snap/dir/save のように、連番と拡張子は
+	削除されている。
 
-  �ե�����̾������ �� filename_set_snap_base()
-	�㤨�С�/my/snap/dir/save0001.bmp �����ꤷ�Ƥ⡢������ Ϣ�֤� ��ĥ�Ҥ�
-	�������롣���Τ��ᡢfilename_set_snap_base() �����ꤷ���ե�����̾��
-	filename_get_snap_base() �Ǽ��������ե�����̾�ϰ��פ��ʤ����Ȥ����롣
-	�ʤ���NULL ����ꤹ��ȡ�����ͤ����åȤ���롣
+  ファイル名の設定 … filename_set_snap_base()
+	例えば、/my/snap/dir/save0001.bmp と設定しても、末尾の 連番と 拡張子は
+	削除される。そのため、filename_set_snap_base() で設定したファイル名と
+	filename_get_snap_base() で取得したファイル名は一致しないことがある。
+	なお、NULL を指定すると、初期値がセットされる。
 
 */
 
 
-/* file_snap[] �������� NNNN.suffix �ȤʤäƤ����硢�����������롣
-   NNNN ��Ϣ�֤� 0000��9999��
-   suffix �ϳ�ĥ�Ҥǡ��ʲ��Τ�Τ��оݤȤ��롣*/
+/* file_snap[] の末尾が NNNN.suffix となっている場合、末尾を削除する。
+   NNNN は連番で 0000〜9999。
+   suffix は拡張子で、以下のものを対象とする。*/
 static const char *snap_suffix[] = { ".ppm",  ".PPM", 
 				     ".xpm",  ".XPM", 
 				     ".png",  ".PNG", 
@@ -448,7 +448,7 @@ const char	*filename_get_snap_base(void)
 int	screen_snapshot_save(void)
 {
     static char filename[ QUASI88_MAX_FILENAME + sizeof("NNNN.suffix") ];
-    static int snapshot_no = 0;		/* Ϣ�� */
+    static int snapshot_no = 0;		/* 連番 */
 
     static const char *suffix[] = { ".bmp", ".ppm", ".raw", };
 
@@ -458,19 +458,19 @@ int	screen_snapshot_save(void)
     if (snapshot_format >= COUNTOF(suffix)) return FALSE;
 
 
-	/* �ե�����̾��̤����ξ�硢����ե�����̾�ˤ��� */
+	/* ファイル名が未指定の場合、初期ファイル名にする */
 
     if (file_snap[0] == '\0') {
 	filename_init_snap(FALSE);
     }
 
 
-	/* file_snap[] ����ü�� NNNN.suffix �ʤ��� */
+	/* file_snap[] の末端が NNNN.suffix なら削除 */
 
     truncate_filename(file_snap, snap_suffix);
 
 
-	/* ¸�ߤ��ʤ��ե�����̾��õ������ (0000.suffix�� 9999.suffix) */
+	/* 存在しないファイル名を探しだす (0000.suffix〜 9999.suffix) */
 
     success = FALSE;
     for (j=0; j<10000; j++) {
@@ -483,7 +483,7 @@ int	screen_snapshot_save(void)
 	    strcat(filename, snap_suffix[ i ]);
 	    if (osd_file_stat(filename) != FILE_STAT_NOEXIST) break;
 	}
-	if (snap_suffix[i] == NULL) {	    /* ���Ĥ��ä� */
+	if (snap_suffix[i] == NULL) {	    /* 見つかった */
 	    filename[ len ] = '\0';
 	    strcat(filename, suffix[ snapshot_format ]);
 	    success = TRUE;
@@ -492,7 +492,7 @@ int	screen_snapshot_save(void)
     }
 
 
-	/* �ե�����򳫤��ơ����ʥåץ���åȥǡ�����񤭹��� */
+	/* ファイルを開いて、スナップショットデータを書き込む */
 
     if (success) {
 
@@ -516,7 +516,7 @@ int	screen_snapshot_save(void)
     }
 
 
-	/* �񤭹��������塢���ޥ�ɤ�¹Ԥ��� */
+	/* 書き込み成功後、コマンドを実行する */
 
 #ifdef	USE_SSS_CMD
 
@@ -530,11 +530,11 @@ int	screen_snapshot_save(void)
 	char *cmd, *s, *d;
 
 	a_len = strlen(filename);
-	b_len = a_len - 4;	/* ���ե��å��� ".???" ��4ʸ��ʬ���� */
+	b_len = a_len - 4;	/* サフィックス ".???" の4文字分減算 */
 
 	len = 0;
-	s = snapshot_cmd;	/* ���ޥ�ɤ� %a, %b ���ִ�����Τ�   */
-	while (*s) {		/* ���ޥ�ɤ�ʸ��Ĺ���ɤ��ʤ뤫������ */
+	s = snapshot_cmd;	/* コマンドの %a, %b は置換するので   */
+	while (*s) {		/* コマンドの文字長がどうなるか数える */
 	    if (*s == '%') {
 		switch (*(s+1)) {
 		case '%': len ++;	s++;	break; 
@@ -546,13 +546,13 @@ int	screen_snapshot_save(void)
 
 	    s++;
 	}
-				/* ������ʸ����ʬ��malloc ���� */
+				/* 数えた文字数分、malloc する */
 	cmd = (char *)malloc(len + 1);
 	if (cmd) {
 
 	    s = snapshot_cmd;
 	    d = cmd;
-	    while (*s) {	/* ���ޥ�ɤ� %a, %b ���ִ����Ƴ�Ǽ���Ƥ��� */
+	    while (*s) {	/* コマンドの %a, %b を置換して格納していく */
 		if (*s == '%') {
 		    switch (*(s+1)) {
 		    case '%': *d++ = *s;			    s++; break;
@@ -564,7 +564,7 @@ int	screen_snapshot_save(void)
 		s++;
 	    }
 	    *d = '\0';
-				/* ����夬�ä����ޥ�ɤ�¹� */
+				/* 出来上がったコマンドを実行 */
 	    printf("[SNAPSHOT command]%% %s\n", cmd);
 	    system(cmd);
 
@@ -581,12 +581,12 @@ int	screen_snapshot_save(void)
 
 
 /***********************************************************************
- * ������ɽ��Ϥ򥻡��֤���
+ * サウンド出力をセーブする
  *
  ************************************************************************/
 #include "snddrv.h"
 
-char	file_wav[QUASI88_MAX_FILENAME];		/* ������ɽ��ϥ١�����	*/
+char	file_wav[QUASI88_MAX_FILENAME];		/* サウンド出力ベース部	*/
 
 static const char *wav_suffix[] = { ".wav",  ".WAV", 
 				     NULL
@@ -614,26 +614,26 @@ const char	*filename_get_wav_base(void)
 int	waveout_save_start(void)
 {
     static char filename[ QUASI88_MAX_FILENAME + sizeof("NNNN.suffix") ];
-    static int waveout_no = 0;		/* Ϣ�� */
+    static int waveout_no = 0;		/* 連番 */
 
     static const char *suffix = ".wav";
 
     int i, j, len, success;
 
 
-	/* �ե�����̾��̤����ξ�硢����ե�����̾�ˤ��� */
+	/* ファイル名が未指定の場合、初期ファイル名にする */
 
     if (file_wav[0] == '\0') {
 	filename_init_wav(FALSE);
     }
 
 
-	/* file_wav[] ����ü�� NNNN.suffix �ʤ��� */
+	/* file_wav[] の末端が NNNN.suffix なら削除 */
 
     truncate_filename(file_wav, wav_suffix);
 
 
-	/* ¸�ߤ��ʤ��ե�����̾��õ������ (0000.suffix�� 9999.suffix) */
+	/* 存在しないファイル名を探しだす (0000.suffix〜 9999.suffix) */
 
     success = FALSE;
     for (j=0; j<10000; j++) {
@@ -646,7 +646,7 @@ int	waveout_save_start(void)
 	    strcat(filename, wav_suffix[ i ]);
 	    if (osd_file_stat(filename) != FILE_STAT_NOEXIST) break;
 	}
-	if (wav_suffix[i] == NULL) {	    /* ���Ĥ��ä� */
+	if (wav_suffix[i] == NULL) {	    /* 見つかった */
 	    filename[ len ] = '\0';
 	    strcat(filename, suffix);
 	    success = TRUE;
@@ -655,7 +655,7 @@ int	waveout_save_start(void)
     }
 
 
-	/* �ե�����̾����ޤä��Τǡ��ե������򳫤� */
+	/* ファイル名が決まったので、ファイルをを開く */
 
     if (success) {
 	success = xmame_wavout_open(filename);

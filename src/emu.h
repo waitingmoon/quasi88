@@ -2,21 +2,21 @@
 #define EMU_H_INCLUDED
 
 
-extern	int	cpu_timing;			/* SUB-CPU ¶îÆ°Êı¼°	*/
-extern	int	select_main_cpu;		/* -cpu 0 ¼Â¹Ô¤¹¤ëCPU	*/
-extern	int	dual_cpu_count;			/* -cpu 1 Æ±»ş½èÍıSTEP¿ô*/
-extern	int	CPU_1_COUNT;			/* ¤½¤Î¡¢½é´üÃÍ		*/
-extern	int	cpu_slice_us;			/* -cpu 2 ½èÍı»şÊ¬³ä(us)*/
+extern	int	cpu_timing;			/* SUB-CPU é§†å‹•æ–¹å¼	*/
+extern	int	select_main_cpu;		/* -cpu 0 å®Ÿè¡Œã™ã‚‹CPU	*/
+extern	int	dual_cpu_count;			/* -cpu 1 åŒæ™‚å‡¦ç†STEPæ•°*/
+extern	int	CPU_1_COUNT;			/* ãã®ã€åˆæœŸå€¤		*/
+extern	int	cpu_slice_us;			/* -cpu 2 å‡¦ç†æ™‚åˆ†å‰²(us)*/
 
-extern	int	trace_counter;			/* TRACE »ş¤Î¥«¥¦¥ó¥¿	*/
+extern	int	trace_counter;			/* TRACE æ™‚ã®ã‚«ã‚¦ãƒ³ã‚¿	*/
 
 
-typedef struct{					/* ¥Ö¥ì¡¼¥¯¥İ¥¤¥ó¥ÈÀ©¸æ */
+typedef struct{					/* ãƒ–ãƒ¬ãƒ¼ã‚¯ãƒã‚¤ãƒ³ãƒˆåˆ¶å¾¡ */
   short	type;
   word	addr;
 } break_t;
 
-typedef struct{					/* FDC ¥Ö¥ì¡¼¥¯¥İ¥¤¥ó¥ÈÀ©¸æ */
+typedef struct{					/* FDC ãƒ–ãƒ¬ãƒ¼ã‚¯ãƒã‚¤ãƒ³ãƒˆåˆ¶å¾¡ */
   short type;
   short drive;
   short track;
@@ -27,8 +27,8 @@ enum BPcpu { BP_MAIN, BP_SUB,                                    EndofBPcpu  };
 enum BPtype{ BP_NONE, BP_PC,  BP_READ, BP_WRITE, BP_IN, BP_OUT,  BP_DIAG, 
 								 EndofBPtype };
 
-#define	NR_BP			(10)		/* ¥Ö¥ì¡¼¥¯¥İ¥¤¥ó¥È¤Î¿ô   */
-#define	BP_NUM_FOR_SYSTEM	(9)		/* ¥·¥¹¥Æ¥à¤¬»È¤¦BP¤ÎÈÖ¹æ */
+#define	NR_BP			(10)		/* ãƒ–ãƒ¬ãƒ¼ã‚¯ãƒã‚¤ãƒ³ãƒˆã®æ•°   */
+#define	BP_NUM_FOR_SYSTEM	(9)		/* ã‚·ã‚¹ãƒ†ãƒ ãŒä½¿ã†BPã®ç•ªå· */
 extern	break_t	break_point[2][NR_BP];
 extern  break_drive_t break_point_fdc[NR_BP];
 
@@ -40,7 +40,7 @@ extern  break_drive_t break_point_fdc[NR_BP];
 
 
 
-	/**** ´Ø¿ô ****/
+	/**** é–¢æ•° ****/
 
 void	emu_breakpoint_init( void );
 void	emu_reset( void );

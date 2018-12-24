@@ -1,6 +1,6 @@
 /************************************************************************/
 /*									*/
-/* CRTC �� DMAC �ν���							*/
+/* CRTC と DMAC の処理							*/
 /*									*/
 /************************************************************************/
 
@@ -16,7 +16,7 @@
  *
  *======================================================================*/
 
-		/* CRTC¦���鸫�����ȥ�ӥ塼��	*/
+		/* CRTC側から見たアトリビュート	*/
 
 #define MONO_SECRET	0x01
 #define MONO_BLINK	0x02
@@ -30,28 +30,28 @@
 #define COLOR_R		0x40
 #define COLOR_G		0x80
 
-		/* ����ɽ���ǻ��Ѥ��륢�ȥ�ӥ塼�� */
+		/* 内部表現で使用するアトリビュート */
 
-#define ATTR_REVERSE	0x01			/* ȿž			*/
-#define ATTR_SECRET	0x02			/* ɽ��/��ɽ��		*/
-#define ATTR_UPPER	0x04			/* ���åѡ��饤��	*/
-#define ATTR_LOWER	0x08			/* ��������饤��	*/
-#define ATTR_GRAPH	0x10			/* ����ե��å��⡼��	*/
-#define ATTR_B		0x20			/* �� Blue		*/
-#define ATTR_R		0x40			/* �� Reg		*/
-#define ATTR_G		0x80			/* �� Green		*/
+#define ATTR_REVERSE	0x01			/* 反転			*/
+#define ATTR_SECRET	0x02			/* 表示/非表示		*/
+#define ATTR_UPPER	0x04			/* アッパーライン	*/
+#define ATTR_LOWER	0x08			/* アンダーライン	*/
+#define ATTR_GRAPH	0x10			/* グラフィックモード	*/
+#define ATTR_B		0x20			/* 色 Blue		*/
+#define ATTR_R		0x40			/* 色 Reg		*/
+#define ATTR_G		0x80			/* 色 Green		*/
 
 #define MONO_MASK	0x0f
 #define COLOR_MASK	0xe0
 
 /*======================================================================*/
 
-int		text_display = TEXT_ENABLE;	/* �ƥ�����ɽ���ե饰	*/
+int		text_display = TEXT_ENABLE;	/* テキスト表示フラグ	*/
 
-int		blink_cycle;		/* ���Ǥμ���	8/16/24/32	*/
-int		blink_counter = 0;	/* �������楫����		*/
+int		blink_cycle;		/* 点滅の周期	8/16/24/32	*/
+int		blink_counter = 0;	/* 点滅制御カウンタ		*/
 
-int		dma_wait_count = 0;	/* DMA�Ǿ��񤹤륵�������	*/
+int		dma_wait_count = 0;	/* DMAで消費するサイクル数	*/
 
 
 static	int	crtc_command;
@@ -62,56 +62,56 @@ static	byte	crtc_light_pen[2];
 static	byte	crtc_load_cursor_position;
 
 
-	int	crtc_active;		/* CRTC�ξ��� 0:CRTC��ư 1:CRTC��� */
-	int	crtc_intr_mask;		/* CRTC�γ���ޥ��� ==3 ��ɽ��	    */
-	int	crtc_cursor[2];		/* ����������� ��ɽ���λ���(-1,-1) */
-	byte	crtc_format[5];		/* CRTC �������Υե����ޥå�	    */
+	int	crtc_active;		/* CRTCの状態 0:CRTC作動 1:CRTC停止 */
+	int	crtc_intr_mask;		/* CRTCの割込マスク ==3 で表示	    */
+	int	crtc_cursor[2];		/* カーソル位置 非表示の時は(-1,-1) */
+	byte	crtc_format[5];		/* CRTC 期化時のフォーマット	    */
 
 
-	int	crtc_reverse_display;	/* ����ȿžɽ�� / �����̾�ɽ��	*/
+	int	crtc_reverse_display;	/* 真…反転表示 / 偽…通常表示	*/
 
-	int	crtc_skip_line;		/* ����1�����Ф�ɽ�� / �����̾� */
-	int	crtc_cursor_style;	/* �֥��å� / ������饤��	*/
-	int	crtc_cursor_blink;	/* �������Ǥ��� �������Ǥ��ʤ�	*/
-	int	crtc_attr_non_separate;	/* ����VRAM��ATTR ����ߤ��¤�	*/
-	int	crtc_attr_color;	/* ���ĥ��顼 �������		*/
-	int	crtc_attr_non_special;	/* ���ĹԤν���� ATTR ���¤�	*/
+	int	crtc_skip_line;		/* 真…1行飛ばし表示 / 偽…通常 */
+	int	crtc_cursor_style;	/* ブロック / アンダライン	*/
+	int	crtc_cursor_blink;	/* 真…点滅する 偽…点滅しない	*/
+	int	crtc_attr_non_separate;	/* 真…VRAM、ATTR が交互に並ぶ	*/
+	int	crtc_attr_color;	/* 真…カラー 偽…白黒		*/
+	int	crtc_attr_non_special;	/* 偽…行の終りに ATTR が並ぶ	*/
 
-	int	CRTC_SZ_LINES	   =20;	/* ɽ�������� (20/25)		*/
-#define		CRTC_SZ_COLUMNS	   (80)	/* ɽ������Կ� (80����)	*/
+	int	CRTC_SZ_LINES	   =20;	/* 表示する桁数 (20/25)		*/
+#define		CRTC_SZ_COLUMNS	   (80)	/* 表示する行数 (80固定)	*/
 
-	int	crtc_sz_lines      =20;	/* ��� (20��25)		*/
-	int	crtc_sz_columns    =80;	/* �Կ� (2��80)			*/
-	int	crtc_sz_attrs      =20;	/* °���� (1��20)		*/
-	int	crtc_byte_per_line=120;	/* 1�Ԥ�����Υ��� �Х��ȿ�	*/
-	int	crtc_font_height   =10;	/* �ե���Ȥι⤵ �ɥåȿ�(8/10)*/
+	int	crtc_sz_lines      =20;	/* 桁数 (20〜25)		*/
+	int	crtc_sz_columns    =80;	/* 行数 (2〜80)			*/
+	int	crtc_sz_attrs      =20;	/* 属性量 (1〜20)		*/
+	int	crtc_byte_per_line=120;	/* 1行あたりのメモリ バイト数	*/
+	int	crtc_font_height   =10;	/* フォントの高さ ドット数(8/10)*/
 
 
 
 /******************************************************************************
 
-			���������������� crtc_byte_per_line  ����������������
-			������   crtc_sz_columns  ������ ��  crtc_sz_attrs ��
+			←─────── crtc_byte_per_line  ───────→
+			←──   crtc_sz_columns  ──→ ←  crtc_sz_attrs →
 			+-------------------------------+-------------------+
-		      ��|				|��		    |
-		      ��|	+--+ ��			|��		    |
-		      ��|	|  | crtc_font_height	|��		    |
-			|	+--+ ��			|		    |
+		      ↑|				|↑		    |
+		      │|	+--+ ↑			|│		    |
+		      │|	|  | crtc_font_height	|│		    |
+			|	+--+ ↓			|		    |
 	   CRTC_SZ_LINES|				|crtc_sz_lines	    |
 			|				|		    |
-		      ��|				|��		    |
-		      ��|				|��		    |
-		      ��|				|��		    |
+		      │|				|│		    |
+		      │|				|│		    |
+		      ↓|				|↓		    |
 			+-------------------------------+-------------------+
-			������   CRTC_SZ_COLUMNS  ������ 
+			←──   CRTC_SZ_COLUMNS  ──→ 
 
-	crtc_sz_columns		���	2��80
-	crtc_sz_attrs		°����	1��20
-	crtc_byte_per_line	1�Ԥ�����Υ�����	columns + attrs*2
-	crtc_sz_lines		�Կ�	20��25
-	crtc_font_height	�ե���Ȥι⤵�ɥå���	8/10
-	CRTC_SZ_COLUMNS		ɽ��������	80
-	CRTC_SZ_LINES		ɽ������Կ�	20/25
+	crtc_sz_columns		桁数	2〜80
+	crtc_sz_attrs		属性量	1〜20
+	crtc_byte_per_line	1行あたりのメモリ量	columns + attrs*2
+	crtc_sz_lines		行数	20〜25
+	crtc_font_height	フォントの高さドット量	8/10
+	CRTC_SZ_COLUMNS		表示する桁数	80
+	CRTC_SZ_LINES		表示する行数	20/25
 
 ******************************************************************************/
 
@@ -123,11 +123,11 @@ static	byte	crtc_load_cursor_position;
 
 
 
-/* ���ͤޤǤˡġġ� 						*/
-/*	SORCERIAN          �� 1�����Ф�����			*/
-/*	Marchen Veil       �� ���ȥ�ӥ塼�Ȥʤ��⡼��		*/
-/*	Xanadu II (E disk) ��             ��			*/
-/*	Wizardry V         �� �Υ�ȥ�󥹥ڥ���������⡼��	*/
+/* 参考までに……… 						*/
+/*	SORCERIAN          … 1行飛ばし指定			*/
+/*	Marchen Veil       … アトリビュートなしモード		*/
+/*	Xanadu II (E disk) …             〃			*/
+/*	Wizardry V         … ノントランスペアレント白黒モード	*/
 
 
 enum{
@@ -142,16 +142,16 @@ enum{
   CRTC_READ_STATUS,
   EndofCRTC
 };
-#define CRTC_STATUS_VE	(0x10)		/* ����ɽ��ͭ��		*/
-#define CRTC_STATUS_U	(0x08)		/* DMA����������	*/
-#define CRTC_STATUS_N	(0x04)		/* �ü�����ʸ�����ȯ�� */
-#define CRTC_STATUS_E	(0x02)		/* ɽ����λ���ȯ��	*/
-#define CRTC_STATUS_LP	(0x01)		/* �饤�ȥڥ����� 	*/
+#define CRTC_STATUS_VE	(0x10)		/* 画面表示有効		*/
+#define CRTC_STATUS_U	(0x08)		/* DMAアンダーラン	*/
+#define CRTC_STATUS_N	(0x04)		/* 特殊制御文字割込発生 */
+#define CRTC_STATUS_E	(0x02)		/* 表示終了割込発生	*/
+#define CRTC_STATUS_LP	(0x01)		/* ライトペン入力 	*/
 
 
 /****************************************************************/
-/* CRTC��Ʊ����������� (OUT 40H,A ... bit3)			*/
-/*	�ä˥��ߥ�졼�Ȥ�ɬ�פʤ������������Ȼפ���		*/
+/* CRTCへ同期信号を送る (OUT 40H,A ... bit3)			*/
+/*	特にエミュレートの必要なし。。。。。と思う。		*/
 /****************************************************************/
 #ifdef	SUPPORT_CRTC_SEND_SYNC_SIGNAL
 void	crtc_send_sync_signal( int flag )
@@ -163,10 +163,10 @@ void	crtc_send_sync_signal( int flag )
 
 
 /****************************************************************/
-/*    CRTC ���ߥ�졼�����					*/
+/*    CRTC エミュレーション					*/
 /****************************************************************/
 
-/*-------- ����� --------*/
+/*-------- 初期化 --------*/
 
 void	crtc_init( void )
 {
@@ -182,7 +182,7 @@ void	crtc_init( void )
   crtc_out_parameter( 0 );
 }
 
-/*-------- ���ޥ�����ϻ� --------*/
+/*-------- コマンド入力時 --------*/
 
 void	crtc_out_command( byte data )
 {
@@ -191,14 +191,14 @@ void	crtc_out_command( byte data )
 
   switch( crtc_command ){
 
-  case CRTC_RESET:					/* �ꥻ�å� */
+  case CRTC_RESET:					/* リセット */
     crtc_status &= ~( CRTC_STATUS_VE | CRTC_STATUS_N | CRTC_STATUS_E );
     crtc_active = FALSE;
     set_text_display();
     screen_set_dirty_all();
     break;
 
-  case CRTC_START_DISPLAY:				/* ɽ������ */
+  case CRTC_START_DISPLAY:				/* 表示開始 */
     crtc_reverse_display = data & 0x01;
     crtc_status |= CRTC_STATUS_VE;
     crtc_status &= ~( CRTC_STATUS_U );
@@ -217,7 +217,7 @@ void	crtc_out_command( byte data )
     crtc_status &= ~( CRTC_STATUS_LP );
     break;
 
-  case CRTC_LOAD_CURSOR_POSITION:			/* ������������ */
+  case CRTC_LOAD_CURSOR_POSITION:			/* カーソル設定 */
     crtc_load_cursor_position = data & 0x01;
     crtc_cursor[ 0 ] = -1;
     crtc_cursor[ 1 ] = -1;
@@ -231,7 +231,7 @@ void	crtc_out_command( byte data )
   }
 }
 
-/*-------- �ѥ�᡼�����ϻ� --------*/
+/*-------- パラメータ入力時 --------*/
 
 void	crtc_out_parameter( byte data )
 {
@@ -251,15 +251,15 @@ void	crtc_out_parameter( byte data )
     crtc_cursor_blink      = crtc_format[2] & 0x20;		/* bool */
     blink_cycle            =(crtc_format[1]>>6) * 8 +8;		/* 8,16,24,48*/
 
-    crtc_sz_lines          =(crtc_format[1] & 0x3f) +1;		/* 1��25 */
+    crtc_sz_lines          =(crtc_format[1] & 0x3f) +1;		/* 1〜25 */
     if     ( crtc_sz_lines <= 20 ) crtc_sz_lines = 20;
     else if( crtc_sz_lines >= 25 ) crtc_sz_lines = 25;
     else                           crtc_sz_lines = 24;
 
-    crtc_sz_columns        =(crtc_format[0] & 0x7f) +2;		/* 2��80 */
+    crtc_sz_columns        =(crtc_format[0] & 0x7f) +2;		/* 2〜80 */
     if( crtc_sz_columns > 80 ) crtc_sz_columns = 80;
 
-    crtc_sz_attrs          =(crtc_format[4] & 0x1f) +1;		/* 1��20 */
+    crtc_sz_attrs          =(crtc_format[4] & 0x1f) +1;		/* 1〜20 */
     if     ( crtc_attr_non_special ) crtc_sz_attrs = 0;
     else if( crtc_sz_attrs > 20 )    crtc_sz_attrs = 20;
 
@@ -284,14 +284,14 @@ void	crtc_out_parameter( byte data )
   }
 }
 
-/*-------- ���ơ��������ϻ� --------*/
+/*-------- ステータス出力時 --------*/
 
 byte	crtc_in_status( void )
 {
   return crtc_status;
 }
 
-/*-------- �ѥ�᡼�����ϻ� --------*/
+/*-------- パラメータ出力時 --------*/
 
 byte	crtc_in_parameter( void )
 {
@@ -313,7 +313,7 @@ byte	crtc_in_parameter( void )
 
 
 /****************************************************************/
-/*    DMAC ���ߥ�졼�����					*/
+/*    DMAC エミュレーション					*/
 /****************************************************************/
 
 static	int	dmac_flipflop;
@@ -356,7 +356,7 @@ void	dmac_out_address( byte addr, byte data )
   else                   dmac_address[ addr ].B.h=data;
 
   dmac_flipflop ^= 0x1;
-  screen_set_dirty_all();	/* �����ϡ�addr==2�λ��Τߡġġ� */
+  screen_set_dirty_all();	/* 本当は、addr==2の時のみ……… */
 }
 void	dmac_out_counter( byte addr, byte data )
 {
@@ -390,7 +390,7 @@ byte	dmac_in_counter( byte addr )
 
 
 /***********************************************************************
- * CRTC,DMAC���������ӡ�I/O 31H / 53H ���ϻ��˸Ƥ�
+ * CRTC,DMAC設定時および、I/O 31H / 53H 出力時に呼ぶ
  ************************************************************************/
 void	set_text_display(void)
 {
@@ -410,39 +410,39 @@ void	set_text_display(void)
 
 
 /***********************************************************************
- * ����ɽ���Τ���δؿ�
+ * 画面表示のための関数
  ************************************************************************/
 
 
 /*======================================================================
- * �ƥ�����VRAM�Υ��ȥ�ӥ塼�Ȥ����ѥ�������ꤹ��
+ * テキストVRAMのアトリビュートを専用ワークに設定する
  *
- *	�Хåե���2�Ĥ��ꡢ��ߤ����ؤ��ƻ��Ѥ��롣
- *	���̽񤭴����κݤϡ�����2�ĤΥХåե�����Ӥ����Ѳ���
- *	���ä���ʬ�����򹹿����롣
+ *	バッファは2個あり、交互に切替えて使用する。
+ *	画面書き換えの際は、この2個のバッファを比較し、変化の
+ *	あった部分だけを更新する。
  *
- *	����ϡ�16bit�ǡ����8bit��ʸ�������ɡ����̤�°����
- *		��������ե��å��⡼�ɡ���������饤��
- *		���åѡ��饤�󡢥�������åȡ���С���
+ *	ワークは、16bitで、上位8bitが文字コード、下位は属性。
+ *		色、グラフィックモード、アンダーライン、
+ *		アッパーライン、シークレット、リバース
  *		+---------------------+--+--+--+--+--+--+--+--+
- *		|    ASCII 8bit       |��|��|��|GR|LO|UP|SC|RV|
+ *		|    ASCII 8bit       |Ｇ|Ｒ|Ｂ|GR|LO|UP|SC|RV|
  *		+---------------------+--+--+--+--+--+--+--+--+
- *	BLINK°���ϡ���������̵�롢�������ϥ�������åȡ�
+ *	BLINK属性は、点灯時は無視、消灯時はシークレット。
  *
- *	����ˡ���������å�°���ξ��� ʸ�������ɤ� 0 ���ִ����롣
- *	(ʸ��������==0��̵���Ƕ���Ȥ��Ƥ���Τ�)
+ *	さらに、シークレット属性の場合は 文字コードを 0 に置換する。
+ *	(文字コード==0は無条件で空白としているので)
  *		+---------------------+--+--+--+--+--+--+--+--+
- *	     ��	|    ASCII == 0       |��|��|��|��|LO|UP|��|RV|
+ *	     →	|    ASCII == 0       |Ｇ|Ｒ|Ｂ|０|LO|UP|０|RV|
  *		+---------------------+--+--+--+--+--+--+--+--+
- *	        ����ե��å��⡼�ɤȥ�������å�°����ä��Ƥ�OK������
- *		������������åѡ��饤�󡢥�С�����ͭ���ʤΤǻĤ���
+ *	        グラフィックモードとシークレット属性も消してもOKだが、
+ *		アンダー、アッパーライン、リバースは有効なので残す。
  *
  *======================================================================*/
 
 int	text_attr_flipflop = 0;
-Ushort	text_attr_buf[2][2048];		/* ���ȥ�ӥ塼�Ⱦ���	*/
-			/* �� 80ʸ��x25��=2000��­���Τ�����	*/
-			/* ;ʬ�˻Ȥ��Τǡ�¿��˳��ݤ��롣	*/
+Ushort	text_attr_buf[2][2048];		/* アトリビュート情報	*/
+			/* ↑ 80文字x25行=2000で足りるのだが、	*/
+			/* 余分に使うので、多めに確保する。	*/
 				   
 
 void	crtc_make_text_attr( void )
@@ -456,26 +456,26 @@ void	crtc_make_text_attr( void )
   Ushort	*text_attr = &text_attr_buf[ text_attr_flipflop ][0];
 
 
-	/* CRTC �� DMAC ��ߤޤäƤ����� */
-	/*  (ʸ���⥢�ȥ�ӥ塼�Ȥ�̵��)   */
+	/* CRTC も DMAC も止まっている場合 */
+	/*  (文字もアトリビュートも無効)   */
 
-  if( text_display==TEXT_DISABLE ){		/* ASCII=0���򿧡������ʤ� */
-    for( i=0; i<CRTC_SZ_LINES; i++ ){		/* �ǽ�������롣	   */
+  if( text_display==TEXT_DISABLE ){		/* ASCII=0、白色、装飾なし */
+    for( i=0; i<CRTC_SZ_LINES; i++ ){		/* で初期化する。	   */
       for( j=0; j<CRTC_SZ_COLUMNS; j++ ){
 	*text_attr ++ =  (ATTR_G|ATTR_R|ATTR_B);
       }
     }
-    return;			/* ������ȿž�䥫�������ʤ������������  */
+    return;			/* 全画面反転やカーソルもなし。すぐに戻る  */
   }
 
 
 
-	/* �Υ󡦥ȥ�󥹥ڥ����ȷ��ξ�� */
-	/* (1ʸ���֤��ˡ�VRAM��ATTR ������) */
+	/* ノン・トランスペアレント型の場合 */
+	/* (1文字置きに、VRAM、ATTR がある) */
 
-			/* �ġġ� ���ܺ����� 				*/
-			/*	CRTC������ѥ����󤫤餷�ơ�����˹Ԥ�	*/
-			/*	�Ǹ��°����������⤢�ꤨ����������?	*/
+			/* ……… ？詳細不明 				*/
+			/*	CRTCの設定パターンからして、さらに行の	*/
+			/*	最後に属性がある場合もありえそうだが…?	*/
 
   if( crtc_attr_non_separate ){
 
@@ -490,15 +490,15 @@ void	crtc_make_text_attr( void )
       char_start_addr += crtc_byte_per_line;
       attr_start_addr += crtc_byte_per_line;
 
-      for( j=0; j<CRTC_SZ_COLUMNS; j+=2 ){		/* °�������������ɤ�*/
-	attr = main_ram[ a_addr ];			/* �Ѵ�����°�����*/
-	a_addr += 2;					/* ���������롣    */
+      for( j=0; j<CRTC_SZ_COLUMNS; j+=2 ){		/* 属性を内部コードに*/
+	attr = main_ram[ a_addr ];			/* 変換し、属性ワーク*/
+	a_addr += 2;					/* を全て埋める。    */
 	global_attr =( global_attr & COLOR_MASK ) |
 		     ((attr &  MONO_GRAPH) >> 3 ) |
 		     ((attr & (MONO_UNDER|MONO_UPPER|MONO_REVERSE))>>2) |
 		     ((attr &  MONO_SECRET) << 1 );
 
-					/* BLINK��OFF����SECRET����    */
+					/* BLINKのOFF時はSECRET扱い    */
 	if( (attr & MONO_BLINK) && ((blink_counter&0x03)==0) ){
 	  global_attr |= ATTR_SECRET;
 	}
@@ -517,21 +517,21 @@ void	crtc_make_text_attr( void )
       }
 
     }
-    for( ; i<CRTC_SZ_LINES; i++ ){		/* �Ĥ�ιԤϡ�SECRET */
-      for( j=0; j<CRTC_SZ_COLUMNS; j++ ){	/*  (24�������к�)    */
+    for( ; i<CRTC_SZ_LINES; i++ ){		/* 残りの行は、SECRET */
+      for( j=0; j<CRTC_SZ_COLUMNS; j++ ){	/*  (24行設定対策)    */
 	*text_attr ++ =  global_attr | ATTR_SECRET;
       }
     }
 
   }else{
 
-	/* �ȥ�󥹥ڥ����ȷ��ξ�� */
-	/* (�ԤκǸ�ˡ�ATTR������)   */
+	/* トランスペアレント型の場合 */
+	/* (行の最後に、ATTRがある)   */
 
     char_start_addr = text_dma_addr.W;
     attr_start_addr = text_dma_addr.W + crtc_sz_columns;
 
-    for( i=0; i<crtc_sz_lines; i++ ){			/* ��ñ�̤�°������ */
+    for( i=0; i<crtc_sz_lines; i++ ){			/* 行単位で属性作成 */
 
       c_addr	= char_start_addr;
       a_addr	= attr_start_addr;
@@ -540,33 +540,33 @@ void	crtc_make_text_attr( void )
       attr_start_addr += crtc_byte_per_line;
 
 
-      attr_rest = 0;						/*°������� */
-      for( j=0; j<=CRTC_SZ_COLUMNS; j++ ) text_attr[j] = 0;	/* [0]��[80] */
+      attr_rest = 0;						/*属性初期化 */
+      for( j=0; j<=CRTC_SZ_COLUMNS; j++ ) text_attr[j] = 0;	/* [0]〜[80] */
 
 
-      for( j=0; j<crtc_sz_attrs; j++ ){			/* °����������ܤ� */
-	column = main_ram[ a_addr++ ];			/* ����˳�Ǽ       */
+      for( j=0; j<crtc_sz_attrs; j++ ){			/* 属性を指定番目の */
+	column = main_ram[ a_addr++ ];			/* 配列に格納       */
 	attr   = main_ram[ a_addr++ ];
 
-	if( j!=0 && column==0    ) column = 0x80;		/* �ü����?*/
+	if( j!=0 && column==0    ) column = 0x80;		/* 特殊処理?*/
 	if( j==0 && column==0x80 ){column = 0;
 /*				   global_attr = (ATTR_G|ATTR_R|ATTR_B);
 				   global_blink= FALSE;  }*/}
 
-	if( column==0x80  &&  !attr_rest ){			/* 8bit�ܤ� */
-	  attr_rest = attr | 0x100;				/* ���ѺѤ� */
-	}							/* �ե饰   */
+	if( column==0x80  &&  !attr_rest ){			/* 8bit目は */
+	  attr_rest = attr | 0x100;				/* 使用済の */
+	}							/* フラグ   */
 	else if( column <= CRTC_SZ_COLUMNS  &&  !text_attr[ column ] ){
 	  text_attr[ column ] = attr | 0x100;
 	}
       }
 
 
-      if( !text_attr[0] && attr_rest ){			/* �����-1�ޤ�°����*/
-	for( j=CRTC_SZ_COLUMNS; j; j-- ){		/* ͭ�����Ȥ�������*/
-	  if( text_attr[j] ){				/* ������(�����ʹ� */
-	    tmp          = text_attr[j];		/* °����ͭ�����Ȥ���*/
-	    text_attr[j] = attr_rest;			/* �դ����¤��ؤ���) */
+      if( !text_attr[0] && attr_rest ){			/* 指定桁-1まで属性が*/
+	for( j=CRTC_SZ_COLUMNS; j; j-- ){		/* 有効、という場合の*/
+	  if( text_attr[j] ){				/* 処理。(指定桁以降 */
+	    tmp          = text_attr[j];		/* 属性が有効、という*/
+	    text_attr[j] = attr_rest;			/* ふうに並べ替える) */
 	    attr_rest    = tmp;
 	  }
 	}
@@ -574,9 +574,9 @@ void	crtc_make_text_attr( void )
       }
 
 
-      for( j=0; j<CRTC_SZ_COLUMNS; j++ ){		/* °�������������ɤ�*/
-							/* �Ѵ�����°�����*/
-	if( ( attr = *text_attr ) ){			/* ���������롣    */
+      for( j=0; j<CRTC_SZ_COLUMNS; j++ ){		/* 属性を内部コードに*/
+							/* 変換し、属性ワーク*/
+	if( ( attr = *text_attr ) ){			/* を全て埋める。    */
 	  if( crtc_attr_color ){
 	    if( attr & COLOR_SWITCH ){
 	      global_attr =( global_attr & MONO_MASK ) |
@@ -594,7 +594,7 @@ void	crtc_make_text_attr( void )
 			 ((attr &  MONO_SECRET) << 1 );
 	    global_blink= (attr & MONO_BLINK);
 	  }
-					/* BLINK��OFF����SECRET����    */
+					/* BLINKのOFF時はSECRET扱い    */
 	  if( global_blink && ((blink_counter&0x03)==0) ){
 	    global_attr =  global_attr | ATTR_SECRET;
 	  }
@@ -604,9 +604,9 @@ void	crtc_make_text_attr( void )
 
       }
 
-      if( crtc_skip_line ){				/* 1�����Ф��������*/
-	if( ++i < crtc_sz_lines ){			/* ���ιԤ�SECRET�� */
-	  for( j=0; j<CRTC_SZ_COLUMNS; j++ ){		/* ���롣         */
+      if( crtc_skip_line ){				/* 1行飛ばし指定時は*/
+	if( ++i < crtc_sz_lines ){			/* 次の行をSECRETで */
+	  for( j=0; j<CRTC_SZ_COLUMNS; j++ ){		/* 埋める。         */
 	    *text_attr ++ =  global_attr | ATTR_SECRET;
 	  }
 	}
@@ -614,8 +614,8 @@ void	crtc_make_text_attr( void )
 
     }
 
-    for( ; i<CRTC_SZ_LINES; i++ ){		/* �Ĥ�ιԤϡ�SECRET */
-      for( j=0; j<CRTC_SZ_COLUMNS; j++ ){	/*  (24�������к�)    */
+    for( ; i<CRTC_SZ_LINES; i++ ){		/* 残りの行は、SECRET */
+      for( j=0; j<CRTC_SZ_COLUMNS; j++ ){	/*  (24行設定対策)    */
 	*text_attr ++ =  global_attr | ATTR_SECRET;
       }
     }
@@ -624,8 +624,8 @@ void	crtc_make_text_attr( void )
 
 
 
-	/* CRTC �� DMAC ��ư���Ƥ��뤱�ɡ� �ƥ����Ȥ���ɽ�� */
-	/* ��VRAM����ξ�� (���ȥ�ӥ塼�Ȥο�������ͭ��)  */
+	/* CRTC や DMAC は動いているけど、 テキストが非表示 */
+	/* でVRAM白黒の場合 (アトリビュートの色だけが有効)  */
 
   if( text_display==TEXT_ATTR_ONLY ){
 
@@ -636,13 +636,13 @@ void	crtc_make_text_attr( void )
 	*text_attr ++ &=  (ATTR_G|ATTR_R|ATTR_B);
       }
     }
-    return;			/* ������ȿž�䥫����������ס������Ǥ����  */
+    return;			/* 全画面反転やカーソルは不要。ここでに戻る  */
   }
 
 
 
 
-		/* ����ȿž���� */
+		/* 全体反転処理 */
 
   if( crtc_reverse_display && (grph_ctrl & GRPH_CTRL_COLOR)){
     text_attr = &text_attr_buf[ text_attr_flipflop ][0];
@@ -653,7 +653,7 @@ void	crtc_make_text_attr( void )
     }
   }
 
-		/* ��������ɽ������ */
+		/* カーソル表示処理 */
 
   if( 0 <= crtc_cursor[0] && crtc_cursor[0] < crtc_sz_columns &&
       0 <= crtc_cursor[1] && crtc_cursor[1] < crtc_sz_lines   ){
@@ -664,12 +664,12 @@ void	crtc_make_text_attr( void )
   }
 
 
-	/* ��������å�°������ (ʸ�������� 0x00 ���ִ�) */
+	/* シークレット属性処理 (文字コード 0x00 に置換) */
 
   text_attr = &text_attr_buf[ text_attr_flipflop ][0];
   for( i=0; i<CRTC_SZ_LINES; i++ ){
     for( j=0; j<CRTC_SZ_COLUMNS; j++ ){
-      if( *text_attr & ATTR_SECRET ){		/* SECRET °���ϡ�������00�� */
+      if( *text_attr & ATTR_SECRET ){		/* SECRET 属性は、コード00に */
 	*text_attr &= (COLOR_MASK|ATTR_UPPER|ATTR_LOWER|ATTR_REVERSE);
       }
       text_attr ++;
@@ -684,19 +684,19 @@ void	crtc_make_text_attr( void )
 
 
 /***********************************************************************
- * ���ꤵ�줿ʸ��������(°����ʸ��)��ꡢ�ե���Ȼ����ǡ�������������
+ * 指定された文字コード(属性・文字)より、フォント字形データを生成する
  *
- *	int attr	�� ʸ�������ɡ� text_attr_buf[]���ͤǤ��롣
- *	T_GRYPH *gryph	�� gryph->b[0]��[7] �� �ե���ȤΥӥåȥޥåפ�
- *			   ��Ǽ����롣(20�Ի��ϡ�b[0]��[9]�˳�Ǽ)
- *	int *color	�� �ե���Ȥο�����Ǽ����롣�ͤϡ� 8��15
+ *	int attr	… 文字コード。 text_attr_buf[]の値である。
+ *	T_GRYPH *gryph	… gryph->b[0]〜[7] に フォントのビットマップが
+ *			   格納される。(20行時は、b[0]〜[9]に格納)
+ *	int *color	… フォントの色が格納される。値は、 8〜15
  *
- *	�����ǡ����ϡ�char 8��10�ĤʤΤ�������©�ʹ�®���Τ���� long ��
- *	�����������Ƥ��롣���Τ��ᡢ T_GRYPH �Ȥ���̯�ʷ���ȤäƤ��롣
- *	(����ס���������͡�)
+ *	字形データは、char 8〜10個なのだが、姑息な高速化のために long で
+ *	アクセスしている。そのため、 T_GRYPH という妙な型を使っている。
+ *	(大丈夫・・・だよね？)
  *
- *	��)	���ȥ�ӥ塼�Ⱦ���ɬ�פʤΤǡ�
- *		ͽ�� make_text_attr_table( ) ��Ƥ�Ǥ�������
+ *	注)	アトリビュート情報が必要なので、
+ *		予め make_text_attr_table( ) を呼んでおくこと
  ************************************************************************/
 
 void	get_font_gryph( int attr, T_GRYPH *gryph, int *color )
@@ -710,20 +710,20 @@ void	get_font_gryph( int attr, T_GRYPH *gryph, int *color )
 
   if( ( attr & ~(COLOR_MASK|ATTR_REVERSE) )==0 ){
 
-    if( ( attr & ATTR_REVERSE ) == 0 ){		/* ����ե���Ȼ� */
+    if( ( attr & ATTR_REVERSE ) == 0 ){		/* 空白フォント時 */
 
       *dst++ = 0;
       *dst++ = 0;
       *dst   = 0;
 
-    }else{					/* �٥��ե���Ȼ� */
+    }else{					/* ベタフォント時 */
 
       *dst++ = 0xffffffff;
       *dst++ = 0xffffffff;
       *dst   = 0xffffffff;
     }
 
-  }else{					/* �̾�ե���Ȼ� */
+  }else{					/* 通常フォント時 */
 
     chara = attr >> 8;
 
@@ -732,12 +732,12 @@ void	get_font_gryph( int attr, T_GRYPH *gryph, int *color )
     else
       src = (bit32 *)&font_rom[ (chara        )*8 ];
 
-					/* �ե���Ȥ�ޤ���������˥��ԡ� */
+					/* フォントをまず内部ワークにコピー */
     *dst++ = *src++;
     *dst++ = *src;
     *dst   = 0;
 
-					/* °���ˤ����������ե���Ȥ�ù�*/
+					/* 属性により内部ワークフォントを加工*/
     if( attr & ATTR_UPPER ) gryph->b[ 0 ] |= 0xff;
     if( attr & ATTR_LOWER ) gryph->b[ crtc_font_height-1 ] |= 0xff;
     if( attr & ATTR_REVERSE ){
@@ -754,7 +754,7 @@ void	get_font_gryph( int attr, T_GRYPH *gryph, int *color )
 
 
 /***********************************************************************
- * ���ơ��ȥ����ɡ����ơ��ȥ�����
+ * ステートロード／ステートセーブ
  ************************************************************************/
 
 #define	SID	"CRTC"

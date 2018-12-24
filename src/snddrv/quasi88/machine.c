@@ -88,25 +88,25 @@
 
 static struct YM2203interface ym2203_interface =
 {
-	0,		/* SSG port-A �꡼�ɻ��˸ƤФ��ؿ� */
-	0,		/* SSG port-B �꡼�ɻ��θƤФ��ؿ� */
-	0,		/* SSG port-A �饤�Ȼ��θƤФ��ؿ� */
-	0,		/* SSG port-B �饤�Ȼ��θƤФ��ؿ� */
-	0		/* ����ե饰��Ω�ä����˸ƤФ��ؿ� */
+	0,		/* SSG port-A リード時に呼ばれる関数 */
+	0,		/* SSG port-B リード時の呼ばれる関数 */
+	0,		/* SSG port-A ライト時の呼ばれる関数 */
+	0,		/* SSG port-B ライト時の呼ばれる関数 */
+	0		/* 割込フラグが立った時に呼ばれる関数 */
 };
 
 static struct YM2608interface ym2608_interface =
 {
-	0,		/* SSG port-A �꡼�ɻ��˸ƤФ��ؿ� */
-	0,		/* SSG port-B �꡼�ɻ��θƤФ��ؿ� */
-	0,		/* SSG port-A �饤�Ȼ��θƤФ��ؿ� */
-	0,		/* SSG port-B �饤�Ȼ��θƤФ��ؿ� */
-	0,		/* ����ե饰��Ω�ä����˸ƤФ��ؿ� */
-	0		/* ADPCM�Υ����ֹ�(QUASI88�Ǥ�̤����) */
+	0,		/* SSG port-A リード時に呼ばれる関数 */
+	0,		/* SSG port-B リード時の呼ばれる関数 */
+	0,		/* SSG port-A ライト時の呼ばれる関数 */
+	0,		/* SSG port-B ライト時の呼ばれる関数 */
+	0,		/* 割込フラグが立った時に呼ばれる関数 */
+	0		/* ADPCMのメモリ番号(QUASI88では未使用) */
 };
 
 
-/* ����ץ�ե�����ϡ���Υ��Ǥ���С�bit�������ȿ������� */
+/* サンプルファイルは、モノラルであれば、bit数、周波数は不問 */
 enum {
 	SAMPLE_NUM_MOTORON,
 	SAMPLE_NUM_MOTOROFF,
@@ -116,19 +116,19 @@ enum {
 };
 static const char *quasi88_sample_names[] =
 {
-	"motoron.wav",			/* ����ץ��ֹ� 0 */
-	"motoroff.wav",			/* ����ץ��ֹ� 1 */
-	"headdown.wav",			/* ����ץ��ֹ� 2 */
-	"headup.wav",			/* ����ץ��ֹ� 3 */
-	"seek.wav",				/* ����ץ��ֹ� 4 */
+	"motoron.wav",			/* サンプル番号 0 */
+	"motoroff.wav",			/* サンプル番号 1 */
+	"headdown.wav",			/* サンプル番号 2 */
+	"headup.wav",			/* サンプル番号 3 */
+	"seek.wav",				/* サンプル番号 4 */
 	0       /* end of array */
 };
 
 static struct Samplesinterface quasi88_samples_interface =
 {
-	5,						/* Ʊ����ȯ����������ͥ��	*/
-	quasi88_sample_names,	/* ����ץ�ե�����̾����		*/
-	NULL					/* ������������˸ƤӽФ��ؿ�	*/
+	5,						/* 同時に発音するチャンネル数	*/
+	quasi88_sample_names,	/* サンプルファイル名一覧		*/
+	NULL					/* 初期化成功時に呼び出す関数	*/
 };
 
 

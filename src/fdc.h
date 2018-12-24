@@ -2,14 +2,14 @@
 #define FDC_H_INCLUDED
 
 
-extern int fdc_debug_mode;	/* FDC ¥Ç¥Ğ¥Ã¥°¥â¡¼¥É¤Î¥Õ¥é¥°		*/
-extern int disk_exchange;	/* ¥Ç¥£¥¹¥¯µ¿»÷Æş¤ìÂØ¤¨¥Õ¥é¥°		*/
-extern int disk_ex_drv;		/* ¥Ç¥£¥¹¥¯µ¿»÷Æş¤ìÂØ¤¨¥É¥é¥¤¥Ö		*/
+extern int fdc_debug_mode;	/* FDC ãƒ‡ãƒãƒƒã‚°ãƒ¢ãƒ¼ãƒ‰ã®ãƒ•ãƒ©ã‚°		*/
+extern int disk_exchange;	/* ãƒ‡ã‚£ã‚¹ã‚¯ç–‘ä¼¼å…¥ã‚Œæ›¿ãˆãƒ•ãƒ©ã‚°		*/
+extern int disk_ex_drv;		/* ãƒ‡ã‚£ã‚¹ã‚¯ç–‘ä¼¼å…¥ã‚Œæ›¿ãˆãƒ‰ãƒ©ã‚¤ãƒ–		*/
 
-extern	int	FDC_flag;			/* FDC ³ä¤ê¹ş¤ß¿®¹æ	*/
-extern	int	fdc_wait;			/* FDC ¤Î ¥¦¥¨¥¤¥È	*/
+extern	int	FDC_flag;			/* FDC å‰²ã‚Šè¾¼ã¿ä¿¡å·	*/
+extern	int	fdc_wait;			/* FDC ã® ã‚¦ã‚¨ã‚¤ãƒˆ	*/
 
-extern	int	fdc_ignore_readonly;	/* ÆÉ¹şÀìÍÑ»ş¡¢¥é¥¤¥È¤òÌµ»ë¤¹¤ë	*/
+extern	int	fdc_ignore_readonly;	/* èª­è¾¼å°‚ç”¨æ™‚ã€ãƒ©ã‚¤ãƒˆã‚’ç„¡è¦–ã™ã‚‹	*/
 
 
 
