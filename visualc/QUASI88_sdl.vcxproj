@@ -83,7 +83,7 @@
       <Optimization>MaxSpeed</Optimization>
       <InlineFunctionExpansion>OnlyExplicitInline</InlineFunctionExpansion>
       <AdditionalIncludeDirectories>..\dependencies\SDL\include;..\src;..\src\FWIN;..\src\SDL;..\src\snddrv;..\src\snddrv\quasi88;..\src\snddrv\quasi88\SDL;..\src\snddrv\src;..\src\snddrv\src\sound;..\src\fmgen;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>NDEBUG;WIN32;_WINDOWS;_CRT_SECURE_NO_WARNINGS;QUASI88_SDL;USE_SOUND;USE_FMGEN;SUPPORT_DOUBLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>NDEBUG;WIN32;_WINDOWS;_CRT_SECURE_NO_WARNINGS;QUASI88_SDL;USE_SOUND;USE_FMGEN;SUPPORT_DOUBLE;SUPPORT_UTF8;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <StringPooling>true</StringPooling>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
       <FunctionLevelLinking>true</FunctionLevelLinking>
@@ -131,7 +131,7 @@
       <Optimization>MaxSpeed</Optimization>
       <InlineFunctionExpansion>OnlyExplicitInline</InlineFunctionExpansion>
       <AdditionalIncludeDirectories>..\dependencies\SDL\include;..\src;..\src\FWIN;..\src\SDL;..\src\snddrv;..\src\snddrv\quasi88;..\src\snddrv\quasi88\SDL;..\src\snddrv\src;..\src\snddrv\src\sound;..\src\fmgen;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>NDEBUG;WIN32;_CONSOLE;_CRT_SECURE_NO_WARNINGS;QUASI88_SDL;USE_SOUND;USE_FMGEN;SUPPORT_DOUBLE;USE_MONITOR;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>NDEBUG;WIN32;_CONSOLE;_CRT_SECURE_NO_WARNINGS;QUASI88_SDL;USE_SOUND;USE_FMGEN;SUPPORT_DOUBLE;USE_MONITOR;SUPPORT_UTF8;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <StringPooling>true</StringPooling>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
       <FunctionLevelLinking>true</FunctionLevelLinking>
@@ -178,7 +178,7 @@
     <ClCompile>
       <Optimization>Disabled</Optimization>
       <AdditionalIncludeDirectories>..\dependencies\SDL\include;..\src;..\src\FWIN;..\src\SDL;..\src\snddrv;..\src\snddrv\quasi88;..\src\snddrv\quasi88\SDL;..\src\snddrv\src;..\src\snddrv\src\sound;..\src\fmgen;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>_DEBUG;WIN32;_CONSOLE;_CRT_SECURE_NO_WARNINGS;QUASI88_SDL;USE_SOUND;USE_FMGEN;SUPPORT_DOUBLE;USE_MONITOR;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>_DEBUG;WIN32;_CONSOLE;_CRT_SECURE_NO_WARNINGS;QUASI88_SDL;USE_SOUND;USE_FMGEN;SUPPORT_DOUBLE;USE_MONITOR;SUPPORT_UTF8;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <MinimalRebuild>true</MinimalRebuild>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
