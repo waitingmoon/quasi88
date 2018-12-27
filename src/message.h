@@ -368,9 +368,9 @@ static const t_menulabel data_cpu_clock[] =
   { { " CLOCK     ",          " 周波数 "              }, },
   { { "[MHz] ",               "[MHz] "                }, },
 #if USE_RETROACHIEVEMENTS
-  { { "(Range = 4.0-999.9) ", "（範囲＝4.0〜999.9） " }, },
+  { { "(Range = 4.0-998.4) ", "（範囲＝4.0〜998.4） " }, },
 #else
-  { { "(Range = 0.1-999.9) ", "（範囲＝0.1〜999.9） " }, },
+  { { "(Range = 0.1-998.4) ", "（範囲＝0.1〜998.4） " }, },
 #endif
 };
 static const t_menudata data_cpu_clock_combo[] =
