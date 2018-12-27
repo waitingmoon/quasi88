@@ -1060,6 +1060,11 @@ static	void	cb_cpu_clock(Q8tkWidget *widget, void *mode)
     char buf[16], *conv_end;
     double val = 0;
     int fit = FALSE;
+#if USE_RETROACHIEVEMENTS
+    double min_val = 3.9936;
+#else
+    double min_val = 0.1;
+#endif
 
     /* COMBO BOX から ENTRY に一致するものを探す */
     for (i=0; i<COUNTOF(data_cpu_clock_combo); i++, p++) {
@@ -1092,7 +1097,7 @@ static	void	cb_cpu_clock(Q8tkWidget *widget, void *mode)
     }
 
     if (fit) {				/* 適用した値が有効範囲なら、セット */
-	if (0.1 <= val && val < 1000.0) {
+	if (min_val <= val && val < 1000.0) {
 	    cpu_clock_mhz = val;
 	    interval_work_init_all();
 	}

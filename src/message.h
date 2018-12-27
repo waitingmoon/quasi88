@@ -367,12 +367,18 @@ static const t_menulabel data_cpu_clock[] =
 {
   { { " CLOCK     ",          " 周波数 "              }, },
   { { "[MHz] ",               "[MHz] "                }, },
+#if USE_RETROACHIEVEMENTS
+  { { "(Range = 4.0-999.9) ", "（範囲＝4.0〜999.9） " }, },
+#else
   { { "(Range = 0.1-999.9) ", "（範囲＝0.1〜999.9） " }, },
+#endif
 };
 static const t_menudata data_cpu_clock_combo[] =
 {
+#if !USE_RETROACHIEVEMENTS
   { { " ( 1MHz) ",  " ( 1MHz) ", }, (int)(CONST_4MHZ_CLOCK * 1000000.0/4) },
   { { " ( 2MHz) ",  " ( 2MHz) ", }, (int)(CONST_4MHZ_CLOCK * 1000000.0/2) },
+#endif
   { { "== 4MHz==",  "== 4MHz==", }, (int)(CONST_4MHZ_CLOCK * 1000000.0)   },
   { { " ( 8MHz) ",  " ( 8MHz) ", }, (int)(CONST_8MHZ_CLOCK * 1000000.0)   },
   { { " (16MHz) ",  " (16MHz) ", }, (int)(CONST_8MHZ_CLOCK * 1000000.0*2) },
