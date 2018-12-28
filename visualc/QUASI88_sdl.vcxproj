@@ -9,8 +9,8 @@
       <Configuration>Monitor</Configuration>
       <Platform>Win32</Platform>
     </ProjectConfiguration>
-    <ProjectConfiguration Include="ReleaseNoAchievements|Win32">
-      <Configuration>ReleaseNoAchievements</Configuration>
+    <ProjectConfiguration Include="ReleaseAchievements|Win32">
+      <Configuration>ReleaseAchievements</Configuration>
       <Platform>Win32</Platform>
     </ProjectConfiguration>
     <ProjectConfiguration Include="Release|Win32">
@@ -40,7 +40,7 @@
     <UseOfMfc>false</UseOfMfc>
     <CharacterSet>MultiByte</CharacterSet>
   </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='ReleaseNoAchievements|Win32'" Label="Configuration">
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='ReleaseAchievements|Win32'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <PlatformToolset>v141</PlatformToolset>
     <UseOfMfc>false</UseOfMfc>
@@ -61,7 +61,7 @@
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
     <Import Project="$(VCTargetsPath)Microsoft.CPP.UpgradeFromVC60.props" />
   </ImportGroup>
-  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='ReleaseNoAchievements|Win32'" Label="PropertySheets">
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='ReleaseAchievements|Win32'" Label="PropertySheets">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
     <Import Project="$(VCTargetsPath)Microsoft.CPP.UpgradeFromVC60.props" />
   </ImportGroup>
@@ -74,7 +74,7 @@
     <IntDir>./sdl/Release\</IntDir>
     <LinkIncremental>false</LinkIncremental>
   </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='ReleaseNoAchievements|Win32'">
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='ReleaseAchievements|Win32'">
     <OutDir>./sdl/Release\</OutDir>
     <IntDir>./sdl/Release\</IntDir>
     <LinkIncremental>false</LinkIncremental>
@@ -101,7 +101,7 @@
     <ClCompile>
       <Optimization>MaxSpeed</Optimization>
       <InlineFunctionExpansion>OnlyExplicitInline</InlineFunctionExpansion>
-      <AdditionalIncludeDirectories>..\dependencies\SDL\include;..\dependencies\RAIntegration\src;..\src;..\src\FWIN;..\src\SDL;..\src\snddrv;..\src\snddrv\quasi88;..\src\snddrv\quasi88\SDL;..\src\snddrv\src;..\src\snddrv\src\sound;..\src\fmgen;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\dependencies\SDL\include;..\src;..\src\FWIN;..\src\SDL;..\src\snddrv;..\src\snddrv\quasi88;..\src\snddrv\quasi88\SDL;..\src\snddrv\src;..\src\snddrv\src\sound;..\src\fmgen;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>NDEBUG;WIN32;_WINDOWS;_CRT_SECURE_NO_WARNINGS;QUASI88_SDL;USE_SOUND;USE_FMGEN;SUPPORT_DOUBLE;SUPPORT_UTF8;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <StringPooling>true</StringPooling>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
@@ -138,7 +138,7 @@
       <Command>copy /Y "$(SolutionDir)lib\Release_Win32\SDL.dll" "$(TargetDir)"</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
-  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='ReleaseNoAchievements|Win32'">
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='ReleaseAchievements|Win32'">
     <Midl>
       <PreprocessorDefinitions>NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <MkTypLibCompatible>true</MkTypLibCompatible>
@@ -201,7 +201,7 @@
     <ClCompile>
       <Optimization>MaxSpeed</Optimization>
       <InlineFunctionExpansion>OnlyExplicitInline</InlineFunctionExpansion>
-      <AdditionalIncludeDirectories>..\dependencies\SDL\include;..\dependencies\RAIntegration\src;..\src;..\src\FWIN;..\src\SDL;..\src\snddrv;..\src\snddrv\quasi88;..\src\snddrv\quasi88\SDL;..\src\snddrv\src;..\src\snddrv\src\sound;..\src\fmgen;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\dependencies\SDL\include;..\src;..\src\FWIN;..\src\SDL;..\src\snddrv;..\src\snddrv\quasi88;..\src\snddrv\quasi88\SDL;..\src\snddrv\src;..\src\snddrv\src\sound;..\src\fmgen;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>NDEBUG;WIN32;_CONSOLE;_CRT_SECURE_NO_WARNINGS;QUASI88_SDL;USE_SOUND;USE_FMGEN;SUPPORT_DOUBLE;USE_MONITOR;SUPPORT_UTF8;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <StringPooling>true</StringPooling>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
@@ -249,7 +249,7 @@
     </Midl>
     <ClCompile>
       <Optimization>Disabled</Optimization>
-      <AdditionalIncludeDirectories>..\dependencies\SDL\include;..\dependencies\RAIntegration\src;..\src;..\src\FWIN;..\src\SDL;..\src\snddrv;..\src\snddrv\quasi88;..\src\snddrv\quasi88\SDL;..\src\snddrv\src;..\src\snddrv\src\sound;..\src\fmgen;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\dependencies\SDL\include;..\src;..\src\FWIN;..\src\SDL;..\src\snddrv;..\src\snddrv\quasi88;..\src\snddrv\quasi88\SDL;..\src\snddrv\src;..\src\snddrv\src\sound;..\src\fmgen;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>_DEBUG;WIN32;_CONSOLE;_CRT_SECURE_NO_WARNINGS;QUASI88_SDL;USE_SOUND;USE_FMGEN;SUPPORT_DOUBLE;USE_MONITOR;SUPPORT_UTF8;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <MinimalRebuild>true</MinimalRebuild>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
