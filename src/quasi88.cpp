@@ -1004,7 +1004,17 @@ unsigned long disk_len[2] = { 0 };
 
 int	quasi88_disk_insert_all(const char *filename, int ro)
 {
-    int success;
+    int success = FALSE;
+
+#if USE_RETROACHIEVEMENTS
+    if (disk_image_exist(DRIVE_1))
+    {
+        if (!RA_ConfirmLoadNewRom(false))
+        {
+            return success;
+        }
+    }
+#endif
 
     quasi88_disk_eject_all();
 
@@ -1026,6 +1036,15 @@ int	quasi88_disk_insert(int drv, const char *filename, int image, int ro)
 {
     int success = FALSE;
 
+#if USE_RETROACHIEVEMENTS
+    if (drv == DRIVE_1 && disk_image_exist(drv))
+    {
+        if (!RA_ConfirmLoadNewRom(false))
+        {
+            return success;
+        }
+    }
+#endif
     quasi88_disk_eject(drv);
 
     if (strlen(filename) < QUASI88_MAX_FILENAME) {
