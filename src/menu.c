@@ -1170,6 +1170,12 @@ static	void	cb_cpu_wait(Q8tkWidget *widget, void *mode)
     char buf[16], *conv_end;
     int val = 0;
     int fit = FALSE;
+#if USE_RETROACHIEVEMENTS
+    int min_val = 100;
+#else
+    int min_val = 5;
+#endif
+    int max_val = 5000;
 
     /* COMBO BOX から ENTRY に一致するものを探す */
     for (i=0; i<COUNTOF(data_cpu_wait_combo); i++, p++) {
@@ -1201,9 +1207,15 @@ static	void	cb_cpu_wait(Q8tkWidget *widget, void *mode)
     }
 
     if (fit) {				/* 適用した値が有効範囲なら、セット */
-	if (5 <= val && val <= 5000) {
+	if (min_val <= val && val <= max_val) {
 	    wait_rate = val;
 	}
+    else if (val < min_val) {
+        wait_rate = min_val;
+    }
+    else /* if (val > max_val) */ {
+        wait_rate = max_val;
+    }
     }
 
     if ((int)mode == 0) {		/* COMBO ないし ENTER時は、値を再表示*/

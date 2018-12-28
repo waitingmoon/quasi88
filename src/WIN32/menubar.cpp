@@ -915,10 +915,14 @@ static	void	f_set_speed(UINT uItem, int data)
 {
     if (menubar_active == FALSE) { return; }
 
-    CheckMenuRadioItem(g_hMenu, M_SET_SPD_25, M_SET_SPD_400, uItem,
-		       MF_BYCOMMAND);
     {
 	quasi88_cfg_set_wait_rate((int)data);
+    }
+
+    if (quasi88_cfg_now_wait_rate() == data)
+    {
+        CheckMenuRadioItem(g_hMenu, M_SET_SPD_25, M_SET_SPD_400, uItem,
+            MF_BYCOMMAND);
     }
 }
 

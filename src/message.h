@@ -398,7 +398,11 @@ static const t_menulabel data_cpu_wait[] =
   { { "No Wait             ", "ウエイトなしにする  "  } },
   { { " Rate of Speed ",      " 速度比     "          } },
   { { "[%]   ",               "[％]  "                } },
+#if USE_RETROACHIEVEMENTS
+  { { "(Range =   100-5000)  ", "（範囲＝  100〜5000）  " } },
+#else
   { { "(Range =   5-5000)  ", "（範囲＝  5〜5000）  " } },
+#endif
 };
 static const t_menudata data_cpu_wait_combo[] =
 {

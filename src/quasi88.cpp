@@ -697,6 +697,11 @@ void	quasi88_reset(const T_RESET_CFG *cfg)
     emu_reset();
 
 #if USE_RETROACHIEVEMENTS
+    if (quasi88_cfg_now_wait_rate() < 100)
+    {
+        quasi88_cfg_set_wait_rate(100);
+    }
+
     RA_OnReset();
 #endif
 
@@ -930,6 +935,13 @@ void	quasi88_cfg_set_wait_rate(int rate)
     char str[32];
     long dt;
 
+#if USE_RETROACHIEVEMENTS
+    if (rate < 100)
+    {
+        if (!RA_WarnDisableHardcore("set the speed below 100%"))
+            return;
+    }
+#endif
     if (rate < 5)    rate = 5;
     if (rate > 5000) rate = 5000;
 
