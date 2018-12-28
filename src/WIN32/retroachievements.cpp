@@ -7,6 +7,7 @@ extern "C"
 
     #include "device.h"
     #include "initval.h"
+    #include "keyboard.h"
     #include "memory.h"
     #include "quasi88.h"
     #include "screen.h"
@@ -222,7 +223,15 @@ void RA_RenderOverlayFrame(HDC hdc)
     }
 
     RECT window_size = { 0, 0, width, height };
+
     ControllerInput input;
+    input.m_bConfirmPressed = IS_KEY88_PRESS(KEY88_RETURN);
+    input.m_bCancelPressed = IS_KEY88_PRESS(KEY88_BS);
+    input.m_bQuitPressed = IS_KEY88_PRESS(KEY88_ESC);
+    input.m_bLeftPressed = IS_KEY88_PRESS(KEY88_LEFT);
+    input.m_bRightPressed = IS_KEY88_PRESS(KEY88_RIGHT);
+    input.m_bUpPressed = IS_KEY88_PRESS(KEY88_UP);
+    input.m_bDownPressed = IS_KEY88_PRESS(KEY88_DOWN);
 
     RA_UpdateRenderOverlay(hdc, &input, delta_time, &window_size, use_fullscreen, (bool)quasi88_is_pause());
 
