@@ -79,7 +79,7 @@
     <OutDir>./win32/Debug\</OutDir>
     <IntDir>./win32/Debug\</IntDir>
     <LinkIncremental>true</LinkIncremental>
-    <LocalDebuggerCommand>$(TargetDir)\RAQUASI88.exe</LocalDebuggerCommand>
+    <LocalDebuggerCommand>./win32/Debug/RAQUASI88.exe</LocalDebuggerCommand>
     <DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -91,7 +91,7 @@
     <OutDir>./win32/Release\</OutDir>
     <IntDir>./win32/Release\</IntDir>
     <LinkIncremental>false</LinkIncremental>
-    <LocalDebuggerCommand>$(TargetDir)\RAQUASI88.exe</LocalDebuggerCommand>
+    <LocalDebuggerCommand>./win32/Release/RAQUASI88.exe</LocalDebuggerCommand>
     <DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
