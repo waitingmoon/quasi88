@@ -470,6 +470,9 @@ void	quasi88_exec(void)
 {
     set_mode(EXEC);
     set_emu_exec_mode(GO);
+#if USE_RETROACHIEVEMENTS
+    RA_SetPaused(false);
+#endif
 }
 
 void	quasi88_exec_step(void)
@@ -498,6 +501,9 @@ void	quasi88_menu(void)
 void	quasi88_pause(void)
 {
     set_mode(PAUSE);
+#if USE_RETROACHIEVEMENTS
+    RA_SetPaused(true);
+#endif
 }
 
 void	quasi88_monitor(void)
