@@ -198,6 +198,8 @@ int RA_HandleMenuEvent(int id)
 }
 
 static unsigned long last_tick = timeGetTime();
+static bool should_display_overlay = false; /* オーバーレイを表示する */
+static bool was_overlay_key_pressed = false; /* オーバーレイを表示させるキーが押されている */
 void RA_RenderOverlayFrame(HDC hdc)
 {
     if (!hdc)
@@ -233,7 +235,18 @@ void RA_RenderOverlayFrame(HDC hdc)
     input.m_bUpPressed = IS_KEY88_PRESS(KEY88_UP);
     input.m_bDownPressed = IS_KEY88_PRESS(KEY88_DOWN);
 
-    RA_UpdateRenderOverlay(hdc, &input, delta_time, &window_size, use_fullscreen, (bool)quasi88_is_pause());
+    if (input.m_bQuitPressed && !was_overlay_key_pressed)
+    {
+        //MessageBox(NULL, "yeah!", NULL, 0);
+        was_overlay_key_pressed = true;
+        should_display_overlay != should_display_overlay;
+    }
+    else if (IS_KEY88_RELEASE(KEY88_ESC))
+    {
+        was_overlay_key_pressed = false;
+    }
+
+    RA_UpdateRenderOverlay(hdc, &input, delta_time, &window_size, use_fullscreen, should_display_overlay);
 
     last_tick = timeGetTime();
 }
