@@ -74,24 +74,28 @@
     <OutDir>./win32/Debug\</OutDir>
     <IntDir>./win32/Debug\</IntDir>
     <LinkIncremental>true</LinkIncremental>
+	<LocalDebuggerWorkingDirectory>./win32/Debug\</LocalDebuggerWorkingDirectory>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='DebugAchievements|Win32'">
     <OutDir>./win32/Debug\</OutDir>
     <IntDir>./win32/Debug\</IntDir>
     <LinkIncremental>true</LinkIncremental>
     <LocalDebuggerCommand>./win32/Debug/RAQUASI88.exe</LocalDebuggerCommand>
+	<LocalDebuggerWorkingDirectory>./win32/Debug\</LocalDebuggerWorkingDirectory>
     <DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <OutDir>./win32/Release\</OutDir>
     <IntDir>./win32/Release\</IntDir>
     <LinkIncremental>false</LinkIncremental>
+	<LocalDebuggerWorkingDirectory>./win32/Release\</LocalDebuggerWorkingDirectory>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='ReleaseAchievements|Win32'">
     <OutDir>./win32/Release\</OutDir>
     <IntDir>./win32/Release\</IntDir>
     <LinkIncremental>false</LinkIncremental>
     <LocalDebuggerCommand>./win32/Release/RAQUASI88.exe</LocalDebuggerCommand>
+	<LocalDebuggerWorkingDirectory>./win32/Debug\</LocalDebuggerWorkingDirectory>
     <DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
