@@ -146,7 +146,7 @@ void RA_InitShared()
 static HDC main_hdc;
 void RA_InitUI()
 {
-    RA_Init(g_hWnd, /* RA_Quasi88 */ 9, Q_VERSION);
+    RA_Init(g_hWnd, RA_QUASI88, Q_VERSION);
     RA_InitShared();
     RebuildMenu();
     RA_AttemptLogin(true);
