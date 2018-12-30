@@ -748,11 +748,6 @@ int	quasi88_stateload(int serial)
 {
     int now_board, success = 0;
 
-#if USE_RETROACHIEVEMENTS
-    if (!RA_WarnDisableHardcore("load a state"))
-        return success;
-#endif
-
     if (serial >= 0) {			/* 連番指定あり (>=0) なら */
 	filename_set_state_serial(serial);	/* 連番を設定する */
     }
@@ -768,6 +763,13 @@ int	quasi88_stateload(int serial)
 	return FALSE;
     }
 
+#if USE_RETROACHIEVEMENTS
+    if (!RA_WarnDisableHardcore("load a state"))
+    {
+        if (verbose_proc) printf("State-Load cancelled (RA)\n");
+        return FALSE;
+    }
+#endif
 
     pc88main_term();			/* 念のため、ワークを終了状態に */
     pc88sub_term();
