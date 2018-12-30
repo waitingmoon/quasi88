@@ -1034,16 +1034,6 @@ int	quasi88_disk_insert_all(const char *filename, int ro)
 {
     int success = FALSE;
 
-#if USE_RETROACHIEVEMENTS
-    if (disk_image_exist(DRIVE_1))
-    {
-        if (!RA_ConfirmLoadNewRom(false))
-        {
-            return success;
-        }
-    }
-#endif
-
     quasi88_disk_eject_all();
 
     success = quasi88_disk_insert(DRIVE_1, filename, 0, ro);
