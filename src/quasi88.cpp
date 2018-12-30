@@ -119,6 +119,11 @@ void	quasi88_start(void)
 
 #if USE_RETROACHIEVEMENTS
     RA_InitUI();    /* 実績システム初期化 */
+
+    if (quasi88_cfg_now_wait_rate() < 100 && RA_HardcoreModeIsActive())
+    {
+        quasi88_cfg_set_wait_rate(100);
+    }
 #endif                      /* (ここもscreen_initの後で) */
 
     					/* サウンドドライバ初期化	*/
@@ -700,16 +705,17 @@ void	quasi88_reset(const T_RESET_CFG *cfg)
 
     /*if (xmame_has_sound()) xmame_sound_reset();*/
 
-    emu_reset();
-
 #if USE_RETROACHIEVEMENTS
-    if (quasi88_cfg_now_wait_rate() < 100)
+    if (quasi88_cfg_now_wait_rate() < 100 && RA_HardcoreModeIsActive())
     {
         quasi88_cfg_set_wait_rate(100);
+        event_switch();
     }
 
     RA_OnReset();
 #endif
+
+    emu_reset();
 
     if (verbose_proc) printf("Reset QUASI88...done\n");
 }
