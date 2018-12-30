@@ -120,9 +120,15 @@ void RebuildMenu()
 
 void GetEstimatedGameTitle(char* sNameOut)
 {
+    const int BUF_SIZE = 64;
+
     if (loaded_title[0] != NULL)
     {
-        sNameOut = (char*)loaded_title;
+        memcpy(sNameOut, loaded_title, BUF_SIZE);
+    }
+    else
+    {
+        memset(sNameOut, 0, BUF_SIZE);
     }
 }
 
