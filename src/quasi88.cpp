@@ -771,9 +771,6 @@ int	quasi88_stateload(int serial)
         if (success)
         {
             printf("Stateload...done\n");
-#if USE_RETROACHIEVEMENTS
-            RA_OnLoadState(filename_get_state());
-#endif
         }
 	else         printf("Stateload...Failed, Reset start\n");
     }
@@ -785,6 +782,10 @@ int	quasi88_stateload(int serial)
 
 	pc88main_init(INIT_STATELOAD);
 	pc88sub_init(INIT_STATELOAD);
+
+#if USE_RETROACHIEVEMENTS
+    RA_OnLoadState(filename_get_state());
+#endif
 
     } else {				/* ステートロード失敗したら・・・ */
 
@@ -829,9 +830,6 @@ int	quasi88_statesave(int serial)
         if (success)
         {
             printf("Statesave...done\n");
-#if USE_RETROACHIEVEMENTS
-            RA_OnSaveState(filename_get_state());
-#endif
         }
 	else         printf("Statesave...Failed, Reset done\n");
     }
@@ -839,6 +837,9 @@ int	quasi88_statesave(int serial)
 
     if (quasi88_is_exec()) {
 	if (success) {
+#if USE_RETROACHIEVEMENTS
+        RA_OnSaveState(filename_get_state());
+#endif
 	    status_message(1, STATUS_INFO_TIME, "State-Save Successful");
 	} else {
 	    status_message(1, STATUS_INFO_TIME, "State-Save Failed !");
