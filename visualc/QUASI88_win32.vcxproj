@@ -71,32 +71,30 @@
     <_ProjectFileVersion>15.0.27625.0</_ProjectFileVersion>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-    <OutDir>./win32/Debug\</OutDir>
-    <IntDir>./win32/Debug\</IntDir>
+    <OutDir>$(SolutionDir)\win32\Debug\</OutDir>
+    <IntDir>$(SolutionDir)\win32\Debug\obj\</IntDir>
     <LinkIncremental>true</LinkIncremental>
-	<LocalDebuggerWorkingDirectory>./win32/Debug\</LocalDebuggerWorkingDirectory>
+    <LocalDebuggerWorkingDirectory>$(OutDir)</LocalDebuggerWorkingDirectory>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='DebugAchievements|Win32'">
-    <OutDir>./win32/Debug\</OutDir>
-    <IntDir>./win32/Debug\</IntDir>
+    <OutDir>$(SolutionDir)\win32\Debug\</OutDir>
+    <IntDir>$(SolutionDir)\win32\Debug\obj\</IntDir>
     <LinkIncremental>true</LinkIncremental>
-    <LocalDebuggerCommand>./win32/Debug/RAQUASI88.exe</LocalDebuggerCommand>
-	<LocalDebuggerWorkingDirectory>./win32/Debug\</LocalDebuggerWorkingDirectory>
-    <DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>
+    <TargetName>RAQUASI88</TargetName>
+    <LocalDebuggerWorkingDirectory>$(OutDir)</LocalDebuggerWorkingDirectory>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
-    <OutDir>./win32/Release\</OutDir>
-    <IntDir>./win32/Release\</IntDir>
+    <OutDir>$(SolutionDir)\win32\Release\</OutDir>
+    <IntDir>$(SolutionDir)\win32\Release\obj\</IntDir>
     <LinkIncremental>false</LinkIncremental>
-	<LocalDebuggerWorkingDirectory>./win32/Release\</LocalDebuggerWorkingDirectory>
+    <LocalDebuggerWorkingDirectory>$(OutDir)</LocalDebuggerWorkingDirectory>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='ReleaseAchievements|Win32'">
-    <OutDir>./win32/Release\</OutDir>
-    <IntDir>./win32/Release\</IntDir>
+    <OutDir>$(SolutionDir)\win32\Release\</OutDir>
+    <IntDir>$(SolutionDir)\win32\Release\obj\</IntDir>
     <LinkIncremental>false</LinkIncremental>
-    <LocalDebuggerCommand>./win32/Release/RAQUASI88.exe</LocalDebuggerCommand>
-	<LocalDebuggerWorkingDirectory>./win32/Debug\</LocalDebuggerWorkingDirectory>
-    <DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>
+    <TargetName>RAQUASI88</TargetName>
+    <LocalDebuggerWorkingDirectory>$(OutDir)</LocalDebuggerWorkingDirectory>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <Midl>
@@ -104,7 +102,7 @@
       <MkTypLibCompatible>true</MkTypLibCompatible>
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <TargetEnvironment>Win32</TargetEnvironment>
-      <TypeLibraryName>./win32/Debug/QUASI88_win32.tlb</TypeLibraryName>
+      <TypeLibraryName>$(IntDir)QUASI88_win32.tlb</TypeLibraryName>
       <HeaderFileName />
     </Midl>
     <ClCompile>
@@ -114,10 +112,10 @@
       <MinimalRebuild>true</MinimalRebuild>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
-      <PrecompiledHeaderOutputFile>win32/Debug/QUASI88_win32.pch</PrecompiledHeaderOutputFile>
-      <AssemblerListingLocation>./win32/Debug/</AssemblerListingLocation>
-      <ObjectFileName>./win32/Debug/</ObjectFileName>
-      <ProgramDataBaseFileName>./win32/Debug/</ProgramDataBaseFileName>
+      <PrecompiledHeaderOutputFile>$(IntDir)QUASI88_win32.pch</PrecompiledHeaderOutputFile>
+      <AssemblerListingLocation>$(IntDir)</AssemblerListingLocation>
+      <ObjectFileName>$(IntDir)</ObjectFileName>
+      <ProgramDataBaseFileName>$(OutDir)</ProgramDataBaseFileName>
       <WarningLevel>Level3</WarningLevel>
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <DebugInformationFormat>EditAndContinue</DebugInformationFormat>
@@ -131,10 +129,10 @@
     </ResourceCompile>
     <Link>
       <AdditionalDependencies>odbc32.lib;odbccp32.lib;imm32.lib;winmm.lib;winhttp.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <OutputFile>win32/Debug/QUASI88_win32.exe</OutputFile>
+      <OutputFile>$(OutDir)QUASI88_win32.exe</OutputFile>
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <ProgramDatabaseFile>./win32/Debug/QUASI88_win32.pdb</ProgramDatabaseFile>
+      <ProgramDatabaseFile>$(OutDir)QUASI88_win32.pdb</ProgramDatabaseFile>
       <SubSystem>Windows</SubSystem>
       <RandomizedBaseAddress>false</RandomizedBaseAddress>
       <DataExecutionPrevention />
@@ -142,7 +140,7 @@
     </Link>
     <Bscmake>
       <SuppressStartupBanner>true</SuppressStartupBanner>
-      <OutputFile>win32/Debug/QUASI88_win32.bsc</OutputFile>
+      <OutputFile>$(IntDir)RAQUASI88.bsc</OutputFile>
     </Bscmake>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='DebugAchievements|Win32'">
@@ -151,7 +149,7 @@
       <MkTypLibCompatible>true</MkTypLibCompatible>
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <TargetEnvironment>Win32</TargetEnvironment>
-      <TypeLibraryName>./win32/Debug/RAQUASI88.tlb</TypeLibraryName>
+      <TypeLibraryName>$(IntDir)QUASI88_win32.tlb</TypeLibraryName>
       <HeaderFileName>
       </HeaderFileName>
     </Midl>
@@ -162,10 +160,10 @@
       <MinimalRebuild>true</MinimalRebuild>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
-      <PrecompiledHeaderOutputFile>win32/Debug/RAQUASI88.pch</PrecompiledHeaderOutputFile>
-      <AssemblerListingLocation>./win32/Debug/</AssemblerListingLocation>
-      <ObjectFileName>./win32/Debug/</ObjectFileName>
-      <ProgramDataBaseFileName>./win32/Debug/</ProgramDataBaseFileName>
+      <PrecompiledHeaderOutputFile>$(IntDir)QUASI88_win32.pch</PrecompiledHeaderOutputFile>
+      <AssemblerListingLocation>$(IntDir)</AssemblerListingLocation>
+      <ObjectFileName>$(IntDir)</ObjectFileName>
+      <ProgramDataBaseFileName>$(OutDir)</ProgramDataBaseFileName>
       <WarningLevel>Level3</WarningLevel>
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <DebugInformationFormat>EditAndContinue</DebugInformationFormat>
@@ -179,10 +177,10 @@
     </ResourceCompile>
     <Link>
       <AdditionalDependencies>odbc32.lib;odbccp32.lib;imm32.lib;winmm.lib;winhttp.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <OutputFile>win32/Debug/RAQUASI88.exe</OutputFile>
+      <OutputFile>$(OutDir)RAQUASI88.exe</OutputFile>
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <ProgramDatabaseFile>./win32/Debug/RAQUASI88.pdb</ProgramDatabaseFile>
+      <ProgramDatabaseFile>$(OutDir)RAQUASI88.pdb</ProgramDatabaseFile>
       <SubSystem>Windows</SubSystem>
       <RandomizedBaseAddress>false</RandomizedBaseAddress>
       <DataExecutionPrevention>
@@ -191,7 +189,7 @@
     </Link>
     <Bscmake>
       <SuppressStartupBanner>true</SuppressStartupBanner>
-      <OutputFile>win32/Debug/RAQUASI88.bsc</OutputFile>
+      <OutputFile>$(IntDir)RAQUASI88.bsc</OutputFile>
     </Bscmake>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -200,7 +198,7 @@
       <MkTypLibCompatible>true</MkTypLibCompatible>
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <TargetEnvironment>Win32</TargetEnvironment>
-      <TypeLibraryName>./win32/Release/QUASI88_win32.tlb</TypeLibraryName>
+      <TypeLibraryName>$(IntDir)QUASI88_win32.tlb</TypeLibraryName>
       <HeaderFileName />
     </Midl>
     <ClCompile>
@@ -211,10 +209,10 @@
       <StringPooling>true</StringPooling>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <FunctionLevelLinking>true</FunctionLevelLinking>
-      <PrecompiledHeaderOutputFile>win32/Release/QUASI88_win32.pch</PrecompiledHeaderOutputFile>
-      <AssemblerListingLocation>./win32/Release/</AssemblerListingLocation>
-      <ObjectFileName>./win32/Release/</ObjectFileName>
-      <ProgramDataBaseFileName>./win32/Release/</ProgramDataBaseFileName>
+      <PrecompiledHeaderOutputFile>$(IntDir)QUASI88_win32.pch</PrecompiledHeaderOutputFile>
+      <AssemblerListingLocation>$(IntDir)</AssemblerListingLocation>
+      <ObjectFileName>$(IntDir)</ObjectFileName>
+      <ProgramDataBaseFileName>$(OutDir)</ProgramDataBaseFileName>
       <WarningLevel>Level3</WarningLevel>
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <DisableSpecificWarnings>
@@ -227,9 +225,9 @@
     </ResourceCompile>
     <Link>
       <AdditionalDependencies>odbc32.lib;odbccp32.lib;imm32.lib;winmm.lib;winhttp.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <OutputFile>win32/Release/QUASI88_win32.exe</OutputFile>
+      <OutputFile>$(OutDir)QUASI88_win32.exe</OutputFile>
       <SuppressStartupBanner>true</SuppressStartupBanner>
-      <ProgramDatabaseFile>./win32/Release/QUASI88_win32.pdb</ProgramDatabaseFile>
+      <ProgramDatabaseFile>$(OutDir)QUASI88_win32.pdb</ProgramDatabaseFile>
       <SubSystem>Windows</SubSystem>
       <RandomizedBaseAddress>false</RandomizedBaseAddress>
       <DataExecutionPrevention />
@@ -237,7 +235,7 @@
     </Link>
     <Bscmake>
       <SuppressStartupBanner>true</SuppressStartupBanner>
-      <OutputFile>win32/Release/QUASI88_win32.bsc</OutputFile>
+      <OutputFile>$(IntDir)RAQUASI88.bsc</OutputFile>
     </Bscmake>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='ReleaseAchievements|Win32'">
@@ -246,7 +244,7 @@
       <MkTypLibCompatible>true</MkTypLibCompatible>
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <TargetEnvironment>Win32</TargetEnvironment>
-      <TypeLibraryName>./win32/Release/RAQUASI88.tlb</TypeLibraryName>
+      <TypeLibraryName>$(IntDir)QUASI88_win32.tlb</TypeLibraryName>
       <HeaderFileName>
       </HeaderFileName>
     </Midl>
@@ -258,10 +256,10 @@
       <StringPooling>true</StringPooling>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <FunctionLevelLinking>true</FunctionLevelLinking>
-      <PrecompiledHeaderOutputFile>win32/Release/RAQUASI88.pch</PrecompiledHeaderOutputFile>
-      <AssemblerListingLocation>./win32/Release/</AssemblerListingLocation>
-      <ObjectFileName>./win32/Release/</ObjectFileName>
-      <ProgramDataBaseFileName>./win32/Release/</ProgramDataBaseFileName>
+      <PrecompiledHeaderOutputFile>$(IntDir)QUASI88_win32.pch</PrecompiledHeaderOutputFile>
+      <AssemblerListingLocation>$(IntDir)</AssemblerListingLocation>
+      <ObjectFileName>$(IntDir)</ObjectFileName>
+      <ProgramDataBaseFileName>$(OutDir)RAQUASI88.pdb</ProgramDataBaseFileName>
       <WarningLevel>Level3</WarningLevel>
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <DisableSpecificWarnings>
@@ -274,9 +272,9 @@
     </ResourceCompile>
     <Link>
       <AdditionalDependencies>odbc32.lib;odbccp32.lib;imm32.lib;winmm.lib;winhttp.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <OutputFile>win32/Release/RAQUASI88.exe</OutputFile>
+      <OutputFile>$(OutDir)RAQUASI88.exe</OutputFile>
       <SuppressStartupBanner>true</SuppressStartupBanner>
-      <ProgramDatabaseFile>./win32/Release/RAQUASI88.pdb</ProgramDatabaseFile>
+      <ProgramDatabaseFile>$(OutDir)RAQUASI88.pdb</ProgramDatabaseFile>
       <SubSystem>Windows</SubSystem>
       <RandomizedBaseAddress>false</RandomizedBaseAddress>
       <DataExecutionPrevention>
@@ -285,7 +283,7 @@
     </Link>
     <Bscmake>
       <SuppressStartupBanner>true</SuppressStartupBanner>
-      <OutputFile>win32/Release/RAQUASI88.bsc</OutputFile>
+      <OutputFile>$(IntDir)RAQUASI88.bsc</OutputFile>
     </Bscmake>
   </ItemDefinitionGroup>
   <ItemGroup>
