@@ -39,8 +39,13 @@
 #include "q8tk.h"
 
 
+/* メニューの言語           */
+#if LANG_EN
+int	menu_lang = MENU_ENGLISH;
+#else
+int	menu_lang = MENU_JAPAN;
+#endif
 
-int	menu_lang	= MENU_JAPAN;		/* メニューの言語           */
 int	menu_readonly	= FALSE;		/* ディスク選択ダイアログの */
 						/* 初期状態は ReadOnly ?    */
 int	menu_swapdrv	= FALSE;		/* ドライブの表示順序       */
