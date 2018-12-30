@@ -125,6 +125,7 @@ void GetEstimatedGameTitle(char* sNameOut)
     if (loaded_title[0] != NULL)
     {
         memcpy(sNameOut, loaded_title, BUF_SIZE);
+        sNameOut[BUF_SIZE - 1] = '\0';
     }
     else
     {
